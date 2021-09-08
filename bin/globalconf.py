@@ -41,13 +41,13 @@ c_station = globals()[f'config']['station']
 c_dut = globals()['config']['dut']
 c_count = globals()['config']['count_num']
 
-testlog = os.path.join(log_folder_date, f"{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
+testlog_file = os.path.join(log_folder_date, f"{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
 # load logger config
 logging_yaml = join(current_path, 'logging.yaml')
 print(logging_yaml)
 log_conf = YamlConfig(logging_yaml).read_yaml()
 res_log_conf = Template(json.dumps(log_conf)).safe_substitute(
-    {'log_file': testlog,
+    {'log_file': testlog_file,
      'critical_log': join(log_folder_date, 'critical_log.txt').replace('\\', '/'),
      'errors_log': join(log_folder_date, 'errors_log.txt').replace('\\', '/')})
 logging.config.dictConfig(yaml.safe_load(res_log_conf))
