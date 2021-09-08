@@ -28,8 +28,7 @@ MesMac = "FF:FF:FF:FF:FF"
 dut_mode = 'firefly'
 error_code_first_fail = ""
 error_details_first_fail = ""
-testlog = os.path.join(f"{c_station['log_folder']}", datetime.now().strftime('%Y%m%d'),
-                       f"{datetime.now().strftime('%H-%M-%S')}.txt")
+
 
 mes_shop_floor = f"http://{c_station['mes_shop_floor']}/api/TEST/serial/{sn}/station/{c_station['station_no']}/info"
 mes_result = f"http://{c_station['mes_result']}/api/TEST/serial/{sn}/station/{c_station['station_no']}/info"
