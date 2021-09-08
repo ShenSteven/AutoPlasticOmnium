@@ -1,0 +1,40 @@
+version: 1
+station:
+    debug: true
+    station_all: MBLT,SRF,RTT
+    station_name: MBLT
+    station_no: MBLT-3000
+    log_folder: $test_log_folder
+    log_server: 10.90.104.85
+    log_server_username: eero
+    log_server_password: eero
+    fix_flag: false
+    fix_com_port: COM3
+    fix_com_baudRate: 115200
+    GPIB_address: 9
+    testcase: SSI.xlsx
+    prompt: root@OpenWrt:/#
+    fail_continue: false
+    mes_shop_floor: 10.90.104.126:8080
+    mes_result: 10.90.104.104:8080
+    csv_column: csv_column.txt
+    test_software_version: 1.0.0.0
+dut:
+    dut_ip: 192.168.1.101
+    dut_com_port: COM7
+    dut_com_baudRate: 115200
+    ssh_port: 22
+    ssh_username: root
+    ssh_password: root
+    dut_modes:
+    - gateway
+    - leaf
+    - firefly
+    sn_len: 16
+    qsdk_ver: 029
+count_num:
+    continue_fail_count: 0
+    continue_fail_limit: 3
+    total_pass_count: 0
+    total_fail_count: 0
+    total_abort_count: 0
