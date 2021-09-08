@@ -8,9 +8,15 @@
 """
 from model.testcase import *
 
-def run():
+
+def run(is_cyclic=False):
     test_task = TestCase(r"F:\pyside2\scripts\fireflyALL.xlsx", 'MBLT')
-    test_task.run_suites(test_task.test_suites.copy(), True)
+
+    if is_cyclic:
+        while True:
+            test_task.run_suites(test_task.test_suites.copy(), True, 0, 2)
+    else:
+        test_task.run_suites(test_task.test_suites.copy(), True)
 
 
-run()
+run(True)

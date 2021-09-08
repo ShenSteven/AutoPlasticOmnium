@@ -1,7 +1,7 @@
 [
     {
         "SeqName": "VerifySFIS",
-        "test_serial": 0,
+        "index": 0,
         "test_steps": [
             {
                 "Bypass": "",
@@ -120,7 +120,7 @@
     },
     {
         "SeqName": "CurrentShortTest",
-        "test_serial": 1,
+        "index": 1,
         "test_steps": [
             {
                 "Bypass": "",
@@ -183,7 +183,7 @@
     },
     {
         "SeqName": "CurrentTest",
-        "test_serial": 2,
+        "index": 2,
         "test_steps": [
             {
                 "Bypass": "",
@@ -302,7 +302,7 @@
     },
     {
         "SeqName": "VoltageTest",
-        "test_serial": 3,
+        "index": 3,
         "test_steps": [
             {
                 "Bypass": "",
@@ -505,7 +505,7 @@
     },
     {
         "SeqName": "EnterUBootTransition",
-        "test_serial": 4,
+        "index": 4,
         "test_steps": [
             {
                 "Bypass": "",
@@ -652,7 +652,7 @@
     },
     {
         "SeqName": "ThermalShutdownTest",
-        "test_serial": 5,
+        "index": 5,
         "test_steps": [
             {
                 "Bypass": "",
@@ -743,7 +743,7 @@
     },
     {
         "SeqName": "ReadBoardRegisterValue",
-        "test_serial": 6,
+        "index": 6,
         "test_steps": [
             {
                 "Bypass": "",
@@ -778,7 +778,7 @@
     },
     {
         "SeqName": "ReadAndUpdateLuxQsdkVersion",
-        "test_serial": 7,
+        "index": 7,
         "test_steps": [
             {
                 "Bypass": "",
@@ -953,7 +953,7 @@
     },
     {
         "SeqName": "SaveIdentityInEnv",
-        "test_serial": 8,
+        "index": 8,
         "test_steps": [
             {
                 "Bypass": "",
@@ -1072,7 +1072,7 @@
     },
     {
         "SeqName": "CPUVersionTest",
-        "test_serial": 9,
+        "index": 9,
         "test_steps": [
             {
                 "Bypass": "",
@@ -1107,7 +1107,7 @@
     },
     {
         "SeqName": "CheckBZTBootloaderVersion",
-        "test_serial": 10,
+        "index": 10,
         "test_steps": [
             {
                 "Bypass": "",
@@ -1142,7 +1142,7 @@
     },
     {
         "SeqName": "LoadBZTFirmware",
-        "test_serial": 11,
+        "index": 11,
         "test_steps": [
             {
                 "Bypass": "",
@@ -1177,7 +1177,7 @@
     },
     {
         "SeqName": "SubsystemTest",
-        "test_serial": 12,
+        "index": 12,
         "test_steps": [
             {
                 "Bypass": "",
@@ -1296,7 +1296,7 @@
     },
     {
         "SeqName": "MMCReadWriteSpeedTest",
-        "test_serial": 13,
+        "index": 13,
         "test_steps": [
             {
                 "Bypass": "",
@@ -1527,7 +1527,7 @@
     },
     {
         "SeqName": "ResetButtonTest",
-        "test_serial": 14,
+        "index": 14,
         "test_steps": [
             {
                 "Bypass": "",
@@ -1674,7 +1674,7 @@
     },
     {
         "SeqName": "LEDFunctionTest",
-        "test_serial": 15,
+        "index": 15,
         "test_steps": [
             {
                 "Bypass": "",
@@ -2129,7 +2129,7 @@
     },
     {
         "SeqName": "EthernetSpeedTest",
-        "test_serial": 16,
+        "index": 16,
         "test_steps": [
             {
                 "Bypass": "",
@@ -2220,7 +2220,7 @@
     },
     {
         "SeqName": "CheckArtPartition",
-        "test_serial": 17,
+        "index": 17,
         "test_steps": [
             {
                 "Bypass": "",

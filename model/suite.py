@@ -7,6 +7,8 @@
 @Desc   : 
 """
 from datetime import datetime
+
+from bin.basefunc import IsNullOrEmpty
 from bin.globalconf import logger
 from model.product import test_phases
 from bin import globalvar as gv
@@ -57,13 +59,20 @@ class TestSuite:
             if not self.testResult:
                 setattr(gv.mesPhases, self.SeqName, str(self.testResult).upper())
 
-    def run_suite(self, global_fail_continue):
+    def run_suite(self, global_fail_continue, stepNo=None):
+        global step_result
+        step_result = False
         testPhase = test_phases()
         step_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
             for step in self.test_steps:
-                step_result = step.run_step(testPhase)
+                if stepNo is not None and step.index == stepNo:
+                    step_result = step.run_step(testPhase)
+                    step_result_list.append(step_result)
+                    break
+                if stepNo is None:
+                    step_result = step.run_step(testPhase)
                 step_result_list.append(step_result)
                 if not step_result and not (global_fail_continue or step.get_fail_continue()):
                     self.testResult = False

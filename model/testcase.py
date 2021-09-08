@@ -107,24 +107,29 @@ class TestCase:
         #     return False
         return True
 
-    def run_suites(self, test_suites, global_fail_continue=False, suite_no=None):
+    def run_suites(self, test_suites, global_fail_continue=False, suiteNo=None, stepNo=None):
+        global suite_result
+        suite_result = True
         suite_result_list = []
         try:
             for suite in test_suites:
-                if not IsNullOrEmpty(suite_no) and suite.index == suite_no:
-                    pass
-                else:
-                    suite_result = suite.run_suite(global_fail_continue)
+                if suiteNo is not None and suite.index == suiteNo:
+                    logger.debug(f'run single suite:{suiteNo},step{stepNo}:')
+                    suite_result = suite.run_suite(global_fail_continue, stepNo)
                     suite_result_list.append(suite_result)
-                    if not suite_result and not global_fail_continue:
-                        self._tResult = False
-                        break
-                    else:
-                        pass
+                    break
+                if suiteNo is None:
+                    suite_result = suite.run_suite(global_fail_continue)
+                suite_result_list.append(suite_result)
+                if not suite_result and not global_fail_continue:
+                    self._tResult = False
+                    break
+                else:
+                    pass
             self._tResult = all(suite_result_list)
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-            suite_result_list.append(self.upload_result_to_mes(gv.mes_result))
+            if suiteNo is None:
+                suite_result_list.append(self.upload_result_to_mes(gv.mes_result))
             self._tResult = all(suite_result_list)
 
         except Exception as e:
@@ -139,13 +144,15 @@ class TestCase:
             logger.info(
                 f"Test end and {'PASS' if self._tResult else 'FAIL'}!,ElapsedTime:{ElapsedTime},Symptom:"
                 f"{get_globalVal('error_code_first_fail')}:{get_globalVal('error_details_first_fail')}.")
-            logger.debug(json.dumps(gv.station, default=lambda o: o.__dict__,
-                                    sort_keys=False,
-                                    indent=4))
+            if suiteNo is None:
+                logger.debug(json.dumps(gv.station, default=lambda o: o.__dict__,
+                                        sort_keys=False,
+                                        indent=4))
 
 
 if __name__ == "__main__":
+    pass
     # ss = load_sequences_from_excel("./Config/fireflyALL.xlsx", 'MBLT')  # ./Config/fireflyALL.xlsx
-    testcase1 = TestCase(r"F:\pyside2\conf\fireflyALL.xlsx", 'MBLT')
-    testingSuite = testcase1.test_suites.copy()
-    testcase1.run_suites(testingSuite)
+    # testcase1 = TestCase(r"F:\pyside2\conf\fireflyALL.xlsx", 'MBLT')
+    # testingSuite = testcase1.test_suites.copy()
+    # testcase1.run_suites(testingSuite)
