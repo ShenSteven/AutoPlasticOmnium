@@ -80,15 +80,7 @@ class TestSuite:
                 else:
                     pass
             self.testResult = all(step_result_list)
-
-            self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-            self.elapsedTime = datetime.strptime(self.finish_time, '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(
-                self.start_time, '%Y-%m-%d %H:%M:%S.%f')
-            if self.testResult:
-                logger.info(f"{self.SeqName} Test Pass!,ElapsedTime:{self.elapsedTime}")
-            else:
-                logger.error(f"{self.SeqName} Test Fail!,ElapsedTime:{self.elapsedTime}")
-
+            self.print_result()
             self._process_mesVer()
             self.copy_to(testPhase)  # 把seq测试结果保存到test_phase变量中.
             gv.station.test_phases.append(testPhase)  # 加入station实例,记录测试结果 用于序列化Json文件
@@ -100,3 +92,12 @@ class TestSuite:
             return self.testResult
         finally:
             self.clear()
+
+    def print_result(self):
+        self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        self.elapsedTime = datetime.strptime(self.finish_time, '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(
+            self.start_time, '%Y-%m-%d %H:%M:%S.%f')
+        if self.testResult:
+            logger.info(f"{self.SeqName} Test Pass!,ElapsedTime:{self.elapsedTime}")
+        else:
+            logger.error(f"{self.SeqName} Test Fail!,ElapsedTime:{self.elapsedTime}")

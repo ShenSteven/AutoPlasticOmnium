@@ -6,8 +6,12 @@
 @Date   : 2021/9/2
 @Desc   : 
 """
+import csv
 import hashlib
+import os
 from enum import Enum
+
+from bin.globalconf import logger
 
 
 def binary_read(filepath):
@@ -44,3 +48,28 @@ class TestStatus(Enum):
     FAIL = 2
     START = 3
     ABORT = 4
+
+
+def create_csv_file(filename, header):
+    try:
+        if not os.path.exists(filename):
+            with open(filename, 'w', newline='') as f:
+                file = csv.writer(f)
+                file.writerow(header)
+    except Exception as e:
+        logger.exception(e)
+
+
+def write_csv_file(filename, row):
+    try:
+        with open(filename, 'a', newline='') as f:
+            file = csv.writer(f)
+            file.writerow(row)
+    except Exception as e:
+        logger.exception(e)
+
+
+if __name__ == '__main__':
+    create_csv_file('test.csv', ['No', 'Phase name', 'Test name', 'Error Code'])
+    write_csv_file('test.csv', ['1wqw', '2eqweq', '3ewqewqe', '4edsd'])
+    print(str(True))

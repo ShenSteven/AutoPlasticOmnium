@@ -54,6 +54,7 @@ class TestStep:
     Spec = None  # 测试定义的Spec
     error_code = ""
     error_details = ""
+    Json = None  # 测试结果是否生成Json数据上传给客户
 
     def __init__(self, isTest=True, retry_times=0):
         self.__retry_times = retry_times
@@ -196,6 +197,7 @@ class TestStep:
                 logger.debug(
                     f"Start step...{self.ItemName},Keyword:{self.TestKeyword},Retry:{self.RetryTimes},Timeout:"
                     f"{self.TimeOut}s,SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MES_var},FTC:{self.FTC}")
+
                 self.retry_times = self.RetryTimes
                 for retry in range(int(self.retry_times), -1, -1):
                     if test(retry, self):
@@ -207,18 +209,9 @@ class TestStep:
                 self.tResult = self._process_if_bypass(test_result)
                 self._process_mesVer()
 
-                self.elapsedTime = (
-                        datetime.now() - datetime.strptime(self.start_time, '%Y-%m-%d %H:%M:%S.%f')).microseconds
-                if self.tResult:
-                    logger.info(
-                        f"{self.ItemName} {'pass' if self.tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}ms,"
-                        f"Symptom:{self.error_code}:{self.error_details},"
-                        f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.TestValue},Max:{self.Limit_max}")
-                else:
-                    logger.error(
-                        f"{self.ItemName} {'pass' if self.tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}ms,"
-                        f"Symptom:{self.error_code}:{self.error_details},"
-                        f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.TestValue},Max:{self.Limit_max}")
+                self.collect_result()
+
+                self.print_result()
                 # 给Json格式对象赋值
                 self.copy_to(phaseItem)
                 testPhase.phase_items.append(phaseItem)
@@ -233,6 +226,33 @@ class TestStep:
             return self.tResult
         finally:
             self.clear()
+
+    def print_result(self):
+        self.elapsedTime = (
+                datetime.now() - datetime.strptime(self.start_time, '%Y-%m-%d %H:%M:%S.%f')).microseconds
+        if self.tResult:
+            logger.info(
+                f"{self.ItemName} {'pass' if self.tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}ms,"
+                f"Symptom:{self.error_code}:{self.error_details},"
+                f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.TestValue},Max:{self.Limit_max}")
+        else:
+            logger.error(
+                f"{self.ItemName} {'pass' if self.tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}ms,"
+                f"Symptom:{self.error_code}:{self.error_details},"
+                f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.TestValue},Max:{self.Limit_max}")
+
+    def collect_result(self):
+        # if IsNullOrEmpty(self.Json):
+        print(f'{self.Spec},{self.Limit_min},{self.Limit_max}')
+        if not IsNullOrEmpty(self.Spec):
+            gv.csv_list_header.extend([self.ItemName, "SPEC"])
+            gv.csv_list_result.extend([self.TestValue, self.Spec])
+        elif not IsNullOrEmpty(self.Limit_max) or not IsNullOrEmpty(self.Limit_min):
+            gv.csv_list_header.extend([self.ItemName, "LIMIT_MIN", "LIMIT_MAX"])
+            gv.csv_list_result.extend([self.TestValue, self.Limit_min, self.Limit_max])
+        else:
+            gv.csv_list_header.append(self.ItemName)
+            gv.csv_list_result.append(self.tResult)
 
 # def wrapper(self, flag):
 #     def wrapper(func):
