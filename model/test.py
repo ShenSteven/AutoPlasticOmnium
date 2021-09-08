@@ -67,6 +67,7 @@ def test(retry_time, item):
         elif item.TestKeyword == '':
             rReturn = True
         else:
+            logger.debug('run test step')
             pass
             # rReturn, revStr = comm.SendCommand(item.ComdSend, item.ExpectStr, item.TimeOut)
             # if rReturn:

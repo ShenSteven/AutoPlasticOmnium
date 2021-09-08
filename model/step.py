@@ -24,7 +24,7 @@ class TestStep:
     index = 0  # 当前测试step序列号
     tResult = False  # 测试项测试结果
     # isTest = True  # 是否测试,不测试的跳过
-    startIndex = 0  # 需要执行的step index
+    startIndex = 0  # 需要执行的step suite_no
     start_time = None  # 测试项的开始时
     TestValue = None  # 测试得到的值
     elapsedTime = None  # 测试步骤耗时
@@ -90,13 +90,13 @@ class TestStep:
     @test_spec.setter
     def test_spec(self, value):
         for a in re.findall(r'<(.*?)>', value):
-            value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+            value = re.compile(f'<{a}>').sub(get_globalVal(a), value, count=1)
         self.__test_spec = value
 
     @test_command.setter
     def test_command(self, value):
         for a in re.findall(r'<(.*?)>', value):
-            value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+            value = re.compile(f'<{a}>').sub(get_globalVal(a), value, count=1)
         self.__test_command = value
 
     @retry_times.setter
@@ -197,7 +197,7 @@ class TestStep:
                     f"Start step...{self.ItemName},Keyword:{self.TestKeyword},Retry:{self.RetryTimes},Timeout:"
                     f"{self.TimeOut}s,SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MES_var},FTC:{self.FTC}")
                 self.retry_times = self.RetryTimes
-                for retry in range(int(self.retry_times), 0, -1):
+                for retry in range(int(self.retry_times), -1, -1):
                     if test(retry, self):
                         test_result = True
                         break

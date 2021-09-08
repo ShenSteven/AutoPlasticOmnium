@@ -10,7 +10,7 @@ from model.testcase import *
 
 def run():
     test_task = TestCase(r"F:\pyside2\scripts\fireflyALL.xlsx", 'MBLT')
-    test_task.run_testcases(test_task.test_suites.copy(), True)
+    test_task.run_suites(test_task.test_suites.copy(), True)
 
 
 run()

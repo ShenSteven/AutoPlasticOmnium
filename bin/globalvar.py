@@ -23,6 +23,8 @@ from sokets.serialport import SerialPort
 #     sys.exit()
 
 sn = 'G1234568799NSS'
+SN = sn
+MesMac = "FF:FF:FF:FF:FF"
 dut_mode = 'firefly'
 error_code_first_fail = ""
 error_details_first_fail = ""

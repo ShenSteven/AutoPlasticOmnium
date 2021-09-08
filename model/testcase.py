@@ -107,17 +107,20 @@ class TestCase:
         #     return False
         return True
 
-    def run_testcases(self, test_suites, global_fail_continue=False):
+    def run_suites(self, test_suites, global_fail_continue=False, suite_no=None):
         suite_result_list = []
         try:
             for suite in test_suites:
-                suite_result = suite.run_suite(global_fail_continue)
-                suite_result_list.append(suite_result)
-                if not suite_result and not global_fail_continue:
-                    self._tResult = False
-                    break
-                else:
+                if not IsNullOrEmpty(suite_no) and suite.index == suite_no:
                     pass
+                else:
+                    suite_result = suite.run_suite(global_fail_continue)
+                    suite_result_list.append(suite_result)
+                    if not suite_result and not global_fail_continue:
+                        self._tResult = False
+                        break
+                    else:
+                        pass
             self._tResult = all(suite_result_list)
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -125,7 +128,7 @@ class TestCase:
             self._tResult = all(suite_result_list)
 
         except Exception as e:
-            logger.exception(f"run_testcases Exception！！{e}")
+            logger.exception(f"run_suites Exception！！{e}")
             self._tResult = False
             return self._tResult
         else:
@@ -145,4 +148,4 @@ if __name__ == "__main__":
     # ss = load_sequences_from_excel("./Config/fireflyALL.xlsx", 'MBLT')  # ./Config/fireflyALL.xlsx
     testcase1 = TestCase(r"F:\pyside2\conf\fireflyALL.xlsx", 'MBLT')
     testingSuite = testcase1.test_suites.copy()
-    testcase1.run_testcases(testingSuite)
+    testcase1.run_suites(testingSuite)

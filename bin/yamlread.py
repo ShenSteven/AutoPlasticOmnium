@@ -41,7 +41,7 @@ class YamlConfig:
             elif len(args) == 5:
                 yaml_data[args[0]][args[1]][args[2]][args[4]][args[5]] = value
             else:
-                raise Exception('args out of index!')
+                raise Exception('args out of suite_no!')
         with open(self.yaml_file, mode='w', encoding='utf-8') as f:
             yaml.safe_dump(yaml_data, stream=f, allow_unicode=True, sort_keys=False, indent=4)
 

@@ -136,3 +136,31 @@ Traceback (most recent call last):
   File "F:\pyside2\model\step.py", line 93, in test_spec
     value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
 KeyError: 'SN'
+2021-09-08 11:48:34,577 - CRITICAL - step.py - run_step Exception！！'MesMac'
+Traceback (most recent call last):
+  File "F:\pyside2\model\step.py", line 193, in run_step
+    self.test_command = self.ComdSend
+  File "F:\pyside2\model\step.py", line 99, in test_command
+    value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+KeyError: 'MesMac'
+2021-09-08 11:48:34,588 - CRITICAL - step.py - run_step Exception！！'MesMac'
+Traceback (most recent call last):
+  File "F:\pyside2\model\step.py", line 194, in run_step
+    self.test_spec = self.Spec
+  File "F:\pyside2\model\step.py", line 93, in test_spec
+    value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+KeyError: 'MesMac'
+2021-09-08 11:48:34,589 - CRITICAL - step.py - run_step Exception！！'SN'
+Traceback (most recent call last):
+  File "F:\pyside2\model\step.py", line 193, in run_step
+    self.test_command = self.ComdSend
+  File "F:\pyside2\model\step.py", line 99, in test_command
+    value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+KeyError: 'SN'
+2021-09-08 11:48:34,589 - CRITICAL - step.py - run_step Exception！！'SN'
+Traceback (most recent call last):
+  File "F:\pyside2\model\step.py", line 194, in run_step
+    self.test_spec = self.Spec
+  File "F:\pyside2\model\step.py", line 93, in test_spec
+    value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+KeyError: 'SN'

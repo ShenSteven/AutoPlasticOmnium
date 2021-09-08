@@ -18,7 +18,7 @@ class TestSuite:
     isTestFinished = False  # 测试完成标志
     testResult = True  # 测试结果
     totalNumber = 0  # 测试大项item总数量
-    test_serial = 0  # 测试大项在所有中的序列号
+    index = 0  # 测试大项在所有中的序列号
     test_version = ""  # 测试程序版本
     system_name = None  # 测试系统名称 SystemName
     test_steps = []
@@ -30,7 +30,7 @@ class TestSuite:
 
     def __init__(self, SeqName, test_serial):
         self.SeqName = SeqName
-        self.test_serial = test_serial
+        self.index = test_serial
         self.test_steps = []
 
     def clear(self):

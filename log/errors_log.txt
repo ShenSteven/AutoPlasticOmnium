@@ -582,3 +582,492 @@ KeyError: 'SN'
 2021-09-08 09:52:50,183 - ERROR    - step.py - writeAllART fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
 2021-09-08 09:52:50,183 - ERROR    - step.py - ART checksum fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
 2021-09-08 09:52:50,183 - ERROR    - suite.py - CheckArtPartition Test Fail!,ElapsedTime:0:00:00
+2021-09-08 11:48:34,547 - ERROR    - step.py - CheckEeroTest fail!! ElapsedTime:0ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,549 - ERROR    - step.py - Checkroute fail!! ElapsedTime:997ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,550 - ERROR    - step.py - CheckEeroABA fail!! ElapsedTime:0ms,Symptom:15.9:ShopFloor.ABXRetestError,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,550 - ERROR    - step.py - GetPcbaErroMessage fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,552 - ERROR    - suite.py - VerifySFIS Test Fail!,ElapsedTime:0:00:00.019580
+2021-09-08 11:48:34,553 - ERROR    - step.py - AT+TESTSTART% fail!! ElapsedTime:1005ms,Symptom:1.11.5:Equipment.FixtureMCU.InsertIOBlock,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,554 - ERROR    - step.py - AT+VBUSOPEN% fail!! ElapsedTime:997ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,554 - ERROR    - suite.py - CurrentShortTest Test Fail!,ElapsedTime:0:00:00.002002
+2021-09-08 11:48:34,555 - ERROR    - step.py - OpenTest fail!! ElapsedTime:0ms,Symptom:2.1.1:Electric.Current.TooLow,Spec:,Min:0.02,Value:None,Max:3
+2021-09-08 11:48:34,556 - ERROR    - step.py - SerialPortOpen fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,557 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,558 - ERROR    - step.py - UbootIdle fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:0.2,Value:None,Max:0.6
+2021-09-08 11:48:34,559 - ERROR    - suite.py - CurrentTest Test Fail!,ElapsedTime:0:00:00.003994
+2021-09-08 11:48:34,560 - ERROR    - step.py - Voltage_USBC_VBUS fail!! ElapsedTime:994ms,Symptom:2.2.17.1:Electric.Voltage.USBC_VBUS.TooLow,Spec:5,Min:4.75,Value:None,Max:5.25
+2021-09-08 11:48:34,560 - ERROR    - step.py - Voltage_DVDD3.3 fail!! ElapsedTime:0ms,Symptom:2.2.19.1:Electric.Voltage.DVDD3.3.TooLow,Spec:3.3,Min:3.15,Value:None,Max:3.45
+2021-09-08 11:48:34,561 - ERROR    - step.py - Voltage_DVDD1.95 fail!! ElapsedTime:0ms,Symptom:2.2.20.1:Electric.Voltage.DVDD1.95.TooLow,Spec:1.95,Min:1.9,Value:None,Max:2.05
+2021-09-08 11:48:34,561 - ERROR    - step.py - Voltage_DVDD2.2 fail!! ElapsedTime:0ms,Symptom:2.2.21.1:Electric.Voltage.DVDD2.2.TooLow,Spec:2.2,Min:2.1,Value:None,Max:2.3
+2021-09-08 11:48:34,561 - ERROR    - step.py - Voltage_DVDD0.912 fail!! ElapsedTime:0ms,Symptom:2.2.22.1:Electric.Voltage.DVDD0.912.TooLow,Spec:0.912,Min:0.87,Value:None,Max:0.95
+2021-09-08 11:48:34,561 - ERROR    - step.py - Voltage_DVDD1.29_MP_CORE fail!! ElapsedTime:0ms,Symptom:2.2.23.1:Electric.Voltage.DVDD1.29_MP_CORE.TooLow,Spec:1.29,Min:1.25,Value:None,Max:1.35
+2021-09-08 11:48:34,562 - ERROR    - step.py - Voltage_DVDD1.35_MP_DDR fail!! ElapsedTime:0ms,Symptom:2.2.24.1:Electric.Voltage.DVDD1.35_MP_DDR.TooLow,Spec:1.35,Min:1.283,Value:None,Max:1.45
+2021-09-08 11:48:34,562 - ERROR    - suite.py - VoltageTest Test Fail!,ElapsedTime:0:00:00.002985
+2021-09-08 11:48:34,562 - ERROR    - step.py - AT+TSD_OUTLOW% fail!! ElapsedTime:0ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,562 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,563 - ERROR    - step.py - AT+TSD_OUTHIGH% fail!! ElapsedTime:997ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,572 - ERROR    - step.py - WaitingToStart fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,573 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:0ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,573 - ERROR    - suite.py - EnterUBootTransition Test Fail!,ElapsedTime:0:00:00.011088
+2021-09-08 11:48:34,574 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,574 - ERROR    - step.py - set-tsdr fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,574 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,574 - ERROR    - suite.py - ThermalShutdownTest Test Fail!,ElapsedTime:0:00:00.000993
+2021-09-08 11:48:34,574 - ERROR    - step.py - ReadBoardRegisterValue fail!! ElapsedTime:0ms,Symptom::,Spec:00100,Min:,Value:None,Max:
+2021-09-08 11:48:34,575 - ERROR    - suite.py - ReadBoardRegisterValue Test Fail!,ElapsedTime:0:00:00.000998
+2021-09-08 11:48:34,575 - ERROR    - step.py - Reboot fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,575 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,576 - ERROR    - step.py - UpgradeImage fail!! ElapsedTime:996ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,576 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:0ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,576 - ERROR    - step.py - VerifyQSDKversion fail!! ElapsedTime:0ms,Symptom:17.9:Version.QSDK,Spec:EVT.11.4_CS.V024,Min:,Value:None,Max:
+2021-09-08 11:48:34,576 - ERROR    - suite.py - ReadAndUpdateLuxQsdkVersion Test Fail!,ElapsedTime:0:00:00.000996
+2021-09-08 11:48:34,577 - CRITICAL - step.py - run_step Exception！！'MesMac'
+Traceback (most recent call last):
+  File "F:\pyside2\model\step.py", line 193, in run_step
+    self.test_command = self.ComdSend
+  File "F:\pyside2\model\step.py", line 99, in test_command
+    value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+KeyError: 'MesMac'
+2021-09-08 11:48:34,588 - CRITICAL - step.py - run_step Exception！！'MesMac'
+Traceback (most recent call last):
+  File "F:\pyside2\model\step.py", line 194, in run_step
+    self.test_spec = self.Spec
+  File "F:\pyside2\model\step.py", line 93, in test_spec
+    value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+KeyError: 'MesMac'
+2021-09-08 11:48:34,589 - CRITICAL - step.py - run_step Exception！！'SN'
+Traceback (most recent call last):
+  File "F:\pyside2\model\step.py", line 193, in run_step
+    self.test_command = self.ComdSend
+  File "F:\pyside2\model\step.py", line 99, in test_command
+    value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+KeyError: 'SN'
+2021-09-08 11:48:34,589 - CRITICAL - step.py - run_step Exception！！'SN'
+Traceback (most recent call last):
+  File "F:\pyside2\model\step.py", line 194, in run_step
+    self.test_spec = self.Spec
+  File "F:\pyside2\model\step.py", line 93, in test_spec
+    value = re.compile(f'<{a}>').sub(globals()[a], value, count=1)
+KeyError: 'SN'
+2021-09-08 11:48:34,590 - ERROR    - suite.py - SaveIdentityInEnv Test Fail!,ElapsedTime:0:00:00.013636
+2021-09-08 11:48:34,591 - ERROR    - step.py - CPUVersionTest fail!! ElapsedTime:0ms,Symptom:17.10:Version.CPU,Spec:0x20180101,Min:,Value:None,Max:
+2021-09-08 11:48:34,591 - ERROR    - suite.py - CPUVersionTest Test Fail!,ElapsedTime:0:00:00.000999
+2021-09-08 11:48:34,592 - ERROR    - step.py - CheckBZTBootloaderVersion fail!! ElapsedTime:0ms,Symptom::,Spec:v0.9.2.6,Min:,Value:None,Max:
+2021-09-08 11:48:34,593 - ERROR    - suite.py - CheckBZTBootloaderVersion Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 11:48:34,594 - ERROR    - step.py - LoadBZTFirmware fail!! ElapsedTime:998ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,594 - ERROR    - suite.py - LoadBZTFirmware Test Fail!,ElapsedTime:0:00:00.000998
+2021-09-08 11:48:34,595 - ERROR    - step.py - check LED info fail!! ElapsedTime:0ms,Symptom:17.8:Version.LED,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,596 - ERROR    - step.py - check PHY info fail!! ElapsedTime:0ms,Symptom:17.1:Version.Switch,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,597 - ERROR    - step.py - check eMMC info fail!! ElapsedTime:0ms,Symptom:17.3:Version.MMC,Spec:{4FTE4R,M62704,S40004},Min:,Value:None,Max:
+2021-09-08 11:48:34,598 - ERROR    - step.py - check CCG info fail!! ElapsedTime:0ms,Symptom:17.7:Version.CCG,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,599 - ERROR    - suite.py - SubsystemTest Test Fail!,ElapsedTime:0:00:00.003989
+2021-09-08 11:48:34,600 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:999ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,601 - ERROR    - step.py - MMCWrite117 fail!! ElapsedTime:996ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 11:48:34,604 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,605 - ERROR    - step.py - MMCWrite120 fail!! ElapsedTime:0ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 11:48:34,606 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,607 - ERROR    - step.py - MMCRead017 fail!! ElapsedTime:0ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 11:48:34,608 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,609 - ERROR    - step.py - MMCRead020 fail!! ElapsedTime:0ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 11:48:34,610 - ERROR    - suite.py - MMCReadWriteSpeedTest Test Fail!,ElapsedTime:0:00:00.010976
+2021-09-08 11:48:34,611 - ERROR    - step.py - CheckResetButton fail!! ElapsedTime:998ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,612 - ERROR    - step.py - PressButton fail!! ElapsedTime:997ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,614 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:997ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,615 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,615 - ERROR    - suite.py - ResetButtonTest Test Fail!,ElapsedTime:0:00:00.004987
+2021-09-08 11:48:34,616 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,617 - ERROR    - step.py - LEDWhiteOn4100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,618 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,619 - ERROR    - step.py - CheckLEDWhiteOn fail!! ElapsedTime:997ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,620 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,621 - ERROR    - step.py - LEDGreenOn2100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,622 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,623 - ERROR    - step.py - CheckLEDGreenOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,624 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,625 - ERROR    - step.py - LEDRedOn1100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,626 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,627 - ERROR    - step.py - CheckLEDRedOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,628 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,629 - ERROR    - step.py - LEDBlueOn3100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,630 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,631 - ERROR    - step.py - CheckLEDBlueOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,632 - ERROR    - suite.py - LEDFunctionTest Test Fail!,ElapsedTime:0:00:00.015957
+2021-09-08 11:48:34,633 - ERROR    - step.py - EthConfig fail!! ElapsedTime:999ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,634 - ERROR    - step.py - Eth0Ping fail!! ElapsedTime:996ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,635 - ERROR    - step.py - Eth1Ping fail!! ElapsedTime:998ms,Symptom:3.2.3.1:Device.Ethernet.Eth1.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,636 - ERROR    - suite.py - EthernetSpeedTest Test Fail!,ElapsedTime:0:00:00.002993
+2021-09-08 11:48:34,638 - ERROR    - step.py - writeAllART fail!! ElapsedTime:998ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,639 - ERROR    - step.py - ART checksum fail!! ElapsedTime:993ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:48:34,640 - ERROR    - suite.py - CheckArtPartition Test Fail!,ElapsedTime:0:00:00.003946
+2021-09-08 11:52:59,211 - ERROR    - step.py - CheckEeroTest fail!! ElapsedTime:0ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,212 - ERROR    - step.py - Checkroute fail!! ElapsedTime:0ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,213 - ERROR    - step.py - CheckEeroABA fail!! ElapsedTime:0ms,Symptom:15.9:ShopFloor.ABXRetestError,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,214 - ERROR    - step.py - GetPcbaErroMessage fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,215 - ERROR    - suite.py - VerifySFIS Test Fail!,ElapsedTime:0:00:00.019950
+2021-09-08 11:52:59,216 - ERROR    - step.py - AT+TESTSTART% fail!! ElapsedTime:0ms,Symptom:1.11.5:Equipment.FixtureMCU.InsertIOBlock,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,217 - ERROR    - step.py - AT+VBUSOPEN% fail!! ElapsedTime:999ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,218 - ERROR    - suite.py - CurrentShortTest Test Fail!,ElapsedTime:0:00:00.001990
+2021-09-08 11:52:59,219 - ERROR    - step.py - OpenTest fail!! ElapsedTime:997ms,Symptom:2.1.1:Electric.Current.TooLow,Spec:,Min:0.02,Value:None,Max:3
+2021-09-08 11:52:59,220 - ERROR    - step.py - SerialPortOpen fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,220 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,220 - ERROR    - step.py - UbootIdle fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:0.2,Value:None,Max:0.6
+2021-09-08 11:52:59,220 - ERROR    - suite.py - CurrentTest Test Fail!,ElapsedTime:0:00:00.001994
+2021-09-08 11:52:59,221 - ERROR    - step.py - Voltage_USBC_VBUS fail!! ElapsedTime:993ms,Symptom:2.2.17.1:Electric.Voltage.USBC_VBUS.TooLow,Spec:5,Min:4.75,Value:None,Max:5.25
+2021-09-08 11:52:59,221 - ERROR    - step.py - Voltage_DVDD3.3 fail!! ElapsedTime:0ms,Symptom:2.2.19.1:Electric.Voltage.DVDD3.3.TooLow,Spec:3.3,Min:3.15,Value:None,Max:3.45
+2021-09-08 11:52:59,221 - ERROR    - step.py - Voltage_DVDD1.95 fail!! ElapsedTime:0ms,Symptom:2.2.20.1:Electric.Voltage.DVDD1.95.TooLow,Spec:1.95,Min:1.9,Value:None,Max:2.05
+2021-09-08 11:52:59,224 - ERROR    - step.py - Voltage_DVDD2.2 fail!! ElapsedTime:3113ms,Symptom:2.2.21.1:Electric.Voltage.DVDD2.2.TooLow,Spec:2.2,Min:2.1,Value:None,Max:2.3
+2021-09-08 11:52:59,224 - ERROR    - step.py - Voltage_DVDD0.912 fail!! ElapsedTime:0ms,Symptom:2.2.22.1:Electric.Voltage.DVDD0.912.TooLow,Spec:0.912,Min:0.87,Value:None,Max:0.95
+2021-09-08 11:52:59,224 - ERROR    - step.py - Voltage_DVDD1.29_MP_CORE fail!! ElapsedTime:0ms,Symptom:2.2.23.1:Electric.Voltage.DVDD1.29_MP_CORE.TooLow,Spec:1.29,Min:1.25,Value:None,Max:1.35
+2021-09-08 11:52:59,225 - ERROR    - step.py - Voltage_DVDD1.35_MP_DDR fail!! ElapsedTime:0ms,Symptom:2.2.24.1:Electric.Voltage.DVDD1.35_MP_DDR.TooLow,Spec:1.35,Min:1.283,Value:None,Max:1.45
+2021-09-08 11:52:59,225 - ERROR    - suite.py - VoltageTest Test Fail!,ElapsedTime:0:00:00.005095
+2021-09-08 11:52:59,225 - ERROR    - step.py - AT+TSD_OUTLOW% fail!! ElapsedTime:0ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,225 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,225 - ERROR    - step.py - AT+TSD_OUTHIGH% fail!! ElapsedTime:0ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,226 - ERROR    - step.py - WaitingToStart fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,226 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:0ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,226 - ERROR    - suite.py - EnterUBootTransition Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 11:52:59,226 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,226 - ERROR    - step.py - set-tsdr fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,227 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,227 - ERROR    - suite.py - ThermalShutdownTest Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 11:52:59,227 - ERROR    - step.py - ReadBoardRegisterValue fail!! ElapsedTime:0ms,Symptom::,Spec:00100,Min:,Value:None,Max:
+2021-09-08 11:52:59,227 - ERROR    - suite.py - ReadBoardRegisterValue Test Fail!,ElapsedTime:0:00:00
+2021-09-08 11:52:59,241 - ERROR    - step.py - Reboot fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,242 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:995ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,242 - ERROR    - step.py - UpgradeImage fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,242 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:0ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,243 - ERROR    - step.py - VerifyQSDKversion fail!! ElapsedTime:997ms,Symptom:17.9:Version.QSDK,Spec:EVT.11.4_CS.V024,Min:,Value:None,Max:
+2021-09-08 11:52:59,243 - ERROR    - suite.py - ReadAndUpdateLuxQsdkVersion Test Fail!,ElapsedTime:0:00:00.015232
+2021-09-08 11:52:59,248 - ERROR    - step.py - WriteMAC fail!! ElapsedTime:5872ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,248 - ERROR    - step.py - VeritfyDUTMAC fail!! ElapsedTime:0ms,Symptom::,Spec:<MesMac>,Min:,Value:None,Max:
+2021-09-08 11:52:59,248 - ERROR    - step.py - WriteSN fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,248 - ERROR    - step.py - VeritfyDUTSN fail!! ElapsedTime:0ms,Symptom::,Spec:<SN>,Min:,Value:None,Max:
+2021-09-08 11:52:59,249 - ERROR    - suite.py - SaveIdentityInEnv Test Fail!,ElapsedTime:0:00:00.006903
+2021-09-08 11:52:59,249 - ERROR    - step.py - CPUVersionTest fail!! ElapsedTime:0ms,Symptom:17.10:Version.CPU,Spec:0x20180101,Min:,Value:None,Max:
+2021-09-08 11:52:59,249 - ERROR    - suite.py - CPUVersionTest Test Fail!,ElapsedTime:0:00:00
+2021-09-08 11:52:59,249 - ERROR    - step.py - CheckBZTBootloaderVersion fail!! ElapsedTime:0ms,Symptom::,Spec:v0.9.2.6,Min:,Value:None,Max:
+2021-09-08 11:52:59,249 - ERROR    - suite.py - CheckBZTBootloaderVersion Test Fail!,ElapsedTime:0:00:00
+2021-09-08 11:52:59,250 - ERROR    - step.py - LoadBZTFirmware fail!! ElapsedTime:998ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,250 - ERROR    - suite.py - LoadBZTFirmware Test Fail!,ElapsedTime:0:00:00.000998
+2021-09-08 11:52:59,256 - ERROR    - step.py - check LED info fail!! ElapsedTime:5335ms,Symptom:17.8:Version.LED,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,257 - ERROR    - step.py - check PHY info fail!! ElapsedTime:1006ms,Symptom:17.1:Version.Switch,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,257 - ERROR    - step.py - check eMMC info fail!! ElapsedTime:0ms,Symptom:17.3:Version.MMC,Spec:{4FTE4R,M62704,S40004},Min:,Value:None,Max:
+2021-09-08 11:52:59,258 - ERROR    - step.py - check CCG info fail!! ElapsedTime:0ms,Symptom:17.7:Version.CCG,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,259 - ERROR    - suite.py - SubsystemTest Test Fail!,ElapsedTime:0:00:00.007340
+2021-09-08 11:52:59,259 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,260 - ERROR    - step.py - MMCWrite117 fail!! ElapsedTime:996ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 11:52:59,260 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,261 - ERROR    - step.py - MMCWrite120 fail!! ElapsedTime:0ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 11:52:59,262 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:998ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,262 - ERROR    - step.py - MMCRead017 fail!! ElapsedTime:0ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 11:52:59,263 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,264 - ERROR    - step.py - MMCRead020 fail!! ElapsedTime:0ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 11:52:59,264 - ERROR    - suite.py - MMCReadWriteSpeedTest Test Fail!,ElapsedTime:0:00:00.004985
+2021-09-08 11:52:59,265 - ERROR    - step.py - CheckResetButton fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,266 - ERROR    - step.py - PressButton fail!! ElapsedTime:996ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,271 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,271 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,272 - ERROR    - suite.py - ResetButtonTest Test Fail!,ElapsedTime:0:00:00.007730
+2021-09-08 11:52:59,273 - ERROR    - step.py - LEDOff fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,273 - ERROR    - step.py - LEDWhiteOn4100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,274 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,274 - ERROR    - step.py - CheckLEDWhiteOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,275 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,276 - ERROR    - step.py - LEDGreenOn2100 fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,276 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,277 - ERROR    - step.py - CheckLEDGreenOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,277 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,278 - ERROR    - step.py - LEDRedOn1100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,279 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,279 - ERROR    - step.py - CheckLEDRedOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,287 - ERROR    - step.py - LEDOff fail!! ElapsedTime:5642ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,288 - ERROR    - step.py - LEDBlueOn3100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,288 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,289 - ERROR    - step.py - CheckLEDBlueOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,290 - ERROR    - suite.py - LEDFunctionTest Test Fail!,ElapsedTime:0:00:00.016350
+2021-09-08 11:52:59,290 - ERROR    - step.py - EthConfig fail!! ElapsedTime:0ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,291 - ERROR    - step.py - Eth0Ping fail!! ElapsedTime:0ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,292 - ERROR    - step.py - Eth1Ping fail!! ElapsedTime:0ms,Symptom:3.2.3.1:Device.Ethernet.Eth1.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,293 - ERROR    - suite.py - EthernetSpeedTest Test Fail!,ElapsedTime:0:00:00.001994
+2021-09-08 11:52:59,294 - ERROR    - step.py - writeAllART fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,295 - ERROR    - step.py - ART checksum fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 11:52:59,296 - ERROR    - suite.py - CheckArtPartition Test Fail!,ElapsedTime:0:00:00.001995
+2021-09-08 13:47:44,957 - ERROR    - step.py - CheckEeroTest fail!! ElapsedTime:1000ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,961 - ERROR    - step.py - Checkroute fail!! ElapsedTime:1001ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,962 - ERROR    - step.py - CheckEeroABA fail!! ElapsedTime:0ms,Symptom:15.9:ShopFloor.ABXRetestError,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,963 - ERROR    - step.py - GetPcbaErroMessage fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,965 - ERROR    - suite.py - VerifySFIS Test Fail!,ElapsedTime:0:00:00.033759
+2021-09-08 13:47:44,966 - ERROR    - step.py - AT+TESTSTART% fail!! ElapsedTime:1001ms,Symptom:1.11.5:Equipment.FixtureMCU.InsertIOBlock,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,967 - ERROR    - step.py - AT+VBUSOPEN% fail!! ElapsedTime:0ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,968 - ERROR    - suite.py - CurrentShortTest Test Fail!,ElapsedTime:0:00:00.002991
+2021-09-08 13:47:44,969 - ERROR    - step.py - OpenTest fail!! ElapsedTime:0ms,Symptom:2.1.1:Electric.Current.TooLow,Spec:,Min:0.02,Value:None,Max:3
+2021-09-08 13:47:44,970 - ERROR    - step.py - SerialPortOpen fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,971 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:997ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,971 - ERROR    - step.py - UbootIdle fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:0.2,Value:None,Max:0.6
+2021-09-08 13:47:44,972 - ERROR    - suite.py - CurrentTest Test Fail!,ElapsedTime:0:00:00.002990
+2021-09-08 13:47:44,973 - ERROR    - step.py - Voltage_USBC_VBUS fail!! ElapsedTime:0ms,Symptom:2.2.17.1:Electric.Voltage.USBC_VBUS.TooLow,Spec:5,Min:4.75,Value:None,Max:5.25
+2021-09-08 13:47:44,973 - ERROR    - step.py - Voltage_DVDD3.3 fail!! ElapsedTime:0ms,Symptom:2.2.19.1:Electric.Voltage.DVDD3.3.TooLow,Spec:3.3,Min:3.15,Value:None,Max:3.45
+2021-09-08 13:47:44,974 - ERROR    - step.py - Voltage_DVDD1.95 fail!! ElapsedTime:997ms,Symptom:2.2.20.1:Electric.Voltage.DVDD1.95.TooLow,Spec:1.95,Min:1.9,Value:None,Max:2.05
+2021-09-08 13:47:44,975 - ERROR    - step.py - Voltage_DVDD2.2 fail!! ElapsedTime:0ms,Symptom:2.2.21.1:Electric.Voltage.DVDD2.2.TooLow,Spec:2.2,Min:2.1,Value:None,Max:2.3
+2021-09-08 13:47:44,975 - ERROR    - step.py - Voltage_DVDD0.912 fail!! ElapsedTime:0ms,Symptom:2.2.22.1:Electric.Voltage.DVDD0.912.TooLow,Spec:0.912,Min:0.87,Value:None,Max:0.95
+2021-09-08 13:47:44,976 - ERROR    - step.py - Voltage_DVDD1.29_MP_CORE fail!! ElapsedTime:997ms,Symptom:2.2.23.1:Electric.Voltage.DVDD1.29_MP_CORE.TooLow,Spec:1.29,Min:1.25,Value:None,Max:1.35
+2021-09-08 13:47:44,976 - ERROR    - step.py - Voltage_DVDD1.35_MP_DDR fail!! ElapsedTime:0ms,Symptom:2.2.24.1:Electric.Voltage.DVDD1.35_MP_DDR.TooLow,Spec:1.35,Min:1.283,Value:None,Max:1.45
+2021-09-08 13:47:44,977 - ERROR    - suite.py - VoltageTest Test Fail!,ElapsedTime:0:00:00.004985
+2021-09-08 13:47:44,977 - ERROR    - step.py - AT+TSD_OUTLOW% fail!! ElapsedTime:0ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,978 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,979 - ERROR    - step.py - AT+TSD_OUTHIGH% fail!! ElapsedTime:997ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,979 - ERROR    - step.py - WaitingToStart fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,980 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:998ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,980 - ERROR    - suite.py - EnterUBootTransition Test Fail!,ElapsedTime:0:00:00.002992
+2021-09-08 13:47:44,988 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:6356ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,988 - ERROR    - step.py - set-tsdr fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,989 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,990 - ERROR    - suite.py - ThermalShutdownTest Test Fail!,ElapsedTime:0:00:00.008146
+2021-09-08 13:47:44,990 - ERROR    - step.py - ReadBoardRegisterValue fail!! ElapsedTime:0ms,Symptom::,Spec:00100,Min:,Value:None,Max:
+2021-09-08 13:47:44,991 - ERROR    - suite.py - ReadBoardRegisterValue Test Fail!,ElapsedTime:0:00:00
+2021-09-08 13:47:44,992 - ERROR    - step.py - Reboot fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,993 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,993 - ERROR    - step.py - UpgradeImage fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,994 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:0ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,995 - ERROR    - step.py - VerifyQSDKversion fail!! ElapsedTime:997ms,Symptom:17.9:Version.QSDK,Spec:EVT.11.4_CS.V024,Min:,Value:None,Max:
+2021-09-08 13:47:44,995 - ERROR    - suite.py - ReadAndUpdateLuxQsdkVersion Test Fail!,ElapsedTime:0:00:00.003988
+2021-09-08 13:47:44,996 - ERROR    - step.py - WriteMAC fail!! ElapsedTime:998ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,997 - ERROR    - step.py - VeritfyDUTMAC fail!! ElapsedTime:0ms,Symptom::,Spec:<MesMac>,Min:,Value:None,Max:
+2021-09-08 13:47:44,998 - ERROR    - step.py - WriteSN fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:44,998 - ERROR    - step.py - VeritfyDUTSN fail!! ElapsedTime:0ms,Symptom::,Spec:<SN>,Min:,Value:None,Max:
+2021-09-08 13:47:44,999 - ERROR    - suite.py - SaveIdentityInEnv Test Fail!,ElapsedTime:0:00:00.003989
+2021-09-08 13:47:45,004 - ERROR    - step.py - CPUVersionTest fail!! ElapsedTime:0ms,Symptom:17.10:Version.CPU,Spec:0x20180101,Min:,Value:None,Max:
+2021-09-08 13:47:45,005 - ERROR    - suite.py - CPUVersionTest Test Fail!,ElapsedTime:0:00:00.001006
+2021-09-08 13:47:45,006 - ERROR    - step.py - CheckBZTBootloaderVersion fail!! ElapsedTime:997ms,Symptom::,Spec:v0.9.2.6,Min:,Value:None,Max:
+2021-09-08 13:47:45,006 - ERROR    - suite.py - CheckBZTBootloaderVersion Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 13:47:45,007 - ERROR    - step.py - LoadBZTFirmware fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,007 - ERROR    - suite.py - LoadBZTFirmware Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 13:47:45,008 - ERROR    - step.py - check LED info fail!! ElapsedTime:997ms,Symptom:17.8:Version.LED,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,008 - ERROR    - step.py - check PHY info fail!! ElapsedTime:0ms,Symptom:17.1:Version.Switch,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,009 - ERROR    - step.py - check eMMC info fail!! ElapsedTime:0ms,Symptom:17.3:Version.MMC,Spec:{4FTE4R,M62704,S40004},Min:,Value:None,Max:
+2021-09-08 13:47:45,010 - ERROR    - step.py - check CCG info fail!! ElapsedTime:997ms,Symptom:17.7:Version.CCG,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,010 - ERROR    - suite.py - SubsystemTest Test Fail!,ElapsedTime:0:00:00.002992
+2021-09-08 13:47:45,011 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,011 - ERROR    - step.py - MMCWrite117 fail!! ElapsedTime:0ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 13:47:45,012 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,013 - ERROR    - step.py - MMCWrite120 fail!! ElapsedTime:0ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 13:47:45,013 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,014 - ERROR    - step.py - MMCRead017 fail!! ElapsedTime:997ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 13:47:45,020 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:923ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,020 - ERROR    - step.py - MMCRead020 fail!! ElapsedTime:0ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 13:47:45,021 - ERROR    - suite.py - MMCReadWriteSpeedTest Test Fail!,ElapsedTime:0:00:00.011096
+2021-09-08 13:47:45,021 - ERROR    - step.py - CheckResetButton fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,022 - ERROR    - step.py - PressButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,023 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,024 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,024 - ERROR    - suite.py - ResetButtonTest Test Fail!,ElapsedTime:0:00:00.002992
+2021-09-08 13:47:45,025 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,026 - ERROR    - step.py - LEDWhiteOn4100 fail!! ElapsedTime:996ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,026 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,027 - ERROR    - step.py - CheckLEDWhiteOn fail!! ElapsedTime:997ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,027 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,028 - ERROR    - step.py - LEDGreenOn2100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,028 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,035 - ERROR    - step.py - CheckLEDGreenOn fail!! ElapsedTime:6008ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,036 - ERROR    - step.py - LEDOff fail!! ElapsedTime:1003ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,036 - ERROR    - step.py - LEDRedOn1100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,037 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,038 - ERROR    - step.py - CheckLEDRedOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,038 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,039 - ERROR    - step.py - LEDBlueOn3100 fail!! ElapsedTime:1000ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,039 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,040 - ERROR    - step.py - CheckLEDBlueOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,040 - ERROR    - suite.py - LEDFunctionTest Test Fail!,ElapsedTime:0:00:00.014987
+2021-09-08 13:47:45,041 - ERROR    - step.py - EthConfig fail!! ElapsedTime:0ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,042 - ERROR    - step.py - Eth0Ping fail!! ElapsedTime:997ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,042 - ERROR    - step.py - Eth1Ping fail!! ElapsedTime:0ms,Symptom:3.2.3.1:Device.Ethernet.Eth1.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,043 - ERROR    - suite.py - EthernetSpeedTest Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 13:47:45,044 - ERROR    - step.py - writeAllART fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,044 - ERROR    - step.py - ART checksum fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 13:47:45,050 - ERROR    - suite.py - CheckArtPartition Test Fail!,ElapsedTime:0:00:00.007163
+2021-09-08 14:28:00,262 - ERROR    - step.py - CheckEeroTest fail!! ElapsedTime:1995ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,265 - ERROR    - step.py - Checkroute fail!! ElapsedTime:999ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,266 - ERROR    - step.py - CheckEeroABA fail!! ElapsedTime:996ms,Symptom:15.9:ShopFloor.ABXRetestError,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,268 - ERROR    - step.py - GetPcbaErroMessage fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,269 - ERROR    - suite.py - VerifySFIS Test Fail!,ElapsedTime:0:00:00.027642
+2021-09-08 14:28:00,271 - ERROR    - step.py - AT+TESTSTART% fail!! ElapsedTime:0ms,Symptom:1.11.5:Equipment.FixtureMCU.InsertIOBlock,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,272 - ERROR    - step.py - AT+VBUSOPEN% fail!! ElapsedTime:996ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,273 - ERROR    - suite.py - CurrentShortTest Test Fail!,ElapsedTime:0:00:00.002993
+2021-09-08 14:28:00,275 - ERROR    - step.py - OpenTest fail!! ElapsedTime:997ms,Symptom:2.1.1:Electric.Current.TooLow,Spec:,Min:0.02,Value:None,Max:3
+2021-09-08 14:28:00,276 - ERROR    - step.py - SerialPortOpen fail!! ElapsedTime:995ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,279 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:2992ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,281 - ERROR    - step.py - UbootIdle fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:0.2,Value:None,Max:0.6
+2021-09-08 14:28:00,281 - ERROR    - suite.py - CurrentTest Test Fail!,ElapsedTime:0:00:00.007979
+2021-09-08 14:28:00,283 - ERROR    - step.py - Voltage_USBC_VBUS fail!! ElapsedTime:0ms,Symptom:2.2.17.1:Electric.Voltage.USBC_VBUS.TooLow,Spec:5,Min:4.75,Value:None,Max:5.25
+2021-09-08 14:28:00,284 - ERROR    - step.py - Voltage_DVDD3.3 fail!! ElapsedTime:997ms,Symptom:2.2.19.1:Electric.Voltage.DVDD3.3.TooLow,Spec:3.3,Min:3.15,Value:None,Max:3.45
+2021-09-08 14:28:00,285 - ERROR    - step.py - Voltage_DVDD1.95 fail!! ElapsedTime:1045ms,Symptom:2.2.20.1:Electric.Voltage.DVDD1.95.TooLow,Spec:1.95,Min:1.9,Value:None,Max:2.05
+2021-09-08 14:28:00,286 - ERROR    - step.py - Voltage_DVDD2.2 fail!! ElapsedTime:0ms,Symptom:2.2.21.1:Electric.Voltage.DVDD2.2.TooLow,Spec:2.2,Min:2.1,Value:None,Max:2.3
+2021-09-08 14:28:00,288 - ERROR    - step.py - Voltage_DVDD0.912 fail!! ElapsedTime:0ms,Symptom:2.2.22.1:Electric.Voltage.DVDD0.912.TooLow,Spec:0.912,Min:0.87,Value:None,Max:0.95
+2021-09-08 14:28:00,289 - ERROR    - step.py - Voltage_DVDD1.29_MP_CORE fail!! ElapsedTime:998ms,Symptom:2.2.23.1:Electric.Voltage.DVDD1.29_MP_CORE.TooLow,Spec:1.29,Min:1.25,Value:None,Max:1.35
+2021-09-08 14:28:00,292 - ERROR    - step.py - Voltage_DVDD1.35_MP_DDR fail!! ElapsedTime:997ms,Symptom:2.2.24.1:Electric.Voltage.DVDD1.35_MP_DDR.TooLow,Spec:1.35,Min:1.283,Value:None,Max:1.45
+2021-09-08 14:28:00,292 - ERROR    - suite.py - VoltageTest Test Fail!,ElapsedTime:0:00:00.009973
+2021-09-08 14:28:00,294 - ERROR    - step.py - AT+TSD_OUTLOW% fail!! ElapsedTime:997ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,295 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:998ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,296 - ERROR    - step.py - AT+TSD_OUTHIGH% fail!! ElapsedTime:997ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,297 - ERROR    - step.py - WaitingToStart fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,304 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:5982ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,304 - ERROR    - suite.py - EnterUBootTransition Test Fail!,ElapsedTime:0:00:00.010969
+2021-09-08 14:28:00,306 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:1076ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,307 - ERROR    - step.py - set-tsdr fail!! ElapsedTime:920ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,307 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,308 - ERROR    - suite.py - ThermalShutdownTest Test Fail!,ElapsedTime:0:00:00.002993
+2021-09-08 14:28:00,309 - ERROR    - step.py - ReadBoardRegisterValue fail!! ElapsedTime:0ms,Symptom::,Spec:00100,Min:,Value:None,Max:
+2021-09-08 14:28:00,309 - ERROR    - suite.py - ReadBoardRegisterValue Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 14:28:00,310 - ERROR    - step.py - Reboot fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,312 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:1995ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,313 - ERROR    - step.py - UpgradeImage fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,314 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:998ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,315 - ERROR    - step.py - VerifyQSDKversion fail!! ElapsedTime:997ms,Symptom:17.9:Version.QSDK,Spec:EVT.11.4_CS.V024,Min:,Value:None,Max:
+2021-09-08 14:28:00,315 - ERROR    - suite.py - ReadAndUpdateLuxQsdkVersion Test Fail!,ElapsedTime:0:00:00.005984
+2021-09-08 14:28:00,316 - ERROR    - step.py - WriteMAC fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,317 - ERROR    - step.py - VeritfyDUTMAC fail!! ElapsedTime:0ms,Symptom::,Spec:<MesMac>,Min:,Value:None,Max:
+2021-09-08 14:28:00,322 - ERROR    - step.py - WriteSN fail!! ElapsedTime:4990ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,323 - ERROR    - step.py - VeritfyDUTSN fail!! ElapsedTime:997ms,Symptom::,Spec:<SN>,Min:,Value:None,Max:
+2021-09-08 14:28:00,323 - ERROR    - suite.py - SaveIdentityInEnv Test Fail!,ElapsedTime:0:00:00.007027
+2021-09-08 14:28:00,324 - ERROR    - step.py - CPUVersionTest fail!! ElapsedTime:0ms,Symptom:17.10:Version.CPU,Spec:0x20180101,Min:,Value:None,Max:
+2021-09-08 14:28:00,325 - ERROR    - suite.py - CPUVersionTest Test Fail!,ElapsedTime:0:00:00
+2021-09-08 14:28:00,325 - ERROR    - step.py - CheckBZTBootloaderVersion fail!! ElapsedTime:0ms,Symptom::,Spec:v0.9.2.6,Min:,Value:None,Max:
+2021-09-08 14:28:00,326 - ERROR    - suite.py - CheckBZTBootloaderVersion Test Fail!,ElapsedTime:0:00:00.000998
+2021-09-08 14:28:00,327 - ERROR    - step.py - LoadBZTFirmware fail!! ElapsedTime:996ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,327 - ERROR    - suite.py - LoadBZTFirmware Test Fail!,ElapsedTime:0:00:00.000996
+2021-09-08 14:28:00,329 - ERROR    - step.py - check LED info fail!! ElapsedTime:997ms,Symptom:17.8:Version.LED,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,330 - ERROR    - step.py - check PHY info fail!! ElapsedTime:997ms,Symptom:17.1:Version.Switch,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,331 - ERROR    - step.py - check eMMC info fail!! ElapsedTime:997ms,Symptom:17.3:Version.MMC,Spec:{4FTE4R,M62704,S40004},Min:,Value:None,Max:
+2021-09-08 14:28:00,332 - ERROR    - step.py - check CCG info fail!! ElapsedTime:997ms,Symptom:17.7:Version.CCG,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,333 - ERROR    - suite.py - SubsystemTest Test Fail!,ElapsedTime:0:00:00.003988
+2021-09-08 14:28:00,333 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,338 - ERROR    - step.py - MMCWrite117 fail!! ElapsedTime:4987ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 14:28:00,339 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,340 - ERROR    - step.py - MMCWrite120 fail!! ElapsedTime:0ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 14:28:00,341 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,342 - ERROR    - step.py - MMCRead017 fail!! ElapsedTime:998ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 14:28:00,343 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,344 - ERROR    - step.py - MMCRead020 fail!! ElapsedTime:997ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 14:28:00,344 - ERROR    - suite.py - MMCReadWriteSpeedTest Test Fail!,ElapsedTime:0:00:00.010971
+2021-09-08 14:28:00,345 - ERROR    - step.py - CheckResetButton fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,345 - ERROR    - step.py - PressButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,347 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:997ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,348 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,348 - ERROR    - suite.py - ResetButtonTest Test Fail!,ElapsedTime:0:00:00.003989
+2021-09-08 14:28:00,355 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,355 - ERROR    - step.py - LEDWhiteOn4100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,356 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:997ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,357 - ERROR    - step.py - CheckLEDWhiteOn fail!! ElapsedTime:997ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,357 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,358 - ERROR    - step.py - LEDGreenOn2100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,359 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,359 - ERROR    - step.py - CheckLEDGreenOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,360 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,360 - ERROR    - step.py - LEDRedOn1100 fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,361 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,361 - ERROR    - step.py - CheckLEDRedOn fail!! ElapsedTime:0ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,361 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,362 - ERROR    - step.py - LEDBlueOn3100 fail!! ElapsedTime:994ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,362 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,369 - ERROR    - step.py - CheckLEDBlueOn fail!! ElapsedTime:7978ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,370 - ERROR    - suite.py - LEDFunctionTest Test Fail!,ElapsedTime:0:00:00.016964
+2021-09-08 14:28:00,370 - ERROR    - step.py - EthConfig fail!! ElapsedTime:0ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,371 - ERROR    - step.py - Eth0Ping fail!! ElapsedTime:986ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,371 - ERROR    - step.py - Eth1Ping fail!! ElapsedTime:0ms,Symptom:3.2.3.1:Device.Ethernet.Eth1.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,371 - ERROR    - suite.py - EthernetSpeedTest Test Fail!,ElapsedTime:0:00:00.000986
+2021-09-08 14:28:00,372 - ERROR    - step.py - writeAllART fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,372 - ERROR    - step.py - ART checksum fail!! ElapsedTime:0ms,Symptom::,Spec:,Min:,Value:None,Max:
+2021-09-08 14:28:00,372 - ERROR    - suite.py - CheckArtPartition Test Fail!,ElapsedTime:0:00:00.000998
+2021-09-08 14:29:25,345 - ERROR    - step.py - CheckEeroTest fail!! ElapsedTime:997ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,346 - ERROR    - step.py - Checkroute fail!! ElapsedTime:0ms,Symptom:15.5:ShopFloor.Repair,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,346 - ERROR    - step.py - CheckEeroABA fail!! ElapsedTime:0ms,Symptom:15.9:ShopFloor.ABXRetestError,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,347 - ERROR    - step.py - GetPcbaErroMessage fail!! ElapsedTime:997ms,Symptom:15.1:ShopFloor.Communication,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,347 - ERROR    - suite.py - VerifySFIS Test Fail!,ElapsedTime:0:00:00.006019
+2021-09-08 14:29:25,348 - ERROR    - step.py - AT+TESTSTART% fail!! ElapsedTime:967ms,Symptom:1.11.5:Equipment.FixtureMCU.InsertIOBlock,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,348 - ERROR    - step.py - AT+VBUSOPEN% fail!! ElapsedTime:0ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,348 - ERROR    - suite.py - CurrentShortTest Test Fail!,ElapsedTime:0:00:00.000967
+2021-09-08 14:29:25,349 - ERROR    - step.py - OpenTest fail!! ElapsedTime:0ms,Symptom:2.1.1:Electric.Current.TooLow,Spec:,Min:0.02,Value:None,Max:3
+2021-09-08 14:29:25,349 - ERROR    - step.py - SerialPortOpen fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,350 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:996ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,351 - ERROR    - step.py - UbootIdle fail!! ElapsedTime:999ms,Symptom:2.1.1:Electric.Current.TooLow,Spec:,Min:0.2,Value:None,Max:0.6
+2021-09-08 14:29:25,351 - ERROR    - suite.py - CurrentTest Test Fail!,ElapsedTime:0:00:00.001995
+2021-09-08 14:29:25,351 - ERROR    - step.py - Voltage_USBC_VBUS fail!! ElapsedTime:0ms,Symptom:2.2.17.1:Electric.Voltage.USBC_VBUS.TooLow,Spec:5,Min:4.75,Value:None,Max:5.25
+2021-09-08 14:29:25,363 - ERROR    - step.py - Voltage_DVDD3.3 fail!! ElapsedTime:12053ms,Symptom:2.2.19.1:Electric.Voltage.DVDD3.3.TooLow,Spec:3.3,Min:3.15,Value:None,Max:3.45
+2021-09-08 14:29:25,363 - ERROR    - step.py - Voltage_DVDD1.95 fail!! ElapsedTime:0ms,Symptom:2.2.20.1:Electric.Voltage.DVDD1.95.TooLow,Spec:1.95,Min:1.9,Value:None,Max:2.05
+2021-09-08 14:29:25,364 - ERROR    - step.py - Voltage_DVDD2.2 fail!! ElapsedTime:0ms,Symptom:2.2.21.1:Electric.Voltage.DVDD2.2.TooLow,Spec:2.2,Min:2.1,Value:None,Max:2.3
+2021-09-08 14:29:25,364 - ERROR    - step.py - Voltage_DVDD0.912 fail!! ElapsedTime:0ms,Symptom:2.2.22.1:Electric.Voltage.DVDD0.912.TooLow,Spec:0.912,Min:0.87,Value:None,Max:0.95
+2021-09-08 14:29:25,365 - ERROR    - step.py - Voltage_DVDD1.29_MP_CORE fail!! ElapsedTime:0ms,Symptom:2.2.23.1:Electric.Voltage.DVDD1.29_MP_CORE.TooLow,Spec:1.29,Min:1.25,Value:None,Max:1.35
+2021-09-08 14:29:25,365 - ERROR    - step.py - Voltage_DVDD1.35_MP_DDR fail!! ElapsedTime:0ms,Symptom:2.2.24.1:Electric.Voltage.DVDD1.35_MP_DDR.TooLow,Spec:1.35,Min:1.283,Value:None,Max:1.45
+2021-09-08 14:29:25,365 - ERROR    - suite.py - VoltageTest Test Fail!,ElapsedTime:0:00:00.014051
+2021-09-08 14:29:25,365 - ERROR    - step.py - AT+TSD_OUTLOW% fail!! ElapsedTime:0ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,366 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,366 - ERROR    - step.py - AT+TSD_OUTHIGH% fail!! ElapsedTime:0ms,Symptom:1.11.1:Equipment.FixtureMCU.Laser,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,366 - ERROR    - step.py - WaitingToStart fail!! ElapsedTime:0ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,380 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:2003ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,381 - ERROR    - suite.py - EnterUBootTransition Test Fail!,ElapsedTime:0:00:00.016125
+2021-09-08 14:29:25,382 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:999ms,Symptom:3.23:Device.ThermalShutdown,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,383 - ERROR    - step.py - set-tsdr fail!! ElapsedTime:996ms,Symptom:3.23:Device.ThermalShutdown,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,383 - ERROR    - step.py - get-gpio17 fail!! ElapsedTime:0ms,Symptom:3.23:Device.ThermalShutdown,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,384 - ERROR    - suite.py - ThermalShutdownTest Test Fail!,ElapsedTime:0:00:00.002993
+2021-09-08 14:29:25,385 - ERROR    - step.py - ReadBoardRegisterValue fail!! ElapsedTime:998ms,Symptom:8.9:UBootError.BRV,Spec:00100,Min:,Value:None,Max:
+2021-09-08 14:29:25,385 - ERROR    - suite.py - ReadBoardRegisterValue Test Fail!,ElapsedTime:0:00:00.000998
+2021-09-08 14:29:25,395 - ERROR    - step.py - Reboot fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,398 - ERROR    - step.py - IntoUboot fail!! ElapsedTime:2993ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,399 - ERROR    - step.py - UpgradeImage fail!! ElapsedTime:998ms,Symptom:3.10.2:Device.MMC.Write,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,400 - ERROR    - step.py - IntoOpenWrt fail!! ElapsedTime:996ms,Symptom:7.6:Linux.KernelStartTimeout,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,401 - ERROR    - step.py - VerifyQSDKversion fail!! ElapsedTime:997ms,Symptom:17.9:Version.QSDK,Spec:EVT.11.4_CS.V024,Min:,Value:None,Max:
+2021-09-08 14:29:25,401 - ERROR    - suite.py - ReadAndUpdateLuxQsdkVersion Test Fail!,ElapsedTime:0:00:00.014681
+2021-09-08 14:29:25,402 - ERROR    - step.py - WriteMAC fail!! ElapsedTime:0ms,Symptom:3.10.2:Device.MMC.Write,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,403 - ERROR    - step.py - VeritfyDUTMAC fail!! ElapsedTime:0ms,Symptom:3.10.1:Device.MMC.Read,Spec:<MesMac>,Min:,Value:None,Max:
+2021-09-08 14:29:25,404 - ERROR    - step.py - WriteSN fail!! ElapsedTime:0ms,Symptom:3.10.2:Device.MMC.Write,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,405 - ERROR    - step.py - VeritfyDUTSN fail!! ElapsedTime:0ms,Symptom:9.14:ProcessControl.InvalidSerial,Spec:<SN>,Min:,Value:None,Max:
+2021-09-08 14:29:25,409 - ERROR    - suite.py - SaveIdentityInEnv Test Fail!,ElapsedTime:0:00:00.007189
+2021-09-08 14:29:25,410 - ERROR    - step.py - CPUVersionTest fail!! ElapsedTime:0ms,Symptom:17.10:Version.CPU,Spec:0x20180101,Min:,Value:None,Max:
+2021-09-08 14:29:25,411 - ERROR    - suite.py - CPUVersionTest Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 14:29:25,412 - ERROR    - step.py - CheckBZTBootloaderVersion fail!! ElapsedTime:0ms,Symptom:17.11:Version.BZTBootloader,Spec:v0.9.2.6,Min:,Value:None,Max:
+2021-09-08 14:29:25,413 - ERROR    - suite.py - CheckBZTBootloaderVersion Test Fail!,ElapsedTime:0:00:00.000998
+2021-09-08 14:29:25,414 - ERROR    - step.py - LoadBZTFirmware fail!! ElapsedTime:0ms,Symptom:17.12:Version.BZTFirmware,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,415 - ERROR    - suite.py - LoadBZTFirmware Test Fail!,ElapsedTime:0:00:00.000997
+2021-09-08 14:29:25,417 - ERROR    - step.py - check LED info fail!! ElapsedTime:1994ms,Symptom:17.8:Version.LED,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,418 - ERROR    - step.py - check PHY info fail!! ElapsedTime:998ms,Symptom:17.1:Version.Switch,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,420 - ERROR    - step.py - check eMMC info fail!! ElapsedTime:997ms,Symptom:17.3:Version.MMC,Spec:{4FTE4R,M62704,S40004},Min:,Value:None,Max:
+2021-09-08 14:29:25,422 - ERROR    - step.py - check CCG info fail!! ElapsedTime:997ms,Symptom:17.7:Version.CCG,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,422 - ERROR    - suite.py - SubsystemTest Test Fail!,ElapsedTime:0:00:00.006981
+2021-09-08 14:29:25,423 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom:0.1.1:ThreadSleep,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,427 - ERROR    - step.py - MMCWrite117 fail!! ElapsedTime:1920ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 14:29:25,428 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:996ms,Symptom:0.1.1:ThreadSleep,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,430 - ERROR    - step.py - MMCWrite120 fail!! ElapsedTime:996ms,Symptom:3.10.2.1:Device.MMC.Write.TooLow,Spec:,Min:15,Value:None,Max:40
+2021-09-08 14:29:25,431 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:998ms,Symptom:0.1.1:ThreadSleep,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,433 - ERROR    - step.py - MMCRead017 fail!! ElapsedTime:995ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 14:29:25,434 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:998ms,Symptom:0.1.1:ThreadSleep,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,435 - ERROR    - step.py - MMCRead020 fail!! ElapsedTime:997ms,Symptom:3.10.1.1:Device.MMC.Read.TooLow,Spec:,Min:35,Value:None,Max:200
+2021-09-08 14:29:25,436 - ERROR    - suite.py - MMCReadWriteSpeedTest Test Fail!,ElapsedTime:0:00:00.012967
+2021-09-08 14:29:25,437 - ERROR    - step.py - CheckResetButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,438 - ERROR    - step.py - PressButton fail!! ElapsedTime:0ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,442 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:996ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,444 - ERROR    - step.py - ReleaseButton fail!! ElapsedTime:997ms,Symptom:3.19:Device.ResetButton,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,445 - ERROR    - suite.py - ResetButtonTest Test Fail!,ElapsedTime:0:00:00.007977
+2021-09-08 14:29:25,446 - ERROR    - step.py - LEDOff fail!! ElapsedTime:997ms,Symptom:13.0:LED.AllOff,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,447 - ERROR    - step.py - LEDWhiteOn4100 fail!! ElapsedTime:998ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,448 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:1000ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,449 - ERROR    - step.py - CheckLEDWhiteOn fail!! ElapsedTime:995ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,451 - ERROR    - step.py - LEDOff fail!! ElapsedTime:0ms,Symptom:13.0:LED.AllOff,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,452 - ERROR    - step.py - LEDGreenOn2100 fail!! ElapsedTime:0ms,Symptom:13.2:LED.G,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,453 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,454 - ERROR    - step.py - CheckLEDGreenOn fail!! ElapsedTime:997ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,455 - ERROR    - step.py - LEDOff fail!! ElapsedTime:997ms,Symptom:13.0:LED.AllOff,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,458 - ERROR    - step.py - LEDRedOn1100 fail!! ElapsedTime:1035ms,Symptom:13.1:LED.R,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,459 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,461 - ERROR    - step.py - CheckLEDRedOn fail!! ElapsedTime:994ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,462 - ERROR    - step.py - LEDOff fail!! ElapsedTime:1000ms,Symptom:13.0:LED.AllOff,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,463 - ERROR    - step.py - LEDBlueOn3100 fail!! ElapsedTime:0ms,Symptom:13.3:LED.B,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,465 - ERROR    - step.py - ThreadSleep fail!! ElapsedTime:0ms,Symptom:8.6:UBootError.Boot,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,466 - ERROR    - step.py - CheckLEDBlueOn fail!! ElapsedTime:996ms,Symptom:13.4:LED.W,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,467 - ERROR    - suite.py - LEDFunctionTest Test Fail!,ElapsedTime:0:00:00.020944
+2021-09-08 14:29:25,468 - ERROR    - step.py - EthConfig fail!! ElapsedTime:997ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,470 - ERROR    - step.py - Eth0Ping fail!! ElapsedTime:0ms,Symptom:3.2.2.1:Device.Ethernet.Eth0.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,471 - ERROR    - step.py - Eth1Ping fail!! ElapsedTime:997ms,Symptom:3.2.3.1:Device.Ethernet.Eth1.Throughput,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,472 - ERROR    - suite.py - EthernetSpeedTest Test Fail!,ElapsedTime:0:00:00.003988
+2021-09-08 14:29:25,474 - ERROR    - step.py - writeAllART fail!! ElapsedTime:0ms,Symptom:7.3:Linux.WriteMMC,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,476 - ERROR    - step.py - ART checksum fail!! ElapsedTime:0ms,Symptom:7.3:Linux.WriteMMC,Spec:,Min:,Value:None,Max:
+2021-09-08 14:29:25,476 - ERROR    - suite.py - CheckArtPartition Test Fail!,ElapsedTime:0:00:00.003989
