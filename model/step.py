@@ -7,13 +7,16 @@
 @Desc   : 
 """
 import re
+import time
 from datetime import datetime
-from bin.basefunc import IsNullOrEmpty
-from bin.globalconf import logger  # , set_global, get_global
-from bin import globalvar as gv
 from model.product import phase_items, test_phases
-from model.test import test
 from bin.globalvar import set_globalVal, get_globalVal
+from bin import globalvar as gv
+from bin import globalconf as gc
+from model.basefunc import IsNullOrEmpty, ping, run_cmd, kill_process, start_process, restart_process, CompareLimit
+from bin.globalconf import logger
+from sokets.serialport import SerialPort
+from sokets.telnet import TelnetComm
 
 count = 0
 IfCond = True
@@ -55,6 +58,7 @@ class TestStep:
     error_code = ""
     error_details = ""
     Json = None  # 测试结果是否生成Json数据上传给客户
+    param1 = None
 
     def __init__(self, isTest=True, retry_times=0):
         self.__retry_times = retry_times
@@ -200,13 +204,16 @@ class TestStep:
 
                 self.retry_times = self.RetryTimes
                 for retry in range(int(self.retry_times), -1, -1):
-                    if test(retry, self):
+                    if test(self):
                         test_result = True
                         break
                     else:
                         pass
 
                 self.tResult = self._process_if_bypass(test_result)
+
+                self.set_errorCode_details(self.tResult, self.ErrorCode.split('\n')[0])
+
                 self._process_mesVer()
 
                 self.collect_result()
@@ -254,16 +261,80 @@ class TestStep:
             gv.csv_list_header.append(self.ItemName)
             gv.csv_list_result.append(self.tResult)
 
-# def wrapper(self, flag):
-#     def wrapper(func):
-#         def inner(obj):
-#             if flag:
-#                 pass
-#             result = func(obj)
-#             if flag:
-#                 obj.set_errorCode_details(result)
-#             return result
-#
-#         return inner
-#
-#     return wrapper
+
+def test(item: TestStep):
+    rReturn = False
+    compInfo = ''
+    try:
+        if item.TestKeyword == 'Sleep':
+            logger.debug(f'sleep {item.TimeOut}s')
+            time.sleep(item.TimeOut)
+            rReturn = True
+
+        elif item.TestKeyword == 'KillProcess':
+            rReturn = kill_process(item.ComdSend)
+
+        elif item.TestKeyword == 'StartProcess':
+            rReturn = start_process(item.ComdSend, item.ExpectStr)
+
+        elif item.TestKeyword == 'RestartProcess':
+            rReturn = restart_process(item.ComdSend, item.ExpectStr)
+
+        elif item.TestKeyword == 'PingDUT':
+            run_cmd('arp -d')
+            rReturn = ping(item.ComdSend)
+
+        elif item.TestKeyword == 'TelnetLogin':
+            if gv.dut_comm is None:
+                gv.dut_comm = TelnetComm(gv.dut_ip)
+            rReturn = gv.dut_comm.open(gc.c_station['prompt'])
+
+        elif item.TestKeyword == 'TelnetAndSendCmd':
+            temp = TelnetComm(item.param1)
+            if temp.open(gc.c_station['prompt']) and temp.SendCommand(item.ComdSend, item.ExpectStr, item.TimeOut)[0]:
+                return True
+
+        elif item.TestKeyword == 'SerialPortOpen':
+            if gv.dut_comm is None:
+                if not IsNullOrEmpty(item.ComdSend):
+                    gv.dut_comm = SerialPort(item.ComdSend, int(item.ExpectStr))
+            rReturn = gv.dut_comm.open()
+
+        elif item.TestKeyword == 'CloseDUTCOMM':
+            if gv.dut_comm is not None:
+                gv.dut_comm.close()
+                rReturn = True
+        else:
+            logger.debug('run test step')
+            pass
+            rReturn, revStr = gv.dut_comm.SendCommand(item.ComdSend, item.ExpectStr, item.TimeOut)
+            if rReturn:
+                if re.search(item.CheckStr1, revStr) and re.search(item.CheckStr2, revStr):
+                    rReturn = True
+
+                    if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
+                        values = re.findall(f'{item.SubStr1}(.*?){item.SubStr2}', revStr)
+                        if len(values) == 1:
+                            item.TestValue = values[0]
+                            logger.debug(f'get TestValue:{item.TestValue}')
+                        else:
+                            raise Exception(f'get TestValue exception:{values}')
+
+                        if not IsNullOrEmpty(item.Spec):
+                            rReturn = True if item.TestValue in item.Spec else False
+                        if not IsNullOrEmpty(item.Limit_min) or not IsNullOrEmpty(item.Limit_max):
+                            rReturn, compInfo = CompareLimit(item.Limit_min, item.Limit_max, item.TestValue)
+                else:
+                    rReturn = False
+            else:
+                pass
+
+    except Exception as e:
+        logger.exception(f"test Exception！！{e}")
+        rReturn = False
+        return rReturn
+    else:
+        return rReturn
+    finally:
+        # item.set_errorCode_details(rReturn, item.ErrorCode.split('\n')[0])
+        pass

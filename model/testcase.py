@@ -10,7 +10,7 @@ from datetime import datetime
 import json
 import sys
 from openpyxl import load_workbook
-from bin.basefunc import IsNullOrEmpty, binary_read, get_sha256
+from model.basefunc import IsNullOrEmpty, binary_read, get_sha256
 from .suite import TestSuite
 from .step import TestStep
 from bin.globalconf import logger
@@ -23,7 +23,7 @@ class TestCase:
     _testcase_path_excel = None
     _testcase_path_json = None
     test_suites = []
-    _tResult = True
+    _tResult = False
     start_time = ""
     finish_time = ""
 
@@ -108,8 +108,7 @@ class TestCase:
         return True
 
     def run_suites(self, test_suites, global_fail_continue=False, suiteNo=None, stepNo=None):
-        global suite_result
-        suite_result = True
+        suite_result = False
         suite_result_list = []
         try:
             for suite in test_suites:

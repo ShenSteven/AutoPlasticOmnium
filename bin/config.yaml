@@ -4,7 +4,7 @@ station:
     station_all: MBLT,SRF,RTT
     station_name: MBLT
     station_no: MBLT-3000
-    log_folder: $test_log_folder
+    log_folder: D:\TestLog
     log_server: 10.90.104.85
     log_server_username: eero
     log_server_password: eero

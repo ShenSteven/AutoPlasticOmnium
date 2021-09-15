@@ -8,7 +8,6 @@
 """
 from datetime import datetime
 
-from bin.basefunc import IsNullOrEmpty
 from bin.globalconf import logger
 from model.product import test_phases
 from bin import globalvar as gv
@@ -60,7 +59,6 @@ class TestSuite:
                 setattr(gv.mesPhases, self.SeqName, str(self.testResult).upper())
 
     def run_suite(self, global_fail_continue, stepNo=None):
-        global step_result
         step_result = False
         testPhase = test_phases()
         step_result_list = []

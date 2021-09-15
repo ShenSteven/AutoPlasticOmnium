@@ -9,7 +9,7 @@
 import re
 import time
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
-from bin.basefunc import IsNullOrEmpty
+from model.basefunc import IsNullOrEmpty
 from bin.globalconf import logger
 
 from sokets.communication import CommAbstract
@@ -22,7 +22,8 @@ class SerialPort(CommAbstract):
                           stopbits=STOPBITS_ONE, parity=PARITY_NONE)
 
     def open(self, *args):
-        self.ser.open()
+        if not self.ser.isOpen():
+            self.ser.open()
 
     def close(self):
         self.ser.close()
@@ -38,6 +39,7 @@ class SerialPort(CommAbstract):
     def SendCommand(self, command, exceptStr, timeout=10, newline=True):
         result = False
         strRecAll = ''
+        start_time = time.time()
         try:
             self.ser.timeout = timeout
             if newline and not IsNullOrEmpty(command):
@@ -53,12 +55,20 @@ class SerialPort(CommAbstract):
             strRecAll = self.ser.read_until(exceptStr.encode('utf-8')).decode('utf-8')
             logger.debug(strRecAll)
             if re.search(exceptStr, strRecAll):
-                logger.info(f'wait until {exceptStr} success in {timeout}s')
+                logger.info(f'wait until {exceptStr} success in {round(time.time() - start_time, 3)}s')
                 result = True
             else:
-                logger.error(f'wait {exceptStr} timeout in {timeout}s')
+                logger.error(f'wait until {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
                 result = False
             return result, strRecAll
         except Exception as e:
             logger.exception(e)
             return False, strRecAll
+
+
+if __name__ == "__main__":
+    com = SerialPort('COM7', 115200, 1, 1)
+    com.SendCommand('', 'luxshare SW Version :', 100)
+    com.SendCommand('\n', 'root@OpenWrt:/#', 3)
+    com.SendCommand('luxshare_tool --get-mac-env', 'root@OpenWrt:/#')
+    com.SendCommand("dmesg | grep 'mmcblk0' | head -1 | awk '{print $5}'", 'root@OpenWrt:/#')

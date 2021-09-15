@@ -6,8 +6,10 @@
 @Date   : 2021/9/3
 @Desc   : 
 """
+import time
+
 from bin import globalvar
-from bin.basefunc import create_csv_file, write_csv_file
+from model.basefunc import create_csv_file, write_csv_file
 from model.testcase import *
 
 
@@ -24,4 +26,5 @@ def run(is_cyclic=False):
         write_csv_file('result.csv', globalvar.csv_list_header)
 
 
-run(False)
+# run(False)
+print(time.strftime("%Y-%m-%d %H:%M:%S"))

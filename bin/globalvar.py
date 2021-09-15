@@ -35,6 +35,8 @@ station = Station(sn, c_station['station_no'], test_mode, c_dut['qsdk_ver'], c_s
 
 csv_list_header = []
 csv_list_result = []
+dut_comm = None
+dut_ip = ''
 
 
 def set_globalVal(name, value):

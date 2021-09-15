@@ -19,8 +19,20 @@ from bin.yamlread import YamlConfig
 current_path = dirname(abspath(__file__))
 above_current_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-log_folder = r'R:/TestLog'
+# load test global variable
+config_yaml = join(current_path, 'config.yaml')
+YamlConfig_obj = YamlConfig(config_yaml)
+config = YamlConfig_obj.read_yaml()
+# res_gConfig = Template(json.dumps(gConfig)).safe_substitute(
+#     {'$test_log_folder': log_folder})
+# config = json.loads(res_gConfig)
+c_station = globals()['config']['station']
+c_dut = globals()['config']['dut']
+c_count = globals()['config']['count_num']
+
+log_folder = c_station['log_folder']
 log_folder_date = join(log_folder, datetime.now().strftime('%Y%m%d'))
+
 try:
     if not exists(log_folder_date):
         os.makedirs(log_folder_date)
@@ -30,26 +42,16 @@ except FileNotFoundError:
     if not exists(log_folder_date):
         os.makedirs(log_folder_date)
 
-# load test global variable
-config_yaml = join(current_path, 'config.yaml')
-YamlConfig_obj = YamlConfig(config_yaml)
-gConfig = YamlConfig_obj.read_yaml()
-res_gConfig = Template(json.dumps(gConfig)).safe_substitute(
-    {'$test_log_folder': log_folder})
-config = json.loads(res_gConfig)
-c_station = globals()[f'config']['station']
-c_dut = globals()['config']['dut']
-c_count = globals()['config']['count_num']
-
 testlog_file = os.path.join(log_folder_date, f"{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
+
 # load logger config
 logging_yaml = join(current_path, 'logging.yaml')
 print(logging_yaml)
 log_conf = YamlConfig(logging_yaml).read_yaml()
 res_log_conf = Template(json.dumps(log_conf)).safe_substitute(
     {'log_file': testlog_file,
-     'critical_log': join(log_folder_date, 'critical_log.txt').replace('\\', '/'),
-     'errors_log': join(log_folder_date, 'errors_log.txt').replace('\\', '/')})
+     'critical_log': join(log_folder_date, 'critical.log').replace('\\', '/'),
+     'errors_log': join(log_folder_date, 'errors.log').replace('\\', '/')})
 logging.config.dictConfig(yaml.safe_load(res_log_conf))
 logger = logging.getLogger('testlog')
 
