@@ -1,4 +1,4 @@
 /debug.py
 /log/
 /conf/result.csv
-/firefly_data_api_client.py
+/scripts/firefly_data_api_client.py
