@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/c/env python
 # coding: utf-8
 """
 @File   : ssh.py

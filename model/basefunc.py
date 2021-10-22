@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/c/env python
 # coding: utf-8
 """
 @File   : basefunc.py
@@ -11,13 +11,11 @@ import hashlib
 import os
 import subprocess
 import time
+import platform
+import psutil as psutil
 from datetime import datetime
 from enum import Enum
-import platform
-
-import psutil as psutil
-
-from bin.globalconf import logger
+from conf.globalconf import logger
 
 win = platform.system() == "Windows"
 
@@ -129,7 +127,7 @@ def CompareLimit(limitMin, limitMax, value, is_round=False):
 def ping(host, timeout=1):
     """
     Returns True if host (str) responds to a ping request.
-    Remember that a host may not respond to a ping (ICMP) request even if the host name is valid.
+    Remember that a host may not respond to a ping (ICMP) request even if the host test_name is valid.
     """
     param = '-n' if win else '-c'
     command = f'ping {param} 1 {host}'
@@ -173,7 +171,7 @@ def kill_process(process_name, killall=True):
                 p = psutil.Process(pid)
                 if p.name() == process_name:
                     p.kill()
-                    logger.debug(f"kill pid-{pid},name-{p.name()}")
+                    logger.debug(f"kill pid-{pid},test_name-{p.name()}")
                     time.sleep(1)
                     if not killall:
                         break
@@ -216,19 +214,20 @@ def restart_process(full_path, process_name):
         logger.exception(e)
         return False
 
+
 def register(name, email, **kwargs):
-    print('name:%s, age:%s, others:%s', (name, email, kwargs))
+    print('test_name:%s, age:%s, others:%s', (name, email, kwargs))
 
 
 if __name__ == '__main__':
     pass
-    # create_csv_file('test.csv', ['No', 'Phase name', 'Test name', 'Error Code'])
+    # create_csv_file('test.csv', ['No', 'Phase test_name', 'Test test_name', 'Error Code'])
     # write_csv_file('test.csv', ['1wqw', '2', '3', '4'])
     # print(str(True))
     # ping('192.168.1.101')
     # ping('127.0.0.1')
     # aa = restart_process('EXCEL.EXE')
     # logger.debug(f"ds{aa}")
-    register("demon", "1@1.com")  # name:%s, age:%s, others:%s ('demon', '1@1.com', {})
+    register("demon", "1@1.com")  # test_name:%s, age:%s, others:%s ('demon', '1@1.com', {})
     register("demon", "1@1.com",
-             addr="shanghai")  # name:%s, age:%s, others:%s ('demon', '1@1.com', {'addr': 'shanghai'})
+             addr="shanghai")  # test_name:%s, age:%s, others:%s ('demon', '1@1.com', {'addr': 'shanghai'})

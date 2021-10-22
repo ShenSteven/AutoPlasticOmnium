@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/c/env python
 # coding: utf-8
 """
 @File   : serialport.py
@@ -10,7 +10,7 @@ import re
 import time
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 from model.basefunc import IsNullOrEmpty
-from bin.globalconf import logger
+from conf.globalconf import logger
 
 from sokets.communication import CommAbstract
 

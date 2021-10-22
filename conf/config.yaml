@@ -1,18 +1,17 @@
-version: 1
 station:
-    debug: true
-    station_all: MBLT,SRF,RTT
-    station_name: MBLT
-    station_no: MBLT-3000
+    privileges: factory
+    station_all: MBLT,SRF,RTT,MBFT,SFT,CCT
+    station_name: SRF
+    station_no: MBFT-3000
     log_folder: D:\TestLog
     log_server: 10.90.104.85
     log_server_username: eero
     log_server_password: eero
-    fix_flag: false
+    fix_flag: true
     fix_com_port: COM3
     fix_com_baudRate: 115200
     GPIB_address: 9
-    testcase: SSI.xlsx
+    testcase: fireflyALL.xlsx
     prompt: root@OpenWrt:/#
     fail_continue: false
     mes_shop_floor: 10.90.104.126:8080
@@ -27,14 +26,22 @@ dut:
     ssh_username: root
     ssh_password: root
     dut_modes:
+    - cento
     - gateway
     - leaf
     - firefly
+    data_api:
+    - cento
+    - anytown
+    - firefly_data_api_client.py
     sn_len: 16
     qsdk_ver: 029
-count_num:
+    test_mode: production
+count:
     continue_fail_count: 0
     continue_fail_limit: 3
     total_pass_count: 0
     total_fail_count: 0
     total_abort_count: 0
+
+

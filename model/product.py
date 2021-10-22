@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/c/env python
 # coding: utf-8
 """
 @File   : product.py
@@ -8,7 +8,7 @@
 """
 
 
-class Station:
+class JsonResult:
     serial = ""
     test_station = ""
     start_time = ""
@@ -19,7 +19,8 @@ class Station:
     error_details = ""
     luxshare_qsdk_version = ""
     test_software_version = ""
-    test_phases = []
+    test_phases = None
+    tests = None
 
     def __init__(self, serial, test_station, test_mode, qsdkVer, test_software_version):
         self.serial = serial
@@ -27,10 +28,11 @@ class Station:
         self.mode = test_mode
         self.luxshare_qsdk_version = qsdkVer
         self.test_software_version = test_software_version
-        self.test_phases = []
+        self.test_phases = None
+        self.tests = None
 
 
-class test_phases:
+class SuiteItem:
     phase_name = ""
     status = "canceled"
     start_time = ""
@@ -43,11 +45,32 @@ class test_phases:
         self.phase_items = []
 
 
-class phase_items:
-    name = None
-    value = None
-    unit = None
-    limit_min = None
-    limit_max = None
+class StepItem:
+    test_name = None
+    test_value = None
+    units = None
+    error_code = None
+    lower_limit = None
+    upper_limit = None
     status = None
-    spec = None
+    start_time = None
+    finish_time = None
+
+
+class MesInfo:
+    serial = ""
+    status = ''
+    start_time = ""
+    finish_time = ""
+    test_station = ""
+    error_code = ""
+    error_details = ""
+    test_software_version = None
+    PartNumber = None
+    MacAddress = None
+    first_fail = None
+
+    def __init__(self, serial, test_station, test_software_version):
+        self.serial = serial
+        self.test_station = test_station
+        self.test_software_version = test_software_version

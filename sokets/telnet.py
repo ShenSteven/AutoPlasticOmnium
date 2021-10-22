@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/c/env python
 # coding: utf-8
 """
 @File   : telnet.py
@@ -11,7 +11,7 @@ import time
 from telnetlib import Telnet
 
 from model.basefunc import IsNullOrEmpty
-from bin.globalconf import logger
+from conf.globalconf import logger
 from sokets.communication import CommAbstract
 
 
