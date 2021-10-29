@@ -109,6 +109,7 @@ class Step:
         self.__test_spec = value
 
     def run(self, testPhase: SuiteItem = None):
+        info = ''
         test_result = False
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
@@ -126,23 +127,17 @@ class Step:
                 if test_result:
                     break
 
-            self.tResult = self.process_if_bypass(test_result)
-
-            self.set_errorCode_details(self.tResult, "")
-
-            self.record_first_fail(self.tResult)
-
-            self.process_mesVer()
-
             self.print_result(test_result)
-
+            self.tResult = self.process_if_bypass(test_result)
+            self.set_errorCode_details(self.tResult, info)
+            self.record_first_fail(self.tResult)
             self.Process_json(testPhase, test_result)
+            self.process_mesVer()
 
         except Exception as e:
             logger.exception(f"run Exception！！{e}")
             self.tResult = False
             return self.tResult
-
         else:
             return self.tResult
         finally:
@@ -187,19 +182,19 @@ class Step:
         global count
         if not tResult:
             count += 1
+        else:
+            return
         if count == 1 and IsNullOrEmpty(gv.error_code_first_fail):
             gv.error_code_first_fail = self.error_code
             gv.error_details_first_fail = self.error_details
             gv.mesPhases.first_fail = self.suite_name
 
     def process_ByPassFail(self, step_result):
-        if str(self.ByPassFail).upper() == 'P' and not step_result:
+        if (str(self.ByPassFail).upper() == 'P' or str(self.ByPassFail).upper() == '1') and not step_result:
             logger.info(f"Let this step:{self.ItemName} bypass.")
             return True
-        elif str(self.ByPassFail).upper() == 'F' and step_result:
-            # self.set_errorCode_details(self.ErrorCode.split('\n')[0])
+        elif (str(self.ByPassFail).upper() == 'F' or str(self.ByPassFail).upper() == '0') and step_result:
             logger.error(f"Let this step:{self.ItemName} by fail.")
-            # f"Set error_code:{self.error_code},error_details:{self.error_details}")
             return False
         else:
             return step_result
@@ -208,7 +203,8 @@ class Step:
         self.tResult = False
         self.error_code = None
         self.error_details = None
-        self.isTest = True
+        if not gv.isDebug:
+            self.isTest = True
         self.testValue = None
         self.elapsedTime = None
         self.start_time = None

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1448</width>
+    <height>857</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1448</width>
+    <height>857</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>AutoTestSystem</string>
+  </property>
+  <property name="toolTip">
+   <string/>
+  </property>
+  <property name="statusTip">
+   <string>TestTime:    FailCount: </string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTreeView" name="treeView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1448</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="testcase">
+    <property name="title">
+     <string>TestCase</string>
+    </property>
+    <addaction name="actionOpenExcel"/>
+    <addaction name="actionOpenJson"/>
+    <addaction name="separator"/>
+    <addaction name="actionReloadExcel"/>
+    <addaction name="actionReloadJson"/>
+    <addaction name="separator"/>
+    <addaction name="actionSaveToJson"/>
+    <addaction name="actionExcelToJson"/>
+   </widget>
+   <widget class="QMenu" name="settings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionconfig"/>
+   </widget>
+   <widget class="QMenu" name="help">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionHelper"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="tools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="debug">
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <addaction name="actionDisable"/>
+    <addaction name="actionEnable"/>
+    <addaction name="separator"/>
+    <addaction name="actionStart"/>
+    <addaction name="actionPause"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menuLog">
+    <property name="title">
+     <string>Log</string>
+    </property>
+    <addaction name="actionSave"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionClear"/>
+    <addaction name="separator"/>
+    <addaction name="actionException"/>
+    <addaction name="actionLogFolder"/>
+    <addaction name="actionCSVLog"/>
+    <addaction name="actionResultLog"/>
+   </widget>
+   <addaction name="testcase"/>
+   <addaction name="settings"/>
+   <addaction name="debug"/>
+   <addaction name="tools"/>
+   <addaction name="menuLog"/>
+   <addaction name="help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpenExcel"/>
+   <addaction name="actionOpenJson"/>
+   <addaction name="actionReloadExcel"/>
+   <addaction name="actionReloadJson"/>
+   <addaction name="separator"/>
+  </widget>
+  <action name="actionOpenJson">
+   <property name="text">
+    <string>OpenJson</string>
+   </property>
+  </action>
+  <action name="actionOpenExcel">
+   <property name="text">
+    <string>OpenExcel</string>
+   </property>
+  </action>
+  <action name="actionReloadExcel">
+   <property name="text">
+    <string>ReloadExcel</string>
+   </property>
+  </action>
+  <action name="actionconfig">
+   <property name="text">
+    <string>参数配置</string>
+   </property>
+  </action>
+  <action name="actionReloadJson">
+   <property name="text">
+    <string>ReloadJson</string>
+   </property>
+  </action>
+  <action name="actionSaveToJson">
+   <property name="text">
+    <string>SaveToJson</string>
+   </property>
+  </action>
+  <action name="actionExcelToJson">
+   <property name="text">
+    <string>ExcelToJson</string>
+   </property>
+  </action>
+  <action name="actionStart">
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionException">
+   <property name="text">
+    <string>Exception</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionLogFolder">
+   <property name="text">
+    <string>LogFolder</string>
+   </property>
+  </action>
+  <action name="actionCSVLog">
+   <property name="text">
+    <string>CSVLog</string>
+   </property>
+  </action>
+  <action name="actionResultLog">
+   <property name="text">
+    <string>ResultLog</string>
+   </property>
+  </action>
+  <action name="actionDisable">
+   <property name="text">
+    <string>Disable</string>
+   </property>
+  </action>
+  <action name="actionEnable">
+   <property name="text">
+    <string>Enable</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="actionHelper">
+   <property name="text">
+    <string>Helper</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
