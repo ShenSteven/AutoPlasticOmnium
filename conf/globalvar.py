@@ -35,6 +35,7 @@ csv_list_header = []
 csv_list_result = []
 dut_comm = None
 inPutValue = ""  # suite内的全局变量
+startFlag = False
 
 ForTotalCycle = 0
 ForTestCycle = 1

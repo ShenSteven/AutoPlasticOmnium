@@ -9,7 +9,6 @@
 import json
 import time
 import requests
-# from conf import globalvar as gv
 from model.basefunc import create_csv_file, write_csv_file
 from model.testcase import *
 

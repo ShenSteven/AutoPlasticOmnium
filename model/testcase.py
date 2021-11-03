@@ -7,7 +7,7 @@
 @Desc   : 
 """
 from datetime import datetime
-from model.loadseq import load_testcase_from_excel, load_testcase_from_json
+from model.loadseq import load_testcase_from_excel
 from conf.globalconf import logger
 from conf import globalvar as gv
 from model.product import JsonResult, MesInfo

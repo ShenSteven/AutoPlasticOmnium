@@ -91,7 +91,7 @@ def load_testcase_from_excel(testcase_path_excel, sheetName, testcase_path_json,
         logger.exception(f"load testcase fail！{e}")
         sys.exit(1)
     else:
-        json.dump(suites_list, open(fr'F:\pyside2\scripts\{sheetName}.json', 'w'),
+        json.dump(suites_list, open(f'scripts/{sheetName}.json', 'w'),
                   default=lambda o: o.__dict__,
                   sort_keys=True,
                   indent=4)

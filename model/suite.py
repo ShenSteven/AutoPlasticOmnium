@@ -41,7 +41,7 @@ def fail_continue(step: Step, failContinue):
 
 class TestSuite:
     SeqName = ""
-    isTest = True  # 是否测试
+    isTest: bool = True  # 是否测试
     isTestFinished = False  # 测试完成标志
     tResult = True  # 测试结果
     totalNumber = 0  # 测试大项item总数量
