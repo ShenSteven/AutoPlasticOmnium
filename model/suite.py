@@ -9,6 +9,7 @@
 import re
 from datetime import datetime
 from conf.globalconf import logger
+# from mainform import mainForm
 from model.basefunc import IsNullOrEmpty
 from model.product import SuiteItem
 from conf import globalvar as gv
@@ -85,8 +86,11 @@ class TestSuite:
     def run(self, global_fail_continue, stepNo=-1):
         if self.isTest:
             return True
-        logger.debug(f"---------Start testSuite:{self.SeqName}----------")
-        step_result = False
+        logger.debug('- ' * 9 + f"Start testSuite:{self.SeqName}" + '- ' * 9)
+        # mainForm.ui.textEdit.insertHtml(
+        #     '- ' * 9 + f"<a name='testSuite:{self.SeqName}'>Start testSuite:{self.SeqName}</a>" + '- ' * 9)
+
+        # step_result = False
         testPhase = SuiteItem()
         step_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')

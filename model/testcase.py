@@ -29,8 +29,9 @@ class TestCase:
         self.testcase_path_excel = testcase_path_excel
         self.testcase_path_json = gv.testcaseJsonPath
         self.sha256_key_path = gv.SHA256Path
-        self.test_suites = load_testcase_from_excel(self.testcase_path_excel, self.sheetName, self.testcase_path_json,
-                                                    self.sha256_key_path)
+        self.test_suites: list = load_testcase_from_excel(self.testcase_path_excel, self.sheetName,
+                                                          self.testcase_path_json,
+                                                          self.sha256_key_path)
         # self.test_suites = load_testcase_from_json(self.sha256_key_path, self.testcase_path_json)
 
     def run(self, test_suites, global_fail_continue=False, stepNo=None):

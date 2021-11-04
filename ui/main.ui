@@ -32,7 +32,7 @@
    <string>TestTime:    FailCount: </string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTreeView" name="treeView">
+   <widget class="QTreeWidget" name="treeWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -41,24 +41,35 @@
       <height>441</height>
      </rect>
     </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::CustomContextMenu</enum>
+    </property>
     <property name="editTriggers">
      <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <attribute name="headerVisible">
      <bool>false</bool>
     </attribute>
-    <attribute name="headerCascadingSectionResizes">
-     <bool>false</bool>
-    </attribute>
+    <column>
+     <property name="text">
+      <string notr="true">1</string>
+     </property>
+    </column>
    </widget>
    <widget class="QTextEdit" name="textEdit">
     <property name="geometry">
      <rect>
       <x>320</x>
       <y>470</y>
-      <width>911</width>
+      <width>241</width>
       <height>291</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="placeholderText">
+     <string/>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit">
@@ -366,6 +377,31 @@ font: 75 11pt &quot;Arial&quot;;</string>
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionCheckAll">
+   <property name="text">
+    <string>CheckAll</string>
+   </property>
+  </action>
+  <action name="actionUncheckAll">
+   <property name="text">
+    <string>UncheckAll</string>
+   </property>
+  </action>
+  <action name="actionStepping">
+   <property name="text">
+    <string>Stepping</string>
+   </property>
+  </action>
+  <action name="actionLooping">
+   <property name="text">
+    <string>Looping</string>
+   </property>
+  </action>
+  <action name="actionEditStep">
+   <property name="text">
+    <string>EditStep</string>
    </property>
   </action>
  </widget>
