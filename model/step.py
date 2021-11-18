@@ -8,6 +8,9 @@
 """
 import re
 from datetime import datetime
+
+from PySide2.QtCore import Qt
+
 import model.product
 import conf.globalvar as gv
 import model.test
@@ -16,9 +19,11 @@ import conf.logconf as lg
 # count = 0
 # IfCond = True
 # setError = True
+import ui.mainform
 
 
 class Step:
+    suite_index = 0
     index = 0  # 当前测试step序列号
     tResult = False  # 测试项测试结果
     # isTest = True  # 是否测试,不测试的跳过
@@ -29,6 +34,7 @@ class Step:
     error_details = ""
     testValue = None  # 测试得到的值
     elapsedTime = None  # 测试步骤耗时
+    globalVar: str = ''
 
     suite_name: str = ''
     ItemName: str = None  # 当前测试step名字
@@ -106,12 +112,12 @@ class Step:
         self.__test_spec = value
 
     def run(self, testPhase: model.product.SuiteItem = None):
-
         info = ''
         test_result = False
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
             if self.isTest:
+                ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.yellow, self.suite_index, self.index)
                 lg.logger.debug(
                     f"Start step...{self.ItemName},Keyword:{self.TestKeyword},Retry:{self.RetryTimes},Timeout:"
                     f"{self.TimeOut}s,SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MES_var},FTC:{self.FTC}")
@@ -124,7 +130,9 @@ class Step:
                 test_result, info = model.test.test(self)
                 if test_result:
                     break
-
+            # gv.main_form.testSequences[self.suite_index].globalVar = self.globalVar
+            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.green if test_result else Qt.red,
+                                                                        self.suite_index, self.index)
             self.print_result(test_result)
             self.tResult = self.process_if_bypass(test_result)
             self.set_errorCode_details(self.tResult, info)
@@ -168,6 +176,7 @@ class Step:
         if self.IfElse.lower() == 'if':
             gv.IfCond = test_result
             if not test_result:
+                ui.mainform.my_signals.update_treeWidgetItem_backColor.emit('#FF99CC', self.suite_index, self.index)
                 lg.logger.info(f"if statement fail needs to continue, setting the test result to true")
                 test_result = True
         elif self.IfElse.lower() == 'else':
@@ -188,10 +197,12 @@ class Step:
 
     def process_ByPassFail(self, step_result):
         if (str(self.ByPassFail).upper() == 'P' or str(self.ByPassFail).upper() == '1') and not step_result:
-            lg.logger.info(f"Let this step:{self.ItemName} bypass.")
+            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkGreen, self.suite_index, self.index)
+            lg.logger.warning(f"Let this step:{self.ItemName} bypass.")
             return True
         elif (str(self.ByPassFail).upper() == 'F' or str(self.ByPassFail).upper() == '0') and step_result:
-            lg.logger.error(f"Let this step:{self.ItemName} by fail.")
+            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.suite_index, self.index)
+            lg.logger.warning(f"Let this step:{self.ItemName} by fail.")
             return False
         else:
             return step_result
@@ -214,21 +225,24 @@ class Step:
         by_result = self.process_ByPassFail(result_if)
         return by_result
 
-    def print_result(self, test_result):
+    def print_result(self, tResult):
         self.elapsedTime = (
                 datetime.now() - datetime.strptime(self.start_time, '%Y-%m-%d %H:%M:%S.%f')).microseconds
         if self.TestKeyword == 'Wait' and self.TestKeyword == 'ThreadSleep':
             return
-        if self.tResult:
+        if tResult:
             lg.logger.info(
-                f"{self.ItemName} {'pass' if self.tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}ms,"
+                f"{self.ItemName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}ms,"
                 f"Symptom:{self.error_code}:{self.error_details},"
                 f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.testValue},Max:{self.Limit_max}")
         else:
             lg.logger.error(
-                f"{self.ItemName} {'pass' if self.tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}ms,"
+                f"{self.ItemName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}ms,"
                 f"Symptom:{self.error_code}:{self.error_details},"
                 f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.testValue},Max:{self.Limit_max}")
+        ui.mainform.my_signals.update_tableWidget.emit(
+            (gv.SN, self.ItemName, self.test_spec, self.Limit_min, self.testValue,
+             self.Limit_max, self.elapsedTime, self.start_time, 'Pass' if tResult else 'Fail'))
 
     def collect_result(self):
         if not model.IsNullOrEmpty(self.Limit_max) or not model.IsNullOrEmpty(self.Limit_min):
@@ -254,8 +268,8 @@ class Step:
         obj.finish_time = self.finish_time
         obj.lower_limit = self.Limit_min
         obj.upper_limit = self.Limit_max
-        if not model.IsNullOrEmpty(
-                self.Spec) and '<' not in self.Spec and '>' not in self.Spec and not model.IsNullOrEmpty(self.Limit_min):
+        if not model.IsNullOrEmpty(self.Spec) and '<' not in self.Spec \
+                and '>' not in self.Spec and not model.IsNullOrEmpty(self.Limit_min):
             obj.lower_limit = self.Spec
 
         gv.stationObj.tests.appand(obj)

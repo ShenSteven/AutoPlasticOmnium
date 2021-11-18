@@ -61,7 +61,7 @@ class QTextEditHandler(logging.Handler):
             if 'INFO' in msg:  # pass
                 self.stream.setTextColor(Qt.blue)
             elif 'DEBUG' in msg:  # debug info
-                self.stream.setTextColor(Qt.black)
+                self.stream.setTextColor(Qt.pink)
             elif 'ERROR' in msg:  # fail
                 self.stream.setTextColor(Qt.red)
             elif 'CRITICAL' in msg:  # except

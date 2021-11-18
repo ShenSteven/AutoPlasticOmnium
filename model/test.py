@@ -20,6 +20,7 @@ import model.basefunc
 def test(item):
     rReturn = False
     compInfo = ''
+    # gv.main_form.testSequences[item.suite_index].globalVar = item.globalVar
     try:
         if item.TestKeyword == 'Sleep':
             lg.logger.debug(f'sleep {item.TimeOut}s')
@@ -52,7 +53,7 @@ def test(item):
 
         elif item.TestKeyword == 'SerialPortOpen':
             if gv.dut_comm is None:
-                if not model.basefunc.IsNullOrEmpty(item.ComdOrParam):
+                if not model.IsNullOrEmpty(item.ComdOrParam):
                     gv.dut_comm = SerialPort(item.ComdOrParam, int(item.ExpectStr))
             rReturn = gv.dut_comm.open()
 
@@ -68,7 +69,7 @@ def test(item):
                 if re.search(item.CheckStr1, revStr) and re.search(item.CheckStr2, revStr):
                     rReturn = True
 
-                    if not model.basefunc.IsNullOrEmpty(item.SubStr1) or not model.basefunc.IsNullOrEmpty(item.SubStr2):
+                    if not model.IsNullOrEmpty(item.SubStr1) or not model.IsNullOrEmpty(item.SubStr2):
                         values = re.findall(f'{item.SubStr1}(.*?){item.SubStr2}', revStr)
                         if len(values) == 1:
                             item.testValue = values[0]
@@ -76,9 +77,9 @@ def test(item):
                         else:
                             raise Exception(f'get TestValue exception:{values}')
 
-                        if not model.basefunc.IsNullOrEmpty(item.Spec):
+                        if not model.IsNullOrEmpty(item.Spec):
                             rReturn = True if item.testValue in item.Spec else False
-                        if not model.basefunc.IsNullOrEmpty(item.Limit_min) or not model.basefunc.IsNullOrEmpty(
+                        if not model.IsNullOrEmpty(item.Limit_min) or not model.IsNullOrEmpty(
                                 item.Limit_max):
                             rReturn, compInfo = model.basefunc.CompareLimit(item.Limit_min, item.Limit_max,
                                                                             item.testValue)

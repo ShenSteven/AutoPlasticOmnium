@@ -16,7 +16,7 @@ import conf.globalvar as gv
 import model.product
 import ui.images  # pyside2-rcc images.qrc -o images.py
 from sokets.serialport import SerialPort
-import conf.logconf
+import conf.logconf as lg
 import model.testcase
 
 
@@ -36,6 +36,7 @@ def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = 
     def thread_update():
         label.setText(str_)
         if color is not None:
+            lg.logger.debug(color.color().colorNames())
             label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
 
     thread = Thread(target=thread_update)
@@ -59,8 +60,8 @@ class MainForm(QWidget):
         super().__init__()
         init_create_dirs()
         self.a = 1
-        self.testcase = None
-        self.testSequences = None
+        self.testcase: model.testcase.TestCase
+        self.testSequences = []
         self.ui = QUiLoader().load(join(dirname(abspath(__file__)), 'main.ui'))
         # self.main_form = self
         gv.main_form = self
@@ -534,8 +535,8 @@ class MainForm(QWidget):
         self.killTimer(self.timer)
 
     def init_textEditHandler(self):
-        textEdit_handler = conf.logconf.QTextEditHandler(stream=self.ui.textEdit)
-        textEdit_handler.formatter = conf.logconf.logger.handlers[0].formatter
+        textEdit_handler = lg.QTextEditHandler(stream=self.ui.textEdit)
+        textEdit_handler.formatter = lg.logger.handlers[0].formatter
         textEdit_handler.level = 10
         textEdit_handler.name = 'textEdit_handler'
         logging.getLogger('testlog').addHandler(textEdit_handler)

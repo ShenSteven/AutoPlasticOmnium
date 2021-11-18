@@ -51,6 +51,7 @@ class TestSuite:
     error_code: str = None
     phase_details: str = None
     elapsedTime = None
+    globalVar: str = ''
 
     def update_from_dict(self, step_dict):
         import model.step
@@ -73,6 +74,7 @@ class TestSuite:
         self.error_code = ''
         self.phase_details = ''
         self.elapsedTime = None
+        self.globalVar = ''
 
     def copy_to(self, obj: model.product.SuiteItem):
         obj.phase_name = self.SeqName
@@ -107,6 +109,8 @@ class TestSuite:
                 self.process_for(self.test_steps[i])
 
                 if self.test_steps[i].isTest:
+                    if not model.IsNullOrEmpty(self.globalVar):
+                        step.globalVar = self.globalVar
                     step_result = self.test_steps[i].run(testPhase)
                     step_result_list.append(step_result)
                 else:
