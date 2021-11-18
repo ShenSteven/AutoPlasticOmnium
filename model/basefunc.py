@@ -1,4 +1,4 @@
-#!/usr/c/env python
+#!/usr/cf/env python
 # coding: utf-8
 """
 @File   : basefunc.py
@@ -7,17 +7,35 @@
 @Desc   : 
 """
 import csv
-import hashlib
+import json
 import os
 import subprocess
 import time
 import platform
 import psutil as psutil
 from datetime import datetime
-from enum import Enum
-from conf.globalconf import logger
+import yaml
+import conf.logconf as lg
+import model
 
 win = platform.system() == "Windows"
+
+
+def save_config(yaml_file, obj):
+    with open(yaml_file, mode='r+', encoding='utf-8') as f:
+        readall = f.read()
+        try:
+            js = json.dumps(obj, default=lambda o: o.__dict__, sort_keys=False, indent=4)
+            ya = yaml.safe_load(js)
+            f.seek(0)
+            yaml.safe_dump(ya, stream=f, default_flow_style=False, sort_keys=False, indent=4)
+        except Exception as e:
+            lg.logger.exception(f"save_config! {e}")
+            f.seek(0)
+            f.write(readall)
+        else:
+            pass
+            lg.logger.info(f"save conf.yaml success!")
 
 
 def wrapper(flag):
@@ -28,7 +46,7 @@ def wrapper(flag):
                 start = datetime.now()
             ret = func(**kwargs)
             if flag:
-                logger.debug(f'elapsed time:{datetime.now() - start}')
+                lg.logger.debug(f'elapsed time:{datetime.now() - start}')
             return ret
 
         return inners
@@ -40,45 +58,9 @@ def wrapper_time(fun):
     def inner(*args):
         start = datetime.now()
         fun(*args)
-        logger.debug(f'elapsed time:{datetime.now() - start}')
+        lg.logger.debug(f'elapsed time:{datetime.now() - start}')
 
     return inner
-
-
-def binary_read(filepath):
-    with open(filepath, 'rb') as f:
-        content = f.read()
-        return content.decode(encoding='UTF-8')
-
-
-def binary_write(filepath, content):
-    with open(filepath, 'wb') as f:
-        f.write(content.encode('utf8'))
-
-
-def get_sha256(filepath):
-    with open(filepath, 'rb') as f:
-        sha256obj = hashlib.sha256()
-        sha256obj.update(f.read())
-        return sha256obj.hexdigest()
-
-
-def IsNullOrEmpty(strObj: str):
-    if strObj and len(str(strObj)) > 0:
-        return False
-    else:
-        return True
-
-
-def SetTestStatus():
-    pass
-
-
-class TestStatus(Enum):
-    PASS = 1
-    FAIL = 2
-    START = 3
-    ABORT = 4
 
 
 def create_csv_file(filename, header):
@@ -88,7 +70,7 @@ def create_csv_file(filename, header):
                 file = csv.writer(f)
                 file.writerow(header)
     except Exception as e:
-        logger.exception(e)
+        lg.logger.exception(e)
 
 
 def write_csv_file(filename, row):
@@ -97,23 +79,23 @@ def write_csv_file(filename, row):
             file = csv.writer(f)
             file.writerow(row)
     except Exception as e:
-        logger.exception(e)
+        lg.logger.exception(e)
 
 
 def CompareLimit(limitMin, limitMax, value, is_round=False):
-    if IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):
+    if model.IsNullOrEmpty(limitMin) and model.IsNullOrEmpty(limitMax):
         return True, ''
-    if IsNullOrEmpty(value):
+    if model.IsNullOrEmpty(value):
         return False, ''
     temp = round(float(value)) if is_round else float(value)
-    if IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 只需比较最大值
-        logger.debug("Compare Limit_max...")
+    if model.IsNullOrEmpty(limitMin) and not model.IsNullOrEmpty(limitMax):  # 只需比较最大值
+        lg.logger.debug("Compare Limit_max...")
         return temp <= float(limitMax), ''
-    if not IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):  # 只需比较最小值
-        logger.debug("Compare Limit_min...")
+    if not model.IsNullOrEmpty(limitMin) and model.IsNullOrEmpty(limitMax):  # 只需比较最小值
+        lg.logger.debug("Compare Limit_min...")
         return temp >= float(limitMin), ''
-    if not IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 比较最小最大值
-        logger.debug("Compare Limit_min and Limit_max...")
+    if not model.IsNullOrEmpty(limitMin) and not model.IsNullOrEmpty(limitMax):  # 比较最小最大值
+        lg.logger.debug("Compare Limit_min and Limit_max...")
         if float(limitMin) <= temp <= float(limitMax):
             return True, ''
         else:
@@ -129,22 +111,22 @@ def ping(host, timeout=1):
     Returns True if host (str) responds to a ping request.
     Remember that a host may not respond to a ping (ICMP) request even if the host test_name is valid.
     """
-    param = '-n' if win else '-c'
+    param = '-n' if win else '-cf'
     command = f'ping {param} 1 {host}'
     try:
         ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              encoding=("gbk" if win else "utf8"), timeout=timeout)
         if ret.returncode == 0 and 'TTL=' in ret.stdout:
-            logger.debug(ret.stdout)
+            lg.logger.debug(ret.stdout)
             return True
         else:
-            logger.error(f"error:{ret.stdout},{ret.stderr}")
+            lg.logger.error(f"error:{ret.stdout},{ret.stderr}")
             return False
     except subprocess.TimeoutExpired:
-        logger.debug(f'ping {host} Timeout.')
+        lg.logger.debug(f'ping {host} Timeout.')
         return False
     except Exception as e:
-        logger.exception(e)
+        lg.logger.exception(e)
         return False
 
 
@@ -154,13 +136,13 @@ def run_cmd(command, timeout=1):
         ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              encoding=("gbk" if win else "utf8"), timeout=timeout)
         if ret.returncode == 0:  # 表示命令下发成功，不对命令内容结果做判断
-            logger.debug(ret.stdout)
+            lg.logger.debug(ret.stdout)
             return True
         else:
-            logger.error(f"error:{ret.stderr}")
+            lg.logger.error(f"error:{ret.stderr}")
             return False
     except Exception as e:
-        logger.exception(e)
+        lg.logger.exception(e)
         return False
 
 
@@ -171,13 +153,13 @@ def kill_process(process_name, killall=True):
                 p = psutil.Process(pid)
                 if p.name() == process_name:
                     p.kill()
-                    logger.debug(f"kill pid-{pid},test_name-{p.name()}")
+                    lg.logger.debug(f"kill pid-{pid},test_name-{p.name()}")
                     time.sleep(1)
                     if not killall:
                         break
         return True
     except Exception as e:
-        logger.exception(e)
+        lg.logger.exception(e)
         return False
 
 
@@ -201,7 +183,7 @@ def start_process(full_path, process_name):
         else:
             return True
     except Exception as e:
-        logger.exception(e)
+        lg.logger.exception(e)
         return False
 
 
@@ -211,7 +193,7 @@ def restart_process(full_path, process_name):
         if kill_process(process_name):
             return start_process(full_path, process_name)
     except Exception as e:
-        logger.exception(e)
+        lg.logger.exception(e)
         return False
 
 

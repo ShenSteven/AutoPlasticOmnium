@@ -1,6 +1,8 @@
 station:
-    privileges: factory
-    station_all: MBLT,SRF,RTT,MBFT,SFT,CCT
+    privileges: labs
+    station_all:
+    - MBLT
+    - SRF
     station_name: SRF
     station_no: MBFT-3000
     log_folder: D:\TestLog
@@ -18,6 +20,7 @@ station:
     mes_result: 10.90.104.104:8080
     csv_column: csv_column.txt
     test_software_version: 1.0.0.0
+    setTimeZone:
 dut:
     dut_ip: 192.168.1.101
     dut_com_port: COM7
@@ -30,18 +33,24 @@ dut:
     - gateway
     - leaf
     - firefly
+    dut_regex:
+        cento: '[A-Z0-9]+$'
+        gateway: '[A-Z0-9]+$'
+        leaf: '[A-Z0-9]+$'
+        firefly: '[A-Z0-9]+$'
     data_api:
-    - cento
-    - anytown
-    - firefly_data_api_client.py
+        cento: cento_data_api_client.py
+        gateway: anytown_data_api_client.py
+        leaf: anytown_data_api_client.py
+        firefly: firefly_data_api_client.py
     sn_len: 16
     qsdk_ver: 029
     test_mode: production
 count:
-    continue_fail_count: 0
+    continue_fail_count: 5
     continue_fail_limit: 3
-    total_pass_count: 0
-    total_fail_count: 0
-    total_abort_count: 0
+    total_pass_count: 3
+    total_fail_count: 3
+    total_abort_count: 3
 
 

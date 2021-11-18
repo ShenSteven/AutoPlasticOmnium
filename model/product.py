@@ -1,4 +1,4 @@
-#!/usr/c/env python
+#!/usr/cf/env python
 # coding: utf-8
 """
 @File   : product.py
@@ -74,3 +74,7 @@ class MesInfo:
         self.serial = serial
         self.test_station = test_station
         self.test_software_version = test_software_version
+
+
+if __name__ == '__main__':
+    pass

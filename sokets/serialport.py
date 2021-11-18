@@ -1,4 +1,4 @@
-#!/usr/c/env python
+#!/usr/cf/env python
 # coding: utf-8
 """
 @File   : serialport.py
@@ -9,10 +9,9 @@
 import re
 import time
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
-from model.basefunc import IsNullOrEmpty
-from conf.globalconf import logger
-
+from model import IsNullOrEmpty
 from sokets.communication import CommAbstract
+import conf.logconf as lg
 
 
 class SerialPort(CommAbstract):
@@ -26,8 +25,9 @@ class SerialPort(CommAbstract):
             self.ser.open()
 
     def close(self):
+        import conf.logconf as lg
         self.ser.close()
-        logger.debug(f"{self.ser.port} serialPort close {'success' if not self.ser.is_open else 'fail'} !!")
+        lg.logger.debug(f"{self.ser.port} serialPort close {'success' if not self.ser.is_open else 'fail'} !!")
 
     def read(self):
         self.ser.read()
@@ -37,6 +37,7 @@ class SerialPort(CommAbstract):
         self.ser.write(date_bytes)
 
     def SendCommand(self, command, exceptStr, timeout=10, newline=True):
+
         result = False
         strRecAll = ''
         start_time = time.time()
@@ -47,22 +48,22 @@ class SerialPort(CommAbstract):
             else:
                 pass
             time.sleep(0.01)
-            logger.debug(f"{self.ser.port}_SendComd-->{command}")
+            lg.logger.debug(f"{self.ser.port}_SendComd-->{command}")
             self.ser.reset_output_buffer()
             self.ser.reset_input_buffer()
             self.write(command)
             self.ser.flush()
             strRecAll = self.ser.read_until(exceptStr.encode('utf-8')).decode('utf-8')
-            logger.debug(strRecAll)
+            lg.logger.debug(strRecAll)
             if re.search(exceptStr, strRecAll):
-                logger.info(f'wait until {exceptStr} success in {round(time.time() - start_time, 3)}s')
+                lg.logger.info(f'wait until {exceptStr} success in {round(time.time() - start_time, 3)}s')
                 result = True
             else:
-                logger.error(f'wait until {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
+                lg.logger.error(f'wait until {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
                 result = False
             return result, strRecAll
         except Exception as e:
-            logger.exception(e)
+            lg.logger.exception(e)
             return False, strRecAll
 
 

@@ -28,163 +28,297 @@
   <property name="toolTip">
    <string/>
   </property>
-  <property name="statusTip">
-   <string>TestTime:    FailCount: </string>
-  </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTreeWidget" name="treeWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>301</width>
-      <height>441</height>
-     </rect>
+   <layout class="QFormLayout" name="formLayout">
+    <property name="fieldGrowthPolicy">
+     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
     </property>
-    <property name="contextMenuPolicy">
-     <enum>Qt::CustomContextMenu</enum>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
-    </property>
-    <attribute name="headerVisible">
-     <bool>false</bool>
-    </attribute>
-    <column>
-     <property name="text">
-      <string notr="true">1</string>
-     </property>
-    </column>
-   </widget>
-   <widget class="QTextEdit" name="textEdit">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>470</y>
-      <width>241</width>
-      <height>291</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="placeholderText">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>590</y>
-      <width>201</width>
-      <height>31</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lb_tatus">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>460</y>
-      <width>271</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(232, 232, 232);
-font: 36pt &quot;宋体&quot;;</string>
-    </property>
-    <property name="text">
-     <string>StandBy</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lb_errorCode">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>640</y>
-      <width>271</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(232, 232, 232);
-font: 20pt &quot;宋体&quot;;</string>
-    </property>
-    <property name="text">
-     <string>ErrorCode</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>590</y>
-      <width>31</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 75 9pt &quot;Agency FB&quot;;
-font: 75 11pt &quot;Arial&quot;;</string>
-    </property>
-    <property name="text">
-     <string>SN:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::RichText</enum>
-    </property>
-   </widget>
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>10</y>
-      <width>911</width>
-      <height>441</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
+    <property name="horizontalSpacing">
      <number>1</number>
     </property>
-    <widget class="QWidget" name="result">
-     <attribute name="title">
-      <string>result</string>
-     </attribute>
-     <widget class="QTableView" name="tableView">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>891</width>
-        <height>411</height>
-       </rect>
-      </property>
+    <property name="verticalSpacing">
+     <number>1</number>
+    </property>
+    <property name="leftMargin">
+     <number>1</number>
+    </property>
+    <property name="topMargin">
+     <number>1</number>
+    </property>
+    <property name="rightMargin">
+     <number>1</number>
+    </property>
+    <property name="bottomMargin">
+     <number>1</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTreeWidget" name="treeWidget">
+         <property name="minimumSize">
+          <size>
+           <width>330</width>
+           <height>450</height>
+          </size>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
      </widget>
-    </widget>
-    <widget class="QWidget" name="stepInfo">
-     <attribute name="title">
-      <string>stepInfo</string>
-     </attribute>
-     <widget class="QListView" name="listView">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>881</width>
-        <height>391</height>
-       </rect>
-      </property>
+    </item>
+    <item row="0" column="1">
+     <widget class="QWidget" name="widget_2" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+       <property name="leftMargin">
+        <number>1</number>
+       </property>
+       <property name="topMargin">
+        <number>1</number>
+       </property>
+       <property name="rightMargin">
+        <number>1</number>
+       </property>
+       <property name="bottomMargin">
+        <number>1</number>
+       </property>
+       <item>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="result">
+          <attribute name="title">
+           <string>result</string>
+          </attribute>
+          <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QTableWidget" name="tableWidget">
+             <property name="rowCount">
+              <number>0</number>
+             </property>
+             <property name="columnCount">
+              <number>9</number>
+             </property>
+             <attribute name="horizontalHeaderCascadingSectionResizes">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderHighlightSections">
+              <bool>true</bool>
+             </attribute>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="stepInfo">
+          <attribute name="title">
+           <string>stepInfo</string>
+          </attribute>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QListView" name="listView">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
-    </widget>
-   </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QWidget" name="widget_3" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="40,20,40">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="lb_status">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(232, 232, 232);
+font: 36pt &quot;宋体&quot;;</string>
+         </property>
+         <property name="text">
+          <string>StandBy</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>22</number>
+         </property>
+         <property name="leftMargin">
+          <number>20</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="styleSheet">
+            <string notr="true">font: 75 12pt &quot;Agency FB&quot;;
+font: 75 12pt &quot;Arial&quot;;
+</string>
+           </property>
+           <property name="text">
+            <string>SN:</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>50</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>254</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="lb_errorCode">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(232, 232, 232);
+font: 20pt &quot;宋体&quot;;</string>
+         </property>
+         <property name="text">
+          <string>ErrorCode</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QWidget" name="widget_4" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <property name="leftMargin">
+        <number>1</number>
+       </property>
+       <property name="topMargin">
+        <number>1</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>1</number>
+       </property>
+       <item>
+        <widget class="QTextEdit" name="textEdit">
+         <property name="styleSheet">
+          <string notr="true">font: 9pt &quot;宋体&quot;;</string>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="placeholderText">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -197,16 +331,11 @@ font: 75 11pt &quot;Arial&quot;;</string>
    </property>
    <widget class="QMenu" name="testcase">
     <property name="title">
-     <string>TestCase</string>
+     <string>TestScript</string>
     </property>
-    <addaction name="actionOpenExcel"/>
-    <addaction name="actionOpenJson"/>
-    <addaction name="separator"/>
-    <addaction name="actionReloadExcel"/>
-    <addaction name="actionReloadJson"/>
-    <addaction name="separator"/>
-    <addaction name="actionSaveToJson"/>
-    <addaction name="actionExcelToJson"/>
+    <addaction name="actionOpenScript"/>
+    <addaction name="actionSaveToScript"/>
+    <addaction name="actionReloadScript"/>
    </widget>
    <widget class="QMenu" name="settings">
     <property name="title">
@@ -219,7 +348,8 @@ font: 75 11pt &quot;Arial&quot;;</string>
      <string>Help</string>
     </property>
     <addaction name="actionHelper"/>
-    <addaction name="actionAbout"/>
+    <addaction name="actionReport_bug"/>
+    <addaction name="actionFeedback"/>
    </widget>
    <widget class="QMenu" name="tools">
     <property name="title">
@@ -230,26 +360,29 @@ font: 75 11pt &quot;Arial&quot;;</string>
     <property name="title">
      <string>Debug</string>
     </property>
-    <addaction name="actionDisable"/>
-    <addaction name="actionEnable"/>
+    <addaction name="actionprivileges"/>
     <addaction name="separator"/>
-    <addaction name="actionStart"/>
-    <addaction name="actionPause"/>
-    <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuLog">
     <property name="title">
      <string>Log</string>
     </property>
-    <addaction name="actionSave"/>
-    <addaction name="actionOpen"/>
-    <addaction name="actionClear"/>
+    <addaction name="actionSaveLog"/>
+    <addaction name="actionOpenLog"/>
+    <addaction name="actionClearLog"/>
     <addaction name="separator"/>
     <addaction name="actionException"/>
     <addaction name="actionLogFolder"/>
     <addaction name="actionCSVLog"/>
-    <addaction name="actionResultLog"/>
    </widget>
+   <widget class="QMenu" name="menuTestCase">
+    <property name="title">
+     <string>TestCase</string>
+    </property>
+    <addaction name="actionOpen_TestCase"/>
+    <addaction name="actionConvertExcelToJson"/>
+   </widget>
+   <addaction name="menuTestCase"/>
    <addaction name="testcase"/>
    <addaction name="settings"/>
    <addaction name="debug"/>
@@ -257,7 +390,14 @@ font: 75 11pt &quot;Arial&quot;;</string>
    <addaction name="menuLog"/>
    <addaction name="help"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>true</bool>
+   </property>
+  </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -268,83 +408,139 @@ font: 75 11pt &quot;Arial&quot;;</string>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionOpenExcel"/>
-   <addaction name="actionOpenJson"/>
-   <addaction name="actionReloadExcel"/>
-   <addaction name="actionReloadJson"/>
+   <addaction name="actionOpen_TestCase"/>
+   <addaction name="actionConvertExcelToJson"/>
+   <addaction name="separator"/>
+   <addaction name="actionOpenScript"/>
+   <addaction name="actionSaveToScript"/>
+   <addaction name="actionReloadScript"/>
+   <addaction name="separator"/>
+   <addaction name="actionconfig"/>
+   <addaction name="separator"/>
+   <addaction name="actionprivileges"/>
+   <addaction name="actionStart"/>
+   <addaction name="actionStop"/>
+   <addaction name="separator"/>
+   <addaction name="actionOpenLog"/>
+   <addaction name="actionClearLog"/>
+   <addaction name="actionLogFolder"/>
+   <addaction name="separator"/>
+   <addaction name="actionHelper"/>
+   <addaction name="separator"/>
+   <addaction name="actionMode"/>
+   <addaction name="actionunknow"/>
+   <addaction name="separator"/>
+   <addaction name="actionTestMode"/>
+   <addaction name="actionproduction"/>
+   <addaction name="separator"/>
+   <addaction name="actionLocal_IP"/>
+   <addaction name="action192_168_1_101"/>
    <addaction name="separator"/>
   </widget>
-  <action name="actionOpenJson">
-   <property name="text">
-    <string>OpenJson</string>
+  <action name="actionOpenScript">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/Open-file-icon.png</normaloff>:/新前缀/images/Open-file-icon.png</iconset>
    </property>
-  </action>
-  <action name="actionOpenExcel">
    <property name="text">
-    <string>OpenExcel</string>
+    <string>OpenScript</string>
    </property>
-  </action>
-  <action name="actionReloadExcel">
-   <property name="text">
-    <string>ReloadExcel</string>
+   <property name="toolTip">
+    <string>OpenScript</string>
    </property>
   </action>
   <action name="actionconfig">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/Settings-icon.png</normaloff>:/新前缀/images/Settings-icon.png</iconset>
+   </property>
    <property name="text">
     <string>参数配置</string>
    </property>
   </action>
-  <action name="actionReloadJson">
+  <action name="actionReloadScript">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/reload.png</normaloff>:/新前缀/images/reload.png</iconset>
+   </property>
    <property name="text">
-    <string>ReloadJson</string>
+    <string>ReloadScript</string>
+   </property>
+   <property name="toolTip">
+    <string>ReloadScript</string>
    </property>
   </action>
-  <action name="actionSaveToJson">
-   <property name="text">
-    <string>SaveToJson</string>
+  <action name="actionSaveToScript">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/Other-Save-Metro-icon.png</normaloff>:/新前缀/images/Other-Save-Metro-icon.png</iconset>
    </property>
-  </action>
-  <action name="actionExcelToJson">
    <property name="text">
-    <string>ExcelToJson</string>
+    <string>SaveToScript</string>
+   </property>
+   <property name="toolTip">
+    <string>SaveToScript</string>
    </property>
   </action>
   <action name="actionStart">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/Start-icon.png</normaloff>:/新前缀/images/Start-icon.png</iconset>
+   </property>
    <property name="text">
     <string>Start</string>
    </property>
   </action>
-  <action name="actionClose">
+  <action name="actionStop">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/Stop-red-icon.png</normaloff>:/新前缀/images/Stop-red-icon.png</iconset>
+   </property>
    <property name="text">
     <string>Stop</string>
    </property>
   </action>
-  <action name="actionSave">
+  <action name="actionSaveLog">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/save.png</normaloff>:/新前缀/images/save.png</iconset>
+   </property>
    <property name="text">
-    <string>Save</string>
+    <string>SaveLog</string>
    </property>
   </action>
-  <action name="actionOpen">
+  <action name="actionOpenLog">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/File-Open-icon.png</normaloff>:/新前缀/images/File-Open-icon.png</iconset>
+   </property>
    <property name="text">
-    <string>Open</string>
+    <string>OpenLog</string>
    </property>
   </action>
   <action name="actionException">
-   <property name="text">
-    <string>Exception</string>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/log-icon.png</normaloff>:/新前缀/images/log-icon.png</iconset>
    </property>
-  </action>
-  <action name="actionClear">
    <property name="text">
-    <string>Clear</string>
+    <string>ExceptionLog</string>
    </property>
   </action>
   <action name="actionLogFolder">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/folder.png</normaloff>:/新前缀/images/folder.png</iconset>
+   </property>
    <property name="text">
     <string>LogFolder</string>
    </property>
   </action>
   <action name="actionCSVLog">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/csv-file.png</normaloff>:/新前缀/images/csv-file.png</iconset>
+   </property>
    <property name="text">
     <string>CSVLog</string>
    </property>
@@ -354,57 +550,154 @@ font: 75 11pt &quot;Arial&quot;;</string>
     <string>ResultLog</string>
    </property>
   </action>
-  <action name="actionDisable">
-   <property name="text">
-    <string>Disable</string>
+  <action name="actionprivileges">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/lab-icon.png</normaloff>:/新前缀/images/lab-icon.png</iconset>
    </property>
-  </action>
-  <action name="actionEnable">
    <property name="text">
-    <string>Enable</string>
+    <string>Lab</string>
    </property>
-  </action>
-  <action name="actionPause">
-   <property name="text">
-    <string>Pause</string>
+   <property name="toolTip">
+    <string>Lab pattern</string>
    </property>
   </action>
   <action name="actionHelper">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/Folders-OS-Help-Metro-icon.png</normaloff>:/新前缀/images/Folders-OS-Help-Metro-icon.png</iconset>
+   </property>
    <property name="text">
     <string>Helper</string>
    </property>
   </action>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
   <action name="actionCheckAll">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/check-all.png</normaloff>:/新前缀/images/check-all.png</iconset>
+   </property>
    <property name="text">
     <string>CheckAll</string>
    </property>
   </action>
   <action name="actionUncheckAll">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/uncheck-all.png</normaloff>:/新前缀/images/uncheck-all.png</iconset>
+   </property>
    <property name="text">
     <string>UncheckAll</string>
    </property>
   </action>
   <action name="actionStepping">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/repeat.png</normaloff>:/新前缀/images/repeat.png</iconset>
+   </property>
    <property name="text">
     <string>Stepping</string>
    </property>
   </action>
   <action name="actionLooping">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/loop.png</normaloff>:/新前缀/images/loop.png</iconset>
+   </property>
    <property name="text">
     <string>Looping</string>
    </property>
   </action>
   <action name="actionEditStep">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/edit.png</normaloff>:/新前缀/images/edit.png</iconset>
+   </property>
    <property name="text">
     <string>EditStep</string>
    </property>
   </action>
+  <action name="actionClearLog">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/clear-log.png</normaloff>:/新前缀/images/clear-log.png</iconset>
+   </property>
+   <property name="text">
+    <string>ClearLog</string>
+   </property>
+  </action>
+  <action name="actionOpen_TestCase">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/microsoft-excel.png</normaloff>:/新前缀/images/microsoft-excel.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open TestCase</string>
+   </property>
+  </action>
+  <action name="actionConvertExcelToJson">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/blue-document-convert-icon.png</normaloff>:/新前缀/images/blue-document-convert-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>ConvertExcelToJson</string>
+   </property>
+  </action>
+  <action name="actionReport_bug">
+   <property name="text">
+    <string>Report bug</string>
+   </property>
+  </action>
+  <action name="actionFeedback">
+   <property name="text">
+    <string>Feedback</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/Pause-icon.png</normaloff>:/新前缀/images/Pause-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="actionunknow">
+   <property name="text">
+    <string>unknow</string>
+   </property>
+  </action>
+  <action name="actionMode">
+   <property name="text">
+    <string>Mode:</string>
+   </property>
+  </action>
+  <action name="actionTestMode">
+   <property name="text">
+    <string>TestMode:</string>
+   </property>
+  </action>
+  <action name="actionproduction">
+   <property name="text">
+    <string>production</string>
+   </property>
+  </action>
+  <action name="actionLocal_IP">
+   <property name="text">
+    <string>Local_IP:</string>
+   </property>
+  </action>
+  <action name="action192_168_1_101">
+   <property name="text">
+    <string>192.168.1.101</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

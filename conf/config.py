@@ -10,7 +10,7 @@
 
 class StationConf:
     privileges: str
-    station_all: str
+    station_all: list
     station_name: str
     station_no: str
     log_folder: str
@@ -41,7 +41,8 @@ class DutConf:
     ssh_username: str
     ssh_password: str
     dut_modes: list
-    data_api: list
+    dut_regex: dict
+    data_api: dict
     sn_len: int
     qsdk_ver: str
     test_mode: str
@@ -67,3 +68,7 @@ class Configs:
         self.station = StationConf(dict_['station'])
         self.dut = DutConf(dict_['dut'])
         self.count = CountConf(dict_['count'])
+
+
+if __name__ == '__main__':
+    pass

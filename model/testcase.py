@@ -1,4 +1,4 @@
-#!/usr/c/env python
+#!/usr/cf/env python
 # coding: utf-8
 """
 @File   : testcase.py
@@ -6,50 +6,50 @@
 @Date   : 2021/9/2
 @Desc   : 
 """
+import copy
 from datetime import datetime
-from model.loadseq import load_testcase_from_excel
-from conf.globalconf import logger
-from conf import globalvar as gv
-from model.product import JsonResult, MesInfo
+import model.loadseq
+import model.product
+import conf.globalvar as gv
 
 
 class TestCase:
     tResult = True
     sheetName = ""
     testcase_path_excel = None
-    testcase_path_json = None
+    test_script_json = None
     sha256_key_path = None
     start_time = ""
     finish_time = ""
-    test_suites = []
+    original_suites = []
+    clone_suites = []
 
     def __init__(self, testcase_path_excel, sheetName):
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.sheetName = sheetName
         self.testcase_path_excel = testcase_path_excel
-        self.testcase_path_json = gv.testcaseJsonPath
+        self.test_script_json = gv.test_script_json
         self.sha256_key_path = gv.SHA256Path
-        self.test_suites: list = load_testcase_from_excel(self.testcase_path_excel, self.sheetName,
-                                                          self.testcase_path_json,
-                                                          self.sha256_key_path)
-        # self.test_suites = load_testcase_from_json(self.sha256_key_path, self.testcase_path_json)
+        self.original_suites = model.loadseq.load_testcase_from_json(self.sha256_key_path, self.test_script_json)
+        # self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path_excel, self.sheetName,
+        #                                                               self.test_script_json, self.sha256_key_path, )
+        self.clone_suites = copy.deepcopy(self.original_suites)
 
-    def run(self, test_suites, global_fail_continue=False, stepNo=None):
+    def run(self, global_fail_continue=False, stepNo=None):
         suite_result_list = []
         try:
-            for i, suite in enumerate(test_suites):
+            for i, suite in enumerate(self.clone_suites):
                 if gv.ForFlag:
                     i = gv.ForStartSuiteNo
                     stepNo = gv.ForStartStepNo
-                suite_result = test_suites[i].run(global_fail_continue, stepNo)
+                suite_result = self.clone_suites[i].run(global_fail_continue, stepNo)
                 suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break
-                else:
-                    pass
             self.tResult = all(suite_result_list)
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         except Exception as e:
+            from conf.logconf import logger
             logger.exception(f"run Exception！！{e}")
             self.tResult = False
             return self.tResult
@@ -60,14 +60,14 @@ class TestCase:
             self.copy_to_mes(gv.mesPhases)
             self.clear()
 
-    def copy_to_station(self, obj: JsonResult):
+    def copy_to_station(self, obj: model.product.JsonResult):
         obj.status = 'passed' if self.tResult else 'failed'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
         obj.error_code = gv.error_code_first_fail
         obj.error_details = gv.error_details_first_fail
 
-    def copy_to_mes(self, obj: MesInfo):
+    def copy_to_mes(self, obj: model.product.MesInfo):
         obj.status = 'PASS' if self.tResult else 'FAIL'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
@@ -77,10 +77,5 @@ class TestCase:
     def clear(self):
         self.tResult = True
 
-
-if __name__ == "__main__":
-    pass
-    # ss = load_sequences_from_excel("./Config/fireflyALL.xlsx", 'MBLT')  # ./Config/fireflyALL.xlsx
-    # testcase1 = TestCase(r"F:\pyside2\c\fireflyALL.xlsx", 'MBLT')
-    # testingSuite = testcase1.test_suites.copy()
-    # testcase1.run(testingSuite)
+    if __name__ == "__main__":
+        pass
