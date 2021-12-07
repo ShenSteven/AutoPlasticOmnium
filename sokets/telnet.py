@@ -26,7 +26,6 @@ class TelnetComm(CommAbstract):
         self.tel.open(self.tel.host, self.tel.port)
 
     def close(self):
-        import conf.logconf as lg
         self.tel.close()
         lg.logger.debug(f"{self.tel.port} serialPort close success!!")
 
@@ -38,7 +37,7 @@ class TelnetComm(CommAbstract):
         self.tel.write(date_bytes)
 
     def SendCommand(self, command, timeout=10, exceptStr=None, newline=True):
-        result = False
+        # result = False
         strRecAll = ''
         start_time = time.time()
         if exceptStr is None:

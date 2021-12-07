@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>AutoTestSystem</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>images/Letter-T-blue-icon.png</normaloff>images/Letter-T-blue-icon.png</iconset>
+  </property>
   <property name="toolTip">
    <string/>
   </property>
@@ -138,6 +142,9 @@
            </property>
            <item>
             <widget class="QTableWidget" name="tableWidget">
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
              <property name="rowCount">
               <number>0</number>
              </property>
@@ -145,13 +152,16 @@
               <number>9</number>
              </property>
              <attribute name="horizontalHeaderCascadingSectionResizes">
-              <bool>false</bool>
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>5</number>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
              </attribute>
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderHighlightSections">
-              <bool>true</bool>
              </attribute>
              <column/>
              <column/>
@@ -184,10 +194,21 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QListView" name="listView">
+            <widget class="QTableWidget" name="tableWidget_2">
              <property name="enabled">
               <bool>true</bool>
              </property>
+             <property name="sortingEnabled">
+              <bool>true</bool>
+             </property>
+             <property name="columnCount">
+              <number>2</number>
+             </property>
+             <attribute name="horizontalHeaderCascadingSectionResizes">
+              <bool>true</bool>
+             </attribute>
+             <column/>
+             <column/>
             </widget>
            </item>
           </layout>
@@ -218,7 +239,7 @@
        <item>
         <widget class="QLabel" name="lb_status">
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(232, 232, 232);
+          <string notr="true">background-color: rgb(198, 198, 198);
 font: 36pt &quot;宋体&quot;;</string>
          </property>
          <property name="text">
@@ -273,7 +294,7 @@ font: 75 12pt &quot;Arial&quot;;
        <item>
         <widget class="QLabel" name="lb_errorCode">
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(232, 232, 232);
+          <string notr="true">background-color: rgb(198, 198, 198);
 font: 20pt &quot;宋体&quot;;</string>
          </property>
          <property name="text">
@@ -341,7 +362,7 @@ font: 20pt &quot;宋体&quot;;</string>
     <property name="title">
      <string>Settings</string>
     </property>
-    <addaction name="actionconfig"/>
+    <addaction name="actionConfig"/>
    </widget>
    <widget class="QMenu" name="help">
     <property name="title">
@@ -360,8 +381,9 @@ font: 20pt &quot;宋体&quot;;</string>
     <property name="title">
      <string>Debug</string>
     </property>
-    <addaction name="actionprivileges"/>
     <addaction name="separator"/>
+    <addaction name="actionEnable_lab"/>
+    <addaction name="actionDisable_factory"/>
    </widget>
    <widget class="QMenu" name="menuLog">
     <property name="title">
@@ -415,9 +437,9 @@ font: 20pt &quot;宋体&quot;;</string>
    <addaction name="actionSaveToScript"/>
    <addaction name="actionReloadScript"/>
    <addaction name="separator"/>
-   <addaction name="actionconfig"/>
+   <addaction name="actionConfig"/>
    <addaction name="separator"/>
-   <addaction name="actionprivileges"/>
+   <addaction name="actionPrivileges"/>
    <addaction name="actionStart"/>
    <addaction name="actionStop"/>
    <addaction name="separator"/>
@@ -426,6 +448,8 @@ font: 20pt &quot;宋体&quot;;</string>
    <addaction name="actionLogFolder"/>
    <addaction name="separator"/>
    <addaction name="actionHelper"/>
+   <addaction name="separator"/>
+   <addaction name="actionRestart"/>
    <addaction name="separator"/>
    <addaction name="actionMode"/>
    <addaction name="actionunknow"/>
@@ -449,7 +473,7 @@ font: 20pt &quot;宋体&quot;;</string>
     <string>OpenScript</string>
    </property>
   </action>
-  <action name="actionconfig">
+  <action name="actionConfig">
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/新前缀/images/Settings-icon.png</normaloff>:/新前缀/images/Settings-icon.png</iconset>
@@ -550,7 +574,7 @@ font: 20pt &quot;宋体&quot;;</string>
     <string>ResultLog</string>
    </property>
   </action>
-  <action name="actionprivileges">
+  <action name="actionPrivileges">
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/新前缀/images/lab-icon.png</normaloff>:/新前缀/images/lab-icon.png</iconset>
@@ -671,11 +695,17 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
   </action>
   <action name="actionMode">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Mode:</string>
    </property>
   </action>
   <action name="actionTestMode">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>TestMode:</string>
    </property>
@@ -686,6 +716,12 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
   </action>
   <action name="actionLocal_IP">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Local_IP:</string>
    </property>
@@ -693,6 +729,52 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="action192_168_1_101">
    <property name="text">
     <string>192.168.1.101</string>
+   </property>
+  </action>
+  <action name="actionRestart">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/restart.png</normaloff>:/新前缀/images/restart.png</iconset>
+   </property>
+   <property name="text">
+    <string>Restart</string>
+   </property>
+   <property name="toolTip">
+    <string>Restart</string>
+   </property>
+  </action>
+  <action name="actionExpandAll">
+   <property name="text">
+    <string>ExpandAll</string>
+   </property>
+   <property name="toolTip">
+    <string>ExpandAll</string>
+   </property>
+  </action>
+  <action name="actionCollapseAll">
+   <property name="text">
+    <string>CollapseAll</string>
+   </property>
+   <property name="toolTip">
+    <string>CollapseAll</string>
+   </property>
+  </action>
+  <action name="actionEnable_lab">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/lab-icon.png</normaloff>:/新前缀/images/lab-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Enable(lab)</string>
+   </property>
+  </action>
+  <action name="actionDisable_factory">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/新前缀/images/factory.png</normaloff>:/新前缀/images/factory.png</iconset>
+   </property>
+   <property name="text">
+    <string>Disable(factory)</string>
    </property>
   </action>
  </widget>

@@ -7,10 +7,12 @@
 @Desc   : 
 """
 import copy
+import os
 from datetime import datetime
 import model.loadseq
 import model.product
 import conf.globalvar as gv
+import conf.logconf as lg
 
 
 class TestCase:
@@ -30,15 +32,18 @@ class TestCase:
         self.testcase_path_excel = testcase_path_excel
         self.test_script_json = gv.test_script_json
         self.sha256_key_path = gv.SHA256Path
-        self.original_suites = model.loadseq.load_testcase_from_json(self.sha256_key_path, self.test_script_json)
-        # self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path_excel, self.sheetName,
-        #                                                               self.test_script_json, self.sha256_key_path, )
+        if os.path.exists(self.sha256_key_path) and os.path.exists(self.test_script_json):
+            self.original_suites = model.loadseq.load_testcase_from_json(self.sha256_key_path, self.test_script_json)
+        else:
+            self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path_excel, self.sheetName,
+                                                                          self.test_script_json, self.sha256_key_path, )
         self.clone_suites = copy.deepcopy(self.original_suites)
 
-    def run(self, global_fail_continue=False, stepNo=None):
+    def run(self, global_fail_continue=False, stepNo=-1):
         suite_result_list = []
+        # suite_result = False
         try:
-            for i, suite in enumerate(self.clone_suites):
+            for i, suite in enumerate(self.clone_suites, start=0):
                 if gv.ForFlag:
                     i = gv.ForStartSuiteNo
                     stepNo = gv.ForStartStepNo
@@ -46,14 +51,13 @@ class TestCase:
                 suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break
+
             self.tResult = all(suite_result_list)
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        except Exception as e:
-            from conf.logconf import logger
-            logger.exception(f"run Exception！！{e}")
-            self.tResult = False
             return self.tResult
-        else:
+        except Exception as e:
+            lg.logger.exception(f"run Exception！！{e}")
+            self.tResult = False
             return self.tResult
         finally:
             self.copy_to_station(gv.stationObj)

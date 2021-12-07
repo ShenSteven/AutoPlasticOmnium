@@ -7,20 +7,16 @@
 @Desc   : 全局变量
 """
 import os
+from datetime import datetime
 from os.path import dirname, abspath, join
-# from cryptography.fernet import Fernet
+from threading import Thread
 import conf
 import model.product
 
 current_path = dirname(abspath(__file__))
 above_current_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-print(current_path)
-# # load test global variable
-cf = conf.read_config(join(current_path, 'config.yaml'), conf.config.Configs)
-
-# key = Fernet.generate_key()
-# token = Fernet(key)
-
+cf = conf.read_config(join(current_path, 'config.yaml'), conf.config.Configs)  # load test global variable
+tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "tValue", "USL", "ElapsedTime", "StartTime", "Result"]
 SN = ''
 dut_ip = ''
 DUTMesIP = ''
@@ -30,18 +26,21 @@ dut_mode = 'unknown'
 error_code_first_fail = ''
 error_details_first_fail = ''
 test_software_ver = cf.station.test_software_version
+
 logFolderPath = ''
-jsonOfResult = ''
+critical_log = ''
+errors_log = ''
 txtLogPath = ''
+jsonOfResult = ''
 csv_list_header = []
 csv_list_result = []
+
 dut_comm = None
-main_form = None
-FixSerialPort = None
-# inPutValue = ""  # suite内的全局变量
+FixSerialPort: None
 
 IsDebug = False
-StartFlag = False
+startFlag = False
+pauseFlag = False
 IsCycle = False
 finalTestResult = False
 setIpFlag = False
@@ -55,16 +54,27 @@ ForStartSuiteNo = 0
 ForStartStepNo = 0
 ForFlag = False
 
+OutPutPath = rf'{above_current_path}\OutPut'
+DataPath = rf'{above_current_path}\Data'
 scriptFolder = f'{above_current_path}\scripts\\'
 excel_file_path = f'{scriptFolder}{cf.station.testcase}'
 test_script_json = f'{scriptFolder}{cf.station.station_name}.json'
 SHA256Path = f'{scriptFolder}{cf.station.station_name}_key.txt'
-
+CSVFilePath = ''
 mes_shop_floor = ''
 mes_result = ''
-mesPhases = None
-stationObj = model.product.JsonResult(SN, cf.station.station_no, cf.dut.test_mode, cf.dut.qsdk_ver,
-                                      cf.station.test_software_version)
+shop_floor_url = ''
+
+mesPhases: model.product.MesInfo
+stationObj: model.product.JsonResult
+testThread: Thread
+
+PassNumOfCycleTest = 0
+FailNumOfCycleTest = 0
+SuiteNo = -1
+StepNo = -1
+startTimeJsonFlag = True
+startTimeJson = datetime.now()
 
 
 def set_globalVal(name, value):

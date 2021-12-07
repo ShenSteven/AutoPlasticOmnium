@@ -19,8 +19,8 @@ class JsonResult:
     error_details = ""
     luxshare_qsdk_version = ""
     test_software_version = ""
-    test_phases = None
-    tests = None
+    test_phases = []
+    tests = []
 
     def __init__(self, serial, test_station, test_mode, qsdkVer, test_software_version):
         self.serial = serial
@@ -28,8 +28,8 @@ class JsonResult:
         self.mode = test_mode
         self.luxshare_qsdk_version = qsdkVer
         self.test_software_version = test_software_version
-        self.test_phases = None
-        self.tests = None
+        self.test_phases = []
+        self.tests = []
 
 
 class SuiteItem:
@@ -69,6 +69,9 @@ class MesInfo:
     PartNumber = None
     MacAddress = None
     first_fail = None
+    HW_REVISION = ''
+    JSON_UPLOAD = ''
+    MES_UPLOAD = ''
 
     def __init__(self, serial, test_station, test_software_version):
         self.serial = serial

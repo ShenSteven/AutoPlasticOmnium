@@ -14,7 +14,9 @@ import yaml
 from datetime import datetime
 import logging.config
 from os.path import dirname, abspath, join, exists
-from PySide2.QtCore import Qt
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTextEdit
+
 import conf.globalvar as gv
 import conf
 
@@ -22,27 +24,25 @@ current_path = dirname(abspath(__file__))
 above_current_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 # testlog_file path
-log_folder_date = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
+gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
 try:
-    if not exists(log_folder_date):
-        os.makedirs(log_folder_date)
+    if not exists(gv.logFolderPath):
+        os.makedirs(gv.logFolderPath)
 except FileNotFoundError:
-    log_folder = join(above_current_path, 'log')
-    log_folder_date = join(above_current_path, 'log', datetime.now().strftime('%Y%m%d'))
-    if not exists(log_folder_date):
-        os.makedirs(log_folder_date)
+    gv.cf.station.log_folder = join(above_current_path, 'log')
+    gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
+    if not exists(gv.logFolderPath):
+        os.makedirs(gv.logFolderPath)
 
-log_file = os.path.join(log_folder_date, f"{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
-critical_log = join(log_folder_date, 'critical.log').replace('\\', '/')
-errors_log = join(log_folder_date, 'errors.log').replace('\\', '/')
+log_file = os.path.join(gv.logFolderPath, f"file_handler_{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
+gv.critical_log = join(gv.cf.station.log_folder, 'critical.log').replace('\\', '/')
+gv.errors_log = join(gv.cf.station.log_folder, 'errors.log').replace('\\', '/')
 
 # load logger config
 logging_yaml = join(current_path, 'logging.yaml')
 log_conf = conf.read_yaml(logging_yaml)
 res_log_conf = Template(json.dumps(log_conf)).safe_substitute(
-    {'log_file': log_file,
-     'critical_log': critical_log,
-     'errors_log': errors_log})
+    {'log_file': log_file, 'critical_log': gv.critical_log, 'errors_log': gv.errors_log})
 logging.config.dictConfig(yaml.safe_load(res_log_conf))
 logger = logging.getLogger('testlog')
 
@@ -61,7 +61,7 @@ class QTextEditHandler(logging.Handler):
             if 'INFO' in msg:  # pass
                 self.stream.setTextColor(Qt.blue)
             elif 'DEBUG' in msg:  # debug info
-                self.stream.setTextColor(Qt.pink)
+                self.stream.setTextColor(Qt.black)
             elif 'ERROR' in msg:  # fail
                 self.stream.setTextColor(Qt.red)
             elif 'CRITICAL' in msg:  # except
@@ -71,19 +71,11 @@ class QTextEditHandler(logging.Handler):
             elif 'NOTSET' in msg:  #
                 self.stream.setTextColor(Qt.blue)
             stream.append(msg)
+            stream.ensureCursorVisible()
         except RecursionError:  # See issue 36272
             raise
         except Exception:
             self.handleError(record)
-
-    def __repr__(self):
-        level = logging.getLevelName(self.level)
-        name = getattr(self.stream, 'name', '')
-        #  bpo-36015: name can be an int
-        name = str(name)
-        if name:
-            name += ' '
-        return '<%s %s(%s)>' % (self.__class__.__name__, name, level)
 
 
 if __name__ == "__main__":

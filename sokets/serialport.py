@@ -25,7 +25,7 @@ class SerialPort(CommAbstract):
             self.ser.open()
 
     def close(self):
-        import conf.logconf as lg
+
         self.ser.close()
         lg.logger.debug(f"{self.ser.port} serialPort close {'success' if not self.ser.is_open else 'fail'} !!")
 
@@ -38,7 +38,7 @@ class SerialPort(CommAbstract):
 
     def SendCommand(self, command, exceptStr, timeout=10, newline=True):
 
-        result = False
+        # result = False
         strRecAll = ''
         start_time = time.time()
         try:
@@ -72,4 +72,3 @@ if __name__ == "__main__":
     com.SendCommand('', 'luxshare SW Version :', 100)
     com.SendCommand('\n', 'root@OpenWrt:/#', 3)
     com.SendCommand('luxshare_tool --get-mac-env', 'root@OpenWrt:/#')
-    com.SendCommand("dmesg | grep 'mmcblk0' | head -1 | awk '{print $5}'", 'root@OpenWrt:/#')

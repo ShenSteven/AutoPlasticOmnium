@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="新前缀">
+    <file>images/Letter-T-blue-icon.png</file>
+    <file>images/test.ico</file>
     <file>images/app-json-icon.png</file>
     <file>images/check-all.png</file>
     <file>images/clear-log.png</file>
@@ -10,7 +12,6 @@
     <file>images/File-Open-icon.png</file>
     <file>images/folder.png</file>
     <file>images/Folders-OS-Help-Metro-icon.png</file>
-    <file>images/images.qrc</file>
     <file>images/lab-icon.png</file>
     <file>images/log-icon.png</file>
     <file>images/loop.png</file>

@@ -1,15 +1,15 @@
 station:
-    privileges: labs
+    privileges: lab
     station_all:
-    - MBLT
-    - SRF
-    station_name: SRF
-    station_no: MBFT-3000
+    - MBFT
+    - RTT
+    station_name: RTT
+    station_no: RTT-3000
     log_folder: D:\TestLog
     log_server: 10.90.104.85
     log_server_username: eero
     log_server_password: eero
-    fix_flag: true
+    fix_flag: false
     fix_com_port: COM3
     fix_com_baudRate: 115200
     GPIB_address: 9
@@ -47,7 +47,7 @@ dut:
     qsdk_ver: 029
     test_mode: production
 count:
-    continue_fail_count: 5
+    continue_fail_count: 0
     continue_fail_limit: 3
     total_pass_count: 3
     total_fail_count: 3

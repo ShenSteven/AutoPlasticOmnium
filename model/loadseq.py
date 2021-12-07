@@ -10,28 +10,24 @@ import os
 import stat
 import json
 import sys
-from PySide2.QtWidgets import QMessageBox
 from openpyxl import load_workbook
 import model.suite
 import model.step
 import conf.globalvar as gv
 import conf.logconf as lg
-
-
-# from cryptography.fernet import Fernet
-# key = Fernet.generate_key()
-# fernet = Fernet(key)
-def thread_excel_convert_to_json(self):
-    if not os.path.exists(gv.test_script_json) and not os.path.exists(gv.SHA256Path):
-        model.loadseq.excel_convert_to_json(rf"{gv.above_current_path}\scripts\{gv.cf.station.testcase}",
-                                            gv.cf.station.station_all)
+import ui.mainform
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QMetaObject, Qt
+from PyQt5 import QtCore
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations):
+    lg.logger.debug("Start convert excel testcase to json script.")
     for station in all_stations:
         test_script_json = f"{gv.scriptFolder}{station}.json"
         SHA256Path = f"{gv.scriptFolder}{station}_key.txt"
         load_testcase_from_excel(testcase_path_excel, station, test_script_json, SHA256Path)
+    lg.logger.debug("convert finish!")
 
 
 def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json, key_path) -> list:
@@ -49,6 +45,7 @@ def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json, k
     itemHeader = []
     temp_suite_name = ""
     try:
+        lg.logger.debug('start load_testcase_from_excel...')
         workbook = load_workbook(testcase_path_excel, read_only=True)
         worksheet = workbook[sheetName]
 
@@ -69,11 +66,12 @@ def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json, k
             test_step = model.step.Step()
             for header, cell in dict(zip(itemHeader, line)).items():  # 给step对象属性赋值
                 test_step.index = temp_suite.totalNumber
+                test_step.suite_index = temp_suite.index
                 setattr(test_step, header, '' if model.IsNullOrEmpty(cell.value) else str(cell.value))
                 test_step.suite_name = temp_suite_name
 
-            temp_suite.totalNumber = temp_suite.totalNumber + 1
-            temp_suite.test_steps.append(test_step)
+            temp_suite.totalNumber += 1
+            temp_suite.steps.append(test_step)
     except Exception as e:
         lg.logger.critical(f"load testcase fail！{e}")
         sys.exit(e.__context__)
@@ -86,25 +84,29 @@ def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json, k
 
 def load_testcase_from_json(shaPath, testcase_path_json):
     sha = model.binary_read(shaPath)
-    lg.logger.debug(f" txtSHA:{sha}")
     JsonSHA = model.get_sha256(testcase_path_json)
     lg.logger.debug(f"jsonSHA:{JsonSHA}")
+    lg.logger.debug(f" txtSHA:{sha}")
     if sha == JsonSHA:
         sequences_dict = json.load(open(testcase_path_json, 'r'))
         sequences_obj_list = []
         for suit_dict in sequences_dict:
             step_obj_list = []
-            for step_dict in suit_dict['test_steps']:
+            for step_dict in suit_dict['steps']:
                 step_obj = model.step.Step(step_dict)
                 step_obj_list.append(step_obj)
             suit_obj = model.suite.TestSuite(dict_=suit_dict)
-            suit_obj.test_steps = step_obj_list
+            suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)
         return sequences_obj_list
     else:
-        # QMessageBox.critical(gv.main_form.ui, 'ERROR!', f'json testCase file {testcase_path_json} has been tampered!',
-        #                      QMessageBox.Ok)
+        QMetaObject.invokeMethod(ui.mainform.main_form, 'showMessageBox', Qt.AutoConnection,
+                                 QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
+                                 QtCore.Q_ARG(str, 'ERROR!'),
+                                 QtCore.Q_ARG(str, f'script {testcase_path_json} has been tampered!'),
+                                 QtCore.Q_ARG(int, 5))
         lg.logger.critical(f"ERROR,json testCase file {testcase_path_json} has been tampered!")
+        sys.exit(0)
 
 
 def serializeToJson(obj, testcase_path_json, key_path):
@@ -113,7 +115,7 @@ def serializeToJson(obj, testcase_path_json, key_path):
     :param testcase_path_json: the path of json
     :param key_path: txt file path that save json SHA256 for encrypt.
     """
-    lg.logger.debug(f"delete old json in script.")
+    lg.logger.debug(f"delete old json in scripts.")
     if os.path.exists(testcase_path_json):
         os.chmod(testcase_path_json, stat.S_IWRITE)
         os.remove(testcase_path_json)
@@ -121,10 +123,8 @@ def serializeToJson(obj, testcase_path_json, key_path):
         os.chmod(key_path, stat.S_IWRITE)
         os.remove(key_path)
     json.dump(obj, open(testcase_path_json, 'w'), default=lambda o: o.__dict__, sort_keys=True, indent=4)
-    lg.logger.info(f"serializeToJson success.")
+    lg.logger.info(f"serializeToJson success! {testcase_path_json}.")
     srcBytes = model.get_sha256(testcase_path_json)
-    # 产生密钥， 密钥是加密解密必须的
-    # token = gv.token.encrypt(srcBytes)
     model.binary_write(key_path, srcBytes)
     os.chmod(testcase_path_json, stat.S_IREAD)
     os.chmod(key_path, stat.S_IREAD)

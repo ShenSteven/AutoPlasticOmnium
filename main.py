@@ -6,82 +6,133 @@
 @Date   : 2021/9/3
 @Desc   : 
 """
-
-from PySide2.QtWidgets import QApplication
+import os
+import csv
+import sys
+import json
+import time
+import requests
 import ui.mainform
-
-# import model.loadseq
-# import model.testcase
-
-# def test_thread():
-#     try:
-#         while True:
-#             if gv.StartFlag:
-#                 if gv.IsCycle:
-#                     while True:
-#                         if testcase.run(gv.cf.station.fail_continue):
-#                             gv.PassNumOfCycleTest += 1
-#                         else:
-#                             gv.FailNumOfCycleTest += 1
-#                 elif gv.SingleStepTest:
-#                     testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo].run()
-#                     gv.StartFlag = False
-#                 else:
-#                     result = testcase.run(gv.cf.station.fail_continue)
-#                     final_result = upload_Json_to_client() & upload_result_to_mes() & result
-#                     gv.finalTestResult = final_result
-#                     set_test_status()
-#                     collectCsvResult()
-#                     saveTestResult()
-#                     write_csv_file('result.csv', gv.csv_list_result)
-#                     write_csv_file('result.csv', gv.csv_list_header)
-#     except:
-#         pass
-#     else:
-#         pass
-#     finally:
-#         pass
-#     # test_task = model.testcase.TestCase(r"F:\pyside2\scripts\fireflyALL.xlsx", 'MBLT')
-#     #
-#     # if is_cyclic:
-#     #     while True:
-#     #         test_task.run(test_task.original_suites.copy(), True, 0)
-#     # elif single_step:
-#     #     test_task.original_suites.copy()[0].test_steps[2].run()
-#     # else:
-#     #     create_csv_file('result.csv', ['No', 'Phase test_name', 'Test test_name', 'Error Code'])
-#     #     test_task.run(test_task.original_suites.copy(), True)
-#     #     print(gv.csv_list_result)
-#     #     write_csv_file('result.csv', gv.csv_list_result)
-#     #     write_csv_file('result.csv', gv.csv_list_header)
-#
-#
-# # run(False)
-#
-# # print(time.strftime("%Y-%m-%d %H:%M:%S"))
-# #
-# #
-# def upload_result_to_mes(url):
-#     logger.debug(json.dumps(gv.mesPhases, default=lambda o: o.__dict__,
-#                             sort_keys=True,
-#                             indent=4))
-#     response = requests.post(url, logger.debug(json.dumps(gv.mesPhases, default=lambda o: o.__dict__,
-#                                                           sort_keys=True,
-#                                                           indent=4)))
-#     if response.status_code == 200:
-#         return True
-#     else:
-#         logger.debug(f'post fail:{response.content}')
-#         return False
 import conf.logconf as lg
+import conf.globalvar as gv
+from PyQt5.QtWidgets import QApplication, QMessageBox
+import model.basefunc
+from threading import Thread
+from traceback import format_exception
+
+
+def upload_Json_to_client():
+    pass
+    return True
+
+
+def CollectResultToCsv():
+    def thread_update():
+        gv.CSVFilePath = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
+        csvColumnPath = fr'{gv.scriptFolder}csv_column.txt'
+        fix_header = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
+                      "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
+                      "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
+        fix_header.extend(gv.csv_list_header)
+        updateColumn = gv.finalTestResult  # and not gv.IsDebug and gv.dut.test_mode == "production"
+        model.basefunc.create_csv_file(gv.CSVFilePath, fix_header, updateColumn)
+        if os.path.exists(csvColumnPath):
+            os.remove(csvColumnPath)
+        with open(csvColumnPath, 'w') as f:
+            header = '\t'.join(fix_header)
+            f.write(header)
+        fix_header_value = [gv.dut_mode, gv.cf.station.station_name, "Luxshare", gv.WorkOrder, gv.cf.station.station_no,
+                            "1", gv.SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.test_software_ver,
+                            time.strftime("%Y/%m/%d %H:%M:%S"), str(ui.mainform.main_form.sec), gv.finalTestResult,
+                            gv.mesPhases.first_fail, gv.error_details_first_fail, "UTC", gv.cf.dut.test_mode,
+                            gv.mesPhases.JSON_UPLOAD, gv.mesPhases.MES_UPLOAD]
+        fix_header_value.extend(gv.csv_list_result)
+        model.basefunc.write_csv_file(gv.CSVFilePath, fix_header_value)
+
+    thread = Thread(target=thread_update)
+    thread.start()
+
+
+def saveTestResult():
+    def thread_update():
+        reportPath = fr'{gv.OutPutPath}\result.csv'
+        model.basefunc.create_csv_file(reportPath, gv.tableWidgetHeader)
+        if os.path.exists(reportPath):
+            all_rows = []
+            for row in range(ui.mainform.main_form.ui.tableWidget.rowCount()):
+                row_data = []
+                for column in range(ui.mainform.main_form.ui.tableWidget.columnCount()):
+                    item = ui.mainform.main_form.ui.tableWidget.item(row, column)
+                    if item is not None:
+                        row_data.append(item.text())
+                all_rows.append(row_data)
+
+            with open(reportPath, 'a', newline='') as stream:
+                writer = csv.writer(stream)
+                writer.writerows(all_rows)
+        lg.logger.debug(f'saveTestResult to:{reportPath}')
+
+    thread = Thread(target=thread_update)
+    thread.start()
+
+
+def test_thread():
+    try:
+        while True:
+            if gv.startFlag:
+                if gv.IsCycle:
+                    while gv.IsCycle:
+                        if ui.mainform.main_form.testcase.run(gv.cf.station.fail_continue):
+                            gv.PassNumOfCycleTest += 1
+                        else:
+                            gv.FailNumOfCycleTest += 1
+                elif gv.SingleStepTest:
+                    lg.logger.debug(f'Suite:{gv.SuiteNo},Step:{gv.StepNo}')
+                    result = ui.mainform.main_form.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo].run(
+                        ui.mainform.main_form.testcase.clone_suites[gv.SuiteNo])
+                    gv.finalTestResult = result
+                    ui.mainform.main_form.SetTestStatus(
+                        ui.mainform.TestStatus.PASS if gv.finalTestResult else ui.mainform.TestStatus.FAIL)
+                else:
+                    result = ui.mainform.main_form.testcase.run(gv.cf.station.fail_continue)
+                    result1 = upload_Json_to_client()
+                    result2 = upload_result_to_mes(gv.mes_result)
+                    gv.finalTestResult = result & result1 & result2
+                    ui.mainform.main_form.SetTestStatus(
+                        ui.mainform.TestStatus.PASS if gv.finalTestResult else ui.mainform.TestStatus.FAIL)
+                    CollectResultToCsv()
+                    saveTestResult()
+    except Exception as e:
+        lg.logger.exception(f"TestThread() Exception:{e}")
+        ui.mainform.main_form.SetTestStatus(ui.mainform.TestStatus.ABORT)
+    finally:
+        lg.logger.debug('finally')
+
+
+def upload_result_to_mes(url):
+    if gv.IsDebug:
+        return True
+    mes_result = json.dumps(gv.mesPhases, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+    lg.logger.debug(mes_result)
+    response = requests.post(url, mes_result)
+    if response.status_code == 200:
+        return True
+    else:
+        lg.logger.debug(f'post fail:{response.content}')
+        return False
+
+
+def excepthook(cls, exception, traceback):
+    lg.logger.exception(format_exception(cls, exception, traceback))
+    QMessageBox.critical(None, "Error", "".join(format_exception(cls, exception, traceback)))
+
 
 if __name__ == "__main__":
+    sys.excepthook = excepthook
     app = QApplication([])
     mainWin = ui.mainform.MainForm()
     mainWin.ui.show()
-    lg.logger.debug("test qtextEdit debug")
-    lg.logger.info("test qtextEdit info")
-    lg.logger.error("eero")
-    lg.logger.critical('fate,except')
-    lg.logger.warning('warning')
-    app.exec_()
+    try:
+        app.exec_()
+    except KeyboardInterrupt:
+        pass

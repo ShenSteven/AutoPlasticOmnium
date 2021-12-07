@@ -10,14 +10,36 @@ import re
 import time
 from sokets.serialport import SerialPort
 from sokets.telnet import TelnetComm
-# import model.step
 import conf.globalvar as gv
 import conf.logconf as lg
 import model.basefunc
+import model.suite
+import ui.mainform
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QMetaObject, Qt
+from PyQt5 import QtCore
 
 
+# import model.step
 # def test(item: model.step.Step):
-def test(item):
+def test(item, testSuite):
+    time.sleep(0.1)
+    # invoke_return = QMetaObject.invokeMethod(
+    #     ui.mainform.main_form,
+    #     'showMessageBox',
+    #     Qt.BlockingQueuedConnection,
+    #     QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
+    #     QtCore.Q_ARG(str, 'ERROR!'),
+    #     QtCore.Q_ARG(str, 'Text to msgBox'),
+    #     QtCore.Q_ARG(int, 2))
+    # lg.logger.debug(f"invoke_return:{invoke_return}")
+    # if invoke_return == QMessageBox.Yes or invoke_return == QMessageBox.Ok:
+    #     lg.logger.debug("yes ok")
+    # else:
+    #     lg.logger.debug('no')
+
+    lg.logger.debug(f'isTest:{item.isTest},testName:{item.ItemName}')
+    return True, ''
     rReturn = False
     compInfo = ''
     # gv.main_form.testSequences[item.suite_index].globalVar = item.globalVar

@@ -8,22 +8,23 @@
 """
 import re
 from datetime import datetime
+from PyQt5.QtCore import Qt
 import model.product
 import conf.globalvar as gv
 import model.step
 import conf.logconf as lg
+import ui.mainform
 
 
 def process_EndFor(step: model.step.Step):
-    if not model.IsNullOrEmpty(step.For) and str(step.For).lower().startswith('end'):
+    if not model.IsNullOrEmpty(step.For) and step.For.lower().startswith('end'):
         if gv.ForTestCycle < gv.ForTotalCycle:
             gv.ForFlag = True
-            gv.ForTestCycle = gv.ForTestCycle + 1
+            gv.ForTestCycle += 1
             return True
         else:
             gv.ForFlag = False
-            lg.logger.debug(
-                f"==================Have Complete all({gv.ForTestCycle}) Cycle test.======================")
+            lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForTestCycle}) Cycle test." + '=' * 10)
             return False
     else:
         return False
@@ -45,7 +46,7 @@ class TestSuite:
     tResult: bool = True  # 测试结果
     totalNumber: int = 0  # 测试大项item总数量
     index: int = 0  # 测试大项在所有中的序列号
-    test_steps: list = []
+    steps: list = []
     start_time: str = ""
     finish_time: str = ""
     error_code: str = None
@@ -53,16 +54,10 @@ class TestSuite:
     elapsedTime = None
     globalVar: str = ''
 
-    def update_from_dict(self, step_dict):
-        import model.step
-        for step_dict in step_dict['test_steps']:
-            step_obj = model.step.Step(step_dict)
-            self.test_steps.append(step_obj)
-
     def __init__(self, SeqName=None, test_serial=None, dict_=None):
         self.SeqName = SeqName
         self.index = test_serial
-        self.test_steps = []
+        self.steps = []
         if dict_ is not None:
             self.__dict__.update(dict_)
 
@@ -91,47 +86,48 @@ class TestSuite:
             setattr(gv.mesPhases, self.SeqName, str(self.tResult).upper())
 
     def run(self, global_fail_continue, stepNo=-1):
-        if self.isTest:
-            return True
-        lg.logger.debug('- ' * 9 + f"Start testSuite:{self.SeqName}" + '- ' * 9)
-        # mainWin.ui.textEdit.insertHtml(
-        #     '- ' * 9 + f"<a name='testSuite:{self.SeqName}'>Start testSuite:{self.SeqName}</a>" + '- ' * 9)
-
+        if not self.isTest:
+            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.gray, self.index, -1, True)
+            self.tResult = True
+            return self.tResult
+        lg.logger.debug('- ' * 8 + f"<a name='testSuite:{self.SeqName}'>Start testSuite:{self.SeqName}</a>" + '- ' * 9)
+        ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.yellow, self.index, -1, False)
         # step_result = False
-        testPhase = model.product.SuiteItem()
+        suiteItem = model.product.SuiteItem()
         step_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
-            for i, step in enumerate(self.test_steps):
+            for i, step in enumerate(self.steps, start=0):
                 if stepNo != -1:
                     i = stepNo
                     stepNo = -1
-                self.process_for(self.test_steps[i])
 
-                if self.test_steps[i].isTest:
-                    if not model.IsNullOrEmpty(self.globalVar):
-                        step.globalVar = self.globalVar
-                    step_result = self.test_steps[i].run(testPhase)
-                    step_result_list.append(step_result)
-                else:
-                    step_result = True
+                self.process_for(self.steps[i])
 
-                if not step_result and not fail_continue(self.test_steps[i], global_fail_continue):
+                if not model.IsNullOrEmpty(self.globalVar):
+                    step.globalVar = self.globalVar
+                step_result = self.steps[i].run(self, suiteItem)
+                step_result_list.append(step_result)
+
+                if not step_result and not fail_continue(self.steps[i], global_fail_continue):
                     break
 
-                if process_EndFor(self.test_steps[i]):
+                if process_EndFor(self.steps[i]):
                     break
 
             self.tResult = all(step_result_list)
             self.print_result()
             self.process_mesVer()
-            # self.copy_to(testPhase)  # 把seq测试结果保存到test_phase变量中.
-            # gv.stationObj.SuiteItem.append(testPhase)  # 加入station实例,记录测试结果 用于序列化Json文件
+            if gv.stationObj.test_phases is not None:
+                self.copy_to(suiteItem)  # 把seq测试结果保存到test_phase变量中.
+                gv.stationObj.test_phases.append(suiteItem)  # 加入station实例,记录测试结果 用于序列化Json文件
+            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.green if self.tResult else Qt.red,
+                                                                        self.index, -1, False)
+            return self.tResult
         except Exception as e:
+            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.index, -1, False)
             lg.logger.exception(f"run testSuite {self.SeqName} Exception！！{e}")
             self.tResult = False
-            return self.tResult
-        else:
             return self.tResult
         finally:
             self.clear()
@@ -147,8 +143,8 @@ class TestSuite:
 
     def process_for(self, step: model.step.Step):
         if not model.IsNullOrEmpty(step.For) and '(' in step.For and ')' in step.For:
-            gv.ForTestCycle = int(re.findall(f'{step.SubStr1}(.*?){step.SubStr2}', step.For)[0])
-            gv.ForStartStepNo = self.index
+            gv.ForTotalCycle = int(re.findall(r'\((.*?)\)', step.For)[0])
+            gv.ForStartSuiteNo = self.index
             gv.ForStartStepNo = step.index
             gv.ForFlag = False
             lg.logger.debug(f"====================Start Cycle-{gv.ForTestCycle}===========================")
