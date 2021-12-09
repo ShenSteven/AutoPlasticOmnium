@@ -23,7 +23,7 @@ from PyQt5 import QtCore
 # import model.step
 # def test(item: model.step.Step):
 def test(item, testSuite):
-    time.sleep(0.1)
+    time.sleep(0.5)
     # invoke_return = QMetaObject.invokeMethod(
     #     ui.mainform.main_form,
     #     'showMessageBox',

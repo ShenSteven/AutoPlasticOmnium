@@ -2,3 +2,7 @@
 /log/
 /conf/result.csv
 /scripts/firefly_data_api_client.py
+/Data/
+/dist/
+/build/
+/OutPut/

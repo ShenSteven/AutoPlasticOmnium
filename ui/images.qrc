@@ -1,5 +1,5 @@
 <RCC>
-  <qresource prefix="新前缀">
+  <qresource>
     <file>images/Letter-T-blue-icon.png</file>
     <file>images/test.ico</file>
     <file>images/app-json-icon.png</file>

@@ -7,15 +7,18 @@
 @Desc   : 全局变量
 """
 import os
+import sys
 from datetime import datetime
 from os.path import dirname, abspath, join
-from threading import Thread
+from threading import Thread, Event
 import conf
 import model.product
+import set
 
-current_path = dirname(abspath(__file__))
-above_current_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-cf = conf.read_config(join(current_path, 'config.yaml'), conf.config.Configs)  # load test global variable
+current_path = set.current_path
+config_yaml_path = join(current_path, 'conf', 'config.yaml')
+logging_yaml = join(current_path, 'conf', 'logging.yaml')
+cf = conf.read_config(config_yaml_path, conf.config.Configs)  # load test global variable
 tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "tValue", "USL", "ElapsedTime", "StartTime", "Result"]
 SN = ''
 dut_ip = ''
@@ -54,12 +57,12 @@ ForStartSuiteNo = 0
 ForStartStepNo = 0
 ForFlag = False
 
-OutPutPath = rf'{above_current_path}\OutPut'
-DataPath = rf'{above_current_path}\Data'
-scriptFolder = f'{above_current_path}\scripts\\'
-excel_file_path = f'{scriptFolder}{cf.station.testcase}'
-test_script_json = f'{scriptFolder}{cf.station.station_name}.json'
-SHA256Path = f'{scriptFolder}{cf.station.station_name}_key.txt'
+OutPutPath = rf'{current_path}\OutPut'
+DataPath = rf'{current_path}\Data'
+scriptFolder = rf'{current_path}\scripts'
+excel_file_path = rf'{scriptFolder}\{cf.station.testcase}'
+test_script_json = rf'{scriptFolder}\{cf.station.station_name}.json'
+SHA256Path = rf'{scriptFolder}\{cf.station.station_name}_key.txt'
 CSVFilePath = ''
 mes_shop_floor = ''
 mes_result = ''
@@ -68,6 +71,7 @@ shop_floor_url = ''
 mesPhases: model.product.MesInfo
 stationObj: model.product.JsonResult
 testThread: Thread
+event = Event()
 
 PassNumOfCycleTest = 0
 FailNumOfCycleTest = 0

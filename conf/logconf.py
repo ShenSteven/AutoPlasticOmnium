@@ -16,12 +16,8 @@ import logging.config
 from os.path import dirname, abspath, join, exists
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTextEdit
-
 import conf.globalvar as gv
 import conf
-
-current_path = dirname(abspath(__file__))
-above_current_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 # testlog_file path
 gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
@@ -29,7 +25,7 @@ try:
     if not exists(gv.logFolderPath):
         os.makedirs(gv.logFolderPath)
 except FileNotFoundError:
-    gv.cf.station.log_folder = join(above_current_path, 'log')
+    gv.cf.station.log_folder = join(gv.current_path, 'log')
     gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
     if not exists(gv.logFolderPath):
         os.makedirs(gv.logFolderPath)
@@ -39,8 +35,7 @@ gv.critical_log = join(gv.cf.station.log_folder, 'critical.log').replace('\\', '
 gv.errors_log = join(gv.cf.station.log_folder, 'errors.log').replace('\\', '/')
 
 # load logger config
-logging_yaml = join(current_path, 'logging.yaml')
-log_conf = conf.read_yaml(logging_yaml)
+log_conf = conf.read_yaml(gv.logging_yaml)
 res_log_conf = Template(json.dumps(log_conf)).safe_substitute(
     {'log_file': log_file, 'critical_log': gv.critical_log, 'errors_log': gv.errors_log})
 logging.config.dictConfig(yaml.safe_load(res_log_conf))

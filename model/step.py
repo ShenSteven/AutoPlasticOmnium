@@ -7,8 +7,10 @@
 @Desc   : 
 """
 import re
+import time
 from datetime import datetime
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, Q_ARG, QMetaObject
+from PyQt5.QtGui import QBrush
 import model.product
 import conf.globalvar as gv
 import model.test
@@ -111,16 +113,35 @@ class Step:
     def _test_spec(self, value):
         self.__test_spec = _parse_var(value)
 
+    def set_json_start_time(self):
+        if model.IsNullOrEmpty(self.Json) and gv.startTimeJsonFlag:
+            gv.startTimeJson = datetime.now()
+            gv.startTimeJsonFlag = False
+        elif model.IsNullOrEmpty(self.Json) and not gv.startTimeJsonFlag:
+            pass
+        elif not model.IsNullOrEmpty(self.Json) and not gv.startTimeJsonFlag:
+            self.start_time_json = gv.startTimeJson
+            gv.startTimeJsonFlag = True
+        elif not model.IsNullOrEmpty(self.Json) and gv.startTimeJsonFlag:
+            self.start_time_json = datetime.now()
+
     def run(self, testSuite, suiteItem: model.product.SuiteItem = None):
         self.suite_name = testSuite.SeqName
         self.suite_index = testSuite.index
         info = ''
         test_result = False
-        self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        self.start_time = datetime.now()
+        self.set_json_start_time()
+        # self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
             if self.isTest:
-                ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.yellow, self.suite_index, self.index,
-                                                                            False)
+                # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.yellow, self.suite_index, self.index,
+                #                                                             False)
+                QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                         Q_ARG(QBrush, Qt.yellow),
+                                         Q_ARG(int, self.suite_index),
+                                         Q_ARG(int, self.index),
+                                         Q_ARG(bool, False))
                 lg.logger.debug(f"<a name='testStep:{self.suite_name}-{self.ItemName}'>Start {self.ItemName},"
                                 f"Keyword:{self.TestKeyword},Retry:{self.RetryTimes},Timeout:{self.TimeOut}s,"
                                 f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MES_var},FTC:{self.FTC}</a>")
@@ -128,17 +149,30 @@ class Step:
                 self._test_spec = self.Spec
             else:
                 if not gv.IsCycle:
-                    ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.gray, self.suite_index, self.index,
-                                                                                False)
+                    # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.gray, self.suite_index, self.index,
+                    #                                                             False)
+                    QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color',
+                                             Qt.BlockingQueuedConnection,
+                                             Q_ARG(QBrush, Qt.gray),
+                                             Q_ARG(int, self.suite_index),
+                                             Q_ARG(int, self.index),
+                                             Q_ARG(bool, False))
                 self.tResult = True
                 return self.tResult
 
             for retry in range(self._retry_times, -1, -1):
-                test_result, info = model.test.test(self, testSuite)
+                if gv.event.wait():
+                    test_result, info = model.test.test(self, testSuite)
                 if test_result:
                     break
-            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.green if test_result else Qt.red,
-                                                                        self.suite_index, self.index, False)
+            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.green if test_result else Qt.red,
+            #                                                             self.suite_index, self.index, False)
+
+            QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                     Q_ARG(QBrush, Qt.green if test_result else Qt.red),
+                                     Q_ARG(int, self.suite_index),
+                                     Q_ARG(int, self.index),
+                                     Q_ARG(bool, False))
             self._print_result(test_result)
             self.tResult = self._process_if_bypass(test_result)
             self._set_errorCode_details(self.tResult, info)
@@ -147,7 +181,12 @@ class Step:
             self._process_mesVer()
         except Exception as e:
             lg.logger.exception(f"run Exception！！{e}")
-            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.suite_index, self.index, False)
+            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.suite_index, self.index, False)
+            QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                     Q_ARG(QBrush, Qt.darkRed),
+                                     Q_ARG(int, self.suite_index),
+                                     Q_ARG(int, self.index),
+                                     Q_ARG(bool, False))
             self.tResult = False
             return self.tResult
         else:
@@ -183,8 +222,13 @@ class Step:
         if self.IfElse.lower() == 'if':
             gv.IfCond = test_result
             if not test_result:
-                ui.mainform.my_signals.update_treeWidgetItem_backColor.emit('#FF99CC', self.suite_index, self.index,
-                                                                            False)
+                # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit('#FF99CC', self.suite_index, self.index,
+                #                                                             False)
+                QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                         Q_ARG(QBrush, '#FF99CC'),
+                                         Q_ARG(int, self.suite_index),
+                                         Q_ARG(int, self.index),
+                                         Q_ARG(bool, False))
                 lg.logger.info(f"if statement fail needs to continue, setting the test result to true")
                 test_result = True
         elif self.IfElse.lower() == 'else':
@@ -205,12 +249,22 @@ class Step:
 
     def _process_ByPassFail(self, step_result):
         if (self.ByPassFail.upper() == 'P' or self.ByPassFail.upper() == '1') and not step_result:
-            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkGreen, self.suite_index, self.index,
-                                                                        False)
+            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkGreen, self.suite_index, self.index,
+            #                                                             False)
+            QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                     Q_ARG(QBrush, Qt.darkGreen),
+                                     Q_ARG(int, self.suite_index),
+                                     Q_ARG(int, self.index),
+                                     Q_ARG(bool, False))
             lg.logger.warning(f"Let this step:{self.ItemName} bypass.")
             return True
         elif (self.ByPassFail.upper() == 'F' or self.ByPassFail.upper() == '0') and step_result:
-            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.suite_index, self.index, False)
+            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.suite_index, self.index, False)
+            QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                     Q_ARG(QBrush, Qt.darkRed),
+                                     Q_ARG(int, self.suite_index),
+                                     Q_ARG(int, self.index),
+                                     Q_ARG(bool, False))
             lg.logger.warning(f"Let this step:{self.ItemName} by fail.")
             return False
         else:
@@ -235,8 +289,9 @@ class Step:
         return by_result
 
     def _print_result(self, tResult):
-        self.__elapsedTime = (
-                datetime.now() - datetime.strptime(self.start_time, '%Y-%m-%d %H:%M:%S.%f')).microseconds
+        # self.__elapsedTime = (
+        #         datetime.now() - datetime.strptime(self.start_time, '%Y-%m-%d %H:%M:%S.%f')).microseconds
+        self.__elapsedTime = (datetime.now() - self.start_time).seconds
         if self.TestKeyword == 'Wait' and self.TestKeyword == 'ThreadSleep':
             return
         if tResult:
@@ -251,7 +306,8 @@ class Step:
                 f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.testValue},Max:{self.Limit_max}")
         ui.mainform.my_signals.update_tableWidget.emit(
             [gv.SN, self.ItemName, self._test_spec, self.Limit_min, self.testValue,
-             self.Limit_max, self.__elapsedTime, self.start_time, 'Pass' if tResult else 'Fail'])
+             self.Limit_max, self.__elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+             'Pass' if tResult else 'Fail'])
 
     def _collect_result(self):
         if not model.IsNullOrEmpty(self.Limit_max) or not model.IsNullOrEmpty(self.Limit_min):
@@ -273,8 +329,8 @@ class Step:
         obj.test_value = self.testValue
         obj.units = self.Unit
         obj.error_code = self.__error_code
-        obj.start_time = self.start_time_json
-        self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        obj.start_time = self.start_time_json.strftime('%Y-%m-%d %H:%M:%S')
+        self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         obj.finish_time = self.finish_time
         obj.lower_limit = self.Limit_min
         obj.upper_limit = self.Limit_max

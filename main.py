@@ -29,12 +29,12 @@ def upload_Json_to_client():
 def CollectResultToCsv():
     def thread_update():
         gv.CSVFilePath = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
-        csvColumnPath = fr'{gv.scriptFolder}csv_column.txt'
+        csvColumnPath = fr'{gv.scriptFolder}\csv_column.txt'
         fix_header = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
                       "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
                       "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
         fix_header.extend(gv.csv_list_header)
-        updateColumn = gv.finalTestResult  # and not gv.IsDebug and gv.dut.test_mode == "production"
+        updateColumn = gv.finalTestResult and not gv.IsDebug
         model.basefunc.create_csv_file(gv.CSVFilePath, fix_header, updateColumn)
         if os.path.exists(csvColumnPath):
             os.remove(csvColumnPath)
@@ -127,6 +127,16 @@ def excepthook(cls, exception, traceback):
     QMessageBox.critical(None, "Error", "".join(format_exception(cls, exception, traceback)))
 
 
+added_files = [
+    ('ui/main.ui', 'ui'),
+    ('ui/images.qrc', 'ui'),
+    ('ui/images', 'ui'),
+    ('conf/*.yaml', 'conf'),
+    ('set.py', '.'),
+    ('scripts', 'scripts')
+]
+# pyinstaller -y --clean --noconsole --debug=all  --distpath=./dist/ -n AutoTestSystem --icon="test.ico" --add-data="ui/main.ui;ui" --add-data="ui/images.qrc;ui" --add-data="ui/images;ui" --add-data="conf/*.yaml;conf" --add-data="scripts;scripts" main.py --runtime-hook="runtimehook.py"
+# pyinstaller AutoTestSystem.spec
 if __name__ == "__main__":
     sys.excepthook = excepthook
     app = QApplication([])

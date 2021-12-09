@@ -7,13 +7,13 @@ from datetime import datetime
 from enum import Enum
 from os.path import dirname, abspath, join
 from threading import Thread
-import ui.images  # pyrcc5 images.qrc -o images.py
+import ui.images
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRegExp, QMetaObject
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QTextEdit, \
-    QAbstractItemView, QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction
+    QAbstractItemView, QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf
 import conf.globalvar as gv
 import main
@@ -23,6 +23,10 @@ import conf.logconf as lg
 import model.testcase
 import model.loadseq
 import conf.logconf
+
+
+# pyrcc5 images.qrc -o images.py
+# pyuic5 main.ui -o main_ui.py
 
 
 class TestStatus(Enum):
@@ -38,7 +42,7 @@ class MySignals(QObject):
     update_treeWidgetItem_backColor = pyqtSignal([QBrush, int, int, bool])
     updateLabel = pyqtSignal([QLabel, str, int, QBrush], [QLabel, str, int], [QLabel, str])
     timing = pyqtSignal(bool)
-    textEditClear = pyqtSignal(str)
+    textEditClear = pyqtSignal()
     lineEditEnable = pyqtSignal(bool)
     setIcon = pyqtSignal(QAction, QIcon)
     updateStatusBar = pyqtSignal(str)
@@ -100,7 +104,7 @@ def UpdateContinueFail(testResult: bool):
 
 def on_actionConfig():
     def actionOpenScript():
-        os.startfile(rf'{gv.current_path}\config.yaml')
+        os.startfile(rf'{gv.config_yaml_path}')
 
     thread = Thread(target=actionOpenScript)
     thread.start()
@@ -194,7 +198,8 @@ class MainForm(QWidget):
         my_signals.updateLabel[QLabel, str, int].connect(update_label)
         my_signals.updateLabel[QLabel, str].connect(update_label)
         my_signals.update_tableWidget[list].connect(self.update_tableWidget)
-        my_signals.textEditClear[str].connect(self.on_textEditClear)
+        my_signals.update_tableWidget[str].connect(self.update_tableWidget)
+        my_signals.textEditClear.connect(self.on_textEditClear)
         my_signals.lineEditEnable[bool].connect(self.lineEditEnable)
         my_signals.setIcon[QAction, QIcon].connect(on_setIcon)
         my_signals.updateAction[QAction, QIcon].connect(updateAction)
@@ -275,6 +280,8 @@ class MainForm(QWidget):
         self.ui.tableWidget.setHorizontalHeaderLabels(gv.tableWidgetHeader)
         self.ui.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.tableWidget.resizeColumnsToContents()
+        self.ui.tableWidget.resizeRowsToContents()
         strHeaderQss = "QHeaderView::section { background:#CCCCCC; color:black;min-height:3em;}"
         self.ui.tableWidget.setStyleSheet(strHeaderQss)
         self.ui.tableWidget_2.setStyleSheet(strHeaderQss)
@@ -282,10 +289,10 @@ class MainForm(QWidget):
     def init_lab_factory(self, str_):
         if str_ == "lab":
             gv.IsDebug = True
-            self.ui.actionPrivileges.setIcon(QIcon(join(dirname(abspath(__file__)), 'images/lab-icon.png')))
+            self.ui.actionPrivileges.setIcon(QIcon(':/images/lab-icon.png'))
         else:
             gv.IsDebug = False
-            self.ui.actionPrivileges.setIcon(QIcon(join(dirname(abspath(__file__)), 'images/factory.png')))
+            self.ui.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
             self.ui.actionConvertExcelToJson.setEnabled(False)
             self.ui.actionSaveToScript.setEnabled(False)
             self.ui.actionReloadScript.setEnabled(False)
@@ -338,15 +345,28 @@ class MainForm(QWidget):
                     sys.exit(0)
 
     def ContinuousFailReset_Click(self):
-        pass
+        text, ok = QInputDialog.getText(self, 'Reset', 'Please input Reset Password:', echo=QLineEdit.Password)
+        if ok:
+            if text == 'test123':
+                gv.cf.count.continue_fail_count = 0
+                self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.cf.count.continue_fail_count}')
+                self.ui.lb_continuous_fail.setStyleSheet(
+                    f"background-color:{self.ui.statusbar.palette().window().color().name()};")
+                return True
+            else:
+                QMessageBox.critical(self, 'ERROR!', 'wrong password!')
+                return False
+        else:
+            return False
 
     def CheckContinueFailNum(self):
         if gv.cf.count.continue_fail_count >= gv.cf.count.continue_fail_limit:
             self.ui.lb_continuous_fail.setStyleSheet(f"background-color:red;")
-            self.ContinuousFailReset_Click()
-            return False
+            if gv.IsDebug:
+                return True
+            else:
+                return self.ContinuousFailReset_Click()
         else:
-            print(self.ui.statusbar.palette().window().color())
             self.ui.lb_continuous_fail.setStyleSheet(
                 f"background-color:{self.ui.statusbar.palette().window().color().name()};")
             return True
@@ -413,7 +433,7 @@ class MainForm(QWidget):
         self.ui.treeWidget.blockSignals(False)
 
     def variable_init(self):
-        gv.cf = conf.read_config(join(gv.current_path, 'config.yaml'), conf.config.Configs)
+        gv.cf = conf.read_config(gv.config_yaml_path, conf.config.Configs)
         if not gv.testThread.is_alive():
             gv.testThread = Thread(target=main.test_thread, daemon=True)
             gv.testThread.start()
@@ -449,21 +469,19 @@ class MainForm(QWidget):
                 ui.mainform.main_form.ui.treeWidget.blockSignals(True)
                 if not gv.SingleStepTest:
                     # self.ui.textEdit.clear()
-                    my_signals.textEditClear[str].emit('clear')
+                    my_signals.textEditClear.emit()
                 my_signals.lineEditEnable[bool].emit(False)
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'Testing', 36, Qt.yellow)
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode, '', 20, Qt.yellow)
                 my_signals.timing[bool].emit(True)
                 gv.startTime = datetime.now()
-                self.ui.actionStart.setIcon(QIcon(join(dirname(abspath(__file__)), 'images/Pause-icon.png')))
-                # pause_icon = QIcon(join(dirname(abspath(__file__)), 'images/Pause-icon.png'))
-                # my_signals.setIcon[QAction, QIcon].emit(self.ui.actionStart, pause_icon)
+                my_signals.setIcon[QAction, QIcon].emit(self.ui.actionStart, QIcon(':/images/Pause-icon.png'))
                 gv.startFlag = True
                 lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_mode},"
                                 f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
                                 f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.test_software_ver}")
                 my_signals.update_tableWidget[str].emit('clear')
-
+                gv.event.set()
             elif status == TestStatus.FAIL:
                 gv.cf.count.total_fail_count += 1
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'FAIL', 36, Qt.red)
@@ -490,8 +508,7 @@ class MainForm(QWidget):
         finally:
             try:
                 if status != TestStatus.START:
-                    start_icon = QIcon(join(dirname(abspath(__file__)), 'images/Start-icon.png'))
-                    my_signals.setIcon[QAction, QIcon].emit(self.ui.actionStart, start_icon)
+                    my_signals.setIcon[QAction, QIcon].emit(self.ui.actionStart, QIcon(':/images/Start-icon.png'))
                     if gv.dut_comm is not None:
                         gv.dut_comm.close()
                     if gv.cf.station.fix_flag:
@@ -529,7 +546,6 @@ class MainForm(QWidget):
                 self.ui.tableWidget.insertRow(row_cnt)
                 column_cnt = self.ui.tableWidget.columnCount()
                 for column in range(column_cnt):
-                    self.ui.tableWidget.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
                     if model.IsNullOrEmpty(result_tuple[column]):
                         result_tuple[column] = '--'
                     item = QTableWidgetItem(str(result_tuple[column]))
@@ -537,11 +553,14 @@ class MainForm(QWidget):
                         item.setForeground(Qt.red)
                         # item.setFont(QFont('Times', 12, QFont.Black))
                     self.ui.tableWidget.setItem(row_cnt, column, item)
+                    self.ui.tableWidget.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
+                # self.ui.tableWidget.resizeColumnsToContents()
                 self.ui.tableWidget.scrollToItem(self.ui.tableWidget.item(row_cnt - 1, 0),
                                                  hint=QAbstractItemView.EnsureVisible)
             elif isinstance(result_tuple, str):
                 for i in range(0, self.ui.tableWidget.rowCount()):
                     self.ui.tableWidget.removeRow(0)
+            QApplication.processEvents()
 
         thread = Thread(target=thread_update_tableWidget)
         thread.start()
@@ -549,10 +568,15 @@ class MainForm(QWidget):
     def on_reloadSeqs(self):
         def thread_convert_and_load_script():
             lg.logger.debug('start reload script...')
-            model.loadseq.load_testcase_from_excel(rf"{gv.above_current_path}\scripts\{gv.cf.station.testcase}",
-                                                   f'{gv.cf.station.station_name}', gv.test_script_json, gv.SHA256Path)
-            self.testcase = model.testcase.TestCase(rf"{gv.above_current_path}\scripts\{gv.cf.station.testcase}",
-                                                    f'{gv.cf.station.station_name}')
+            if os.path.exists(gv.test_script_json):
+                os.chmod(testcase_path_json, stat.S_IWRITE)
+                os.remove(gv.test_script_json)
+            if os.path.exists(gv.SHA256Path):
+                os.chmod(key_path, stat.S_IWRITE)
+                os.remove(gv.SHA256Path)
+            # model.loadseq.load_testcase_from_excel(gv.excel_file_path, gv.cf.station.station_name, gv.test_script_json,
+            #                                        gv.SHA256Path)
+            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
             self.testSequences = self.testcase.clone_suites
 
         thread = Thread(target=thread_convert_and_load_script)
@@ -566,7 +590,7 @@ class MainForm(QWidget):
         if gv.startFlag:
             return
         if item.parent() is None:
-            lg.logger.critical('handle_itemChanged_parent')
+            # lg.logger.critical('handle_itemChanged_parent')
             pNo = self.ui.treeWidget.indexOfTopLevelItem(item)
             isChecked = item.checkState(column) == Qt.Checked
             self.testcase.clone_suites[pNo].isTest = isChecked
@@ -576,7 +600,7 @@ class MainForm(QWidget):
                 self.testcase.clone_suites[pNo].steps[i].isTest = isChecked
             self.ui.treeWidget.blockSignals(False)
         else:
-            lg.logger.critical('handle_itemChanged_child')
+            # lg.logger.critical('handle_itemChanged_child')
             ParentIsTest = []
             pNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
             cNO = item.parent().indexOfChild(item)
@@ -590,26 +614,26 @@ class MainForm(QWidget):
             item.parent().setCheckState(column, Qt.Checked if isChecked_parent else Qt.Unchecked)
             self.ui.treeWidget.blockSignals(False)
 
-    def handle_itemClicked(self, item, column=0):
-        """mouse left-click event, In Qt, it is always a left button that emits the clicked() signal.
-        :param column:
-        :param item:
-        """
-        if item.parent() is None:
-            lg.logger.critical('itemClicked_parent')
-            gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item)
-            gv.StepNo = 0
-            pp = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
-            anchor = f'testSuite:{pp}'
-            self.ui.textEdit.scrollToAnchor(anchor)
-        else:
-            lg.logger.critical('itemClicked_child')
-            gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
-            gv.StepNo = item.parent().indexOfChild(item)
-            pp = item.parent().data(column, Qt.DisplayRole).split(' ', 1)[1]
-            cc = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
-            anchor = f'testStep:{pp}-{cc}'
-            self.ui.textEdit.scrollToAnchor(anchor)
+    # def handle_itemClicked(self, item, column=0):
+    #     """mouse left-click event, In Qt, it is always a left button that emits the clicked() signal.
+    #     :param column:
+    #     :param item:
+    #     """
+    #     if item.parent() is None:
+    #         lg.logger.critical('itemClicked_parent')
+    #         gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item)
+    #         gv.StepNo = 0
+    #         pp = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
+    #         anchor = f'testSuite:{pp}'
+    #         self.ui.textEdit.scrollToAnchor(anchor)
+    #     else:
+    #         lg.logger.critical('itemClicked_child')
+    #         gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
+    #         gv.StepNo = item.parent().indexOfChild(item)
+    #         pp = item.parent().data(column, Qt.DisplayRole).split(' ', 1)[1]
+    #         cc = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
+    #         anchor = f'testStep:{pp}-{cc}'
+    #         self.ui.textEdit.scrollToAnchor(anchor)
 
     def on_treeWidgetMenu(self):
         if gv.IsDebug:
@@ -673,10 +697,12 @@ class MainForm(QWidget):
         if gv.startFlag:
             if not gv.pauseFlag:
                 gv.pauseFlag = True
-                self.ui.actionStart.setIcon(QIcon(join(dirname(abspath(__file__)), 'images/Start-icon.png')))
+                self.ui.actionStart.setIcon(QIcon(':/images/Start-icon.png'))
+                gv.event.clear()
             else:
                 gv.pauseFlag = False
-                self.ui.actionStart.setIcon(QIcon(join(dirname(abspath(__file__)), 'images/Pause-icon.png')))
+                self.ui.actionStart.setIcon(QIcon(':/images/Pause-icon.png'))
+                gv.event.set()
         else:
             self.on_returnPressed()
 
@@ -707,12 +733,12 @@ class MainForm(QWidget):
 
     def on_actionEnable_lab(self):
         gv.IsDebug = True
-        self.ui.actionPrivileges.setIcon(QIcon(join(dirname(abspath(__file__)), 'images/lab-icon.png')))
+        self.ui.actionPrivileges.setIcon(QIcon(':/images/lab-icon.png'))
         self.debug_switch(gv.IsDebug)
 
     def on_actionDisable_factory(self):
         gv.IsDebug = False
-        self.ui.actionPrivileges.setIcon(QIcon(join(dirname(abspath(__file__)), 'images/factory.png')))
+        self.ui.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
         self.debug_switch(gv.IsDebug)
 
     def debug_switch(self, isDebug: bool):
@@ -768,7 +794,7 @@ class MainForm(QWidget):
         for suite in sequences:
             suite_node = QTreeWidgetItem(self.ui.treeWidget)
             suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. {suite.SeqName}')
-            suite_node.setIcon(0, QIcon(join(dirname(abspath(__file__)), 'images/folder-icon.png')))
+            suite_node.setIcon(0, QIcon(':/images/folder-icon.png'))
             if checkall:
                 suite_node.setCheckState(0, Qt.Checked)
                 suite.isTest = True
@@ -792,7 +818,7 @@ class MainForm(QWidget):
                     step_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 else:
                     step_node.setFlags(Qt.ItemIsSelectable)
-                step_node.setIcon(0, QIcon(join(dirname(abspath(__file__)), 'images/Document-txt-icon.png')))
+                step_node.setIcon(0, QIcon(':/images/Document-txt-icon.png'))
                 suite_node.addChild(step_node)
         self.ui.treeWidget.setStyle(QStyleFactory.create('windows'))
         self.ui.treeWidget.resizeColumnToContents(0)
@@ -813,9 +839,29 @@ class MainForm(QWidget):
                 self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
                 self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
                                                 hint=QAbstractItemView.EnsureVisible)
+            QApplication.processEvents()
 
         thread = Thread(target=thread_update)
         thread.start()
+
+    @QtCore.pyqtSlot(QBrush, int, int, bool)
+    def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
+        pass
+        lg.logger.debug('update_treeWidget_color...')
+        if stepNo_ == -1:
+            if gv.IsCycle or not gv.startFlag:
+                return
+            self.ui.treeWidget.topLevelItem(suiteNO_).setExpanded(True)
+            self.ui.treeWidget.topLevelItem(suiteNO_).setBackground(0, color)
+            if allChild:
+                for i in range(self.ui.treeWidget.topLevelItem(suiteNO_).childCount()):
+                    self.ui.treeWidget.topLevelItem(suiteNO_).child(i).setBackground(0, color)
+        else:
+            self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
+            self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
+                                            hint=QAbstractItemView.EnsureVisible)
+        lg.logger.debug('update_treeWidget_color...finish')
+        QApplication.processEvents()
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
     def showMessageBox(self, title, text, level):
@@ -842,12 +888,11 @@ class MainForm(QWidget):
         thread = Thread(target=thread_update)
         thread.start()
 
-    def on_textEditClear(self, str_):
+    def on_textEditClear(self):
         self.ui.textEdit.clear()
 
     def updateStatusBar(self, str_):
         def update_status_bar():
-            lg.logger.debug(str_)
             self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.cf.count.continue_fail_count}')
             self.ui.lb_count_pass.setText(f'PASS: {gv.cf.count.total_pass_count}')
             self.ui.lb_count_fail.setText(f'FAIL: {gv.cf.count.total_fail_count}')
@@ -857,13 +902,15 @@ class MainForm(QWidget):
                         gv.cf.count.total_pass_count + gv.cf.count.total_fail_count + gv.cf.count.total_abort_count)))
             except ZeroDivisionError:
                 self.ui.lb_count_yield.setText('Yield: 0.00%')
-            self.ui.statusbar.update()
+            # self.ui.statusbar.update()
+            QApplication.processEvents()
 
         thread = Thread(target=update_status_bar)
         thread.start()
 
     def timerEvent(self, a):
         my_signals.updateLabel[QLabel, str, int].emit(self.ui.lb_errorCode, str(self.sec), 20)
+        QApplication.processEvents()
         self.sec += 1
 
     def timing(self, flag):
@@ -890,11 +937,6 @@ class MainForm(QWidget):
         # QTextEditHandler.clear()           #文本清除
         # my_signals.update_tableWidget[tuple].emit(("1", "ItemName", "Spec", "Limit_min", "tValue", "Limit_max",
         #                                            "ElapsedTime", "StartTime", "fail"))
-        # my_signals.update_tableWidget[tuple].emit(("2", "ItemName", "Spec", "Limit_min", "tValue", "Limit_max",
-        #                                            "ElapsedTime", "StartTime", "fail"))
-        # my_signals.update_tableWidget[tuple].emit(("3", "ItemName", "Spec", "Limit_min", "tValue", "Limit_max",
-        #                                            "ElapsedTime", "StartTime", "fail"))
-
         # my_signals.update_treeWidgetItem_backColor[QBrush, int, int].emit(Qt.red, 3, 1)
         # self.ui.lb_status.setStyleSheet("background-color:red;font: 36pt '宋体';")
         # self.ui.lb_status.setText('PASS')

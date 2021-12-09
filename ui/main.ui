@@ -464,7 +464,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionOpenScript">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/Open-file-icon.png</normaloff>:/新前缀/images/Open-file-icon.png</iconset>
+     <normaloff>:/images/Open-file-icon.png</normaloff>:/images/Open-file-icon.png</iconset>
    </property>
    <property name="text">
     <string>OpenScript</string>
@@ -476,7 +476,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionConfig">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/Settings-icon.png</normaloff>:/新前缀/images/Settings-icon.png</iconset>
+     <normaloff>:/images/Settings-icon.png</normaloff>:/images/Settings-icon.png</iconset>
    </property>
    <property name="text">
     <string>参数配置</string>
@@ -485,7 +485,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionReloadScript">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/reload.png</normaloff>:/新前缀/images/reload.png</iconset>
+     <normaloff>:/images/reload.png</normaloff>:/images/reload.png</iconset>
    </property>
    <property name="text">
     <string>ReloadScript</string>
@@ -497,7 +497,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionSaveToScript">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/Other-Save-Metro-icon.png</normaloff>:/新前缀/images/Other-Save-Metro-icon.png</iconset>
+     <normaloff>:/images/Other-Save-Metro-icon.png</normaloff>:/images/Other-Save-Metro-icon.png</iconset>
    </property>
    <property name="text">
     <string>SaveToScript</string>
@@ -509,7 +509,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionStart">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/Start-icon.png</normaloff>:/新前缀/images/Start-icon.png</iconset>
+     <normaloff>:/images/Start-icon.png</normaloff>:/images/Start-icon.png</iconset>
    </property>
    <property name="text">
     <string>Start</string>
@@ -518,7 +518,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionStop">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/Stop-red-icon.png</normaloff>:/新前缀/images/Stop-red-icon.png</iconset>
+     <normaloff>:/images/Stop-red-icon.png</normaloff>:/images/Stop-red-icon.png</iconset>
    </property>
    <property name="text">
     <string>Stop</string>
@@ -527,7 +527,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionSaveLog">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/save.png</normaloff>:/新前缀/images/save.png</iconset>
+     <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
    </property>
    <property name="text">
     <string>SaveLog</string>
@@ -536,7 +536,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionOpenLog">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/File-Open-icon.png</normaloff>:/新前缀/images/File-Open-icon.png</iconset>
+     <normaloff>:/images/File-Open-icon.png</normaloff>:/images/File-Open-icon.png</iconset>
    </property>
    <property name="text">
     <string>OpenLog</string>
@@ -545,7 +545,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionException">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/log-icon.png</normaloff>:/新前缀/images/log-icon.png</iconset>
+     <normaloff>:/images/log-icon.png</normaloff>:/images/log-icon.png</iconset>
    </property>
    <property name="text">
     <string>ExceptionLog</string>
@@ -554,7 +554,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionLogFolder">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/folder.png</normaloff>:/新前缀/images/folder.png</iconset>
+     <normaloff>:/images/folder.png</normaloff>:/images/folder.png</iconset>
    </property>
    <property name="text">
     <string>LogFolder</string>
@@ -563,7 +563,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionCSVLog">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/csv-file.png</normaloff>:/新前缀/images/csv-file.png</iconset>
+     <normaloff>:/images/csv-file.png</normaloff>:/images/csv-file.png</iconset>
    </property>
    <property name="text">
     <string>CSVLog</string>
@@ -577,7 +577,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionPrivileges">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/lab-icon.png</normaloff>:/新前缀/images/lab-icon.png</iconset>
+     <normaloff>:/images/lab-icon.png</normaloff>:/images/lab-icon.png</iconset>
    </property>
    <property name="text">
     <string>Lab</string>
@@ -589,7 +589,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionHelper">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/Folders-OS-Help-Metro-icon.png</normaloff>:/新前缀/images/Folders-OS-Help-Metro-icon.png</iconset>
+     <normaloff>:/images/Folders-OS-Help-Metro-icon.png</normaloff>:/images/Folders-OS-Help-Metro-icon.png</iconset>
    </property>
    <property name="text">
     <string>Helper</string>
@@ -598,7 +598,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionCheckAll">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/check-all.png</normaloff>:/新前缀/images/check-all.png</iconset>
+     <normaloff>:/images/check-all.png</normaloff>:/images/check-all.png</iconset>
    </property>
    <property name="text">
     <string>CheckAll</string>
@@ -607,7 +607,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionUncheckAll">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/uncheck-all.png</normaloff>:/新前缀/images/uncheck-all.png</iconset>
+     <normaloff>:/images/uncheck-all.png</normaloff>:/images/uncheck-all.png</iconset>
    </property>
    <property name="text">
     <string>UncheckAll</string>
@@ -616,7 +616,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionStepping">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/repeat.png</normaloff>:/新前缀/images/repeat.png</iconset>
+     <normaloff>:/images/repeat.png</normaloff>:/images/repeat.png</iconset>
    </property>
    <property name="text">
     <string>Stepping</string>
@@ -625,7 +625,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionLooping">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/loop.png</normaloff>:/新前缀/images/loop.png</iconset>
+     <normaloff>:/images/loop.png</normaloff>:/images/loop.png</iconset>
    </property>
    <property name="text">
     <string>Looping</string>
@@ -634,7 +634,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionEditStep">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/edit.png</normaloff>:/新前缀/images/edit.png</iconset>
+     <normaloff>:/images/edit.png</normaloff>:/images/edit.png</iconset>
    </property>
    <property name="text">
     <string>EditStep</string>
@@ -643,7 +643,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionClearLog">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/clear-log.png</normaloff>:/新前缀/images/clear-log.png</iconset>
+     <normaloff>:/images/clear-log.png</normaloff>:/images/clear-log.png</iconset>
    </property>
    <property name="text">
     <string>ClearLog</string>
@@ -652,7 +652,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionOpen_TestCase">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/microsoft-excel.png</normaloff>:/新前缀/images/microsoft-excel.png</iconset>
+     <normaloff>:/images/microsoft-excel.png</normaloff>:/images/microsoft-excel.png</iconset>
    </property>
    <property name="text">
     <string>Open TestCase</string>
@@ -664,7 +664,7 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/blue-document-convert-icon.png</normaloff>:/新前缀/images/blue-document-convert-icon.png</iconset>
+     <normaloff>:/images/blue-document-convert-icon.png</normaloff>:/images/blue-document-convert-icon.png</iconset>
    </property>
    <property name="text">
     <string>ConvertExcelToJson</string>
@@ -683,7 +683,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionPause">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/Pause-icon.png</normaloff>:/新前缀/images/Pause-icon.png</iconset>
+     <normaloff>:/images/Pause-icon.png</normaloff>:/images/Pause-icon.png</iconset>
    </property>
    <property name="text">
     <string>Pause</string>
@@ -734,7 +734,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionRestart">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/restart.png</normaloff>:/新前缀/images/restart.png</iconset>
+     <normaloff>:/images/restart.png</normaloff>:/images/restart.png</iconset>
    </property>
    <property name="text">
     <string>Restart</string>
@@ -762,7 +762,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionEnable_lab">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/lab-icon.png</normaloff>:/新前缀/images/lab-icon.png</iconset>
+     <normaloff>:/images/lab-icon.png</normaloff>:/images/lab-icon.png</iconset>
    </property>
    <property name="text">
     <string>Enable(lab)</string>
@@ -771,7 +771,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionDisable_factory">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/新前缀/images/factory.png</normaloff>:/新前缀/images/factory.png</iconset>
+     <normaloff>:/images/factory.png</normaloff>:/images/factory.png</iconset>
    </property>
    <property name="text">
     <string>Disable(factory)</string>

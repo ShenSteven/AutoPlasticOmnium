@@ -8,7 +8,8 @@
 """
 import re
 from datetime import datetime
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, Q_ARG, QMetaObject
+from PyQt5.QtGui import QBrush
 import model.product
 import conf.globalvar as gv
 import model.step
@@ -87,11 +88,21 @@ class TestSuite:
 
     def run(self, global_fail_continue, stepNo=-1):
         if not self.isTest:
-            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.gray, self.index, -1, True)
+            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.gray, self.index, -1, True)
+            QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                     Q_ARG(QBrush, Qt.gray),
+                                     Q_ARG(int, self.index),
+                                     Q_ARG(int, -1),
+                                     Q_ARG(bool, True))
             self.tResult = True
             return self.tResult
         lg.logger.debug('- ' * 8 + f"<a name='testSuite:{self.SeqName}'>Start testSuite:{self.SeqName}</a>" + '- ' * 9)
-        ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.yellow, self.index, -1, False)
+        # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.yellow, self.index, -1, False)
+        QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                 Q_ARG(QBrush, Qt.yellow),
+                                 Q_ARG(int, self.index),
+                                 Q_ARG(int, -1),
+                                 Q_ARG(bool, False))
         # step_result = False
         suiteItem = model.product.SuiteItem()
         step_result_list = []
@@ -121,11 +132,21 @@ class TestSuite:
             if gv.stationObj.test_phases is not None:
                 self.copy_to(suiteItem)  # 把seq测试结果保存到test_phase变量中.
                 gv.stationObj.test_phases.append(suiteItem)  # 加入station实例,记录测试结果 用于序列化Json文件
-            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.green if self.tResult else Qt.red,
-                                                                        self.index, -1, False)
+            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.green if self.tResult else Qt.red,
+            #                                                             self.index, -1, False)
+            QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                     Q_ARG(QBrush, Qt.green if self.tResult else Qt.red),
+                                     Q_ARG(int, self.index),
+                                     Q_ARG(int, -1),
+                                     Q_ARG(bool, False))
             return self.tResult
         except Exception as e:
-            ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.index, -1, False)
+            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.index, -1, False)
+            QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
+                                     Q_ARG(QBrush, Qt.darkRed),
+                                     Q_ARG(int, self.index),
+                                     Q_ARG(int, -1),
+                                     Q_ARG(bool, False))
             lg.logger.exception(f"run testSuite {self.SeqName} Exception！！{e}")
             self.tResult = False
             return self.tResult

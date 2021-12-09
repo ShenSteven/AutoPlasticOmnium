@@ -24,8 +24,8 @@ from PyQt5 import QtCore
 def excel_convert_to_json(testcase_path_excel, all_stations):
     lg.logger.debug("Start convert excel testcase to json script.")
     for station in all_stations:
-        test_script_json = f"{gv.scriptFolder}{station}.json"
-        SHA256Path = f"{gv.scriptFolder}{station}_key.txt"
+        test_script_json = rf"{gv.scriptFolder}\{station}.json"
+        SHA256Path = rf"{gv.scriptFolder}\{station}_key.txt"
         load_testcase_from_excel(testcase_path_excel, station, test_script_json, SHA256Path)
     lg.logger.debug("convert finish!")
 
