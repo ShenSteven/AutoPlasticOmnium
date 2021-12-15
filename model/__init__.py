@@ -27,7 +27,7 @@ def binary_write(filepath, content):
         f.write(content.encode('utf8'))
 
 
-def get_sha256(filepath):
+def get_sha256(filepath) -> str:
     with open(filepath, 'rb') as f:
         sha256obj = hashlib.sha256()
         sha256obj.update(f.read())

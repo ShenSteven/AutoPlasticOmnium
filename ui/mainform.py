@@ -23,6 +23,7 @@ import conf.logconf as lg
 import model.testcase
 import model.loadseq
 import conf.logconf
+import model.sqlite
 
 
 # pyrcc5 images.qrc -o images.py
@@ -97,9 +98,9 @@ def UpdateContinueFail(testResult: bool):
     if gv.IsDebug or gv.cf.dut.test_mode.lower() == 'debug':
         return
     if testResult:
-        gv.cf.count.continue_fail_count = 0
+        gv.continue_fail_count = 0
     else:
-        gv.cf.count.continue_fail_count += 1
+        gv.continue_fail_count += 1
 
 
 def on_actionConfig():
@@ -154,7 +155,6 @@ class MainForm(QWidget):
     def __init__(self):
         super().__init__()
         self.ui = loadUi(join(dirname(abspath(__file__)), 'main.ui'))
-        # self.ui.treeWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.test_software_ver}')
         init_create_dirs()
         global main_form
@@ -238,7 +238,6 @@ class MainForm(QWidget):
         self.ui.lineEdit.textEdited.connect(self.on_textEdited)
         self.ui.lineEdit.returnPressed.connect(self.on_returnPressed)
         self.ui.treeWidget.customContextMenuRequested.connect(self.on_treeWidgetMenu)
-        # self.ui.treeWidget.itemClicked.connect(self.handle_itemClicked)
         self.ui.treeWidget.itemChanged.connect(self.on_itemChanged)
         self.ui.treeWidget.itemPressed.connect(self.on_itemActivated)
         self.ui.tableWidget_2.itemChanged.connect(self.on_tableWidget2Edit)
@@ -313,13 +312,23 @@ class MainForm(QWidget):
         self.ui.action192_168_1_101.setText(GetAllIpv4Address('10.90.'))
 
     def init_status_bar(self):
-        self.ui.lb_continuous_fail = QLabel(f'continuous_fail: {gv.cf.count.continue_fail_count}')
-        self.ui.lb_count_pass = QLabel(f'PASS: {gv.cf.count.total_pass_count}')
-        self.ui.lb_count_fail = QLabel(f'FAIL: {gv.cf.count.total_fail_count}')
-        self.ui.lb_count_abort = QLabel(f'ABORT: {gv.cf.count.total_abort_count}')
+        with model.sqlite.Sqlite(gv.database_setting) as db:
+            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
+            gv.continue_fail_count = db.cur.fetchone()[0]
+            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_pass_count'")
+            gv.total_pass_count = db.cur.fetchone()[0]
+            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_fail_count'")
+            gv.total_fail_count = db.cur.fetchone()[0]
+            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_abort_count'")
+            gv.total_abort_count = db.cur.fetchone()[0]
+
+        self.ui.lb_continuous_fail = QLabel(f'continuous_fail: {gv.continue_fail_count}')
+        self.ui.lb_count_pass = QLabel(f'PASS: {gv.total_pass_count}')
+        self.ui.lb_count_fail = QLabel(f'FAIL: {gv.total_fail_count}')
+        self.ui.lb_count_abort = QLabel(f'ABORT: {gv.total_abort_count}')
         try:
-            self.ui.lb_count_yield = QLabel('Yield: {:.2%}'.format(gv.cf.count.total_pass_count / (
-                    gv.cf.count.total_pass_count + gv.cf.count.total_fail_count + gv.cf.count.total_abort_count)))
+            self.ui.lb_count_yield = QLabel('Yield: {:.2%}'.format(gv.total_pass_count / (
+                    gv.total_pass_count + gv.total_fail_count + gv.total_abort_count)))
         except ZeroDivisionError:
             self.ui.lb_count_yield = QLabel('Yield: 0.00%')
         self.ui.statusbar.addPermanentWidget(self.ui.lb_continuous_fail, 3)
@@ -348,8 +357,8 @@ class MainForm(QWidget):
         text, ok = QInputDialog.getText(self, 'Reset', 'Please input Reset Password:', echo=QLineEdit.Password)
         if ok:
             if text == 'test123':
-                gv.cf.count.continue_fail_count = 0
-                self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.cf.count.continue_fail_count}')
+                gv.continue_fail_count = 0
+                self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.continue_fail_count}')
                 self.ui.lb_continuous_fail.setStyleSheet(
                     f"background-color:{self.ui.statusbar.palette().window().color().name()};")
                 return True
@@ -360,7 +369,11 @@ class MainForm(QWidget):
             return False
 
     def CheckContinueFailNum(self):
-        if gv.cf.count.continue_fail_count >= gv.cf.count.continue_fail_limit:
+        with model.sqlite.Sqlite(gv.database_setting) as db:
+            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
+            gv.continue_fail_count = db.cur.fetchone()[0]
+            lg.logger.debug(str(gv.continue_fail_count))
+        if gv.continue_fail_count >= gv.cf.station.continue_fail_limit:
             self.ui.lb_continuous_fail.setStyleSheet(f"background-color:red;")
             if gv.IsDebug:
                 return True
@@ -433,7 +446,6 @@ class MainForm(QWidget):
         self.ui.treeWidget.blockSignals(False)
 
     def variable_init(self):
-        gv.cf = conf.read_config(gv.config_yaml_path, conf.config.Configs)
         if not gv.testThread.is_alive():
             gv.testThread = Thread(target=main.test_thread, daemon=True)
             gv.testThread.start()
@@ -468,7 +480,6 @@ class MainForm(QWidget):
             if status == TestStatus.START:
                 ui.mainform.main_form.ui.treeWidget.blockSignals(True)
                 if not gv.SingleStepTest:
-                    # self.ui.textEdit.clear()
                     my_signals.textEditClear.emit()
                 my_signals.lineEditEnable[bool].emit(False)
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'Testing', 36, Qt.yellow)
@@ -483,7 +494,7 @@ class MainForm(QWidget):
                 my_signals.update_tableWidget[str].emit('clear')
                 gv.event.set()
             elif status == TestStatus.FAIL:
-                gv.cf.count.total_fail_count += 1
+                gv.total_fail_count += 1
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'FAIL', 36, Qt.red)
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_testTime, str(self.sec), 11, Qt.gray)
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode,
@@ -492,13 +503,13 @@ class MainForm(QWidget):
                 if gv.setIpFlag:
                     gv.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0", )
             elif status == TestStatus.PASS:
-                gv.cf.count.total_pass_count += 1
+                gv.total_pass_count += 1
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'PASS', 36, Qt.green)
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode, str(self.sec), 20,
                                                                       Qt.green)
                 UpdateContinueFail(True)
             elif status == TestStatus.ABORT:
-                gv.cf.count.total_abort_count += 1
+                gv.total_abort_count += 1
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'Abort', 36, Qt.gray)
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_testTime, str(self.sec), 11, Qt.gray)
                 my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode,
@@ -571,11 +582,6 @@ class MainForm(QWidget):
             if os.path.exists(gv.test_script_json):
                 os.chmod(testcase_path_json, stat.S_IWRITE)
                 os.remove(gv.test_script_json)
-            if os.path.exists(gv.SHA256Path):
-                os.chmod(key_path, stat.S_IWRITE)
-                os.remove(gv.SHA256Path)
-            # model.loadseq.load_testcase_from_excel(gv.excel_file_path, gv.cf.station.station_name, gv.test_script_json,
-            #                                        gv.SHA256Path)
             self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
             self.testSequences = self.testcase.clone_suites
 
@@ -590,7 +596,6 @@ class MainForm(QWidget):
         if gv.startFlag:
             return
         if item.parent() is None:
-            # lg.logger.critical('handle_itemChanged_parent')
             pNo = self.ui.treeWidget.indexOfTopLevelItem(item)
             isChecked = item.checkState(column) == Qt.Checked
             self.testcase.clone_suites[pNo].isTest = isChecked
@@ -600,7 +605,6 @@ class MainForm(QWidget):
                 self.testcase.clone_suites[pNo].steps[i].isTest = isChecked
             self.ui.treeWidget.blockSignals(False)
         else:
-            # lg.logger.critical('handle_itemChanged_child')
             ParentIsTest = []
             pNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
             cNO = item.parent().indexOfChild(item)
@@ -613,27 +617,6 @@ class MainForm(QWidget):
             self.testcase.clone_suites[pNo].isTest = isChecked_parent
             item.parent().setCheckState(column, Qt.Checked if isChecked_parent else Qt.Unchecked)
             self.ui.treeWidget.blockSignals(False)
-
-    # def handle_itemClicked(self, item, column=0):
-    #     """mouse left-click event, In Qt, it is always a left button that emits the clicked() signal.
-    #     :param column:
-    #     :param item:
-    #     """
-    #     if item.parent() is None:
-    #         lg.logger.critical('itemClicked_parent')
-    #         gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item)
-    #         gv.StepNo = 0
-    #         pp = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
-    #         anchor = f'testSuite:{pp}'
-    #         self.ui.textEdit.scrollToAnchor(anchor)
-    #     else:
-    #         lg.logger.critical('itemClicked_child')
-    #         gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
-    #         gv.StepNo = item.parent().indexOfChild(item)
-    #         pp = item.parent().data(column, Qt.DisplayRole).split(' ', 1)[1]
-    #         cc = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
-    #         anchor = f'testStep:{pp}-{cc}'
-    #         self.ui.textEdit.scrollToAnchor(anchor)
 
     def on_treeWidgetMenu(self):
         if gv.IsDebug:
@@ -684,7 +667,7 @@ class MainForm(QWidget):
 
     def on_actionSaveToScript(self):
         thread = Thread(target=model.loadseq.serializeToJson,
-                        args=(self.testcase.clone_suites, gv.test_script_json, gv.SHA256Path))
+                        args=(self.testcase.clone_suites, gv.test_script_json))
         thread.start()
 
     def on_actionPrivileges(self):
@@ -893,16 +876,20 @@ class MainForm(QWidget):
 
     def updateStatusBar(self, str_):
         def update_status_bar():
-            self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.cf.count.continue_fail_count}')
-            self.ui.lb_count_pass.setText(f'PASS: {gv.cf.count.total_pass_count}')
-            self.ui.lb_count_fail.setText(f'FAIL: {gv.cf.count.total_fail_count}')
-            self.ui.lb_count_abort.setText(f'ABORT: {gv.cf.count.total_abort_count}')
+            with model.sqlite.Sqlite(gv.database_setting) as db:
+                db.execute(f"UPDATE COUNT SET VALUE='{gv.continue_fail_count}' where NAME ='continue_fail_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_pass_count}' where NAME ='total_pass_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_fail_count}' where NAME ='total_fail_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_abort_count}' where NAME ='total_abort_count'")
+            self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.continue_fail_count}')
+            self.ui.lb_count_pass.setText(f'PASS: {gv.total_pass_count}')
+            self.ui.lb_count_fail.setText(f'FAIL: {gv.total_fail_count}')
+            self.ui.lb_count_abort.setText(f'ABORT: {gv.total_abort_count}')
             try:
-                self.ui.lb_count_yield.setText('Yield: {:.2%}'.format(gv.cf.count.total_pass_count / (
-                        gv.cf.count.total_pass_count + gv.cf.count.total_fail_count + gv.cf.count.total_abort_count)))
+                self.ui.lb_count_yield.setText('Yield: {:.2%}'.format(gv.total_pass_count / (
+                        gv.total_pass_count + gv.total_fail_count + gv.total_abort_count)))
             except ZeroDivisionError:
                 self.ui.lb_count_yield.setText('Yield: 0.00%')
-            # self.ui.statusbar.update()
             QApplication.processEvents()
 
         thread = Thread(target=update_status_bar)

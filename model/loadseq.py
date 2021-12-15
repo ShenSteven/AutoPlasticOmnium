@@ -19,21 +19,22 @@ import ui.mainform
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QMetaObject, Qt
 from PyQt5 import QtCore
+import model.sqlite
+import sqlite3
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations):
     lg.logger.debug("Start convert excel testcase to json script.")
     for station in all_stations:
         test_script_json = rf"{gv.scriptFolder}\{station}.json"
-        SHA256Path = rf"{gv.scriptFolder}\{station}_key.txt"
-        load_testcase_from_excel(testcase_path_excel, station, test_script_json, SHA256Path)
+        load_testcase_from_excel(testcase_path_excel, station, test_script_json)
     lg.logger.debug("convert finish!")
 
 
-def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json, key_path) -> list:
+def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json) -> list:
     """load testcase form a sheet in excel and return the suites sequences list,
        if success,serialize the suites list to json.
-    :param key_path: save json SHA256 key for decrypt
+    # :param key_path: save json SHA256 key for decrypt
     :param testcase_path_excel: the path of excel
     :param sheetName: the sheet test_name of excel
     :param test_script_json:  serialize and save to json path
@@ -76,18 +77,20 @@ def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json, k
         lg.logger.critical(f"load testcase fail！{e}")
         sys.exit(e.__context__)
     else:
-        serializeToJson(suites_list, test_script_json, key_path)
+        serializeToJson(suites_list, test_script_json)
         return suites_list
     finally:
         workbook.close()
 
 
-def load_testcase_from_json(shaPath, testcase_path_json):
-    sha = model.binary_read(shaPath)
+def load_testcase_from_json(testcase_path_json):
+    with model.sqlite.Sqlite(gv.database_setting) as db:
+        db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{testcase_path_json}'")
+        sha256 = db.cur.fetchone()[0]
+        # lg.logger.debug(f"  dbSHA:{sha256}")
     JsonSHA = model.get_sha256(testcase_path_json)
-    lg.logger.debug(f"jsonSHA:{JsonSHA}")
-    lg.logger.debug(f" txtSHA:{sha}")
-    if sha == JsonSHA:
+    # lg.logger.debug(f"jsonSHA:{JsonSHA}")
+    if sha256 == JsonSHA:
         sequences_dict = json.load(open(testcase_path_json, 'r'))
         sequences_obj_list = []
         for suit_dict in sequences_dict:
@@ -109,22 +112,22 @@ def load_testcase_from_json(shaPath, testcase_path_json):
         sys.exit(0)
 
 
-def serializeToJson(obj, testcase_path_json, key_path):
+def serializeToJson(obj, testcase_path_json):
     """serialize obj to json and encrypt.
     :param obj: the object you want to serialize
     :param testcase_path_json: the path of json
-    :param key_path: txt file path that save json SHA256 for encrypt.
+    # :param key_path: txt file path that save json SHA256 for encrypt.
     """
     lg.logger.debug(f"delete old json in scripts.")
     if os.path.exists(testcase_path_json):
         os.chmod(testcase_path_json, stat.S_IWRITE)
         os.remove(testcase_path_json)
-    if os.path.exists(key_path):
-        os.chmod(key_path, stat.S_IWRITE)
-        os.remove(key_path)
     json.dump(obj, open(testcase_path_json, 'w'), default=lambda o: o.__dict__, sort_keys=True, indent=4)
     lg.logger.info(f"serializeToJson success! {testcase_path_json}.")
-    srcBytes = model.get_sha256(testcase_path_json)
-    model.binary_write(key_path, srcBytes)
+    sha256 = model.get_sha256(testcase_path_json)
+    with model.sqlite.Sqlite(gv.database_setting) as db:
+        try:
+            db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{testcase_path_json}', '{sha256}')")
+        except sqlite3.IntegrityError:
+            db.execute(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{testcase_path_json}'")
     os.chmod(testcase_path_json, stat.S_IREAD)
-    os.chmod(key_path, stat.S_IREAD)

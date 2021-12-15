@@ -62,11 +62,16 @@ DataPath = rf'{current_path}\Data'
 scriptFolder = rf'{current_path}\scripts'
 excel_file_path = rf'{scriptFolder}\{cf.station.testcase}'
 test_script_json = rf'{scriptFolder}\{cf.station.station_name}.json'
-SHA256Path = rf'{scriptFolder}\{cf.station.station_name}_key.txt'
 CSVFilePath = ''
 mes_shop_floor = ''
 mes_result = ''
 shop_floor_url = ''
+database_setting = rf'{current_path}\conf\setting.db'
+
+continue_fail_count = 0
+total_pass_count = 0
+total_fail_count = 0
+total_abort_count = 0
 
 mesPhases: model.product.MesInfo
 stationObj: model.product.JsonResult

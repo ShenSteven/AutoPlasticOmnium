@@ -13,6 +13,33 @@ import model.loadseq
 import model.product
 import conf.globalvar as gv
 import conf.logconf as lg
+import model.sqlite
+
+
+def init_database(database_name):
+    try:
+        if not os.path.exists(database_name):
+            with model.sqlite.Sqlite(database_name) as db:
+                db.execute('''CREATE TABLE SHA256_ENCRYPTION
+                               (NAME TEXT PRIMARY KEY     NOT NULL,
+                               SHA256           TEXT    NOT NULL
+                               );''')
+                db.execute('''CREATE TABLE COUNT
+                                           (NAME TEXT PRIMARY KEY     NOT NULL,
+                                           VALUE           INT    NOT NULL
+                                           );''')
+                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('continue_fail_count', '0')")
+                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_pass_count', '0')")
+                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_fail_count', '0')")
+                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_abort_count', '0')")
+
+                db.execute('''CREATE TABLE RESULT
+                                             (NAME TEXT PRIMARY KEY     NOT NULL,
+                                             VALUE           INT    NOT NULL
+                                             );''')
+                print(f"Table created successfully")
+    except Exception as e:
+        lg.logger.exception(f'init_database:{e}')
 
 
 class TestCase:
@@ -20,7 +47,6 @@ class TestCase:
     sheetName = ""
     testcase_path_excel = None
     test_script_json = None
-    sha256_key_path = None
     start_time = ""
     finish_time = ""
     original_suites = []
@@ -31,12 +57,12 @@ class TestCase:
         self.sheetName = sheetName
         self.testcase_path_excel = testcase_path_excel
         self.test_script_json = gv.test_script_json
-        self.sha256_key_path = gv.SHA256Path
-        if os.path.exists(self.sha256_key_path) and os.path.exists(self.test_script_json):
-            self.original_suites = model.loadseq.load_testcase_from_json(self.sha256_key_path, self.test_script_json)
+        init_database(gv.database_setting)
+        if os.path.exists(self.test_script_json):
+            self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json)
         else:
             self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path_excel, self.sheetName,
-                                                                          self.test_script_json, self.sha256_key_path, )
+                                                                          self.test_script_json)
         self.clone_suites = copy.deepcopy(self.original_suites)
 
     def run(self, global_fail_continue=False, stepNo=-1):

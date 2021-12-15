@@ -28,6 +28,8 @@ class StationConf:
     mes_result: str
     csv_column: str
     test_software_version: str
+    continue_fail_limit: int
+    setTimeZone: str
 
     def __init__(self, dict_):
         self.__dict__.update(dict_)
@@ -51,23 +53,11 @@ class DutConf:
         self.__dict__.update(dict_)
 
 
-class CountConf:
-    continue_fail_count: int
-    continue_fail_limit: int
-    total_pass_count: int
-    total_fail_count: int
-    total_abort_count: int
-
-    def __init__(self, dict_):
-        self.__dict__.update(dict_)
-
-
 class Configs:
     def __init__(self, dict_):
         self.__dict__ = dict_
         self.station = StationConf(dict_['station'])
         self.dut = DutConf(dict_['dut'])
-        self.count = CountConf(dict_['count'])
 
 
 if __name__ == '__main__':

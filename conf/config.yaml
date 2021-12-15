@@ -20,6 +20,7 @@ station:
     mes_result: 10.90.104.104:8080
     csv_column: csv_column.txt
     test_software_version: 1.0.0.0
+    continue_fail_limit: 3
     setTimeZone:
 dut:
     dut_ip: 192.168.1.101
@@ -46,11 +47,3 @@ dut:
     sn_len: 16
     qsdk_ver: 029
     test_mode: production
-count:
-    continue_fail_count: 0
-    continue_fail_limit: 3
-    total_pass_count: 3
-    total_fail_count: 3
-    total_abort_count: 3
-
-
