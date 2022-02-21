@@ -42,7 +42,7 @@ class DutConf:
     ssh_port: int
     ssh_username: str
     ssh_password: str
-    dut_modes: list
+    dut_models: list
     dut_regex: dict
     data_api: dict
     sn_len: int

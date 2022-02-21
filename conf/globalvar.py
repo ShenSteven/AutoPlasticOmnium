@@ -1,4 +1,4 @@
-#!/usr/cf/env python
+#!/usr/bin/env python
 # coding: utf-8
 """
 @File   : globalvar.py
@@ -14,18 +14,21 @@ from threading import Thread, Event
 import conf
 import model.product
 import set
+import platform
 
+win = platform.system() == 'Windows'
+linux = platform.system() == 'Linux'
 current_path = set.current_path
 config_yaml_path = join(current_path, 'conf', 'config.yaml')
 logging_yaml = join(current_path, 'conf', 'logging.yaml')
 cf = conf.read_config(config_yaml_path, conf.config.Configs)  # load test global variable
-tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "tValue", "USL", "ElapsedTime", "StartTime", "Result"]
+tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "ElapsedTime", "StartTime", "Result"]
 SN = ''
 dut_ip = ''
 DUTMesIP = ''
 MesMac = 'FF:FF:FF:FF:FF'
 WorkOrder = '1'
-dut_mode = 'unknown'
+dut_model = 'unknown'
 error_code_first_fail = ''
 error_details_first_fail = ''
 test_software_ver = cf.station.test_software_version
@@ -67,7 +70,7 @@ mes_shop_floor = ''
 mes_result = ''
 shop_floor_url = ''
 database_setting = rf'{current_path}\conf\setting.db'
-
+database_result = rf'{current_path}\OutPut\result.db'
 continue_fail_count = 0
 total_pass_count = 0
 total_fail_count = 0

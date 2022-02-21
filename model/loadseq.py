@@ -1,4 +1,4 @@
-#!/usr/cf/env python
+#!/usr/bin/env python
 # coding: utf-8
 """
 @File   : loadseq.py
@@ -34,7 +34,6 @@ def excel_convert_to_json(testcase_path_excel, all_stations):
 def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json) -> list:
     """load testcase form a sheet in excel and return the suites sequences list,
        if success,serialize the suites list to json.
-    # :param key_path: save json SHA256 key for decrypt
     :param testcase_path_excel: the path of excel
     :param sheetName: the sheet test_name of excel
     :param test_script_json:  serialize and save to json path
@@ -87,9 +86,9 @@ def load_testcase_from_json(testcase_path_json):
     with model.sqlite.Sqlite(gv.database_setting) as db:
         db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{testcase_path_json}'")
         sha256 = db.cur.fetchone()[0]
-        # lg.logger.debug(f"  dbSHA:{sha256}")
+        lg.logger.debug(f"  dbSHA:{sha256}")
     JsonSHA = model.get_sha256(testcase_path_json)
-    # lg.logger.debug(f"jsonSHA:{JsonSHA}")
+    lg.logger.debug(f"jsonSHA:{JsonSHA}")
     if sha256 == JsonSHA:
         sequences_dict = json.load(open(testcase_path_json, 'r'))
         sequences_obj_list = []
@@ -116,7 +115,6 @@ def serializeToJson(obj, testcase_path_json):
     """serialize obj to json and encrypt.
     :param obj: the object you want to serialize
     :param testcase_path_json: the path of json
-    # :param key_path: txt file path that save json SHA256 for encrypt.
     """
     lg.logger.debug(f"delete old json in scripts.")
     if os.path.exists(testcase_path_json):

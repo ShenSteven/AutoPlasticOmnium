@@ -29,7 +29,7 @@ dut:
     ssh_port: 22
     ssh_username: root
     ssh_password: root
-    dut_modes:
+    dut_models:
     - cento
     - gateway
     - leaf

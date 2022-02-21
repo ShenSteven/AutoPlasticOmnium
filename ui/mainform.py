@@ -234,6 +234,7 @@ class MainForm(QWidget):
         self.ui.actionException.triggered.connect(on_actionException)
         self.ui.actionEnable_lab.triggered.connect(self.on_actionEnable_lab)
         self.ui.actionDisable_factory.triggered.connect(self.on_actionDisable_factory)
+        self.ui.actionAbout.triggered.connect(self.on_actionAbout)
 
         self.ui.lineEdit.textEdited.connect(self.on_textEdited)
         self.ui.lineEdit.returnPressed.connect(self.on_returnPressed)
@@ -244,7 +245,7 @@ class MainForm(QWidget):
 
     def on_itemActivated(self, item, column=0):
         if item.parent() is None:
-            lg.logger.critical('itemActivate')
+            # lg.logger.critical('itemActivate')
             gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item)
             gv.StepNo = 0
             self.ui.treeWidget.expandItem(item)
@@ -254,7 +255,7 @@ class MainForm(QWidget):
             anchor = f'testSuite:{pp}'
             self.ui.textEdit.scrollToAnchor(anchor)
         else:
-            lg.logger.critical('itemActivate')
+            # lg.logger.critical('itemActivate')
             gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
             gv.StepNo = item.parent().indexOfChild(item)
             self.ui.actionStepping.setEnabled(True)
@@ -332,8 +333,8 @@ class MainForm(QWidget):
         except ZeroDivisionError:
             self.ui.lb_count_yield = QLabel('Yield: 0.00%')
         self.ui.statusbar.addPermanentWidget(self.ui.lb_continuous_fail, 3)
-        self.ui.statusbar.addPermanentWidget(self.ui.lb_count_pass, 1)
-        self.ui.statusbar.addPermanentWidget(self.ui.lb_count_fail, 1)
+        self.ui.statusbar.addPermanentWidget(self.ui.lb_count_pass, 2)
+        self.ui.statusbar.addPermanentWidget(self.ui.lb_count_fail, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_abort, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_yield, 16)
 
@@ -389,23 +390,23 @@ class MainForm(QWidget):
 
         def JudgeProdMode():
             if model.IsNullOrEmpty(sn):
-                gv.dut_mode = 'unknown'
-                return gv.dut_mode
+                gv.dut_model = 'unknown'
+                return gv.dut_model
             if sn[0] == 'J' or sn[0] == '6':
-                gv.dut_mode = gv.cf.dut.dut_modes[0]
+                gv.dut_mode = gv.cf.dut.dut_models[0]
             elif sn[0] == 'N' or sn[0] == '7':
-                gv.dut_mode = gv.cf.dut.dut_modes[1]
+                gv.dut_mode = gv.cf.dut.dut_models[1]
             elif sn[0] == 'Q' or sn[0] == '8':
-                gv.dut_mode = gv.cf.dut.dut_modes[2]
+                gv.dut_mode = gv.cf.dut.dut_models[2]
             elif sn[0] == 'S' or sn[0] == 'G':
-                gv.dut_mode = gv.cf.dut.dut_modes[3]
+                gv.dut_mode = gv.cf.dut.dut_models[3]
             else:
-                gv.dut_mode = 'unknown'
-            self.ui.actionunknow.setText(gv.dut_mode)
-            return gv.dut_mode
+                gv.dut_model = 'unknown'
+            self.ui.actionunknow.setText(gv.dut_model)
+            return gv.dut_model
 
         if JudgeProdMode() != 'unknown' and not gv.IsDebug:
-            reg = QRegExp(gv.cf.dut.dut_regex[gv.dut_mode])
+            reg = QRegExp(gv.cf.dut.dut_regex[gv.dut_model])
             pValidator = QRegExpValidator(reg, self)
             self.ui.lineEdit.setValidator(pValidator)
 
@@ -414,7 +415,7 @@ class MainForm(QWidget):
             gv.SingleStepTest = True
         else:
             gv.SingleStepTest = False
-        if gv.dut_mode == 'unknown' and not gv.IsDebug:
+        if gv.dut_model == 'unknown' and not gv.IsDebug:
             QMetaObject.invokeMethod(
                 self,
                 'showMessageBox',
@@ -488,7 +489,7 @@ class MainForm(QWidget):
                 gv.startTime = datetime.now()
                 my_signals.setIcon[QAction, QIcon].emit(self.ui.actionStart, QIcon(':/images/Pause-icon.png'))
                 gv.startFlag = True
-                lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_mode},"
+                lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
                                 f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
                                 f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.test_software_ver}")
                 my_signals.update_tableWidget[str].emit('clear')
@@ -724,6 +725,9 @@ class MainForm(QWidget):
         self.ui.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
         self.debug_switch(gv.IsDebug)
 
+    def on_actionAbout(self):
+        QMessageBox.about(self, 'About', 'Python3.8+PyQt5\nTechnical support: StevenShen\nWeChat:chenhlzqbx')
+
     def debug_switch(self, isDebug: bool):
         self.ui.actionConvertExcelToJson.setEnabled(isDebug)
         self.ui.actionSaveToScript.setEnabled(isDebug)
@@ -752,6 +756,9 @@ class MainForm(QWidget):
                     self.ui.tableWidget_2.horizontalHeader().setSectionResizeMode(column,
                                                                                   QHeaderView.ResizeToContents)
                     item = QTableWidgetItem(key_pairs[column])
+                    if column == 0:
+                        item.setFlags(Qt.ItemIsEnabled)
+                        item.setBackground(Qt.lightGray)
                     self.ui.tableWidget_2.setItem(row_cnt, column, item)
         self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
         self.ui.tableWidget_2.blockSignals(False)
@@ -830,7 +837,7 @@ class MainForm(QWidget):
     @QtCore.pyqtSlot(QBrush, int, int, bool)
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
         pass
-        lg.logger.debug('update_treeWidget_color...')
+        # lg.logger.debug('update_treeWidget_color...')
         if stepNo_ == -1:
             if gv.IsCycle or not gv.startFlag:
                 return
@@ -843,7 +850,7 @@ class MainForm(QWidget):
             self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
             self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
                                             hint=QAbstractItemView.EnsureVisible)
-        lg.logger.debug('update_treeWidget_color...finish')
+        # lg.logger.debug('update_treeWidget_color...finish')
         QApplication.processEvents()
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
@@ -937,6 +944,8 @@ main_form: MainForm
 if __name__ == "__main__":
     pass
     app = QApplication([])
+
     mainWin = MainForm()
     mainWin.ui.show()
     app.exec_()
+

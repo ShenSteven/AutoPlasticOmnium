@@ -1,4 +1,4 @@
-#!/usr/cf/env python
+#!/usr/bin/env python
 # coding: utf-8
 """
 @File   : test step.py
@@ -16,6 +16,7 @@ import conf.globalvar as gv
 import model.test
 import conf.logconf as lg
 import ui.mainform
+import model.sqlite
 
 
 def _parse_var(value):
@@ -32,14 +33,14 @@ class Step:
     suite_index = 0
     index = 0  # 当前测试step序列号
     tResult = False  # 测试项测试结果
-    # isTest = True  # 是否测试,不测试的跳过
     start_time = None  # 测试项的开始时
     finish_time = None
     start_time_json = None
-    __error_code = None
-    __error_details = None
+    __error_code = ''
+    __error_details = ''
+    __status = 'exception'  # pass,fail,exception
     testValue = None  # 测试得到的值
-    __elapsedTime = None  # 测试步骤耗时
+    __elapsedTime = 0  # 测试步骤耗时
     globalVar: str = ''
 
     suite_name: str = ''
@@ -81,7 +82,7 @@ class Step:
     def isTest(self):
         if str(self.IfElse).lower() == 'else':
             self.__isTest = not gv.IfCond
-        if not model.IsNullOrEmpty(self.Mode) and gv.dut_mode.lower() not in self.Mode.lower():
+        if not model.IsNullOrEmpty(self.Mode) and gv.dut_model.lower() not in self.Mode.lower():
             self.__isTest = False
         return self.__isTest
 
@@ -132,11 +133,8 @@ class Step:
         test_result = False
         self.start_time = datetime.now()
         self.set_json_start_time()
-        # self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
             if self.isTest:
-                # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.yellow, self.suite_index, self.index,
-                #                                                             False)
                 QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
                                          Q_ARG(QBrush, Qt.yellow),
                                          Q_ARG(int, self.suite_index),
@@ -149,8 +147,6 @@ class Step:
                 self._test_spec = self.Spec
             else:
                 if not gv.IsCycle:
-                    # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.gray, self.suite_index, self.index,
-                    #                                                             False)
                     QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color',
                                              Qt.BlockingQueuedConnection,
                                              Q_ARG(QBrush, Qt.gray),
@@ -165,9 +161,6 @@ class Step:
                     test_result, info = model.test.test(self, testSuite)
                 if test_result:
                     break
-            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.green if test_result else Qt.red,
-            #                                                             self.suite_index, self.index, False)
-
             QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
                                      Q_ARG(QBrush, Qt.green if test_result else Qt.red),
                                      Q_ARG(int, self.suite_index),
@@ -181,7 +174,6 @@ class Step:
             self._process_mesVer()
         except Exception as e:
             lg.logger.exception(f"run Exception！！{e}")
-            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkRed, self.suite_index, self.index, False)
             QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
                                      Q_ARG(QBrush, Qt.darkRed),
                                      Q_ARG(int, self.suite_index),
@@ -192,6 +184,19 @@ class Step:
         else:
             return self.tResult
         finally:
+            ui.mainform.my_signals.update_tableWidget.emit(
+                [gv.SN, self.ItemName, self._test_spec, self.Limit_min, self.testValue,
+                 self.Limit_max, self.__elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                 'Pass' if test_result else 'Fail'])
+            if not test_result:
+                with model.sqlite.Sqlite(gv.database_result) as db:
+                    lg.logger.debug('INSERT test result to result.db table RESULT.')
+                    db.execute(
+                        f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
+                        f"VALUES (NULL,'{gv.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
+                        f"'{gv.dut_model}','{self.suite_name}','{self.ItemName}','{self._test_spec}','{self.Limit_min}',"
+                        f"'{self.testValue}','{self.Limit_max}',{self.__elapsedTime},'{self.__error_code}','{self.__error_details}',"
+                        f"'{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.__status}')")
             self._clear()
 
     def _set_errorCode_details(self, result=False, info=''):
@@ -222,8 +227,6 @@ class Step:
         if self.IfElse.lower() == 'if':
             gv.IfCond = test_result
             if not test_result:
-                # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit('#FF99CC', self.suite_index, self.index,
-                #                                                             False)
                 QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
                                          Q_ARG(QBrush, '#FF99CC'),
                                          Q_ARG(int, self.suite_index),
@@ -249,8 +252,6 @@ class Step:
 
     def _process_ByPassFail(self, step_result):
         if (self.ByPassFail.upper() == 'P' or self.ByPassFail.upper() == '1') and not step_result:
-            # ui.mainform.my_signals.update_treeWidgetItem_backColor.emit(Qt.darkGreen, self.suite_index, self.index,
-            #                                                             False)
             QMetaObject.invokeMethod(ui.mainform.main_form, 'update_treeWidget_color', Qt.BlockingQueuedConnection,
                                      Q_ARG(QBrush, Qt.darkGreen),
                                      Q_ARG(int, self.suite_index),
@@ -277,7 +278,7 @@ class Step:
         if not gv.IsDebug:
             self.isTest = True
         self.testValue = None
-        self.__elapsedTime = None
+        self.__elapsedTime = 0
         self.start_time = None
         self.finish_time = None
         self._test_command = ''
@@ -289,25 +290,33 @@ class Step:
         return by_result
 
     def _print_result(self, tResult):
-        # self.__elapsedTime = (
-        #         datetime.now() - datetime.strptime(self.start_time, '%Y-%m-%d %H:%M:%S.%f')).microseconds
         self.__elapsedTime = (datetime.now() - self.start_time).seconds
         if self.TestKeyword == 'Wait' and self.TestKeyword == 'ThreadSleep':
             return
         if tResult:
+            self.__status = 'pass'
             lg.logger.info(
                 f"{self.ItemName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.__elapsedTime}us,"
                 f"Symptom:{self.__error_code}:{self.__error_details},"
                 f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.testValue},Max:{self.Limit_max}")
         else:
+            self.__status = 'fail'
             lg.logger.error(
                 f"{self.ItemName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.__elapsedTime}us,"
                 f"Symptom:{self.__error_code}:{self.__error_details},"
                 f"Spec:{self.Spec},Min:{self.Limit_min},Value:{self.testValue},Max:{self.Limit_max}")
-        ui.mainform.my_signals.update_tableWidget.emit(
-            [gv.SN, self.ItemName, self._test_spec, self.Limit_min, self.testValue,
-             self.Limit_max, self.__elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
-             'Pass' if tResult else 'Fail'])
+        # ui.mainform.my_signals.update_tableWidget.emit(
+        #     [gv.SN, self.ItemName, self._test_spec, self.Limit_min, self.testValue,
+        #      self.Limit_max, self.__elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+        #      'Pass' if tResult else 'Fail'])
+        # with model.sqlite.Sqlite(gv.database_result) as db:
+        #     lg.logger.debug('INSERT test result to result.db table RESULT.')
+        #     db.execute(
+        #         f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT) "
+        #         f"VALUES (NULL,'{gv.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
+        #         f"'{gv.dut_model}','{self.suite_name}','{self.ItemName}','{self._test_spec}','{self.Limit_min}',"
+        #         f"'{self.testValue}','{self.Limit_max}',{self.__elapsedTime},'{self.__error_code}','{self.__error_details}',"
+        #         f"'{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{tResult}')")
 
     def _collect_result(self):
         if not model.IsNullOrEmpty(self.Limit_max) or not model.IsNullOrEmpty(self.Limit_min):

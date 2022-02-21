@@ -1,4 +1,4 @@
-#!/usr/cf/env python
+#!/usr/bin/env python
 # coding: utf-8
 """
 @File   : serialport.py

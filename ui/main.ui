@@ -371,6 +371,7 @@ font: 20pt &quot;宋体&quot;;</string>
     <addaction name="actionHelper"/>
     <addaction name="actionReport_bug"/>
     <addaction name="actionFeedback"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="tools">
     <property name="title">
@@ -775,6 +776,11 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
    <property name="text">
     <string>Disable(factory)</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

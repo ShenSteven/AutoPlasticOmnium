@@ -1,4 +1,4 @@
-#!/usr/cf/env python
+#!/usr/bin/env python
 # coding: utf-8
 """
 @File   : main.py
@@ -41,7 +41,8 @@ def CollectResultToCsv():
         with open(csvColumnPath, 'w') as f:
             header = '\t'.join(fix_header)
             f.write(header)
-        fix_header_value = [gv.dut_mode, gv.cf.station.station_name, "Luxshare", gv.WorkOrder, gv.cf.station.station_no,
+        fix_header_value = [gv.dut_model, gv.cf.station.station_name, "Luxshare", gv.WorkOrder,
+                            gv.cf.station.station_no,
                             "1", gv.SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.test_software_ver,
                             time.strftime("%Y/%m/%d %H:%M:%S"), str(ui.mainform.main_form.sec), gv.finalTestResult,
                             gv.mesPhases.first_fail, gv.error_details_first_fail, "UTC", gv.cf.dut.test_mode,
@@ -140,6 +141,7 @@ added_files = [
 if __name__ == "__main__":
     sys.excepthook = excepthook
     app = QApplication([])
+    print("applicationDirPath:", app.applicationDirPath())
     mainWin = ui.mainform.MainForm()
     mainWin.ui.show()
     try:

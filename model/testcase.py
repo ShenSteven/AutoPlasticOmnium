@@ -1,4 +1,4 @@
-#!/usr/cf/env python
+#!/usr/bin/env python
 # coding: utf-8
 """
 @File   : testcase.py
@@ -32,10 +32,27 @@ def init_database(database_name):
                 db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_pass_count', '0')")
                 db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_fail_count', '0')")
                 db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_abort_count', '0')")
-
+                print(f"Table created successfully")
+        if not os.path.exists(gv.database_result):
+            with model.sqlite.Sqlite(gv.database_result) as db:
                 db.execute('''CREATE TABLE RESULT
-                                             (NAME TEXT PRIMARY KEY     NOT NULL,
-                                             VALUE           INT    NOT NULL
+                                             (ID            INTEGER PRIMARY KEY AUTOINCREMENT,
+                                              SN            TEXT,
+                                              STATION_NAME  TEXT    NOT NULL,
+                                              STATION_NO    TEXT    NOT NULL,
+                                              MODEL         TEXT    NOT NULL,
+                                              SUITE_NAME    TEXT    NOT NULL,
+                                              ITEM_NAME     TEXT    NOT NULL,
+                                              SPEC          TEXT,
+                                              LSL           TEXT,
+                                              VALUE         TEXT,
+                                              USL           TEXT,
+                                              ELAPSED_TIME  INT,
+                                              ERROR_CODE    TEXT,
+                                              ERROR_DETAILS TEXT,
+                                              START_TIME    TEXT    NOT NULL,
+                                              TEST_RESULT   TEXT    NOT NULL,
+                                              STATUS        TEXT    NOT NULL
                                              );''')
                 print(f"Table created successfully")
     except Exception as e:
