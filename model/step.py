@@ -30,6 +30,9 @@ def _parse_var(value):
 
 
 class Step:
+    """
+
+    """
     suite_index = 0
     index = 0  # 当前测试step序列号
     tResult = False  # 测试项测试结果

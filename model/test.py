@@ -8,8 +8,8 @@
 """
 import re
 import time
-from sokets.serialport import SerialPort
-from sokets.telnet import TelnetComm
+from sockets.serialport import SerialPort
+from sockets.telnet import TelnetComm
 import conf.globalvar as gv
 import conf.logconf as lg
 import model.basefunc

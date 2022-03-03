@@ -27,7 +27,6 @@ class StationConf:
     mes_shop_floor: str
     mes_result: str
     csv_column: str
-    test_software_version: str
     continue_fail_limit: int
     setTimeZone: str
 

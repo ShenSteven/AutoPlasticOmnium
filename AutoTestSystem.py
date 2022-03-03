@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-@File   : main.py
+@File   : AutoTestSystem.py
 @Author : Steven.Shen
 @Date   : 2021/9/3
 @Desc   : 
@@ -43,7 +43,7 @@ def CollectResultToCsv():
             f.write(header)
         fix_header_value = [gv.dut_model, gv.cf.station.station_name, "Luxshare", gv.WorkOrder,
                             gv.cf.station.station_no,
-                            "1", gv.SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.test_software_ver,
+                            "1", gv.SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.version,
                             time.strftime("%Y/%m/%d %H:%M:%S"), str(ui.mainform.main_form.sec), gv.finalTestResult,
                             gv.mesPhases.first_fail, gv.error_details_first_fail, "UTC", gv.cf.dut.test_mode,
                             gv.mesPhases.JSON_UPLOAD, gv.mesPhases.MES_UPLOAD]
@@ -128,16 +128,6 @@ def excepthook(cls, exception, traceback):
     QMessageBox.critical(None, "Error", "".join(format_exception(cls, exception, traceback)))
 
 
-added_files = [
-    ('ui/main.ui', 'ui'),
-    ('ui/images.qrc', 'ui'),
-    ('ui/images', 'ui'),
-    ('conf/*.yaml', 'conf'),
-    ('set.py', '.'),
-    ('scripts', 'scripts')
-]
-# pyinstaller -y --clean --noconsole --debug=all  --distpath=./dist/ -n AutoTestSystem --icon="test.ico" --add-data="ui/main.ui;ui" --add-data="ui/images.qrc;ui" --add-data="ui/images;ui" --add-data="conf/*.yaml;conf" --add-data="scripts;scripts" main.py --runtime-hook="runtimehook.py"
-# pyinstaller AutoTestSystem.spec
 if __name__ == "__main__":
     sys.excepthook = excepthook
     app = QApplication([])

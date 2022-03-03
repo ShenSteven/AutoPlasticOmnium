@@ -13,12 +13,12 @@ from os.path import dirname, abspath, join
 from threading import Thread, Event
 import conf
 import model.product
-import set
+import setup
 import platform
 
 win = platform.system() == 'Windows'
 linux = platform.system() == 'Linux'
-current_path = set.current_path
+current_path = setup.current_path
 config_yaml_path = join(current_path, 'conf', 'config.yaml')
 logging_yaml = join(current_path, 'conf', 'logging.yaml')
 cf = conf.read_config(config_yaml_path, conf.config.Configs)  # load test global variable
@@ -31,7 +31,7 @@ WorkOrder = '1'
 dut_model = 'unknown'
 error_code_first_fail = ''
 error_details_first_fail = ''
-test_software_ver = cf.station.test_software_version
+version = setup.about['__version__']
 
 logFolderPath = ''
 critical_log = ''

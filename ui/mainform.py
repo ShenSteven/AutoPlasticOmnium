@@ -16,9 +16,9 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
     QAbstractItemView, QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf
 import conf.globalvar as gv
-import main
+import AutoTestSystem
 import model.product
-import sokets.serialport
+import sockets.serialport
 import conf.logconf as lg
 import model.testcase
 import model.loadseq
@@ -155,7 +155,7 @@ class MainForm(QWidget):
     def __init__(self):
         super().__init__()
         self.ui = loadUi(join(dirname(abspath(__file__)), 'main.ui'))
-        self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.test_software_ver}')
+        self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         init_create_dirs()
         global main_form
         main_form = self
@@ -172,7 +172,7 @@ class MainForm(QWidget):
         self.init_lineEdit()
         self.init_signals_connect()
         self.ShowTreeView(self.testSequences)
-        gv.testThread = Thread(target=main.test_thread, daemon=True)
+        gv.testThread = Thread(target=AutoTestSystem.test_thread, daemon=True)
         gv.testThread.start()
         self.test()
 
@@ -341,7 +341,7 @@ class MainForm(QWidget):
     def get_stationNo(self):
         if not gv.cf.station.fix_flag:
             return
-        gv.FixSerialPort = sokets.serialport.SerialPort(gv.cf.station.fix_com_port, gv.cf.station.fix_com_baudRate)
+        gv.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port, gv.cf.station.fix_com_baudRate)
         for i in range(0, 3):
             rReturn, revStr = gv.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
             if rReturn:
@@ -448,13 +448,13 @@ class MainForm(QWidget):
 
     def variable_init(self):
         if not gv.testThread.is_alive():
-            gv.testThread = Thread(target=main.test_thread, daemon=True)
+            gv.testThread = Thread(target=AutoTestSystem.test_thread, daemon=True)
             gv.testThread.start()
         gv.stationObj = model.product.JsonResult(gv.SN, gv.cf.station.station_no, gv.cf.dut.test_mode,
-                                                 gv.cf.dut.qsdk_ver, gv.cf.station.test_software_version)
+                                                 gv.cf.dut.qsdk_ver, gv.version)
         gv.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{gv.SN}/station/{gv.cf.station.station_no}/info'
         gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{gv.SN}/station/{gv.cf.station.station_name}'
-        gv.mesPhases = model.product.MesInfo(gv.SN, gv.cf.station.station_no, gv.cf.station.test_software_version)
+        gv.mesPhases = model.product.MesInfo(gv.SN, gv.cf.station.station_no, gv.version)
         init_create_dirs()
         gv.csv_list_header = []
         gv.csv_list_result = []
@@ -491,7 +491,7 @@ class MainForm(QWidget):
                 gv.startFlag = True
                 lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
                                 f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
-                                f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.test_software_ver}")
+                                f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
                 my_signals.update_tableWidget[str].emit('clear')
                 gv.event.set()
             elif status == TestStatus.FAIL:

@@ -10,7 +10,7 @@ import re
 import time
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 from model import IsNullOrEmpty
-from sokets.communication import CommAbstract
+from sockets.communication import CommAbstract
 import conf.logconf as lg
 
 

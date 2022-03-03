@@ -10,7 +10,7 @@ import re
 import time
 from telnetlib import Telnet
 from model import IsNullOrEmpty
-from sokets.communication import CommAbstract
+from sockets.communication import CommAbstract
 import conf.logconf as lg
 
 

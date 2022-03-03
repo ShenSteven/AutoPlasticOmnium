@@ -1,8 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
+# pyinstaller -y --clean --noconsole --debug=all  --distpath=./dist/ -n AutoTestSystem --icon="test.ico" --add-data="ui/main.ui;ui" --add-data="ui/images.qrc;ui" --add-data="ui/images;ui" --add-data="conf/*.yaml;conf" --add-data="scripts;scripts" main.py --runtime-hook="runtimehook.py"
+# pyinstaller AutoTestSystem.spec
 
+added_files = [
+    ('ui/main.ui', 'ui'),
+    ('ui/images.qrc', 'ui'),
+    ('ui/images', 'ui'),
+    ('conf/*.yaml', 'conf'),
+    ('setup.py', '.'),
+    ('scripts', 'scripts')
+]
 
 block_cipher = None
-
 
 a = Analysis(['main.py'],
              pathex=[],
