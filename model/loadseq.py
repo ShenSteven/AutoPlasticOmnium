@@ -51,14 +51,14 @@ def load_testcase_from_excel(testcase_path_excel, sheetName, test_script_json) -
 
         for i in list(worksheet.rows)[0]:  # 获取表头，第一行
             itemHeader.append(i.value)
-            if not hasattr(model.step.Step, i.value):  # 动态创建Item类的属性
+            if not hasattr(model.step.Step, i.value):  # 动态创建step类的属性
                 setattr(model.step.Step, i.value, '')
 
         for i in range(1, worksheet.max_row):  # 一行行的读取excel
             line = list(worksheet.rows)[i]
             if model.IsNullOrEmpty(line[1].value):  # ItemName为空停止解析
                 break
-            if not model.IsNullOrEmpty(line[0].value):  # 新的seqItem
+            if not model.IsNullOrEmpty(line[0].value):  # 实例化test suite
                 temp_suite_name = line[0].value
                 temp_suite = model.suite.TestSuite(line[0].value, len(suites_list))
                 suites_list.append(temp_suite)
