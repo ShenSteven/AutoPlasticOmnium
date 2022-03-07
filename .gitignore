@@ -1,8 +1,6 @@
 /test/test.py
 /log/
-/src/conf/result.csv
-/src/scripts/firefly_data_api_client.py
 /Data/
+/OutPut/
 /dist/
 /build/
-/OutPut/

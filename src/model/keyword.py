@@ -21,7 +21,6 @@ import platform
 import psutil
 from datetime import datetime
 import yaml
-# import conf.logprint as lg
 from .basicfunc import IsNullOrEmpty
 
 
@@ -48,7 +47,6 @@ def CompareLimit(limitMin, limitMax, value, is_round=False):
                 return False, 'TooHigh'
 
 
-# @wrapper_time
 def ping(host, timeout=1):
     """
     Returns True if host (str) responds to a ping request.
@@ -144,8 +142,6 @@ def register(name, email, **kwargs):
     print('test_name:%s, age:%s, others:%s', (name, email, kwargs))
 
 
-# import model.step
-# def test(item: model.step.Step):
 def test(item, testSuite):
     time.sleep(0.5)
     # invoke_return = QMetaObject.invokeMethod(
@@ -241,7 +237,6 @@ def test(item, testSuite):
     else:
         return rReturn, compInfo
     finally:
-        # item.set_errorCode_details(rReturn, item.ErrorCode.split('\n')[0])
         pass
 
 

@@ -7,17 +7,9 @@
 @Desc   : 
 """
 import os
-# import csv
 import sys
-# import json
-# import time
-# import requests
-# import conf.logprint as lg
-# import conf.globalvar as gv
 from PyQt5.QtWidgets import QApplication, QMessageBox
-# import model.basicfunc
 import ui.mainform as mf
-# from threading import Thread
 from traceback import format_exception
 
 #
