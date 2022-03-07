@@ -2,7 +2,7 @@
 # |(  |-  |.| | | |-  `-.  |  `-.
 # ' ' `-' `-`.`-' `-' `-'  '  `-'
 
-__title__ = 'AutoTestSystem'
+__title__ = 'AutoTestSystem_pyqt5'
 __description__ = 'automation framework for test automation and robotic process automation.'
 __url__ = 'https://requests.readthedocs.io'
 __version__ = '0.0.1'

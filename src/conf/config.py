@@ -4,8 +4,9 @@
 @File   : config.py
 @Author : Steven.Shen
 @Date   : 2021/10/22
-@Desc   : config.yaml 对象数据结构模型
+@Desc   : config.yaml 配置对象数据结构模型
 """
+import yaml
 
 
 class StationConf:
@@ -26,6 +27,7 @@ class StationConf:
     fail_continue: bool
     mes_shop_floor: str
     mes_result: str
+    rs_url: str
     csv_column: str
     continue_fail_limit: int
     setTimeZone: str
@@ -57,6 +59,19 @@ class Configs:
         self.__dict__ = dict_
         self.station = StationConf(dict_['station'])
         self.dut = DutConf(dict_['dut'])
+
+
+def read_config(yaml_file, objType) -> Configs:
+    with open(yaml_file, 'r', encoding='utf-8') as f:
+        yaml_data = yaml.safe_load(f)
+        obj = objType(yaml_data)
+        return obj
+
+
+def read_yaml(yaml_file):
+    with open(yaml_file, 'r', encoding='utf-8') as f:
+        yaml_data = yaml.safe_load(f)
+        return yaml_data
 
 
 if __name__ == '__main__':

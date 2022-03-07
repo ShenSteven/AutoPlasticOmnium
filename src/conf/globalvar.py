@@ -6,23 +6,22 @@
 @Date   : 2021/9/8
 @Desc   : 全局变量
 """
-import os
-import sys
 from datetime import datetime
-from os.path import dirname, abspath, join
+from os.path import join
 from threading import Thread, Event
-import conf
-import model.product
+# from .config import read_config, Configs
+import conf.config
 import setup
 import platform
+import model.product
 
 win = platform.system() == 'Windows'
 linux = platform.system() == 'Linux'
 current_path = setup.current_path
-config_yaml_path = join(current_path, 'conf', 'config.yaml')
-logging_yaml = join(current_path, 'conf', 'logging.yaml')
-cf = conf.read_config(config_yaml_path, conf.config.Configs)  # load test global variable
-tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "ElapsedTime", "StartTime", "Result"]
+config_yaml_path = join(current_path, 'src/conf', 'config.yaml')
+logging_yaml = join(current_path, 'src/conf', 'logging.yaml')
+cf = conf.config.read_config(config_yaml_path, conf.config.Configs)  # load test global variable
+tableWidgetHeader = ["SN", "StepName", "Spec", "LSL", "Value", "USL", "ElapsedTime", "StartTime", "Result"]
 SN = ''
 dut_ip = ''
 DUTMesIP = ''
@@ -62,14 +61,14 @@ ForFlag = False
 
 OutPutPath = rf'{current_path}\OutPut'
 DataPath = rf'{current_path}\Data'
-scriptFolder = rf'{current_path}\scripts'
+scriptFolder = rf'{current_path}\src\scripts'
 excel_file_path = rf'{scriptFolder}\{cf.station.testcase}'
 test_script_json = rf'{scriptFolder}\{cf.station.station_name}.json'
 CSVFilePath = ''
 mes_shop_floor = ''
 mes_result = ''
 shop_floor_url = ''
-database_setting = rf'{current_path}\conf\setting.db'
+database_setting = rf'{current_path}\src\conf\setting.db'
 database_result = rf'{current_path}\OutPut\result.db'
 continue_fail_count = 0
 total_pass_count = 0

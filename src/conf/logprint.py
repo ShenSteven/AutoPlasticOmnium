@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-@File   : logconf.py
+@File   : logprint.py
 @Author : Steven.Shen
 @Date   : 2021/11/4
 @Desc   : 
@@ -13,11 +13,10 @@ from string import Template
 import yaml
 from datetime import datetime
 import logging.config
-from os.path import dirname, abspath, join, exists
+from os.path import join, exists
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTextEdit
 import conf.globalvar as gv
-import conf
+import conf.config
 
 # testlog_file path
 gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
@@ -35,7 +34,7 @@ gv.critical_log = join(gv.cf.station.log_folder, 'critical.log').replace('\\', '
 gv.errors_log = join(gv.cf.station.log_folder, 'errors.log').replace('\\', '/')
 
 # load logger config
-log_conf = conf.read_yaml(gv.logging_yaml)
+log_conf = conf.config.read_yaml(gv.logging_yaml)
 res_log_conf = Template(json.dumps(log_conf)).safe_substitute(
     {'log_file': log_file, 'critical_log': gv.critical_log, 'errors_log': gv.errors_log})
 logging.config.dictConfig(yaml.safe_load(res_log_conf))
@@ -43,6 +42,8 @@ logger = logging.getLogger('testlog')
 
 
 class QTextEditHandler(logging.Handler):
+    """继承logging.Handler类，并重写emit方法，创建打印到控件QTextEdit的handler class，并按照日志级别设置字体颜色."""
+
     def __init__(self, stream=None):
         logging.Handler.__init__(self)
         if stream is None or stream == 'None':
