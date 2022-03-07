@@ -4,8 +4,6 @@ import os
 import sys
 import time
 import json
-import csv
-import requests
 from datetime import datetime
 from enum import Enum
 from os.path import dirname, abspath, join
@@ -26,6 +24,7 @@ import model.loadseq
 import model.sqlite
 import sockets.serialport
 from model.basicfunc import IsNullOrEmpty
+from . import reporting
 
 
 # pyrcc5 images.qrc -o images.py
@@ -928,88 +927,18 @@ class MainForm(QWidget):
                             TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
                     else:
                         result = self.main_form.testcase.run(gv.cf.station.fail_continue)
-                        result1 = upload_Json_to_client(gv.cf.station.rs_url, gv.txtLogPath)
-                        result2 = upload_result_to_mes(gv.mes_result)
+                        result1 = reporting.upload_Json_to_client(gv.cf.station.rs_url, gv.txtLogPath)
+                        result2 = reporting.upload_result_to_mes(gv.mes_result)
                         gv.finalTestResult = result & result1 & result2
                         self.main_form.SetTestStatus(
                             TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
-                        CollectResultToCsv()
-                        saveTestResult()
+                        reporting.CollectResultToCsv()
+                        reporting.saveTestResult()
         except Exception as e:
             lg.logger.exception(f"TestThread() Exception:{e}")
             self.main_form.SetTestStatus(TestStatus.ABORT)
         finally:
             lg.logger.debug('finally')
-
-
-def CollectResultToCsv():
-    def thread_update():
-        gv.CSVFilePath = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
-        csvColumnPath = fr'{gv.scriptFolder}\csv_column.txt'
-        fix_header = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
-                      "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
-                      "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
-        fix_header.extend(gv.csv_list_header)
-        updateColumn = gv.finalTestResult and not gv.IsDebug
-        model.basicfunc.create_csv_file(gv.CSVFilePath, fix_header, updateColumn)
-        if os.path.exists(csvColumnPath):
-            os.remove(csvColumnPath)
-        with open(csvColumnPath, 'w') as f:
-            header = '\t'.join(fix_header)
-            f.write(header)
-        fix_header_value = [gv.dut_model, gv.cf.station.station_name, "Luxshare", gv.WorkOrder,
-                            gv.cf.station.station_no,
-                            "1", gv.SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.version,
-                            time.strftime("%Y/%m/%d %H:%M:%S"), str(MainForm.main_form.sec),
-                            gv.finalTestResult,
-                            gv.mesPhases.first_fail, gv.error_details_first_fail, "UTC", gv.cf.dut.test_mode,
-                            gv.mesPhases.JSON_UPLOAD, gv.mesPhases.MES_UPLOAD]
-        fix_header_value.extend(gv.csv_list_result)
-        model.basicfunc.write_csv_file(gv.CSVFilePath, fix_header_value)
-
-    thread = Thread(target=thread_update)
-    thread.start()
-
-
-def saveTestResult():
-    def thread_update():
-        reportPath = fr'{gv.OutPutPath}\result.csv'
-        model.basicfunc.create_csv_file(reportPath, gv.tableWidgetHeader)
-        if os.path.exists(reportPath):
-            all_rows = []
-            for row in range(MainForm.main_form.ui.tableWidget.rowCount()):
-                row_data = []
-                for column in range(MainForm.main_form.ui.tableWidget.columnCount()):
-                    item = MainForm.main_form.ui.tableWidget.item(row, column)
-                    if item is not None:
-                        row_data.append(item.text())
-                all_rows.append(row_data)
-
-            with open(reportPath, 'a', newline='') as stream:
-                writer = csv.writer(stream)
-                writer.writerows(all_rows)
-        lg.logger.debug(f'saveTestResult to:{reportPath}')
-
-    thread = Thread(target=thread_update)
-    thread.start()
-
-
-def upload_Json_to_client(url, log_path):
-    return True
-    pass
-
-
-def upload_result_to_mes(url):
-    if gv.IsDebug:
-        return True
-    mes_result = json.dumps(gv.mesPhases, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-    lg.logger.debug(mes_result)
-    response = requests.post(url, mes_result)
-    if response.status_code == 200:
-        return True
-    else:
-        lg.logger.debug(f'post fail:{response.content}')
-        return False
 
 
 if __name__ == "__main__":

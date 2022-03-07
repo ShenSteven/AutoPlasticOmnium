@@ -20,8 +20,6 @@ else:
 os_type = platform.system()
 # print(os_type + " detected!")
 
-packages = ['src.conf']
-
 requires = [
     'PyQt5~=5.15.4',
     'PyYAML~=5.4.1',
@@ -49,17 +47,16 @@ if __name__ == "__main__":
         author=about['__author__'],
         author_email=about['__author_email__'],
         url=about['__url__'],
-        packages=packages,
-        py_modules=['src.py'],
+        packages=find_packages('src'),
         package_data={'': ['LICENSE', 'NOTICE']},
-        package_dir={'': ''},
-        include_package_data=True,
+        package_dir={'': 'src'},
+        # include_package_data=True,
         python_requires=">=3.8, !=3.9.*",
         install_requires=requires,
         license=about['__license__'],
-        zip_safe=False,
-        project_urls={
-            'Documentation': 'https://requests.readthedocs.io',
-            'Source': 'https://github.com/psf/requests',
-        },
+        # zip_safe=False,
+        # project_urls={
+        #     'Documentation': 'https://requests.readthedocs.io',
+        #     'Source': 'https://github.com/psf/requests', },
+        entry_points={'console_scripts': ['autotest = src.__main__']}
     )

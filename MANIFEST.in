@@ -1,3 +1,4 @@
-include README.md LICENSE NOTICE HISTORY.md requirements.txt AutoTestSystem.spec test.ico
-recursive-include tests *.py
-prune conf/setting.db /scripts/firefly_data_api_client.py /OutPut/* /Data/*
+include README.md LICENSE HISTORY.md requirements.txt AutoTestSystem.spec
+include src/conf/*.yaml src/scripts/*.xlsx src/ui/main.ui src/ui/images.qrc
+recursive-include src/ui/images *png *ico
+recursive-include src *py
