@@ -10,7 +10,7 @@ import os
 import csv
 from datetime import datetime
 import yaml
-import conf.logprint as lg
+import robotsystem.conf.logprint as lg
 import hashlib
 
 

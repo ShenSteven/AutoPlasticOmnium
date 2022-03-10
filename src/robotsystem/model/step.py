@@ -14,9 +14,9 @@ from . import product
 from . import sqlite
 from . import keyword
 from .basicfunc import IsNullOrEmpty
-import conf.globalvar as gv
-import conf.logprint as lg
-import ui.mainform
+import robotsystem.conf.globalvar as gv
+import robotsystem.conf.logprint as lg
+import robotsystem.ui.mainform
 
 
 class Step:
@@ -148,7 +148,7 @@ class Step:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        QMetaObject.invokeMethod(ui.mainform.MainForm.main_form, 'update_treeWidget_color',
+        QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
                                  Qt.BlockingQueuedConnection,
                                  Q_ARG(QBrush, color),
                                  Q_ARG(int, self.suite_index),
@@ -178,7 +178,7 @@ class Step:
 
             for retry in range(self.retry_times, -1, -1):
                 if gv.event.wait():
-                    test_result, info = keyword.test(self, testSuite)
+                    test_result, info = keyword.testKeyword(self, testSuite)
                 if test_result:
                     break
             self.setColor(Qt.green if test_result else Qt.red)
@@ -198,11 +198,10 @@ class Step:
         finally:
             # record test date to DB.
             if self.isTest:
-                ui.mainform.MainForm.my_signals.update_tableWidget.emit(
-                    [gv.SN, self.StepName, self.spec, self.LSL,
-                     self.testValue, self.USL, self.elapsedTime,
-                     self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
-                     'Pass' if test_result else 'Fail'])
+                self.elapsedTime = (datetime.now() - self.start_time).seconds
+                robotsystem.ui.mainform.MainForm.my_signals.update_tableWidget.emit(
+                    [gv.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
+                     self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if test_result else 'Fail'])
             if not test_result:
                 with sqlite.Sqlite(gv.database_result) as db:
                     lg.logger.debug('INSERT test result to result.db table RESULT.')

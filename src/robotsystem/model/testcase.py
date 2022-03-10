@@ -9,12 +9,11 @@
 import copy
 import os
 from datetime import datetime
-# import model.loadseq
 from . import loadseq
 from . import product
 from . import sqlite
-import conf.globalvar as gv
-import conf.logprint as lg
+import robotsystem.conf.globalvar as gv
+import robotsystem.conf.logprint as lg
 
 
 def init_database(database_name):

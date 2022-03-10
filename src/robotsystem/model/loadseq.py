@@ -18,9 +18,9 @@ from . import suite
 from . import step
 from . import sqlite
 from .basicfunc import IsNullOrEmpty,get_sha256
-import conf.globalvar as gv
-import conf.logprint as lg
-import ui.mainform
+import robotsystem.conf.globalvar as gv
+import robotsystem.conf.logprint as lg
+import robotsystem.ui.mainform
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations):
@@ -90,7 +90,7 @@ def load_testcase_from_json(json_path, verify=True):
         if sha256 == JsonSHA:
             return deserialize_from_json(json_path)
         else:
-            QMetaObject.invokeMethod(ui.mainform.MainForm.main_form, 'showMessageBox', Qt.AutoConnection,
+            QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'showMessageBox', Qt.AutoConnection,
                                      QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
                                      QtCore.Q_ARG(str, 'ERROR!'),
                                      QtCore.Q_ARG(str, f'script {json_path} has been tampered!'),

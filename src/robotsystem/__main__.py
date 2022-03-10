@@ -6,11 +6,14 @@
 @Date   : 2022/3/7
 @Desc   : 
 """
+
 import os
 import sys
+from os.path import abspath, join, dirname
 from PyQt5.QtWidgets import QApplication, QMessageBox
-import ui.mainform as mf
+import robotsystem.ui.mainform as mf
 from traceback import format_exception
+import robotsystem.conf.logprint as lg
 
 
 def excepthook(cls, exception, traceback):

@@ -13,9 +13,9 @@ from PyQt5.QtGui import QBrush
 from . import product
 from . import step
 from .basicfunc import IsNullOrEmpty
-import conf.globalvar as gv
-import conf.logprint as lg
-import ui.mainform
+import robotsystem.conf.globalvar as gv
+import robotsystem.conf.logprint as lg
+import robotsystem.ui.mainform
 
 
 def fail_continue(step, failContinue):
@@ -108,7 +108,7 @@ class TestSuite:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        QMetaObject.invokeMethod(ui.mainform.MainForm.main_form, 'update_treeWidget_color',
+        QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
                                  Qt.BlockingQueuedConnection,
                                  Q_ARG(QBrush, color),
                                  Q_ARG(int, self.index),

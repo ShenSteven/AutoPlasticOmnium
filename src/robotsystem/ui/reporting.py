@@ -7,17 +7,15 @@
 @Desc   : 
 """
 import os
-import sys
 import time
 import json
 import csv
 import requests
 from threading import Thread
-from PyQt5.QtWidgets import QApplication, QMessageBox
-import ui.mainform as mf
-import conf.logprint as lg
-import conf.globalvar as gv
-from model.basicfunc import write_csv_file, create_csv_file
+import robotsystem.ui.mainform as mf
+import robotsystem.conf.logprint as lg
+import robotsystem.conf.globalvar as gv
+from robotsystem.model.basicfunc import write_csv_file, create_csv_file
 
 
 def check_connection(url):

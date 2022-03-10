@@ -9,9 +9,9 @@
 import re
 import time
 from telnetlib import Telnet
-from model.basicfunc import IsNullOrEmpty
-from sockets.communication import CommAbstract
-import conf.logprint as lg
+from robotsystem.model.basicfunc import IsNullOrEmpty
+from robotsystem.sockets.communication import CommAbstract
+import robotsystem.conf.logprint as lg
 
 
 class TelnetComm(CommAbstract):

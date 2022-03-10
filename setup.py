@@ -11,13 +11,9 @@ import sys
 import platform
 import shutil
 from setuptools import setup, Command, find_packages
+from os.path import abspath, join, dirname
 
-if getattr(sys, 'frozen', False):
-    # we are running in a bundle
-    current_path = sys._MEIPASS
-else:
-    current_path = os.path.dirname(os.path.abspath(__file__))
-os_type = platform.system()
+# os_type = platform.system()
 # print(os_type + " detected!")
 
 requires = [
@@ -31,10 +27,10 @@ requires = [
 ]
 
 about = {}
-with open(os.path.join(current_path, 'src/conf', '__version__.py'), 'r', encoding='utf-8') as f:
+with open(join(dirname(abspath(__file__)), 'src', '__version__.py'), 'r', encoding='utf-8') as f:
     exec(f.read(), about)
 
-with open(os.path.join(current_path, 'README.md'), 'r', encoding='utf-8') as f:
+with open(join(dirname(abspath(__file__)), 'README.md'), 'r', encoding='utf-8') as f:
     readme = f.read()
 
 if __name__ == "__main__":
@@ -50,7 +46,7 @@ if __name__ == "__main__":
         packages=find_packages('src'),
         package_data={'': ['LICENSE', 'NOTICE']},
         package_dir={'': 'src'},
-        # include_package_data=True,
+        include_package_data=True,
         python_requires=">=3.8, !=3.9.*",
         install_requires=requires,
         license=about['__license__'],

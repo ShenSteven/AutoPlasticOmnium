@@ -7,20 +7,13 @@
 @Desc   : 
 """
 import re
-import time
-from sockets.serialport import SerialPort
-from sockets.telnet import TelnetComm
-import conf.globalvar as gv
-import conf.logprint as lg
-import csv
-import json
-import os
+from robotsystem.sockets.serialport import SerialPort
+from robotsystem.sockets.telnet import TelnetComm
+import robotsystem.conf.globalvar as gv
+import robotsystem.conf.logprint as lg
 import subprocess
 import time
-import platform
 import psutil
-from datetime import datetime
-import yaml
 from .basicfunc import IsNullOrEmpty
 
 
@@ -142,7 +135,7 @@ def register(name, email, **kwargs):
     print('test_name:%s, age:%s, others:%s', (name, email, kwargs))
 
 
-def test(item, testSuite):
+def testKeyword(item, testSuite):
     time.sleep(0.5)
     # invoke_return = QMetaObject.invokeMethod(
     #     ui.mainform.MainForm.main_form,

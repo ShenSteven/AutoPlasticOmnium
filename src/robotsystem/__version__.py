@@ -1,11 +1,10 @@
 # .-. .-. .-. . . .-. .-. .-. .-.
 # |(  |-  |.| | | |-  `-.  |  `-.
 # ' ' `-' `-`.`-' `-' `-'  '  `-'
-
-__title__ = 'AutoTestSystem_pyqt5'
+__title__ = 'robotsystem-pyqt5'
 __description__ = 'automation framework for test automation and robotic process automation.'
 __url__ = 'https://requests.readthedocs.io'
-__version__ = '0.0.1'
+__version__ = '0.1.1'
 __build__ = 0x022701
 __author__ = 'Steven Shen'
 __author_email__ = '394109529@qq.com'

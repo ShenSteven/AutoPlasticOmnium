@@ -3,7 +3,6 @@ import logging
 import os
 import sys
 import time
-import json
 from datetime import datetime
 from enum import Enum
 from os.path import dirname, abspath, join
@@ -15,15 +14,14 @@ from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRegExp, QMetaObject
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
-import conf.globalvar as gv
-import conf.logprint as lg
-# import AutoTestSystem
-import model.product
-import model.testcase
-import model.loadseq
-import model.sqlite
-import sockets.serialport
-from model.basicfunc import IsNullOrEmpty
+import robotsystem.conf.globalvar as gv
+import robotsystem.conf.logprint as lg
+import robotsystem.model.product
+import robotsystem.model.testcase
+import robotsystem.model.loadseq
+import robotsystem.model.sqlite
+import robotsystem.sockets.serialport
+from robotsystem.model.basicfunc import IsNullOrEmpty
 from . import reporting
 
 
@@ -162,7 +160,7 @@ class MainForm(QWidget):
         init_create_dirs()
         MainForm.main_form = self  # 单例模式
         self.sec = 1
-        self.testcase: model.testcase.TestCase = model.testcase.TestCase(
+        self.testcase: robotsystem.model.testcase.TestCase = robotsystem.model.testcase.TestCase(
             rf'{gv.excel_file_path}',
             f'{gv.cf.station.station_name}')
         self.testSequences = self.testcase.clone_suites
@@ -244,7 +242,7 @@ class MainForm(QWidget):
         self.ui.action192_168_1_101.setText(GetAllIpv4Address('10.90.'))
 
     def init_status_bar(self):
-        with model.sqlite.Sqlite(gv.database_setting) as db:
+        with robotsystem.model.sqlite.Sqlite(gv.database_setting) as db:
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             gv.continue_fail_count = db.cur.fetchone()[0]
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_pass_count'")
@@ -347,7 +345,8 @@ class MainForm(QWidget):
         """通过串口读取治具中设置的测试工站名字"""
         if not gv.cf.station.fix_flag:
             return
-        gv.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port, gv.cf.station.fix_com_baudRate)
+        gv.FixSerialPort = robotsystem.sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
+                                                                     gv.cf.station.fix_com_baudRate)
         for i in range(0, 3):
             rReturn, revStr = gv.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
             if rReturn:
@@ -376,7 +375,7 @@ class MainForm(QWidget):
             return False
 
     def CheckContinueFailNum(self):
-        with model.sqlite.Sqlite(gv.database_setting) as db:
+        with robotsystem.model.sqlite.Sqlite(gv.database_setting) as db:
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             gv.continue_fail_count = db.cur.fetchone()[0]
             lg.logger.debug(str(gv.continue_fail_count))
@@ -456,12 +455,12 @@ class MainForm(QWidget):
         if not gv.testThread.is_alive():
             gv.testThread = Thread(target=self.test_thread, daemon=True)
             gv.testThread.start()
-        gv.stationObj = model.product.JsonResult(gv.SN, gv.cf.station.station_no,
-                                                 gv.cf.dut.test_mode,
-                                                 gv.cf.dut.qsdk_ver, gv.version)
+        gv.stationObj = robotsystem.model.product.JsonResult(gv.SN, gv.cf.station.station_no,
+                                                             gv.cf.dut.test_mode,
+                                                             gv.cf.dut.qsdk_ver, gv.version)
         gv.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{gv.SN}/station/{gv.cf.station.station_no}/info'
         gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{gv.SN}/station/{gv.cf.station.station_name}'
-        gv.mesPhases = model.product.MesInfo(gv.SN, gv.cf.station.station_no, gv.version)
+        gv.mesPhases = robotsystem.model.product.MesInfo(gv.SN, gv.cf.station.station_no, gv.version)
         init_create_dirs()
         gv.csv_list_header = []
         gv.csv_list_result = []
@@ -579,6 +578,7 @@ class MainForm(QWidget):
                 # self.ui.tableWidget.resizeColumnsToContents()
                 self.ui.tableWidget.scrollToItem(self.ui.tableWidget.item(row_cnt - 1, 0),
                                                  hint=QAbstractItemView.EnsureVisible)
+                # clear all rows if var is str
             elif isinstance(result_tuple, str):
                 for i in range(0, self.ui.tableWidget.rowCount()):
                     self.ui.tableWidget.removeRow(0)
@@ -593,7 +593,7 @@ class MainForm(QWidget):
             if os.path.exists(gv.test_script_json):
                 os.chmod(testcase_path_json, stat.S_IWRITE)
                 os.remove(gv.test_script_json)
-            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
+            self.testcase = robotsystem.model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
             self.testSequences = self.testcase.clone_suites
 
         thread = Thread(target=thread_convert_and_load_script)
@@ -665,8 +665,8 @@ class MainForm(QWidget):
 
     def on_actionConvertExcelToJson(self):
         thread = Thread(
-            target=model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
-                                                              gv.cf.station.station_all))
+            target=robotsystem.model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
+                                                                          gv.cf.station.station_all))
         thread.start()
 
     def on_actionOpenScript(self):
@@ -677,7 +677,7 @@ class MainForm(QWidget):
         thread.start()
 
     def on_actionSaveToScript(self):
-        thread = Thread(target=model.loadseq.serializeToJson,
+        thread = Thread(target=robotsystem.model.loadseq.serializeToJson,
                         args=(self.testcase.clone_suites, gv.test_script_json))
         thread.start()
 
@@ -872,7 +872,7 @@ class MainForm(QWidget):
 
     def updateStatusBar(self):
         def update_status_bar():
-            with model.sqlite.Sqlite(gv.database_setting) as db:
+            with robotsystem.model.sqlite.Sqlite(gv.database_setting) as db:
                 db.execute(f"UPDATE COUNT SET VALUE='{gv.continue_fail_count}' where NAME ='continue_fail_count'")
                 db.execute(f"UPDATE COUNT SET VALUE='{gv.total_pass_count}' where NAME ='total_pass_count'")
                 db.execute(f"UPDATE COUNT SET VALUE='{gv.total_fail_count}' where NAME ='total_fail_count'")

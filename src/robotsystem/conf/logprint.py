@@ -15,8 +15,8 @@ from datetime import datetime
 import logging.config
 from os.path import join, exists
 from PyQt5.QtCore import Qt
-import conf.globalvar as gv
-import conf.config
+import robotsystem.conf.globalvar as gv
+import robotsystem.conf.config
 
 # testlog_file path
 gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
@@ -24,7 +24,7 @@ try:
     if not exists(gv.logFolderPath):
         os.makedirs(gv.logFolderPath)
 except FileNotFoundError:
-    gv.cf.station.log_folder = join(gv.current_path, 'log')
+    gv.cf.station.log_folder = join(gv.current_dir, 'log')
     gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
     if not exists(gv.logFolderPath):
         os.makedirs(gv.logFolderPath)
@@ -34,7 +34,7 @@ gv.critical_log = join(gv.cf.station.log_folder, 'critical.log').replace('\\', '
 gv.errors_log = join(gv.cf.station.log_folder, 'errors.log').replace('\\', '/')
 
 # load logger config
-log_conf = conf.config.read_yaml(gv.logging_yaml)
+log_conf = robotsystem.conf.config.read_yaml(gv.logging_yaml)
 res_log_conf = Template(json.dumps(log_conf)).safe_substitute(
     {'log_file': log_file, 'critical_log': gv.critical_log, 'errors_log': gv.errors_log})
 logging.config.dictConfig(yaml.safe_load(res_log_conf))
