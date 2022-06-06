@@ -8,13 +8,13 @@
 """
 
 
-class JsonResult:
+class JsonObject:
 
-    def __init__(self, serial, test_station, test_mode, qsdkVer, test_software_version):
+    def __init__(self, serial, test_station, test_mode, image_version, test_software_version):
         self.serial = serial
         self.test_station = test_station
         self.mode = test_mode
-        self.luxshare_qsdk_version = qsdkVer
+        self.luxshare_qsdk_version = image_version
         self.test_software_version = test_software_version
         self.test_phases = None
         self.tests = []

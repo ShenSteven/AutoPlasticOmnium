@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-@File   : basicfunc.py
+@File   : basic func.py
 @Author : Steven.Shen
 @Date   : 2021/9/2
 @Desc   : 
 """
+import json
 import os
 import csv
 from datetime import datetime
@@ -123,6 +124,6 @@ if __name__ == '__main__':
     # ping('127.0.0.1')
     # aa = restart_process('EXCEL.EXE')
     # logger.debug(f"ds{aa}")
-    register("demon", "1@1.com")  # test_name:%s, age:%s, others:%s ('demon', '1@1.com', {})
-    register("demon", "1@1.com",
-             addr="shanghai")  # test_name:%s, age:%s, others:%s ('demon', '1@1.com', {'addr': 'shanghai'})
+    # register("demon", "1@1.com")  # test_name:%s, age:%s, others:%s ('demon', '1@1.com', {})
+    # register("demon", "1@1.com",
+    #          addr="shanghai")  # test_name:%s, age:%s, others:%s ('demon', '1@1.com', {'addr': 'shanghai'})

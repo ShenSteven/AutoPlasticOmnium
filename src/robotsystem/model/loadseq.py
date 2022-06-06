@@ -7,6 +7,7 @@
 @Desc   : 
 """
 import os
+import sqlite3
 import stat
 import json
 import sys
@@ -17,7 +18,7 @@ from PyQt5 import QtCore
 from . import suite
 from . import step
 from . import sqlite
-from .basicfunc import IsNullOrEmpty,get_sha256
+from .basicfunc import IsNullOrEmpty, get_sha256
 import robotsystem.conf.globalvar as gv
 import robotsystem.conf.logprint as lg
 import robotsystem.ui.mainform
@@ -31,10 +32,10 @@ def excel_convert_to_json(testcase_path_excel, all_stations):
 
 
 def load_testcase_from_excel(testcase_path, sheetName, test_script_path) -> list:
-    """load test sequence form a sheet in excel and return the suites sequences list,
+    """load test sequence form a sheet in Excel and return the suites sequences list,
        if success,serialize the suites list to json.
-    :param testcase_path: the path of excel
-    :param sheetName: the sheet test_name of excel
+    :param testcase_path: the path of Excel
+    :param sheetName: the sheet test_name of Excel
     :param test_script_path:  serialize and save to json path
     :return : temp_suite[] list
     """
@@ -62,8 +63,9 @@ def load_testcase_from_excel(testcase_path, sheetName, test_script_path) -> list
             test_step = step.Step()
             for header, cell in dict(zip(itemHeader, line)).items():
                 test_step.index = temp_suite.totalNumber
-                test_step.suite_index = temp_suite.index
+                test_step.suiteIndex = temp_suite.index
                 setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
+                # setattr(test_step, header, cell.value)
                 test_step.SuiteName = temp_suite_name
 
             temp_suite.totalNumber += 1

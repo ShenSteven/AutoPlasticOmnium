@@ -18,10 +18,10 @@ import robotsystem.conf.logprint as lg
 import robotsystem.ui.mainform
 
 
-def fail_continue(step, failContinue):
-    if step.FTC.lower() == 'n' or step.FTC.lower() == 'no' or step.FTC.lower() == '0':
+def fail_continue(test_step: step.Step, failContinue):
+    if test_step.FTC.lower() == 'n' or test_step.FTC.lower() == 'no' or test_step.FTC.lower() == '0':
         return False
-    elif step.FTC.lower() == 'y' or step.FTC.lower() == 'yes' or step.FTC.lower() == '1':
+    elif test_step.FTC.lower() == 'y' or test_step.FTC.lower() == 'yes' or test_step.FTC.lower() == '1':
         return True
     else:
         return failContinue
@@ -36,7 +36,7 @@ class TestSuite:
         self.suiteResult = True
         self.isTestFinished = False
         self.totalNumber = 0
-        self.globalVar = ''
+        self.suiteVar = ''
         self.steps = []
         self.start_time = ""
         self.finish_time = ""
@@ -64,16 +64,15 @@ class TestSuite:
         step_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
-            for i, step in enumerate(self.steps, start=0):
+            for i, step_item in enumerate(self.steps, start=0):
                 if stepNo != -1:
                     i = stepNo
                     stepNo = -1
 
                 self.process_for(self.steps[i])
                 # 把测试套的全局变量赋值给下面的测试步骤
-                if not IsNullOrEmpty(self.globalVar):
-                    step.globalVar = self.globalVar
-
+                # if not IsNullOrEmpty(self.suiteVar):
+                step_item.suiteVar = self.suiteVar
                 step_result = self.steps[i].run(self, suiteItem)
                 step_result_list.append(step_result)
 
@@ -88,7 +87,7 @@ class TestSuite:
             self.process_mesVer()
             # 加入station实例,记录测试结果 用于序列化Json文件
             if gv.stationObj.test_phases is not None:
-                self.copy_to(suiteItem)
+                self.copy_to_json_obj(suiteItem)
                 gv.stationObj.test_phases.append(suiteItem)
             self.setColor(Qt.green if self.suiteResult else Qt.red)
             return self.suiteResult
@@ -124,19 +123,19 @@ class TestSuite:
         else:
             lg.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime}")
 
-    def process_for(self, step: step.Step):
+    def process_for(self, step_item: step.Step):
         """FOR 循环开始判断"""
-        if not IsNullOrEmpty(step.For) and '(' in step.For and ')' in step.For:
-            gv.ForTotalCycle = int(re.findall(r'\((.*?)\)', step.For)[0])
+        if not IsNullOrEmpty(step_item.For) and '(' in step_item.For and ')' in step_item.For:
+            gv.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
             gv.ForStartSuiteNo = self.index
-            gv.ForStartStepNo = step.index
+            gv.ForStartStepNo = step_item.index
             gv.ForFlag = False
             lg.logger.debug(f"====================Start Cycle-{gv.ForTestCycle}===========================")
 
     @staticmethod
-    def process_EndFor(step: step.Step):
+    def process_EndFor(step_item: step.Step):
         """FOR 循环结束判断"""
-        if not IsNullOrEmpty(step.For) and step.For.lower().startswith('end'):
+        if not IsNullOrEmpty(step_item.For) and step_item.For.lower().startswith('end'):
             if gv.ForTestCycle < gv.ForTotalCycle:
                 gv.ForFlag = True
                 gv.ForTestCycle += 1
@@ -144,11 +143,12 @@ class TestSuite:
             else:
                 gv.ForFlag = False
                 lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForTestCycle}) Cycle test." + '=' * 10)
+                gv.ForTestCycle = 1
                 return False
         else:
             return False
 
-    def copy_to(self, obj: product.SuiteItem):
+    def copy_to_json_obj(self, obj: product.SuiteItem):
         obj.phase_name = self.SuiteName
         obj.status = "passed" if self.suiteResult else "failed"
         obj.start_time = self.start_time
@@ -164,7 +164,7 @@ class TestSuite:
         self.error_code = ''
         self.phase_details = ''
         self.elapsedTime = None
-        self.globalVar = ''
+        self.suiteVar = ''
 
 
 if __name__ == "__main__":

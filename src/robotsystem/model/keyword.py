@@ -45,11 +45,11 @@ def ping(host, timeout=1):
     Returns True if host (str) responds to a ping request.
     Remember that a host may not respond to a ping (ICMP) request even if the host test_name is valid.
     """
-    param = '-n' if win else '-cf'
+    param = '-n' if gv.win else '-cf'
     command = f'ping {param} 1 {host}'
     try:
         ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             encoding=("gbk" if win else "utf8"), timeout=timeout)
+                             encoding=("gbk" if gv.win else "utf8"), timeout=timeout)
         if ret.returncode == 0 and 'TTL=' in ret.stdout:
             lg.logger.debug(ret.stdout)
             return True
@@ -68,7 +68,7 @@ def run_cmd(command, timeout=1):
     """send command, command executed successfully return true,otherwise false"""
     try:
         ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             encoding=("gbk" if win else "utf8"), timeout=timeout)
+                             encoding=("gbk" if gv.win else "utf8"), timeout=timeout)
         if ret.returncode == 0:  # 表示命令下发成功，不对命令内容结果做判断
             lg.logger.debug(ret.stdout)
             return True

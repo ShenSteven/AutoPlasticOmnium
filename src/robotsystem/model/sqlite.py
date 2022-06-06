@@ -7,7 +7,6 @@
 @Desc   : 
 """
 import sqlite3
-import sqlite3
 
 
 class Sqlite(object):
@@ -18,13 +17,10 @@ class Sqlite(object):
     def __enter__(self):
         return self
 
-    def __exit__(self, exectype, value, traceback):
+    def __exit__(self, exec_type, value, traceback):
         self.cur.close()
         self.conn.close()
 
     def execute(self, command):
         self.cur.execute(command)
         self.conn.commit()
-
-
-

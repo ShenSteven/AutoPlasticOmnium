@@ -2,12 +2,13 @@ import copy
 import logging
 import os
 import sys
+import stat
 import time
 from datetime import datetime
 from enum import Enum
 from os.path import dirname, abspath, join
 from threading import Thread
-import ui.images
+import robotsystem.ui.images
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRegExp, QMetaObject
@@ -22,7 +23,7 @@ import robotsystem.model.loadseq
 import robotsystem.model.sqlite
 import robotsystem.sockets.serialport
 from robotsystem.model.basicfunc import IsNullOrEmpty
-from . import reporting
+from robotsystem.ui.reporting import upload_Json_to_client, upload_result_to_mes, CollectResultToCsv, saveTestResult
 
 
 # pyrcc5 images.qrc -o images.py
@@ -455,7 +456,7 @@ class MainForm(QWidget):
         if not gv.testThread.is_alive():
             gv.testThread = Thread(target=self.test_thread, daemon=True)
             gv.testThread.start()
-        gv.stationObj = robotsystem.model.product.JsonResult(gv.SN, gv.cf.station.station_no,
+        gv.stationObj = robotsystem.model.product.JsonObject(gv.SN, gv.cf.station.station_no,
                                                              gv.cf.dut.test_mode,
                                                              gv.cf.dut.qsdk_ver, gv.version)
         gv.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{gv.SN}/station/{gv.cf.station.station_no}/info'
@@ -500,7 +501,7 @@ class MainForm(QWidget):
                                 f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
                                 f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
                 self.my_signals.update_tableWidget[str].emit('clear')
-                gv.event.set()
+                gv.pause_event.set()
             elif status == TestStatus.FAIL:
                 gv.total_fail_count += 1
                 self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'FAIL', 36, Qt.red)
@@ -591,7 +592,7 @@ class MainForm(QWidget):
         def thread_convert_and_load_script():
             lg.logger.debug('start reload script...')
             if os.path.exists(gv.test_script_json):
-                os.chmod(testcase_path_json, stat.S_IWRITE)
+                os.chmod(gv.test_script_json, stat.S_IWRITE)
                 os.remove(gv.test_script_json)
             self.testcase = robotsystem.model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
             self.testSequences = self.testcase.clone_suites
@@ -692,11 +693,11 @@ class MainForm(QWidget):
             if not gv.pauseFlag:
                 gv.pauseFlag = True
                 self.ui.actionStart.setIcon(QIcon(':/images/Start-icon.png'))
-                gv.event.clear()
+                gv.pause_event.clear()
             else:
                 gv.pauseFlag = False
                 self.ui.actionStart.setIcon(QIcon(':/images/Pause-icon.png'))
-                gv.event.set()
+                gv.pause_event.set()
         else:
             self.on_returnPressed()
 
@@ -927,13 +928,13 @@ class MainForm(QWidget):
                             TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
                     else:
                         result = self.main_form.testcase.run(gv.cf.station.fail_continue)
-                        result1 = reporting.upload_Json_to_client(gv.cf.station.rs_url, gv.txtLogPath)
-                        result2 = reporting.upload_result_to_mes(gv.mes_result)
+                        result1 = upload_Json_to_client(gv.cf.station.rs_url, gv.txtLogPath)
+                        result2 = upload_result_to_mes(gv.mes_result)
                         gv.finalTestResult = result & result1 & result2
                         self.main_form.SetTestStatus(
                             TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
-                        reporting.CollectResultToCsv()
-                        reporting.saveTestResult()
+                        CollectResultToCsv()
+                        saveTestResult()
         except Exception as e:
             lg.logger.exception(f"TestThread() Exception:{e}")
             self.main_form.SetTestStatus(TestStatus.ABORT)

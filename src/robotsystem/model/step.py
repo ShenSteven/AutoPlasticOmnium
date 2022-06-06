@@ -22,9 +22,9 @@ import robotsystem.ui.mainform
 class Step:
     """测试步骤类
     Attributes:
-        suite_index: 测试套序列号
+        suiteIndex: 测试套序列号
         index: 当前测试step序列号
-        stepResult: 测试项测试结果
+        # stepResult: 测试项测试结果
         start_time: 测试项的开始时
         finish_time: 测试结束时间
         start_time_json = None
@@ -62,29 +62,58 @@ class Step:
         Json: str = None: 测试结果是否生成Json数据上传给客户
         EeroName: str = None: 客户定义的测试步骤名字
         param1: str = None
-
     """
-    Retry: int
-    TimeOut: int
-    suite_index: int
+    # Retry: int
+    # TimeOut: int
+    # suiteIndex: int
     index: int
 
     def __init__(self, dict_=None):
-        self.stepResult = False
+        self.suiteIndex: int = 0
+        self.index: int = 0
+        # self.stepResult = False
         self.testValue = None
         self.start_time = None
         self.finish_time = None
         self.start_time_json = None
         self.error_code = ''
         self.error_details = ''
-        self.status = 'exception'  # pass/fail/exception
+        self.status: str = 'exception'  # pass/fail/exception
         self.elapsedTime = 0
         self._isTest = True
         self._command = ''
         self._spec = ''
-        self.Retry = 0
-        self.TimeOut = 0
-        self.globalVar = ''
+        self.suiteVar = ''
+
+        self.SuiteName: str = ''
+        self.StepName: str = ''
+        self.EeroName: str = ''
+        self.TestKeyword: str = ''
+        self.ErrorCode: str = ''
+        self.ErrorDetails: str = ''
+        self.Retry: int = 0
+        self.TimeOut: int = 0
+        self.IfElse: str = ''
+        self.For: str = ''
+        self.SubStr1: str = ''
+        self.SubStr2: str = ''
+        self.Model: str = ''
+        self.CmdOrParam: str = ''
+        self.ExpectStr: str = ''
+        self.CheckStr1: str = ''
+        self.CheckStr2: str = ''
+        self.SPEC: str = ''
+        self.LSL: str = ''
+        self.USL: str = ''
+        self.Unit: str = ''
+        self.MesVar: str = ''
+        self.ByPF: str = ''
+        self.FTC: str = ''
+        self.Json: str = ''
+        self.SetGlobalVar = ''
+        self.param1 = ''
+        self.Teardown: str = ''
+
         if dict_ is not None:
             self.__dict__.update(dict_)
 
@@ -100,12 +129,12 @@ class Step:
     def isTest(self, value):
         self._isTest = value
 
-    @property
-    def retry_times(self):
-        if IsNullOrEmpty(self.Retry):
-            return 0
-        else:
-            return int(self.Retry)
+    # @property
+    # def retry_times(self):
+    #     if IsNullOrEmpty(self.Retry):
+    #         return 0
+    #     else:
+    #         return int(self.Retry)
 
     @property
     def command(self):
@@ -127,44 +156,65 @@ class Step:
     def parse_var(value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
         for a in re.findall(r'<(.*?)>', value):
-            varVal = gv.get_globalVal(a)
+            # varVal = gv.get_globalVal(a)
+            varVal = getattr(gv.testGlobalVar, a)
             if varVal is None:
                 raise Exception(f'Variable:{a} not found in globalVal!!')
             else:
                 value = re.compile(f'<{a}>').sub(varVal, value, count=1)
         return value
 
+    # def set_json_start_time(self):
+    #     if IsNullOrEmpty(self.Json) and gv.startTimeJsonFlag:
+    #         gv.startTimeJson = datetime.now()
+    #         gv.startTimeJsonFlag = False
+    #     elif IsNullOrEmpty(self.Json) and not gv.startTimeJsonFlag:
+    #         pass
+    #     elif not IsNullOrEmpty(self.Json) and not gv.startTimeJsonFlag:
+    #         self.start_time_json = gv.startTimeJson
+    #         gv.startTimeJsonFlag = True
+    #     elif not IsNullOrEmpty(self.Json) and gv.startTimeJsonFlag:
+    #         self.start_time_json = datetime.now()
+
     def set_json_start_time(self):
-        if IsNullOrEmpty(self.Json) and gv.startTimeJsonFlag:
+        if IsNullOrEmpty(self.Json):
+            if not gv.startTimeJsonFlag:
+                return
             gv.startTimeJson = datetime.now()
             gv.startTimeJsonFlag = False
-        elif IsNullOrEmpty(self.Json) and not gv.startTimeJsonFlag:
-            pass
-        elif not IsNullOrEmpty(self.Json) and not gv.startTimeJsonFlag:
-            self.start_time_json = gv.startTimeJson
-            gv.startTimeJsonFlag = True
-        elif not IsNullOrEmpty(self.Json) and gv.startTimeJsonFlag:
-            self.start_time_json = datetime.now()
+        else:
+            if gv.startTimeJsonFlag:
+                self.start_time_json = datetime.now()
+            else:
+                self.start_time_json = gv.startTimeJson
+                gv.startTimeJsonFlag = True
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
         QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
                                  Qt.BlockingQueuedConnection,
                                  Q_ARG(QBrush, color),
-                                 Q_ARG(int, self.suite_index),
+                                 Q_ARG(int, self.suiteIndex),
                                  Q_ARG(int, self.index),
                                  Q_ARG(bool, False))
 
     def run(self, testSuite, suiteItem: product.SuiteItem = None):
         """run test step"""
+
+        self.SuiteName = testSuite.SuiteName
+        self.suiteIndex = testSuite.Index
+        self.suiteVar = testSuite.suiteVar
+        if IsNullOrEmpty(self.EeroName):
+            self.EeroName = self.StepName
         info = ''
         test_result = False
-        self.start_time = datetime.now()
         self.set_json_start_time()
+        self.start_time = datetime.now()
+
         try:
             if self.isTest:
                 self.setColor(Qt.yellow)
-                lg.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start {self.StepName},"
+                lg.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                 f"Keyword:{self.TestKeyword},Retry:{self.Retry},Timeout:{self.TimeOut}s,"
                                 f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
                 self.command = self.CmdOrParam
@@ -173,28 +223,35 @@ class Step:
                 if not gv.IsCycle:
                     self.setColor(Qt.gray)
                 test_result = True
-                self.stepResult = True
-                return self.stepResult
+                self.status = str(test_result)
+                return True
 
-            for retry in range(self.retry_times, -1, -1):
-                if gv.event.wait():
+            if breakpoint == str(True) or gv.pauseFlag:
+                gv.pauseFlag = True
+                # change icon ....
+                gv.pause_event.clear()
+
+            for retry in range(self.Retry, -1, -1):
+                if gv.pause_event.wait():
                     test_result, info = keyword.testKeyword(self, testSuite)
                 if test_result:
                     break
             self.setColor(Qt.green if test_result else Qt.red)
-            self._print_test_info(test_result)
-            self.stepResult = self._process_if_bypass(test_result)
-            self._set_errorCode_details(self.stepResult, info)
-            self._record_first_fail(self.stepResult)
-            self._process_json(suiteItem, test_result)
-            self._process_mesVer()
+            self.set_errorCode_details(test_result, info)
+            self.print_test_info(test_result)
+            self.process_teardown(test_result, self.Teardown)
+            self.status = self.process_if_bypass(test_result)
+            self.set_errorCode_details(True if self.status == 'True' else False, info)
+            self.record_first_fail(True if self.status == 'True' else False)
+            self.process_json(suiteItem, test_result)
+            self.process_mesVer()
         except Exception as e:
             lg.logger.exception(f"run Exception！！{e}")
             self.setColor(Qt.darkRed)
-            self.stepResult = False
-            return self.stepResult
+            self.status = False
+            return False
         else:
-            return self.stepResult
+            return True if self.status == 'True' else False
         finally:
             # record test date to DB.
             if self.isTest:
@@ -206,44 +263,50 @@ class Step:
                 with sqlite.Sqlite(gv.database_result) as db:
                     lg.logger.debug('INSERT test result to result.db table RESULT.')
                     db.execute(
-                        f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
+                        f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
+                        f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
                         f"VALUES (NULL,'{gv.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
                         f"'{gv.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
                         f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',"
                         f"'{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')")
             self._clear()
 
-    def _set_errorCode_details(self, result=False, info=''):
-        if not result:
-            if not IsNullOrEmpty(self.error_code) and not IsNullOrEmpty(self.error_details):
-                return
-            if IsNullOrEmpty(self.ErrorCode):
-                self.error_code = self.EeroName
-                self.error_details = self.EeroName
-            elif ':' in self.ErrorCode:
-                error_list = self.ErrorCode.split()
-                if len(error_list) > 1 and info == 'TooHigh':
-                    self.error_code = error_list[1].split(':')[0].strip()
-                    self.error_details = error_list[1].split(':')[1].strip()
-                else:
-                    self.error_code = error_list[0].split(':')[0].strip()
-                    self.error_details = error_list[0].split(':')[1].strip()
-            else:
-                self.error_code = self.ErrorCode
-                self.error_details = self.ErrorCode
+    def set_errorCode_details(self, result=False, info=''):
+        if result:
+            self.error_code = ''
+            self.error_details = ''
+            return
 
-    def _process_mesVer(self):
+        if IsNullOrEmpty(self.error_code) and IsNullOrEmpty(self.error_details):
+            return
+
+        if IsNullOrEmpty(self.ErrorCode):
+            self.error_code = self.EeroName
+            self.error_details = self.EeroName
+        elif ':' in self.ErrorCode:
+            error_list = self.ErrorCode.split()
+            if len(error_list) > 1 and info == 'TooHigh':
+                self.error_code = error_list[1].split(':')[0].strip()
+                self.error_details = error_list[1].split(':')[1].strip()
+            else:
+                self.error_code = error_list[0].split(':')[0].strip()
+                self.error_details = error_list[0].split(':')[1].strip()
+        else:
+            self.error_code = self.ErrorCode
+            self.error_details = self.ErrorCode
+
+    def process_mesVer(self):
         """collect data to mes"""
         if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(
                 self.testValue).lower() != 'true':
             setattr(gv.mesPhases, self.MesVar, self.testValue)
 
-    def _if_statement(self, test_result: bool):
+    def _if_statement(self, test_result: bool) -> bool:
         if self.IfElse.lower() == 'if':
             gv.IfCond = test_result
             if not test_result:
                 self.setColor('#FF99CC')
-                lg.logger.info(f"if statement fail needs to continue, setting the test result to true")
+                lg.logger.warning(f"if statement fail needs to continue, setting the test result to true")
                 test_result = True
         elif self.IfElse.lower() == 'else':
             pass
@@ -251,7 +314,7 @@ class Step:
             gv.IfCond = True
         return test_result
 
-    def _record_first_fail(self, tResult):
+    def record_first_fail(self, tResult):
         if not tResult:
             gv.failCount += 1
         else:
@@ -261,7 +324,7 @@ class Step:
             gv.error_details_first_fail = self.error_details
             gv.mesPhases.first_fail = self.SuiteName
 
-    def _process_ByPF(self, step_result):
+    def _process_ByPF(self, step_result: bool):
         if (self.ByPF.upper() == 'P' or self.ByPF.upper() == '1') and not step_result:
             self.setColor(Qt.darkGreen)
             lg.logger.warning(f"Let this step:{self.StepName} bypass.")
@@ -274,7 +337,7 @@ class Step:
             return step_result
 
     def _clear(self):
-        self.stepResult = False
+        self.stepResultxxxxx = False
         self.error_code = None
         self.error_details = None
         if not gv.IsDebug:
@@ -288,12 +351,12 @@ class Step:
         self._spec = ''
         self.status = 'exception'
 
-    def _process_if_bypass(self, test_result: bool):
+    def process_if_bypass(self, test_result: bool) -> str:
         result_if = self._if_statement(test_result)
         by_result = self._process_ByPF(result_if)
-        return by_result
+        return str(by_result)
 
-    def _print_test_info(self, tResult):
+    def print_test_info(self, tResult):
         self.elapsedTime = (datetime.now() - self.start_time).seconds
         if self.TestKeyword == 'Wait' or self.TestKeyword == 'ThreadSleep':
             return
@@ -318,7 +381,7 @@ class Step:
             gv.csv_list_result.extend([self.testValue, self.spec])
         else:
             gv.csv_list_header.append(self.EeroName)
-            gv.csv_list_result.append(self.stepResult)
+            gv.csv_list_result.append(self.stepResultxxxxx)
 
     def _copy_to(self, obj: product.StepItem):
         """copy test data to json object"""
@@ -326,7 +389,7 @@ class Step:
             obj.test_name = self.EeroName + str(gv.ForTestCycle)
         else:
             obj.test_name = self.EeroName
-        obj.status = 'passed' if self.stepResult else 'failed'
+        obj.status = 'passed' if self.stepResultxxxxx else 'failed'
         obj.test_value = self.testValue
         obj.units = self.Unit
         obj.error_code = self.error_code
@@ -341,7 +404,7 @@ class Step:
         if gv.stationObj.tests is not None:
             gv.stationObj.tests.append(obj)
 
-    def _process_json(self, suiteItem: product.SuiteItem, test_result):
+    def process_json(self, suiteItem: product.SuiteItem, test_result):
         """ according to self.json, if record test result and data into json file"""
         if self.Json is not None and self.Json.lower() == 'y':
             if self.IfElse.lower() == 'if' and not test_result:
@@ -354,11 +417,11 @@ class Step:
     def _JsonAndCsv(self, suiteItem: product.SuiteItem, test_result):
         obj = product.StepItem()
         if self.ByPF.lower() == 'f' or self.ByPF.lower() == '0':
-            self.stepResult = False
+            self.status = False
         elif self.ByPF.lower() == 'p' or self.ByPF.lower() == '1':
-            self.stepResult = True
+            self.status = True
         else:
-            self.stepResult = test_result
+            self.status = test_result
 
         if self.testValue is None:
             self.testValue = str(test_result)
@@ -367,6 +430,9 @@ class Step:
         self._collect_result()
         if suiteItem is not None:
             suiteItem.phase_items.append(obj)
+
+    def process_teardown(self, test_result, fun_invoke):
+        pass
 
 
 if __name__ == "__main__":

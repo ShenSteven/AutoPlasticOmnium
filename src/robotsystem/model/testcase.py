@@ -61,7 +61,7 @@ def init_database(database_name):
 
 
 class TestCase:
-    """testcase class,edit all testcase in a excel file, categorized by test station or testing feature in sheet."""
+    """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
     def __init__(self, testcase_path, sheetName):
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -99,11 +99,11 @@ class TestCase:
             self.tResult = False
             return self.tResult
         finally:
-            self.copy_to_station(gv.stationObj)
+            self.copy_to_json(gv.stationObj)
             self.copy_to_mes(gv.mesPhases)
             self.clear()
 
-    def copy_to_station(self, obj: product.JsonResult):
+    def copy_to_json(self, obj: product.JsonObject):
         obj.status = 'passed' if self.tResult else 'failed'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time

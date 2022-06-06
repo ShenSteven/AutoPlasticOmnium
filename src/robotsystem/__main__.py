@@ -7,13 +7,11 @@
 @Desc   : 
 """
 
-import os
 import sys
-from os.path import abspath, join, dirname
-from PyQt5.QtWidgets import QApplication, QMessageBox
-import robotsystem.ui.mainform as mf
 from traceback import format_exception
+from PyQt5.QtWidgets import QApplication, QMessageBox
 import robotsystem.conf.logprint as lg
+import robotsystem.ui.mainform as mf
 
 
 def excepthook(cls, exception, traceback):
