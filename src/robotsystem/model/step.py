@@ -35,7 +35,6 @@ class Step:
         elapsedTime = 0: 测试步骤耗时
         _isTest：bool 决定步骤是否测试，默认都测试
         _command：test command after parse variant.
-
         ### excel header variant ###
         SuiteName: str = ''：测试套名字
         StepName: str = None: 当前测试step名字
@@ -81,12 +80,10 @@ class Step:
         self.status = 'exception'  # pass/fail/exception
         self.elapsedTime = 0
         self._isTest = True
-        # self._command = ''
-        # self._spec = ''
+        self._command = ''
+        self._spec = ''
         self.Retry = 0
         self.TimeOut = 0
-        self.SPEC = ''
-        self.CmdOrParam = ''
         self.globalVar = ''
         if dict_ is not None:
             self.__dict__.update(dict_)
@@ -112,19 +109,19 @@ class Step:
 
     @property
     def command(self):
-        return Step.parse_var(self.CmdOrParam)
+        return self._command
 
-    # @command.setter
-    # def command(self, value):
-    #     self._command = Step.parse_var(value)
+    @command.setter
+    def command(self, value):
+        self._command = Step.parse_var(value)
 
     @property
     def spec(self):
-        return Step.parse_var(self.SPEC)
+        return self._spec
 
-    # @spec.setter
-    # def spec(self, value):
-    #     self._spec = Step.parse_var(value)
+    @spec.setter
+    def spec(self, value):
+        self._spec = Step.parse_var(value)
 
     @staticmethod
     def parse_var(value):
@@ -170,8 +167,8 @@ class Step:
                 lg.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start {self.StepName},"
                                 f"Keyword:{self.TestKeyword},Retry:{self.Retry},Timeout:{self.TimeOut}s,"
                                 f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
-                # self.command = self.CmdOrParam
-                # self.spec = self.SPEC
+                self.command = self.CmdOrParam
+                self.spec = self.SPEC
             else:
                 if not gv.IsCycle:
                     self.setColor(Qt.gray)
