@@ -13,7 +13,7 @@ station:
     fix_com_baudRate: 115200
     GPIB_address: 9
     testcase: testcase.xlsx
-    prompt: root@OpenWrt:/#
+    #prompt: root@OpenWrt:/#
     fail_continue: false
     mes_shop_floor: 10.90.104.126:8080
     mes_result: 10.90.104.104:8080
@@ -21,7 +21,10 @@ station:
     csv_column: csv_column.txt
     continue_fail_limit: 3
     setTimeZone:
+    pop_fix: true
+    auto_scan: false
 dut:
+    prompt: root@OpenWrt:/#
     dut_ip: 192.168.1.101
     dut_com_port: COM7
     dut_com_baudRate: 115200

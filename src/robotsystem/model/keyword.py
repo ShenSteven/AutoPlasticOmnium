@@ -177,12 +177,12 @@ def testKeyword(item, testSuite):
 
         elif item.TestKeyword == 'TelnetLogin':
             if gv.dut_comm is None:
-                gv.dut_comm = TelnetComm(gv.dut_ip, gv.cf.station.prompt)
-            rReturn = gv.dut_comm.open(gv.cf.station.prompt)
+                gv.dut_comm = TelnetComm(gv.dut_ip, gv.cf.dut.prompt)
+            rReturn = gv.dut_comm.open(gv.cf.dut.prompt)
 
         elif item.TestKeyword == 'TelnetAndSendCmd':
-            temp = TelnetComm(item.param1, gv.cf.station.prompt)
-            if temp.open(gv.cf.station.prompt) and \
+            temp = TelnetComm(item.param1, gv.cf.dut.prompt)
+            if temp.open(gv.cf.dut.prompt) and \
                     temp.SendCommand(item.ComdOrParam, item.ExpectStr, item.TimeOut)[0]:
                 return True
 

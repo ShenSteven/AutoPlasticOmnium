@@ -23,7 +23,6 @@ class StationConf:
     fix_com_baudRate: int
     GPIB_address: int
     testcase: str
-    prompt: str
     fail_continue: bool
     mes_shop_floor: str
     mes_result: str
@@ -37,6 +36,7 @@ class StationConf:
 
 
 class DutConf:
+    prompt: str
     dut_ip: str
     dut_com_port: str
     dut_com_baudRate: int
