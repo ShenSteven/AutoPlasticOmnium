@@ -21,7 +21,7 @@ current_dir = robotsystem.current_dir
 config_yaml_path = join(current_dir, 'conf', 'config.yaml')
 logging_yaml = join(current_dir, 'conf', 'logging.yaml')
 cf = robotsystem.conf.config.read_config(config_yaml_path, robotsystem.conf.config.Configs)  # load test global variable
-tableWidgetHeader = ["SN", "StepName", "Spec", "LSL", "Value", "USL", "ElapsedTime", "StartTime", "Result"]
+tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
 
 SN = ''
 dut_ip = ''

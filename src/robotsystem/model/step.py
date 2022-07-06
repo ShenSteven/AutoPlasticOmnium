@@ -58,17 +58,14 @@ class Step:
         MesVar: str = None: 上传MES信息的变量名字
         ByPF: str = None: 手动人为控制测试结果 1=pass，0||空=fail
         FTC: str = None: 失败继续 fail to continue。1=继续，0||空=不继续
-        TestKeyword: str = None: 测试步骤对应的关键字，执行对应关键字下的代码段
+        Keyword: str = None: 测试步骤对应的关键字，执行对应关键字下的代码段
         Json: str = None: 测试结果是否生成Json数据上传给客户
         EeroName: str = None: 客户定义的测试步骤名字
         param1: str = None
     """
-    # Retry: int
-    # TimeOut: int
-    # suiteIndex: int
-    index: int
 
     def __init__(self, dict_=None):
+        # self.IfElse = None
         self.suiteIndex: int = 0
         self.index: int = 0
         # self.stepResult = False
@@ -81,18 +78,17 @@ class Step:
         self.status: str = 'exception'  # pass/fail/exception
         self.elapsedTime = 0
         self._isTest = True
-        self._command = ''
-        self._spec = ''
+        # self._command = ''
+        # self._spec = ''
         self.suiteVar = ''
-
         self.SuiteName: str = ''
         self.StepName: str = ''
         self.EeroName: str = ''
-        self.TestKeyword: str = ''
+        self.Keyword: str = ''
         self.ErrorCode: str = ''
         self.ErrorDetails: str = ''
-        self.Retry: int = 0
-        self.TimeOut: int = 0
+        self.Retry: str = ''
+        self.TimeOut: str = ''
         self.IfElse: str = ''
         self.For: str = ''
         self.SubStr1: str = ''
@@ -110,8 +106,8 @@ class Step:
         self.ByPF: str = ''
         self.FTC: str = ''
         self.Json: str = ''
-        self.SetGlobalVar = ''
-        self.param1 = ''
+        self.SetGlobalVar: str = ''
+        self.param1: str = ''
         self.Teardown: str = ''
 
         if dict_ is not None:
@@ -129,39 +125,40 @@ class Step:
     def isTest(self, value):
         self._isTest = value
 
-    # @property
-    # def retry_times(self):
-    #     if IsNullOrEmpty(self.Retry):
-    #         return 0
-    #     else:
-    #         return int(self.Retry)
+    @property
+    def retry(self):
+        if IsNullOrEmpty(self.Retry):
+            return 0
+        else:
+            return int(self.Retry)
 
     @property
     def command(self):
-        return self._command
+        return Step.parse_var(self.CmdOrParam)
 
-    @command.setter
-    def command(self, value):
-        self._command = Step.parse_var(value)
+    # @command.setter
+    # def command(self, value):
+    #     self._command = Step.parse_var(value)
 
     @property
     def spec(self):
-        return self._spec
+        return Step.parse_var(self.SPEC)
 
-    @spec.setter
-    def spec(self, value):
-        self._spec = Step.parse_var(value)
+    # @spec.setter
+    # def spec(self, value):
+    #     self._spec = Step.parse_var(value)
 
     @staticmethod
     def parse_var(value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
         for a in re.findall(r'<(.*?)>', value):
-            # varVal = gv.get_globalVal(a)
+            # varVal = gv.get_global_val(a)
             varVal = getattr(gv.testGlobalVar, a)
             if varVal is None:
                 raise Exception(f'Variable:{a} not found in globalVal!!')
             else:
                 value = re.compile(f'<{a}>').sub(varVal, value, count=1)
+
         return value
 
     # def set_json_start_time(self):
@@ -202,7 +199,7 @@ class Step:
         """run test step"""
 
         self.SuiteName = testSuite.SuiteName
-        self.suiteIndex = testSuite.Index
+        self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
         if IsNullOrEmpty(self.EeroName):
             self.EeroName = self.StepName
@@ -215,10 +212,10 @@ class Step:
             if self.isTest:
                 self.setColor(Qt.yellow)
                 lg.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
-                                f"Keyword:{self.TestKeyword},Retry:{self.Retry},Timeout:{self.TimeOut}s,"
+                                f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.TimeOut}s,"
                                 f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
-                self.command = self.CmdOrParam
-                self.spec = self.SPEC
+                # self.command = self.CmdOrParam
+                # self.spec = self.SPEC
             else:
                 if not gv.IsCycle:
                     self.setColor(Qt.gray)
@@ -231,7 +228,7 @@ class Step:
                 # change icon ....
                 gv.pause_event.clear()
 
-            for retry in range(self.Retry, -1, -1):
+            for retry in range(self.retry, -1, -1):
                 if gv.pause_event.wait():
                     test_result, info = keyword.testKeyword(self, testSuite)
                 if test_result:
@@ -269,7 +266,7 @@ class Step:
                         f"'{gv.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
                         f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',"
                         f"'{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')")
-            self._clear()
+            self.clear()
 
     def set_errorCode_details(self, result=False, info=''):
         if result:
@@ -336,8 +333,8 @@ class Step:
         else:
             return step_result
 
-    def _clear(self):
-        self.stepResultxxxxx = False
+    def clear(self):
+        # self.stepResultxxxxx = False
         self.error_code = None
         self.error_details = None
         if not gv.IsDebug:
@@ -347,8 +344,8 @@ class Step:
         # self.start_time = None
         # self.finish_time = None
         # start_time_json = None
-        self._command = ''
-        self._spec = ''
+        # self._command = ''
+        # self._spec = ''
         self.status = 'exception'
 
     def process_if_bypass(self, test_result: bool) -> str:
@@ -358,18 +355,17 @@ class Step:
 
     def print_test_info(self, tResult):
         self.elapsedTime = (datetime.now() - self.start_time).seconds
-        if self.TestKeyword == 'Wait' or self.TestKeyword == 'ThreadSleep':
+        if self.Keyword == 'Wait' or self.Keyword == 'ThreadSleep':
             return
+        result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}us," \
+                      f"Symptom:{self.error_code}:{self.error_details}," \
+                      f"spec:{self.spec},Min:{self.LSL},Value:{self.testValue},Max:{self.USL}"
         if tResult:
             self.status = 'pass'
-            lg.logger.info(f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}us,"
-                           f"Symptom:{self.error_code}:{self.error_details},"
-                           f"spec:{self.spec},Min:{self.LSL},Value:{self.testValue},Max:{self.USL}")
+            lg.logger.info(result_info)
         else:
             self.status = 'fail'
-            lg.logger.error(f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}us,"
-                            f"Symptom:{self.error_code}:{self.error_details},"
-                            f"spec:{self.spec},Min:{self.LSL},Value:{self.testValue},Max:{self.USL}")
+            lg.logger.error(result_info)
 
     def _collect_result(self):
         """collect test result and data into csv file"""

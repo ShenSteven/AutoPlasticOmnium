@@ -157,42 +157,42 @@ def testKeyword(item, testSuite):
     compInfo = ''
     # gv.main_form.testSequences[item.suite_index].globalVar = item.globalVar
     try:
-        if item.TestKeyword == 'Sleep':
+        if item.Keyword == 'Sleep':
             lg.logger.debug(f'sleep {item.TimeOut}s')
             time.sleep(item.TimeOut)
             rReturn = True
 
-        elif item.TestKeyword == 'KillProcess':
+        elif item.Keyword == 'KillProcess':
             rReturn = kill_process(item.ComdOrParam)
 
-        elif item.TestKeyword == 'StartProcess':
+        elif item.Keyword == 'StartProcess':
             rReturn = start_process(item.ComdOrParam, item.ExpectStr)
 
-        elif item.TestKeyword == 'RestartProcess':
+        elif item.Keyword == 'RestartProcess':
             rReturn = restart_process(item.ComdOrParam, item.ExpectStr)
 
-        elif item.TestKeyword == 'PingDUT':
+        elif item.Keyword == 'PingDUT':
             run_cmd('arp -d')
             rReturn = ping(item.ComdOrParam)
 
-        elif item.TestKeyword == 'TelnetLogin':
+        elif item.Keyword == 'TelnetLogin':
             if gv.dut_comm is None:
-                gv.dut_comm = TelnetComm(gv.dut_ip, gv.cf.station.prompt)
-            rReturn = gv.dut_comm.open(gv.cf.station.prompt)
+                gv.dut_comm = TelnetComm(gv.dut_ip, gv.cf.dut.prompt)
+            rReturn = gv.dut_comm.open(gv.cf.dut.prompt)
 
-        elif item.TestKeyword == 'TelnetAndSendCmd':
-            temp = TelnetComm(item.param1, gv.cf.station.prompt)
-            if temp.open(gv.cf.station.prompt) and \
+        elif item.Keyword == 'TelnetAndSendCmd':
+            temp = TelnetComm(item.param1, gv.cf.dut.prompt)
+            if temp.open(gv.cf.dut.prompt) and \
                     temp.SendCommand(item.ComdOrParam, item.ExpectStr, item.TimeOut)[0]:
                 return True
 
-        elif item.TestKeyword == 'SerialPortOpen':
+        elif item.Keyword == 'SerialPortOpen':
             if gv.dut_comm is None:
                 if not IsNullOrEmpty(item.ComdOrParam):
                     gv.dut_comm = SerialPort(item.ComdOrParam, int(item.ExpectStr))
             rReturn = gv.dut_comm.open()
 
-        elif item.TestKeyword == 'CloseDUTCOMM':
+        elif item.Keyword == 'CloseDUTCOMM':
             if gv.dut_comm is not None:
                 gv.dut_comm.close()
                 rReturn = True
