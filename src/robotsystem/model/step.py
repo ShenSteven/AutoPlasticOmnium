@@ -65,10 +65,9 @@ class Step:
     """
 
     def __init__(self, dict_=None):
-        # self.IfElse = None
+        self.ForCycleCounter = 1
         self.suiteIndex: int = 0
         self.index: int = 0
-        # self.stepResult = False
         self.testValue = None
         self.start_time = None
         self.finish_time = None
@@ -78,9 +77,8 @@ class Step:
         self.status: str = 'exception'  # pass/fail/exception
         self.elapsedTime = 0
         self._isTest = True
-        # self._command = ''
-        # self._spec = ''
         self.suiteVar = ''
+        # Excel Column
         self.SuiteName: str = ''
         self.StepName: str = ''
         self.EeroName: str = ''
@@ -98,6 +96,7 @@ class Step:
         self.ExpectStr: str = ''
         self.CheckStr1: str = ''
         self.CheckStr2: str = ''
+        self.NoContain: str = ''
         self.SPEC: str = ''
         self.LSL: str = ''
         self.USL: str = ''
@@ -108,7 +107,7 @@ class Step:
         self.Json: str = ''
         self.SetGlobalVar: str = ''
         self.param1: str = ''
-        self.Teardown: str = ''
+        self.TearDown: str = ''
 
         if dict_ is not None:
             self.__dict__.update(dict_)
@@ -159,19 +158,9 @@ class Step:
             else:
                 value = re.compile(f'<{a}>').sub(varVal, value, count=1)
 
+        if value == 'quit' or value == '0x03':
+            value = chr(0x03).encode('utf8')
         return value
-
-    # def set_json_start_time(self):
-    #     if IsNullOrEmpty(self.Json) and gv.startTimeJsonFlag:
-    #         gv.startTimeJson = datetime.now()
-    #         gv.startTimeJsonFlag = False
-    #     elif IsNullOrEmpty(self.Json) and not gv.startTimeJsonFlag:
-    #         pass
-    #     elif not IsNullOrEmpty(self.Json) and not gv.startTimeJsonFlag:
-    #         self.start_time_json = gv.startTimeJson
-    #         gv.startTimeJsonFlag = True
-    #     elif not IsNullOrEmpty(self.Json) and gv.startTimeJsonFlag:
-    #         self.start_time_json = datetime.now()
 
     def set_json_start_time(self):
         if IsNullOrEmpty(self.Json):
@@ -197,10 +186,10 @@ class Step:
 
     def run(self, testSuite, suiteItem: product.SuiteItem = None):
         """run test step"""
-
         self.SuiteName = testSuite.SuiteName
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
+        self.ForCycleCounter = testSuite.ForCycleCounter
         if IsNullOrEmpty(self.EeroName):
             self.EeroName = self.StepName
         info = ''
@@ -214,8 +203,7 @@ class Step:
                 lg.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                 f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.TimeOut}s,"
                                 f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
-                # self.command = self.CmdOrParam
-                # self.spec = self.SPEC
+                self.init_online_limit()
             else:
                 if not gv.IsCycle:
                     self.setColor(Qt.gray)
@@ -226,7 +214,10 @@ class Step:
             if breakpoint == str(True) or gv.pauseFlag:
                 gv.pauseFlag = True
                 # change icon ....
+                # robotsystem.ui.mainform.MainForm.main_for
                 gv.pause_event.clear()
+            else:
+                gv.pause_event.set()
 
             for retry in range(self.retry, -1, -1):
                 if gv.pause_event.wait():
@@ -236,11 +227,11 @@ class Step:
             self.setColor(Qt.green if test_result else Qt.red)
             self.set_errorCode_details(test_result, info)
             self.print_test_info(test_result)
-            self.process_teardown(test_result, self.Teardown)
+            self.process_teardown(test_result)
             self.status = self.process_if_bypass(test_result)
             self.set_errorCode_details(True if self.status == 'True' else False, info)
             self.record_first_fail(True if self.status == 'True' else False)
-            self.process_json(suiteItem, test_result)
+            self.generate_report(test_result, suiteItem)
             self.process_mesVer()
         except Exception as e:
             lg.logger.exception(f"run Exception！！{e}")
@@ -250,13 +241,14 @@ class Step:
         else:
             return True if self.status == 'True' else False
         finally:
+            if not IsNullOrEmpty(self.SetGlobalVar):
+                if bool(self.status):
+                    setattr(gv.testGlobalVar, self.SetGlobalVar, self.testValue)
+                    lg.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
+                else:
+                    lg.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             # record test date to DB.
-            if self.isTest:
-                self.elapsedTime = (datetime.now() - self.start_time).seconds
-                robotsystem.ui.mainform.MainForm.my_signals.update_tableWidget.emit(
-                    [gv.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
-                     self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if test_result else 'Fail'])
-            if not test_result:
+            if self.Json.lower() == 'y':
                 with sqlite.Sqlite(gv.database_result) as db:
                     lg.logger.debug('INSERT test result to result.db table RESULT.')
                     db.execute(
@@ -294,6 +286,8 @@ class Step:
 
     def process_mesVer(self):
         """collect data to mes"""
+        if self.Json.lower() == 'y' and IsNullOrEmpty(self.MesVar):
+            self.MesVar = self.EeroName
         if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(
                 self.testValue).lower() != 'true':
             setattr(gv.mesPhases, self.MesVar, self.testValue)
@@ -322,11 +316,11 @@ class Step:
             gv.mesPhases.first_fail = self.SuiteName
 
     def _process_ByPF(self, step_result: bool):
-        if (self.ByPF.upper() == 'P' or self.ByPF.upper() == '1') and not step_result:
+        if (self.ByPF.upper() == 'P') and not step_result:
             self.setColor(Qt.darkGreen)
             lg.logger.warning(f"Let this step:{self.StepName} bypass.")
             return True
-        elif (self.ByPF.upper() == 'F' or self.ByPF.upper() == '0') and step_result:
+        elif (self.ByPF.upper() == 'F') and step_result:
             self.setColor(Qt.darkRed)
             lg.logger.warning(f"Let this step:{self.StepName} by fail.")
             return False
@@ -334,18 +328,12 @@ class Step:
             return step_result
 
     def clear(self):
-        # self.stepResultxxxxx = False
         self.error_code = None
         self.error_details = None
         if not gv.IsDebug:
             self.isTest = True
         self.testValue = None
         self.elapsedTime = 0
-        # self.start_time = None
-        # self.finish_time = None
-        # start_time_json = None
-        # self._command = ''
-        # self._spec = ''
         self.status = 'exception'
 
     def process_if_bypass(self, test_result: bool) -> str:
@@ -355,38 +343,46 @@ class Step:
 
     def print_test_info(self, tResult):
         self.elapsedTime = (datetime.now() - self.start_time).seconds
-        if self.Keyword == 'Wait' or self.Keyword == 'ThreadSleep':
+        if self.Keyword == 'Waiting':
             return
         result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}us," \
                       f"Symptom:{self.error_code}:{self.error_details}," \
                       f"spec:{self.spec},Min:{self.LSL},Value:{self.testValue},Max:{self.USL}"
         if tResult:
-            self.status = 'pass'
             lg.logger.info(result_info)
         else:
-            self.status = 'fail'
             lg.logger.error(result_info)
+        if self.Json.lower() == 'y':
+            self.elapsedTime = (datetime.now() - self.start_time).seconds
+            robotsystem.ui.mainform.MainForm.my_signals.update_tableWidget.emit(
+                [gv.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
+                 self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
-    def _collect_result(self):
+    def report_to_csv(self, name):
         """collect test result and data into csv file"""
+        if name in gv.csv_list_header:
+            return
         if not IsNullOrEmpty(self.USL) or not IsNullOrEmpty(self.LSL):
-            gv.csv_list_header.extend([self.EeroName, f"{self.EeroName}_LIMIT_MIN", f"{self.EeroName}_LIMIT_MAX"])
+            gv.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
             gv.csv_list_result.extend([self.testValue, self.LSL, self.USL])
         elif not IsNullOrEmpty(self.spec):
-            gv.csv_list_header.extend([self.EeroName, f"{self.EeroName}_SPEC"])
+            gv.csv_list_header.extend([name, f"{name}_SPEC"])
             gv.csv_list_result.extend([self.testValue, self.spec])
         else:
-            gv.csv_list_header.append(self.EeroName)
-            gv.csv_list_result.append(self.stepResultxxxxx)
+            gv.csv_list_header.append(name)
+            gv.csv_list_result.append(self.testValue)
 
-    def _copy_to(self, obj: product.StepItem):
+    def report_to_json(self, testResult, suiteItem: product.SuiteItem = None):
         """copy test data to json object"""
+        if self.status == str(False):
+            self.start_time_json = gv.startTimeJson
+        obj = product.StepItem()
         if self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(gv.ForTestCycle)
+            obj.test_name = self.EeroName + str(self.ForCycleCounter)
         else:
             obj.test_name = self.EeroName
-        obj.status = 'passed' if self.stepResultxxxxx else 'failed'
-        obj.test_value = self.testValue
+        obj.status = 'passed' if testResult else 'failed'
+        obj.test_value = str(testResult) if self.testValue is None else self.testValue
         obj.units = self.Unit
         obj.error_code = self.error_code
         obj.start_time = self.start_time_json.strftime('%Y-%m-%d %H:%M:%S')
@@ -394,40 +390,40 @@ class Step:
         obj.finish_time = self.finish_time
         obj.lower_limit = self.LSL
         obj.upper_limit = self.USL
-        if not IsNullOrEmpty(self.spec) and '<' not in self.SPEC \
-                and '>' not in self.SPEC and IsNullOrEmpty(self.LSL):
+        if not IsNullOrEmpty(self.SPEC) and IsNullOrEmpty(self.LSL):
             obj.lower_limit = self.spec
+        # update gv.stationObj.tests json item
         if gv.stationObj.tests is not None:
+            for item in gv.stationObj.tests:
+                if item.test_name == obj.test_name:
+                    gv.stationObj.tests.remove(item)
+                    lg.logger.debug(f"update testName:{obj.test_name} in json report.")
+                    break
             gv.stationObj.tests.append(obj)
-
-    def process_json(self, suiteItem: product.SuiteItem, test_result):
-        """ according to self.json, if record test result and data into json file"""
-        if self.Json is not None and self.Json.lower() == 'y':
-            if self.IfElse.lower() == 'if' and not test_result:
-                return
-            else:
-                self._JsonAndCsv(suiteItem, test_result)
-        elif not test_result or self.ByPF.lower() == 'f' or self.ByPF.lower() == '0':
-            self._JsonAndCsv(suiteItem, test_result)
-
-    def _JsonAndCsv(self, suiteItem: product.SuiteItem, test_result):
-        obj = product.StepItem()
-        if self.ByPF.lower() == 'f' or self.ByPF.lower() == '0':
-            self.status = False
-        elif self.ByPF.lower() == 'p' or self.ByPF.lower() == '1':
-            self.status = True
-        else:
-            self.status = test_result
-
-        if self.testValue is None:
-            self.testValue = str(test_result)
-
-        self._copy_to(obj)
-        self._collect_result()
+        # update suiteItem.phase_items json item
         if suiteItem is not None:
+            for item in suiteItem.phase_items:
+                if item.test_name == obj.test_name:
+                    suiteItem.phase_items.remove(item)
+                    lg.logger.debug(f"update testName:{obj.test_name} in json report.")
+                    break
             suiteItem.phase_items.append(obj)
 
-    def process_teardown(self, test_result, fun_invoke):
+        return obj
+
+    def generate_report(self, test_result, suiteItem: product.SuiteItem):
+        """ according to self.json, if record test result and data into json file"""
+        if self.Json is not None and self.Json.lower() == 'y':
+            obj = self.report_to_json(test_result, suiteItem)
+            self.report_to_csv(obj.test_name)
+        elif not test_result or self.ByPF.lower() == 'f':
+            obj = self.report_to_json(test_result, suiteItem)
+            self.report_to_csv(obj.test_name)
+
+    def process_teardown(self, test_result):
+        pass
+
+    def init_online_limit(self):
         pass
 
 

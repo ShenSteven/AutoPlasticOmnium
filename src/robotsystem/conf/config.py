@@ -49,6 +49,7 @@ class DutConf:
     sn_len: int
     qsdk_ver: str
     test_mode: str
+    debug_skip: list
 
     def __init__(self, dict_):
         self.__dict__.update(dict_)

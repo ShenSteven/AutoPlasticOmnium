@@ -33,8 +33,8 @@ class SerialPort(CommAbstract):
         self.ser.read()
 
     def write(self, date: str):
-        date_bytes = date.encode('utf-8')
-        self.ser.write(date_bytes)
+        # date_bytes = date.encode('utf-8')
+        self.ser.write(date.encode('utf-8'))
 
     def SendCommand(self, command, exceptStr, timeout=10, newline=True):
 

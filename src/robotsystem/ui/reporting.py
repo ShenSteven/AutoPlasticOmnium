@@ -37,6 +37,7 @@ def check_connection(url):
 
 
 def upload_Json_to_client(url, log_path):
+    return  True
     """上传json内容和测试log到客户服务器"""
     json_upload_path = os.path.join(gv.logFolderPath, 'Json', f'{gv.SN}_{time.strftime("%H%M%S")}.json')
     gv.jsonOfResult = json_upload_path

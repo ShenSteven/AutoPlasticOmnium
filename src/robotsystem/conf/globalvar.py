@@ -30,7 +30,6 @@ MesMac = 'FF:FF:FF:FF:FF'
 WorkOrder = '1'
 dut_model = 'unknown'
 
-
 error_code_first_fail = ''
 error_details_first_fail = ''
 version = robotsystem.about['__version__']
@@ -42,9 +41,11 @@ txtLogPath = ''
 jsonOfResult = ''
 csv_list_header = []
 csv_list_result = []
+ArrayListDaq = []
 
 dut_comm = None
 FixSerialPort: None
+PLin: None
 
 IsDebug = False
 startFlag = False
@@ -73,7 +74,6 @@ mes_result = ''
 shop_floor_url = ''
 database_setting = rf'{current_dir}\conf\setting.db'
 database_result = rf'{current_dir}\OutPut\result.db'
-
 
 continue_fail_count = 0
 total_pass_count = 0

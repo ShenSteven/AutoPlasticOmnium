@@ -14,6 +14,7 @@ from . import product
 from . import sqlite
 import robotsystem.conf.globalvar as gv
 import robotsystem.conf.logprint as lg
+from inspect import currentframe, getframeinfo
 
 
 def init_database(database_name):
@@ -57,19 +58,22 @@ def init_database(database_name):
                                              );''')
                 print(f"Table created successfully")
     except Exception as e:
-        lg.logger.exception(f'init_database:{e}')
+        lg.logger.exception(f'{currentframe().f_code.co_name}:{e}')
 
 
 class TestCase:
     """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
-    def __init__(self, testcase_path, sheetName):
+    def __init__(self, testcase_path, sheet_name):
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = ''
         self.tResult = True
-        self.sheetName = sheetName
+        self.sheetName = sheet_name
         self.testcase_path = testcase_path
         self.test_script_json = gv.test_script_json
+        self.ForStartSuiteNo = 0
+        self.ForFlag = False
+        self.Finished = False
         init_database(gv.database_setting)
         if os.path.exists(self.test_script_json):
             self.original_suites = loadseq.load_testcase_from_json(self.test_script_json)
@@ -83,25 +87,31 @@ class TestCase:
         suite_result_list = []
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
-                if gv.ForFlag:
-                    i = gv.ForStartSuiteNo
-                    stepNo = gv.ForStartStepNo
-                suite_result = self.clone_suites[i].run(global_fail_continue, stepNo)
+                if self.ForFlag:
+                    i = self.ForStartSuiteNo
+                    stepNo = self.clone_suites[i].ForStartStepNo
+                else:
+                    stepNo = -1
+                suite_result = self.clone_suites[i].run(self, global_fail_continue, stepNo)
                 suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break
+                if self.ForFlag and i == (len(self.clone_suites) - 1):
+                    i = - 1
 
             self.tResult = all(suite_result_list)
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return self.tResult
         except Exception as e:
-            lg.logger.exception(f"run Exception！！{e}")
+            lg.logger.exception(f'{currentframe().f_code.co_name}:{e}')
             self.tResult = False
             return self.tResult
         finally:
             self.copy_to_json(gv.stationObj)
             self.copy_to_mes(gv.mesPhases)
             self.clear()
+            self.teardown()
+            self.Finished = True
 
     def copy_to_json(self, obj: product.JsonObject):
         obj.status = 'passed' if self.tResult else 'failed'
@@ -119,6 +129,13 @@ class TestCase:
 
     def clear(self):
         self.tResult = True
+
+    def teardown(self):
+        if gv.dut_comm is not None:
+            gv.dut_comm.close()
+        if gv.cf.station.fix_flag and gv.cf.station.pop_fix and gv.FixSerialPort is not None:
+            gv.FixSerialPort.open()
+            gv.FixSerialPort.sendCommand('AT+TESTEND%', )
 
     if __name__ == "__main__":
         pass

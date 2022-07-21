@@ -31,25 +31,25 @@ def excel_convert_to_json(testcase_path_excel, all_stations):
     lg.logger.debug("convert finish!")
 
 
-def load_testcase_from_excel(testcase_path, sheetName, test_script_path) -> list:
+def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> list:
     """load test sequence form a sheet in Excel and return the suites sequences list,
-       if success,serialize the suites list to json.
+    if success,serialize the suites list to json.
     :param testcase_path: the path of Excel
-    :param sheetName: the sheet test_name of Excel
+    :param sheet_name: the sheet test_name of Excel
     :param test_script_path:  serialize and save to json path
     :return : temp_suite[] list
     """
     workbook = None
     temp_suite = None
     suites_list = []
-    itemHeader = []
+    item_header = []
     temp_suite_name = ""
     try:
         lg.logger.debug('start load_testcase_from_excel...')
         workbook = load_workbook(testcase_path, read_only=True)
-        worksheet = workbook[sheetName]
+        worksheet = workbook[sheet_name]
         for i in list(worksheet.rows)[0]:  # 获取表头，第一行
-            itemHeader.append(i.value)
+            item_header.append(i.value)
 
         for i in range(1, worksheet.max_row):  # 一行行的读取excel
             line = list(worksheet.rows)[i]
@@ -61,11 +61,11 @@ def load_testcase_from_excel(testcase_path, sheetName, test_script_path) -> list
                 suites_list.append(temp_suite)
             # 给step对象属性赋值
             test_step = step.Step()
-            for header, cell in dict(zip(itemHeader, line)).items():
+            for header, cell in dict(zip(item_header, line)).items():
                 test_step.index = temp_suite.totalNumber
                 test_step.suiteIndex = temp_suite.index
-                setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
-                # setattr(test_step, header, cell.value)
+                # setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
+                setattr(test_step, header, cell.value)
                 test_step.SuiteName = temp_suite_name
 
             temp_suite.totalNumber += 1
@@ -74,7 +74,7 @@ def load_testcase_from_excel(testcase_path, sheetName, test_script_path) -> list
         lg.logger.critical(f"load testcase fail！{e}")
         sys.exit(e.__context__)
     else:
-        serializeToJson(suites_list, test_script_path)
+        serialize_to_json(suites_list, test_script_path)
         return suites_list
     finally:
         workbook.close()
@@ -138,7 +138,7 @@ def wrapper_save_sha256(fun):
 
 
 @wrapper_save_sha256
-def serializeToJson(obj, json_path):
+def serialize_to_json(obj, json_path):
     """serialize obj to json and encrypt.
     :param obj: the object you want to serialize
     :param json_path: the path of json

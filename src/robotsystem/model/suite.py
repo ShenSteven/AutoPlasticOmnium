@@ -10,18 +10,21 @@ import re
 from datetime import datetime
 from PyQt5.QtCore import Qt, Q_ARG, QMetaObject
 from PyQt5.QtGui import QBrush
+
+# from robotsystem.model.testcase import TestCase
 from . import product
 from . import step
 from .basicfunc import IsNullOrEmpty
 import robotsystem.conf.globalvar as gv
 import robotsystem.conf.logprint as lg
 import robotsystem.ui.mainform
+import robotsystem.model.testcase
 
 
 def fail_continue(test_step: step.Step, failContinue):
-    if test_step.FTC.lower() == 'n' or test_step.FTC.lower() == 'no' or test_step.FTC.lower() == '0':
+    if test_step.FTC.lower() == 'n':
         return False
-    elif test_step.FTC.lower() == 'y' or test_step.FTC.lower() == 'yes' or test_step.FTC.lower() == '1':
+    elif test_step.FTC.lower() == 'y':
         return True
     else:
         return failContinue
@@ -43,10 +46,13 @@ class TestSuite:
         self.error_code = None
         self.phase_details = None
         self.elapsedTime = None
+        self.ForStartStepNo = 0
+        self._forTotalCycle = 0
+        self.ForCycleCounter = 1
         if dict_ is not None:
             self.__dict__.update(dict_)
 
-    def run(self, global_fail_continue, stepNo=-1):
+    def run(self, test_case, global_fail_continue, stepNo=-1):
         """
         run test suite.
         :param global_fail_continue: a boolean indicate step or continue when test fail.
@@ -69,7 +75,7 @@ class TestSuite:
                     i = stepNo
                     stepNo = -1
 
-                self.process_for(self.steps[i])
+                self.process_for(test_case, self.steps[i])
                 # 把测试套的全局变量赋值给下面的测试步骤
                 # if not IsNullOrEmpty(self.suiteVar):
                 step_item.suiteVar = self.suiteVar
@@ -79,7 +85,7 @@ class TestSuite:
                 if not step_result and not fail_continue(self.steps[i], global_fail_continue):
                     break
 
-                if TestSuite.process_EndFor(self.steps[i]):
+                if self.process_EndFor(test_case, self.steps[i]):
                     break
 
             self.suiteResult = all(step_result_list)
@@ -123,28 +129,28 @@ class TestSuite:
         else:
             lg.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime}")
 
-    def process_for(self, step_item: step.Step):
+    def process_for(self, test_case, step_item: step.Step):
         """FOR 循环开始判断"""
         if not IsNullOrEmpty(step_item.For) and '(' in step_item.For and ')' in step_item.For:
             gv.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
-            gv.ForStartSuiteNo = self.index
-            gv.ForStartStepNo = step_item.index
-            gv.ForFlag = False
+            test_case.ForStartSuiteNo = self.index
+            self.ForStartStepNo = step_item.index
+            test_case.ForFlag = False
             lg.logger.debug(f"====================Start Cycle-{gv.ForTestCycle}===========================")
 
-    @staticmethod
-    def process_EndFor(step_item: step.Step):
+    # @staticmethod
+    def process_EndFor(self, test_case, step_item: step.Step):
         """FOR 循环结束判断"""
         if not IsNullOrEmpty(step_item.For) and step_item.For.lower().startswith('end'):
             if gv.ForTestCycle < gv.ForTotalCycle:
-                gv.ForFlag = True
-                gv.ForTestCycle += 1
+                test_case.ForFlag = True
+                self.ForCycleCounter += 1
                 return True
-            else:
-                gv.ForFlag = False
-                lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForTestCycle}) Cycle test." + '=' * 10)
-                gv.ForTestCycle = 1
-                return False
+
+            test_case.ForFlag = False
+            lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForTestCycle}) Cycle test." + '=' * 10)
+            self.ForCycleCounter = 1
+            return False
         else:
             return False
 

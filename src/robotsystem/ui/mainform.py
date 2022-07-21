@@ -21,9 +21,11 @@ import robotsystem.model.product
 import robotsystem.model.testcase
 import robotsystem.model.loadseq
 import robotsystem.model.sqlite
-import robotsystem.sockets.serialport
+import robotsystem.model.testglobalvar
 from robotsystem.model.basicfunc import IsNullOrEmpty
+import robotsystem.sockets.serialport
 from robotsystem.ui.reporting import upload_Json_to_client, upload_result_to_mes, CollectResultToCsv, saveTestResult
+from inspect import currentframe
 
 
 # pyrcc5 images.qrc -o images.py
@@ -42,26 +44,15 @@ class MySignals(QObject):
     """自定义信号类"""
     loadseq = pyqtSignal(str)
     update_tableWidget = pyqtSignal((list,), (str,))
-    # update_treeWidgetItem_backColor = pyqtSignal([QBrush, int, int, bool])
     updateLabel = pyqtSignal([QLabel, str, int, QBrush], [QLabel, str, int], [QLabel, str])
-    timing = pyqtSignal(bool)
-    textEditClear = pyqtSignal()
-    lineEditEnable = pyqtSignal(bool)
-    setIcon = pyqtSignal(QAction, QIcon)
-    updateStatusBar = pyqtSignal()
-    updateAction = pyqtSignal([QAction, QIcon, str], [QAction, QIcon])
+    timingSignal = pyqtSignal(bool)
+    textEditClearSignal = pyqtSignal(str)
+    lineEditEnableSignal = pyqtSignal(bool)
+    setIconSignal = pyqtSignal(QAction, QIcon)
+    updateStatusBarSignal = pyqtSignal(str)
+    updateActionSignal = pyqtSignal([QAction, QIcon, str], [QAction, QIcon])
+    saveTextEditSignal = pyqtSignal(str)
     # showMessageBox = pyqtSignal([str, str, int])
-    saveTextEdit = pyqtSignal()
-
-
-def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
-    def thread_update():
-        label.setText(str_)
-        if color is not None:
-            label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
-
-    thread = Thread(target=thread_update)
-    thread.start()
 
 
 def init_create_dirs():
@@ -73,9 +64,11 @@ def init_create_dirs():
     os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
 
 
-def on_setIcon(action_, icon: QIcon):
+def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
     def thread_update():
-        action_.setIcon(icon)
+        label.setText(str_)
+        if color is not None:
+            label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
 
     thread = Thread(target=thread_update)
     thread.start()
@@ -93,13 +86,20 @@ def updateAction(action_, icon: QIcon = None, text: str = None):
 
 
 def UpdateContinueFail(testResult: bool):
-    pass
     if gv.IsDebug or gv.cf.dut.test_mode.lower() == 'debug':
         return
     if testResult:
         gv.continue_fail_count = 0
     else:
         gv.continue_fail_count += 1
+
+
+def on_setIcon(action_, icon: QIcon):
+    def thread_update():
+        action_.setIcon(icon)
+
+    thread = Thread(target=thread_update)
+    thread.start()
 
 
 def on_actionConfig():
@@ -156,6 +156,7 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.timer = None
         self.ui = loadUi(join(dirname(abspath(__file__)), 'main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         init_create_dirs()
@@ -176,7 +177,6 @@ class MainForm(QWidget):
         self.ShowTreeView(self.testSequences)
         gv.testThread = Thread(target=self.test_thread, daemon=True)
         gv.testThread.start()
-        self.test()
 
     def init_textEditHandler(self):
         """create log handler for textEdit"""
@@ -270,29 +270,28 @@ class MainForm(QWidget):
 
     def init_signals_connect(self):
         """connect signals to slots"""
-        self.my_signals.timing[bool].connect(self.timing)
+        self.my_signals.timingSignal[bool].connect(self.timing)
         self.my_signals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
         self.my_signals.updateLabel[QLabel, str, int].connect(update_label)
         self.my_signals.updateLabel[QLabel, str].connect(update_label)
-        self.my_signals.update_tableWidget[list].connect(self.update_tableWidget)
-        self.my_signals.update_tableWidget[str].connect(self.update_tableWidget)
-        self.my_signals.textEditClear.connect(self.on_textEditClear)
-        self.my_signals.lineEditEnable[bool].connect(self.lineEditEnable)
-        self.my_signals.setIcon[QAction, QIcon].connect(on_setIcon)
-        self.my_signals.updateAction[QAction, QIcon].connect(updateAction)
-        self.my_signals.updateAction[QAction, QIcon, str].connect(updateAction)
-        self.my_signals.updateStatusBar.connect(self.updateStatusBar)
-        # self.my_signals.update_treeWidgetItem_backColor[QBrush, int, int, bool].connect(self.update_treeWidgetItem_backColor)
+        self.my_signals.update_tableWidget[list].connect(self.on_update_tableWidget)
+        self.my_signals.update_tableWidget[str].connect(self.on_update_tableWidget)
+        self.my_signals.textEditClearSignal[str].connect(self.on_textEditClear)
+        self.my_signals.lineEditEnableSignal[bool].connect(self.lineEditEnable)
+        self.my_signals.setIconSignal[QAction, QIcon].connect(on_setIcon)
+        self.my_signals.updateActionSignal[QAction, QIcon].connect(updateAction)
+        self.my_signals.updateActionSignal[QAction, QIcon, str].connect(updateAction)
+        self.my_signals.updateStatusBarSignal[str].connect(self.updateStatusBar)
+        self.my_signals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
         # self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
-        self.my_signals.saveTextEdit.connect(self.on_actionSaveLog)
 
-        self.ui.actionCheckAll.triggered.connect(self.handle_actionCheckAll)
-        self.ui.actionUncheckAll.triggered.connect(self.handle_actionUncheckAll)
-        self.ui.actionStepping.triggered.connect(self.handle_actionStepping)
-        self.ui.actionLooping.triggered.connect(self.handle_actionLooping)
-        self.ui.actionEditStep.triggered.connect(self.handle_actionEditStep)
-        self.ui.actionExpandAll.triggered.connect(self.handle_actionExpandAll)
-        self.ui.actionCollapseAll.triggered.connect(self.handle_actionCollapseAll)
+        self.ui.actionCheckAll.triggered.connect(self.on_actionCheckAll)
+        self.ui.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
+        self.ui.actionStepping.triggered.connect(self.on_actionStepping)
+        self.ui.actionLooping.triggered.connect(self.on_actionLooping)
+        self.ui.actionEditStep.triggered.connect(self.on_actionEditStep)
+        self.ui.actionExpandAll.triggered.connect(self.on_actionExpandAll)
+        self.ui.actionCollapseAll.triggered.connect(self.on_actionCollapseAll)
 
         self.ui.actionOpen_TestCase.triggered.connect(self.on_actionOpen_TestCase)
         self.ui.actionConvertExcelToJson.triggered.connect(self.on_actionConvertExcelToJson)
@@ -320,6 +319,14 @@ class MainForm(QWidget):
         self.ui.treeWidget.itemPressed.connect(self.on_itemActivated)
         self.ui.tableWidget_2.itemChanged.connect(self.on_tableWidget2Edit)
 
+    def init_treeWidget_color(self):
+        self.ui.treeWidget.blockSignals(True)
+        for i, item in enumerate(self.testSequences):
+            self.ui.treeWidget.topLevelItem(i).setBackground(0, Qt.white)
+            for j in range(len(self.testSequences[i].steps)):
+                self.ui.treeWidget.topLevelItem(i).child(j).setBackground(0, Qt.white)
+        self.ui.treeWidget.blockSignals(False)
+
     def on_itemActivated(self, item, column=0):
         if item.parent() is None:
             # lg.logger.critical('itemActivate')
@@ -341,6 +348,355 @@ class MainForm(QWidget):
             cc = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
             anchor = f'testStep:{pp}-{cc}'
             self.ui.textEdit.scrollToAnchor(anchor)
+
+    def on_tableWidget_clear(self):
+        for i in range(0, self.ui.tableWidget.rowCount()):
+            self.ui.tableWidget.removeRow(0)
+
+    def on_update_tableWidget(self, result_tuple):
+        def thread_update_tableWidget():
+            if isinstance(result_tuple, list):
+                row_cnt = self.ui.tableWidget.rowCount()
+                self.ui.tableWidget.insertRow(row_cnt)
+                column_cnt = self.ui.tableWidget.columnCount()
+                for column in range(column_cnt):
+                    if IsNullOrEmpty(result_tuple[column]):
+                        result_tuple[column] = '--'
+                    item = QTableWidgetItem(str(result_tuple[column]))
+                    if 'false' in str(result_tuple[-1]).lower() or 'fail' in str(result_tuple[-1]).lower():
+                        item.setForeground(Qt.red)
+                        # item.setFont(QFont('Times', 12, QFont.Black))
+                    self.ui.tableWidget.setItem(row_cnt, column, item)
+                    self.ui.tableWidget.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
+                # self.ui.tableWidget.resizeColumnsToContents()
+                self.ui.tableWidget.scrollToItem(self.ui.tableWidget.item(row_cnt - 1, 0),
+                                                 hint=QAbstractItemView.EnsureVisible)
+                # clear all rows if var is str
+            elif isinstance(result_tuple, str):
+                for i in range(0, self.ui.tableWidget.rowCount()):
+                    self.ui.tableWidget.removeRow(0)
+            QApplication.processEvents()
+
+        thread = Thread(target=thread_update_tableWidget)
+        thread.start()
+
+    def on_reloadSeqs(self):
+        def thread_convert_and_load_script():
+            lg.logger.debug('start reload script...')
+            if os.path.exists(gv.test_script_json):
+                os.chmod(gv.test_script_json, stat.S_IWRITE)
+                os.remove(gv.test_script_json)
+            self.testcase = robotsystem.model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
+            self.testSequences = self.testcase.clone_suites
+
+        thread = Thread(target=thread_convert_and_load_script)
+        thread.start()
+        thread.join()
+        if self.testSequences is not None:
+            self.ShowTreeView(self.testSequences, gv.IsDebug)
+        lg.logger.debug('reload finish!')
+
+    def on_itemChanged(self, item, column=0):
+        if gv.startFlag:
+            return
+        if item.parent() is None:
+            pNo = self.ui.treeWidget.indexOfTopLevelItem(item)
+            isChecked = item.checkState(column) == Qt.Checked
+            self.testcase.clone_suites[pNo].isTest = isChecked
+            self.ui.treeWidget.blockSignals(True)
+            for i in range(0, item.childCount()):
+                item.child(i).setCheckState(column, Qt.Checked if isChecked else Qt.Unchecked)
+                self.testcase.clone_suites[pNo].steps[i].isTest = isChecked
+            self.ui.treeWidget.blockSignals(False)
+        else:
+            ParentIsTest = []
+            pNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
+            cNO = item.parent().indexOfChild(item)
+            self.testcase.clone_suites[pNo].steps[cNO].isTest = item.checkState(column) == Qt.Checked
+            for i in range(item.parent().childCount()):
+                isChecked = item.parent().child(i).checkState(column) == Qt.Checked
+                ParentIsTest.append(isChecked)
+            isChecked_parent = any(ParentIsTest)
+            self.ui.treeWidget.blockSignals(True)
+            self.testcase.clone_suites[pNo].isTest = isChecked_parent
+            item.parent().setCheckState(column, Qt.Checked if isChecked_parent else Qt.Unchecked)
+            self.ui.treeWidget.blockSignals(False)
+
+    def on_treeWidgetMenu(self):
+        if gv.IsDebug:
+            menu = QMenu(self.ui.treeWidget)
+            menu.addAction(self.ui.actionStepping)
+            menu.addAction(self.ui.actionEditStep)
+            menu.addAction(self.ui.actionLooping)
+            menu.addAction(self.ui.actionCheckAll)
+            menu.addAction(self.ui.actionUncheckAll)
+            menu.addAction(self.ui.actionExpandAll)
+            menu.addAction(self.ui.actionCollapseAll)
+            menu.exec_(QCursor.pos())
+
+    def on_actionCheckAll(self):
+        self.ShowTreeView(self.testSequences, True)
+
+    def on_actionUncheckAll(self):
+        self.ShowTreeView(self.testSequences, False)
+
+    def on_actionStepping(self):
+        self.on_returnPressed('stepping')
+
+    def on_actionLooping(self):
+        gv.FailNumOfCycleTest = 0
+        gv.PassNumOfCycleTest = 0
+        gv.IsCycle = True
+        self.on_returnPressed()
+
+    def on_actionOpen_TestCase(self):
+        def thread_actionOpen_TestCase():
+            os.startfile(self.testcase.testcase_path)
+
+        thread = Thread(target=thread_actionOpen_TestCase)
+        thread.start()
+
+    def on_actionConvertExcelToJson(self):
+        thread = Thread(
+            target=robotsystem.model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
+                                                                          gv.cf.station.station_all))
+        thread.start()
+
+    def on_actionOpenScript(self):
+        def actionOpenScript():
+            os.startfile(self.testcase.test_script_json)
+
+        thread = Thread(target=actionOpenScript)
+        thread.start()
+
+    def on_actionSaveToScript(self):
+        thread = Thread(target=robotsystem.model.loadseq.serialize_to_json,
+                        args=(self.testcase.clone_suites, gv.test_script_json))
+        thread.start()
+
+    def on_actionPrivileges(self):
+        if gv.IsDebug:
+            QMessageBox.information(self, 'Authority', 'This is lab test privileges.', QMessageBox.Yes)
+        else:
+            QMessageBox.information(self, 'Authority', 'This is factory test privileges.', QMessageBox.Yes)
+
+    def on_actionStart(self):
+        if gv.startFlag:
+            if not gv.pauseFlag:
+                gv.pauseFlag = True
+                self.ui.actionStart.setIcon(QIcon(':/images/Start-icon.png'))
+                gv.pause_event.clear()
+            else:
+                gv.pauseFlag = False
+                self.ui.actionStart.setIcon(QIcon(':/images/Pause-icon.png'))
+                gv.pause_event.set()
+        else:
+            self.on_returnPressed()
+
+    def on_actionStop(self):
+        if gv.startFlag:
+            if gv.FailNumOfCycleTest == 0:
+                gv.finalTestResult = True
+                self.SetTestStatus(TestStatus.PASS)
+            else:
+                self.SetTestStatus(TestStatus.FAIL)
+            gv.IsCycle = False
+
+    def on_actionClearLog(self):
+        if not gv.startFlag:
+            self.ui.textEdit.clear()
+
+    def on_actionSaveLog(self, info):
+        def thread_update():
+            gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_' \
+                            rf'{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
+            content = self.ui.textEdit.toPlainText()
+            with open(gv.txtLogPath, 'wb') as f:
+                f.write(content.encode('utf8'))
+            lg.logger.debug(f"Save test log OK.{gv.txtLogPath}")
+
+        thread = Thread(target=thread_update)
+        thread.start()
+
+    def on_actionEnable_lab(self):
+        gv.IsDebug = True
+        self.ui.actionPrivileges.setIcon(QIcon(':/images/lab-icon.png'))
+        self.debug_switch(gv.IsDebug)
+
+    def on_actionDisable_factory(self):
+        gv.IsDebug = False
+        self.ui.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
+        self.debug_switch(gv.IsDebug)
+
+    def on_actionAbout(self):
+        QMessageBox.about(self, 'About', 'Python3.8+PyQt5\nTechnical support: StevenShen\nWeChat:chenhlzqbx')
+
+    def debug_switch(self, isDebug: bool):
+        self.ui.actionConvertExcelToJson.setEnabled(isDebug)
+        self.ui.actionSaveToScript.setEnabled(isDebug)
+        self.ui.actionReloadScript.setEnabled(isDebug)
+        self.ui.actionStart.setEnabled(isDebug)
+        self.ui.actionStop.setEnabled(isDebug)
+        self.ui.actionClearLog.setEnabled(isDebug)
+        self.ui.actionSaveLog.setEnabled(isDebug)
+        self.ui.actionConfig.setEnabled(isDebug)
+
+    def on_actionEditStep(self):
+        self.ui.tableWidget_2.blockSignals(True)
+        if self.ui.tabWidget.currentIndex() != 1:
+            self.ui.tabWidget.setCurrentIndex(1)
+        for i in range(0, self.ui.tableWidget_2.rowCount()):
+            self.ui.tableWidget_2.removeRow(0)
+        step_obj = self.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo]
+        for prop_name in list(dir(step_obj)):
+            prop_value = getattr(step_obj, prop_name)
+            if isinstance(prop_value, str) and not prop_name.startswith('_'):
+                column_cnt = self.ui.tableWidget_2.columnCount()
+                row_cnt = self.ui.tableWidget_2.rowCount()
+                self.ui.tableWidget_2.insertRow(row_cnt)
+                key_pairs = [prop_name, prop_value]
+                for column in range(column_cnt):
+                    self.ui.tableWidget_2.horizontalHeader().setSectionResizeMode(column,
+                                                                                  QHeaderView.ResizeToContents)
+                    item = QTableWidgetItem(key_pairs[column])
+                    if column == 0:
+                        item.setFlags(Qt.ItemIsEnabled)
+                        item.setBackground(Qt.lightGray)
+                    self.ui.tableWidget_2.setItem(row_cnt, column, item)
+        self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
+        self.ui.tableWidget_2.blockSignals(False)
+
+    def on_tableWidget2Edit(self, item):
+        prop_name = self.ui.tableWidget_2.item(item.row(), item.column() - 1).text()
+        prop_value = item.text()
+        setattr(self.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo], prop_name, prop_value)
+
+    def on_actionExpandAll(self):
+        self.ui.treeWidget.expandAll()
+        self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(0), hint=QAbstractItemView.EnsureVisible)
+
+    def on_actionCollapseAll(self):
+        self.ui.treeWidget.collapseAll()
+
+    def ShowTreeView(self, sequences=None, checkall=True):
+        if sequences is None:
+            return
+        self.ui.treeWidget.blockSignals(True)
+        self.ui.treeWidget.clear()
+        self.ui.treeWidget.setHeaderLabel(f'{gv.cf.station.station_no}')
+        for suite in sequences:
+            suite_node = QTreeWidgetItem(self.ui.treeWidget)
+            suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. {suite.SuiteName}')
+            suite_node.setIcon(0, QIcon(':/images/folder-icon.png'))
+            if checkall:
+                suite_node.setCheckState(0, Qt.Checked)
+                suite.isTest = True
+            else:
+                suite_node.setCheckState(0, Qt.Unchecked)
+                suite.isTest = False
+            if gv.IsDebug:
+                suite_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+            else:
+                suite_node.setFlags(Qt.ItemIsSelectable)
+            for step in suite.steps:
+                step_node = QTreeWidgetItem(suite_node)
+                step_node.setData(0, Qt.DisplayRole, f'{step.index + 1}) {step.StepName}')
+                if checkall:
+                    step_node.setCheckState(0, Qt.Checked)
+                    step.isTest = True
+                else:
+                    step_node.setCheckState(0, Qt.Unchecked)
+                    step.isTest = False
+                if gv.IsDebug:
+                    step_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                else:
+                    step_node.setFlags(Qt.ItemIsSelectable)
+                step_node.setIcon(0, QIcon(':/images/Document-txt-icon.png'))
+                suite_node.addChild(step_node)
+        self.ui.treeWidget.setStyle(QStyleFactory.create('windows'))
+        self.ui.treeWidget.resizeColumnToContents(0)
+        self.ui.treeWidget.topLevelItem(0).setExpanded(True)
+        self.ui.treeWidget.blockSignals(False)
+
+    @QtCore.pyqtSlot(QBrush, int, int, bool)
+    def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
+        if stepNo_ == -1:
+            if gv.IsCycle or not gv.startFlag:
+                return
+            self.ui.treeWidget.topLevelItem(suiteNO_).setExpanded(True)
+            self.ui.treeWidget.topLevelItem(suiteNO_).setBackground(0, color)
+            if allChild:
+                for i in range(self.ui.treeWidget.topLevelItem(suiteNO_).childCount()):
+                    self.ui.treeWidget.topLevelItem(suiteNO_).child(i).setBackground(0, color)
+        else:
+            self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
+            self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
+                                            hint=QAbstractItemView.EnsureVisible)
+        QApplication.processEvents()
+
+    @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
+    def showMessageBox(self, title, text, level):
+        if level == 0:
+            return QMessageBox.information(self, title, text, QMessageBox.Yes)
+        elif level == 1:
+            return QMessageBox.warning(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        elif level == 2:
+            aa = QMessageBox.question(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            lg.logger.debug(aa)
+            return aa
+        elif level == 3:
+            return QMessageBox.about(self, title, text)
+        else:
+            return QMessageBox.critical(self, title, text, QMessageBox.Yes)
+
+    def lineEditEnable(self, isEnable):
+        def thread_update():
+            self.ui.lineEdit.setEnabled(isEnable)
+            if isEnable:
+                self.ui.lineEdit.setText('')
+                self.ui.lineEdit.setFocus()
+
+        thread = Thread(target=thread_update)
+        thread.start()
+
+    def on_textEditClear(self, info):
+        lg.logger.debug(f'{currentframe().f_code.co_name}:{info}')
+        self.ui.textEdit.clear()
+
+    def updateStatusBar(self, info):
+        def update_status_bar():
+            lg.logger.debug(f'{currentframe().f_code.co_name}:{info}')
+            with robotsystem.model.sqlite.Sqlite(gv.database_setting) as db:
+                db.execute(f"UPDATE COUNT SET VALUE='{gv.continue_fail_count}' where NAME ='continue_fail_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_pass_count}' where NAME ='total_pass_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_fail_count}' where NAME ='total_fail_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_abort_count}' where NAME ='total_abort_count'")
+            self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.continue_fail_count}')
+            self.ui.lb_count_pass.setText(f'PASS: {gv.total_pass_count}')
+            self.ui.lb_count_fail.setText(f'FAIL: {gv.total_fail_count}')
+            self.ui.lb_count_abort.setText(f'ABORT: {gv.total_abort_count}')
+            try:
+                self.ui.lb_count_yield.setText('Yield: {:.2%}'.format(gv.total_pass_count / (
+                        gv.total_pass_count + gv.total_fail_count + gv.total_abort_count)))
+            except ZeroDivisionError:
+                self.ui.lb_count_yield.setText('Yield: 0.00%')
+            QApplication.processEvents()
+
+        thread = Thread(target=update_status_bar)
+        thread.start()
+
+    def timerEvent(self, a):
+        self.my_signals.updateLabel[QLabel, str, int].emit(self.ui.lb_errorCode, str(self.sec), 20)
+        QApplication.processEvents()
+        self.sec += 1
+
+    def timing(self, flag):
+        if flag:
+            lg.logger.debug('start timing...')
+            self.timer = self.startTimer(1000)
+        else:
+            lg.logger.debug('stop timing...')
+            self.killTimer(self.timer)
 
     def get_stationNo(self):
         """通过串口读取治具中设置的测试工站名字"""
@@ -443,19 +799,18 @@ class MainForm(QWidget):
         gv.SN = self.ui.lineEdit.text()
         self.variable_init()
 
-    def init_treeWidget_color(self):
-        self.ui.treeWidget.blockSignals(True)
-        for i, item in enumerate(self.testSequences):
-            self.ui.treeWidget.topLevelItem(i).setBackground(0, Qt.white)
-            for j in range(len(self.testSequences[i].steps)):
-                self.ui.treeWidget.topLevelItem(i).child(j).setBackground(0, Qt.white)
-        self.ui.treeWidget.blockSignals(False)
-
     def variable_init(self):
         """测试变量初始化"""
         if not gv.testThread.is_alive():
             gv.testThread = Thread(target=self.test_thread, daemon=True)
             gv.testThread.start()
+
+        if gv.SingleStepTest and self.testcase.Finished:
+            pass
+        else:
+            gv.testGlobalVar = robotsystem.model.testglobalvar.TestGlobalVar(gv.cf.station.station_name,
+                                                                             gv.cf.station.station_no, gv.SN,
+                                                                             gv.cf.dut.dut_ip, gv.cf.station.log_folder)
         gv.stationObj = robotsystem.model.product.JsonObject(gv.SN, gv.cf.station.station_no,
                                                              gv.cf.dut.test_mode,
                                                              gv.cf.dut.qsdk_ver, gv.version)
@@ -489,13 +844,14 @@ class MainForm(QWidget):
             if status == TestStatus.START:
                 self.main_form.ui.treeWidget.blockSignals(True)
                 if not gv.SingleStepTest:
-                    self.my_signals.textEditClear.emit()
-                self.my_signals.lineEditEnable[bool].emit(False)
+                    self.my_signals.textEditClearSignal[str].emit('')
+                self.my_signals.lineEditEnableSignal[bool].emit(False)
                 self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'Testing', 36, Qt.yellow)
                 self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode, '', 20, Qt.yellow)
-                self.my_signals.timing[bool].emit(True)
+                self.my_signals.timingSignal[bool].emit(True)
                 gv.startTime = datetime.now()
-                self.my_signals.setIcon[QAction, QIcon].emit(self.ui.actionStart, QIcon(':/images/Pause-icon.png'))
+                self.my_signals.setIconSignal[QAction, QIcon].emit(self.ui.actionStart,
+                                                                   QIcon(':/images/Pause-icon.png'))
                 gv.startFlag = True
                 lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
                                 f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
@@ -530,7 +886,8 @@ class MainForm(QWidget):
         finally:
             try:
                 if status != TestStatus.START:
-                    self.my_signals.setIcon[QAction, QIcon].emit(self.ui.actionStart, QIcon(':/images/Start-icon.png'))
+                    self.my_signals.setIconSignal[QAction, QIcon].emit(self.ui.actionStart,
+                                                                       QIcon(':/images/Start-icon.png'))
                     if gv.dut_comm is not None:
                         gv.dut_comm.close()
                     if gv.cf.station.fix_flag:
@@ -541,372 +898,21 @@ class MainForm(QWidget):
             finally:
                 try:
                     if status != TestStatus.START:
-                        self.my_signals.lineEditEnable[bool].emit(True)
-                        self.my_signals.updateStatusBar.emit()
+                        self.my_signals.lineEditEnableSignal[bool].emit(True)
+                        self.my_signals.updateStatusBarSignal[str].emit('')
                         # save config/
                         # gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
-                        self.my_signals.saveTextEdit.emit()
+                        self.my_signals.saveTextEditSignal[str].emit('')
                         if not gv.finalTestResult:
                             self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode,
                                                                                        gv.error_details_first_fail, 20,
                                                                                        Qt.red)
-                        self.my_signals.timing[bool].emit(False)
+                        self.my_signals.timingSignal[bool].emit(False)
                         lg.logger.debug(f"Test end,ElapsedTime:{self.sec}s.")
                         gv.startFlag = False
                         self.main_form.ui.treeWidget.blockSignals(False)
                 except Exception as e:
                     lg.logger.exception(f"SetTestStatus Exception！！{e}")
-
-    def on_tableWidget_clear(self):
-        for i in range(0, self.ui.tableWidget.rowCount()):
-            self.ui.tableWidget.removeRow(0)
-
-    def update_tableWidget(self, result_tuple):
-        def thread_update_tableWidget():
-            if isinstance(result_tuple, list):
-                row_cnt = self.ui.tableWidget.rowCount()
-                self.ui.tableWidget.insertRow(row_cnt)
-                column_cnt = self.ui.tableWidget.columnCount()
-                for column in range(column_cnt):
-                    if IsNullOrEmpty(result_tuple[column]):
-                        result_tuple[column] = '--'
-                    item = QTableWidgetItem(str(result_tuple[column]))
-                    if 'false' in str(result_tuple[-1]).lower() or 'fail' in str(result_tuple[-1]).lower():
-                        item.setForeground(Qt.red)
-                        # item.setFont(QFont('Times', 12, QFont.Black))
-                    self.ui.tableWidget.setItem(row_cnt, column, item)
-                    self.ui.tableWidget.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
-                # self.ui.tableWidget.resizeColumnsToContents()
-                self.ui.tableWidget.scrollToItem(self.ui.tableWidget.item(row_cnt - 1, 0),
-                                                 hint=QAbstractItemView.EnsureVisible)
-                # clear all rows if var is str
-            elif isinstance(result_tuple, str):
-                for i in range(0, self.ui.tableWidget.rowCount()):
-                    self.ui.tableWidget.removeRow(0)
-            QApplication.processEvents()
-
-        thread = Thread(target=thread_update_tableWidget)
-        thread.start()
-
-    def on_reloadSeqs(self):
-        def thread_convert_and_load_script():
-            lg.logger.debug('start reload script...')
-            if os.path.exists(gv.test_script_json):
-                os.chmod(gv.test_script_json, stat.S_IWRITE)
-                os.remove(gv.test_script_json)
-            self.testcase = robotsystem.model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
-            self.testSequences = self.testcase.clone_suites
-
-        thread = Thread(target=thread_convert_and_load_script)
-        thread.start()
-        thread.join()
-        if self.testSequences is not None:
-            self.ShowTreeView(self.testSequences, gv.IsDebug)
-        lg.logger.debug('reload finish!')
-
-    def on_itemChanged(self, item, column=0):
-        if gv.startFlag:
-            return
-        if item.parent() is None:
-            pNo = self.ui.treeWidget.indexOfTopLevelItem(item)
-            isChecked = item.checkState(column) == Qt.Checked
-            self.testcase.clone_suites[pNo].isTest = isChecked
-            self.ui.treeWidget.blockSignals(True)
-            for i in range(0, item.childCount()):
-                item.child(i).setCheckState(column, Qt.Checked if isChecked else Qt.Unchecked)
-                self.testcase.clone_suites[pNo].steps[i].isTest = isChecked
-            self.ui.treeWidget.blockSignals(False)
-        else:
-            ParentIsTest = []
-            pNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
-            cNO = item.parent().indexOfChild(item)
-            self.testcase.clone_suites[pNo].steps[cNO].isTest = item.checkState(column) == Qt.Checked
-            for i in range(item.parent().childCount()):
-                isChecked = item.parent().child(i).checkState(column) == Qt.Checked
-                ParentIsTest.append(isChecked)
-            isChecked_parent = any(ParentIsTest)
-            self.ui.treeWidget.blockSignals(True)
-            self.testcase.clone_suites[pNo].isTest = isChecked_parent
-            item.parent().setCheckState(column, Qt.Checked if isChecked_parent else Qt.Unchecked)
-            self.ui.treeWidget.blockSignals(False)
-
-    def on_treeWidgetMenu(self):
-        if gv.IsDebug:
-            menu = QMenu(self.ui.treeWidget)
-            menu.addAction(self.ui.actionStepping)
-            menu.addAction(self.ui.actionEditStep)
-            menu.addAction(self.ui.actionLooping)
-            menu.addAction(self.ui.actionCheckAll)
-            menu.addAction(self.ui.actionUncheckAll)
-            menu.addAction(self.ui.actionExpandAll)
-            menu.addAction(self.ui.actionCollapseAll)
-            menu.exec_(QCursor.pos())
-
-    def handle_actionCheckAll(self):
-        self.ShowTreeView(self.testSequences, True)
-
-    def handle_actionUncheckAll(self):
-        self.ShowTreeView(self.testSequences, False)
-
-    def handle_actionStepping(self):
-        self.on_returnPressed('stepping')
-
-    def handle_actionLooping(self):
-        gv.FailNumOfCycleTest = 0
-        gv.PassNumOfCycleTest = 0
-        gv.IsCycle = True
-        self.on_returnPressed()
-
-    def on_actionOpen_TestCase(self):
-        def thread_actionOpen_TestCase():
-            os.startfile(self.testcase.testcase_path)
-
-        thread = Thread(target=thread_actionOpen_TestCase)
-        thread.start()
-
-    def on_actionConvertExcelToJson(self):
-        thread = Thread(
-            target=robotsystem.model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
-                                                                          gv.cf.station.station_all))
-        thread.start()
-
-    def on_actionOpenScript(self):
-        def actionOpenScript():
-            os.startfile(self.testcase.test_script_json)
-
-        thread = Thread(target=actionOpenScript)
-        thread.start()
-
-    def on_actionSaveToScript(self):
-        thread = Thread(target=robotsystem.model.loadseq.serializeToJson,
-                        args=(self.testcase.clone_suites, gv.test_script_json))
-        thread.start()
-
-    def on_actionPrivileges(self):
-        if gv.IsDebug:
-            QMessageBox.information(self, 'Authority', 'This is lab test privileges.', QMessageBox.Yes)
-        else:
-            QMessageBox.information(self, 'Authority', 'This is factory test privileges.', QMessageBox.Yes)
-
-    def on_actionStart(self):
-        if gv.startFlag:
-            if not gv.pauseFlag:
-                gv.pauseFlag = True
-                self.ui.actionStart.setIcon(QIcon(':/images/Start-icon.png'))
-                gv.pause_event.clear()
-            else:
-                gv.pauseFlag = False
-                self.ui.actionStart.setIcon(QIcon(':/images/Pause-icon.png'))
-                gv.pause_event.set()
-        else:
-            self.on_returnPressed()
-
-    def on_actionStop(self):
-        if gv.startFlag:
-            if gv.FailNumOfCycleTest == 0:
-                gv.finalTestResult = True
-                self.SetTestStatus(TestStatus.PASS)
-            else:
-                self.SetTestStatus(TestStatus.FAIL)
-            gv.IsCycle = False
-
-    def on_actionClearLog(self):
-        if not gv.startFlag:
-            self.ui.textEdit.clear()
-
-    def on_actionSaveLog(self):
-        def thread_update():
-            # if not gv.startFlag:
-            gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
-            content = self.ui.textEdit.toPlainText()
-            with open(gv.txtLogPath, 'wb') as f:
-                f.write(content.encode('utf8'))
-            lg.logger.debug(f"Save test log OK.{gv.txtLogPath}")
-
-        thread = Thread(target=thread_update)
-        thread.start()
-
-    def on_actionEnable_lab(self):
-        gv.IsDebug = True
-        self.ui.actionPrivileges.setIcon(QIcon(':/images/lab-icon.png'))
-        self.debug_switch(gv.IsDebug)
-
-    def on_actionDisable_factory(self):
-        gv.IsDebug = False
-        self.ui.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
-        self.debug_switch(gv.IsDebug)
-
-    def on_actionAbout(self):
-        QMessageBox.about(self, 'About', 'Python3.8+PyQt5\nTechnical support: StevenShen\nWeChat:chenhlzqbx')
-
-    def debug_switch(self, isDebug: bool):
-        self.ui.actionConvertExcelToJson.setEnabled(isDebug)
-        self.ui.actionSaveToScript.setEnabled(isDebug)
-        self.ui.actionReloadScript.setEnabled(isDebug)
-        self.ui.actionStart.setEnabled(isDebug)
-        self.ui.actionStop.setEnabled(isDebug)
-        self.ui.actionClearLog.setEnabled(isDebug)
-        self.ui.actionSaveLog.setEnabled(isDebug)
-        self.ui.actionConfig.setEnabled(isDebug)
-
-    def handle_actionEditStep(self):
-        self.ui.tableWidget_2.blockSignals(True)
-        if self.ui.tabWidget.currentIndex() != 1:
-            self.ui.tabWidget.setCurrentIndex(1)
-        for i in range(0, self.ui.tableWidget_2.rowCount()):
-            self.ui.tableWidget_2.removeRow(0)
-        step_obj = self.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo]
-        for prop_name in list(dir(step_obj)):
-            prop_value = getattr(step_obj, prop_name)
-            if isinstance(prop_value, str) and not prop_name.startswith('_'):
-                column_cnt = self.ui.tableWidget_2.columnCount()
-                row_cnt = self.ui.tableWidget_2.rowCount()
-                self.ui.tableWidget_2.insertRow(row_cnt)
-                key_pairs = [prop_name, prop_value]
-                for column in range(column_cnt):
-                    self.ui.tableWidget_2.horizontalHeader().setSectionResizeMode(column,
-                                                                                  QHeaderView.ResizeToContents)
-                    item = QTableWidgetItem(key_pairs[column])
-                    if column == 0:
-                        item.setFlags(Qt.ItemIsEnabled)
-                        item.setBackground(Qt.lightGray)
-                    self.ui.tableWidget_2.setItem(row_cnt, column, item)
-        self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
-        self.ui.tableWidget_2.blockSignals(False)
-
-    def on_tableWidget2Edit(self, item):
-        prop_name = self.ui.tableWidget_2.item(item.row(), item.column() - 1).text()
-        prop_value = item.text()
-        setattr(self.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo], prop_name, prop_value)
-
-    def handle_actionExpandAll(self):
-        self.ui.treeWidget.expandAll()
-        self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(0), hint=QAbstractItemView.EnsureVisible)
-
-    def handle_actionCollapseAll(self):
-        self.ui.treeWidget.collapseAll()
-
-    def ShowTreeView(self, sequences=None, checkall=True):
-        if sequences is None:
-            return
-        self.ui.treeWidget.blockSignals(True)
-        self.ui.treeWidget.clear()
-        self.ui.treeWidget.setHeaderLabel(f'{gv.cf.station.station_no}')
-        for suite in sequences:
-            suite_node = QTreeWidgetItem(self.ui.treeWidget)
-            suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. {suite.SuiteName}')
-            suite_node.setIcon(0, QIcon(':/images/folder-icon.png'))
-            if checkall:
-                suite_node.setCheckState(0, Qt.Checked)
-                suite.isTest = True
-            else:
-                suite_node.setCheckState(0, Qt.Unchecked)
-                suite.isTest = False
-            if gv.IsDebug:
-                suite_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-            else:
-                suite_node.setFlags(Qt.ItemIsSelectable)
-            for step in suite.steps:
-                step_node = QTreeWidgetItem(suite_node)
-                step_node.setData(0, Qt.DisplayRole, f'{step.index + 1}) {step.StepName}')
-                if checkall:
-                    step_node.setCheckState(0, Qt.Checked)
-                    step.isTest = True
-                else:
-                    step_node.setCheckState(0, Qt.Unchecked)
-                    step.isTest = False
-                if gv.IsDebug:
-                    step_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-                else:
-                    step_node.setFlags(Qt.ItemIsSelectable)
-                step_node.setIcon(0, QIcon(':/images/Document-txt-icon.png'))
-                suite_node.addChild(step_node)
-        self.ui.treeWidget.setStyle(QStyleFactory.create('windows'))
-        self.ui.treeWidget.resizeColumnToContents(0)
-        self.ui.treeWidget.topLevelItem(0).setExpanded(True)
-        self.ui.treeWidget.blockSignals(False)
-
-    @QtCore.pyqtSlot(QBrush, int, int, bool)
-    def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
-        pass
-        if stepNo_ == -1:
-            if gv.IsCycle or not gv.startFlag:
-                return
-            self.ui.treeWidget.topLevelItem(suiteNO_).setExpanded(True)
-            self.ui.treeWidget.topLevelItem(suiteNO_).setBackground(0, color)
-            if allChild:
-                for i in range(self.ui.treeWidget.topLevelItem(suiteNO_).childCount()):
-                    self.ui.treeWidget.topLevelItem(suiteNO_).child(i).setBackground(0, color)
-        else:
-            self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
-            self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
-                                            hint=QAbstractItemView.EnsureVisible)
-        QApplication.processEvents()
-
-    @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
-    def showMessageBox(self, title, text, level):
-        if level == 0:
-            return QMessageBox.information(self, title, text, QMessageBox.Yes)
-        elif level == 1:
-            return QMessageBox.warning(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        elif level == 2:
-            aa = QMessageBox.question(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            lg.logger.debug(aa)
-            return aa
-        elif level == 3:
-            return QMessageBox.about(self, title, text, QMessageBox.Ok)
-        else:
-            return QMessageBox.critical(self, title, text, QMessageBox.Yes)
-
-    def lineEditEnable(self, isEnable):
-        def thread_update():
-            self.ui.lineEdit.setEnabled(isEnable)
-            if isEnable:
-                self.ui.lineEdit.setText('')
-                self.ui.lineEdit.setFocus()
-
-        thread = Thread(target=thread_update)
-        thread.start()
-
-    def on_textEditClear(self):
-        self.ui.textEdit.clear()
-
-    def updateStatusBar(self):
-        def update_status_bar():
-            with robotsystem.model.sqlite.Sqlite(gv.database_setting) as db:
-                db.execute(f"UPDATE COUNT SET VALUE='{gv.continue_fail_count}' where NAME ='continue_fail_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_pass_count}' where NAME ='total_pass_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_fail_count}' where NAME ='total_fail_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_abort_count}' where NAME ='total_abort_count'")
-            self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.continue_fail_count}')
-            self.ui.lb_count_pass.setText(f'PASS: {gv.total_pass_count}')
-            self.ui.lb_count_fail.setText(f'FAIL: {gv.total_fail_count}')
-            self.ui.lb_count_abort.setText(f'ABORT: {gv.total_abort_count}')
-            try:
-                self.ui.lb_count_yield.setText('Yield: {:.2%}'.format(gv.total_pass_count / (
-                        gv.total_pass_count + gv.total_fail_count + gv.total_abort_count)))
-            except ZeroDivisionError:
-                self.ui.lb_count_yield.setText('Yield: 0.00%')
-            QApplication.processEvents()
-
-        thread = Thread(target=update_status_bar)
-        thread.start()
-
-    def timerEvent(self, a):
-        self.my_signals.updateLabel[QLabel, str, int].emit(self.ui.lb_errorCode, str(self.sec), 20)
-        QApplication.processEvents()
-        self.sec += 1
-
-    def timing(self, flag):
-        if flag:
-            lg.logger.debug('start timing...')
-            self.timer = self.startTimer(1000)
-        else:
-            lg.logger.debug('stop timing...')
-            self.killTimer(self.timer)
-
-    def test(self):
-        pass
 
     def test_thread(self):
         try:

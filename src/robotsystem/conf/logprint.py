@@ -15,6 +15,7 @@ from datetime import datetime
 import logging.config
 from os.path import join, exists
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication
 import robotsystem.conf.globalvar as gv
 import robotsystem.conf.config
 
@@ -68,6 +69,7 @@ class QTextEditHandler(logging.Handler):
                 self.stream.setTextColor(Qt.blue)
             stream.append(msg)
             stream.ensureCursorVisible()
+            QApplication.processEvents()
         except RecursionError:  # See issue 36272
             raise
         except Exception:
