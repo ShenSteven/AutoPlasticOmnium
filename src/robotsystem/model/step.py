@@ -40,7 +40,7 @@ class Step:
         StepName: str = None: 当前测试step名字
         ErrorCode: str = None: 测试错误码
         Retry: str = None: 测试失败retry次数
-        TimeOut: int = None: 测试步骤超时时间
+        Timeout: int = None: 测试步骤超时时间
         SubStr1: str = None: 截取字符串 如截取abc中的b SubStr1=a，SubStr2=cf
         SubStr2: str = None
         IfElse: str = None: 测试步骤结果是否做为if条件，决定else步骤是否执行
@@ -86,7 +86,7 @@ class Step:
         self.ErrorCode: str = ''
         self.ErrorDetails: str = ''
         self.Retry: str = ''
-        self.TimeOut: str = ''
+        self.Timeout: str = ''
         self.IfElse: str = ''
         self.For: str = ''
         self.SubStr1: str = ''
@@ -108,6 +108,44 @@ class Step:
         self.SetGlobalVar: str = ''
         self.param1: str = ''
         self.TearDown: str = ''
+        # PLIN
+        self.ID: str = ''
+        self.NAD: str = ''
+        self.PCI_LEN: str = ''
+
+        # self.SuiteName = ''
+        # self.StepName = ''
+        # self.EeroName = None
+        # self.Keyword = ''
+        # self.ErrorCode = None
+        # self.ErrorDetails = None
+        # self.Retry = None
+        # self.Timeout = None
+        # self.IfElse = ''
+        # self.For = ''
+        # self.SubStr1 = None
+        # self.SubStr2 = None
+        # self.Model = None
+        # self.CmdOrParam = None
+        # self.ExpectStr = None
+        # self.CheckStr1 = None
+        # self.CheckStr2 = None
+        # self.NoContain = None
+        # self.SPEC = None
+        # self.LSL = None
+        # self.USL = None
+        # self.Unit = None
+        # self.MesVar = None
+        # self.ByPF = ''
+        # self.FTC = ''
+        # self.Json = ''
+        # self.SetGlobalVar = None
+        # self.param1 = None
+        # self.TearDown = None
+        # # PLIN
+        # self.ID = None
+        # self.NAD = None
+        # self.PCI_LEN = None
 
         if dict_ is not None:
             self.__dict__.update(dict_)
@@ -147,6 +185,14 @@ class Step:
     # def spec(self, value):
     #     self._spec = Step.parse_var(value)
 
+    @property
+    def _NAD(self):
+        return Step.parse_var(self.NAD)
+
+    @property
+    def _PCI_LEN(self):
+        return Step.parse_var(self.PCI_LEN)
+
     @staticmethod
     def parse_var(value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
@@ -177,12 +223,14 @@ class Step:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
-                                 Qt.BlockingQueuedConnection,
-                                 Q_ARG(QBrush, color),
-                                 Q_ARG(int, self.suiteIndex),
-                                 Q_ARG(int, self.index),
-                                 Q_ARG(bool, False))
+        robotsystem.ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex,
+                                                                                   self.index, False)
+        # QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
+        #                          Qt.BlockingQueuedConnection,
+        #                          Q_ARG(QBrush, color),
+        #                          Q_ARG(int, self.suiteIndex),
+        #                          Q_ARG(int, self.index),
+        #                          Q_ARG(bool, False))
 
     def run(self, testSuite, suiteItem: product.SuiteItem = None):
         """run test step"""
@@ -201,7 +249,7 @@ class Step:
             if self.isTest:
                 self.setColor(Qt.yellow)
                 lg.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
-                                f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.TimeOut}s,"
+                                f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
                                 f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
                 self.init_online_limit()
             else:
@@ -256,8 +304,9 @@ class Step:
                         f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
                         f"VALUES (NULL,'{gv.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
                         f"'{gv.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
-                        f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',"
-                        f"'{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')")
+                        f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}',"
+                        f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
+                        f"'{test_result}','{self.status}')")
             self.clear()
 
     def set_errorCode_details(self, result=False, info=''):
@@ -354,7 +403,7 @@ class Step:
             lg.logger.error(result_info)
         if self.Json.lower() == 'y':
             self.elapsedTime = (datetime.now() - self.start_time).seconds
-            robotsystem.ui.mainform.MainForm.my_signals.update_tableWidget.emit(
+            robotsystem.ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(
                 [gv.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
                  self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 

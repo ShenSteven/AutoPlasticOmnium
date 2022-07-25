@@ -133,6 +133,8 @@ class TestCase:
     def teardown(self):
         if gv.dut_comm is not None:
             gv.dut_comm.close()
+        if gv.PLin is not None:
+            gv.PLin.close()
         if gv.cf.station.fix_flag and gv.cf.station.pop_fix and gv.FixSerialPort is not None:
             gv.FixSerialPort.open()
             gv.FixSerialPort.sendCommand('AT+TESTEND%', )

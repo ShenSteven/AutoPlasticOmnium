@@ -8,12 +8,12 @@
 """
 from datetime import datetime
 from os.path import join
-from threading import Thread, Event
+from threading import Event, Lock
 import robotsystem.conf.config
 import platform
 import robotsystem.model.product
 import robotsystem.model.testglobalvar
-import robotsystem
+import robotsystem.model.testcase
 
 win = platform.system() == 'Windows'
 linux = platform.system() == 'Linux'
@@ -49,6 +49,7 @@ PLin: None
 
 IsDebug = False
 startFlag = False
+startFlagLock = Lock()
 pauseFlag = False
 IsCycle = False
 finalTestResult = False
@@ -80,9 +81,10 @@ total_pass_count = 0
 total_fail_count = 0
 total_abort_count = 0
 
+testcase = robotsystem.model.testcase.TestCase(rf'{excel_file_path}', f'{cf.station.station_name}')
 mesPhases: robotsystem.model.product.MesInfo
 stationObj: robotsystem.model.product.JsonObject
-testThread: Thread
+testThread = None
 pause_event = Event()
 
 PassNumOfCycleTest = 0

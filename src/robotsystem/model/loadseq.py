@@ -20,15 +20,15 @@ from . import step
 from . import sqlite
 from .basicfunc import IsNullOrEmpty, get_sha256
 import robotsystem.conf.globalvar as gv
-import robotsystem.conf.logprint as lg
+# import robotsystem.conf.logprint as lg
 import robotsystem.ui.mainform
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations):
-    lg.logger.debug("Start convert excel testcase to json script.")
+    # lg.logger.debug("Start convert excel testcase to json script.")
     for station in all_stations:
         load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json")
-    lg.logger.debug("convert finish!")
+    # lg.logger.debug("convert finish!")
 
 
 def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> list:
@@ -45,7 +45,7 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
     item_header = []
     temp_suite_name = ""
     try:
-        lg.logger.debug('start load_testcase_from_excel...')
+        # lg.logger.debug('start load_testcase_from_excel...')
         workbook = load_workbook(testcase_path, read_only=True)
         worksheet = workbook[sheet_name]
         for i in list(worksheet.rows)[0]:  # 获取表头，第一行
@@ -64,14 +64,14 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
             for header, cell in dict(zip(item_header, line)).items():
                 test_step.index = temp_suite.totalNumber
                 test_step.suiteIndex = temp_suite.index
-                # setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
-                setattr(test_step, header, cell.value)
+                setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
+                # setattr(test_step, header, cell.value)
                 test_step.SuiteName = temp_suite_name
 
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
-        lg.logger.critical(f"load testcase fail！{e}")
+        # lg.logger.critical(f"load testcase fail！{e}")
         sys.exit(e.__context__)
     else:
         serialize_to_json(suites_list, test_script_path)
@@ -85,9 +85,9 @@ def load_testcase_from_json(json_path, verify=True):
     with sqlite.Sqlite(gv.database_setting) as db:
         db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{json_path}'")
         sha256 = db.cur.fetchone()[0]
-        lg.logger.debug(f"  dbSHA:{sha256}")
+        # lg.logger.debug(f"  dbSHA:{sha256}")
     JsonSHA = get_sha256(json_path)
-    lg.logger.debug(f"jsonSHA:{JsonSHA}")
+    # lg.logger.debug(f"jsonSHA:{JsonSHA}")
     if verify:
         if sha256 == JsonSHA:
             return deserialize_from_json(json_path)
@@ -97,7 +97,7 @@ def load_testcase_from_json(json_path, verify=True):
                                      QtCore.Q_ARG(str, 'ERROR!'),
                                      QtCore.Q_ARG(str, f'script {json_path} has been tampered!'),
                                      QtCore.Q_ARG(int, 5))
-            lg.logger.critical(f"ERROR,json testCase file {json_path} has been tampered!")
+            # lg.logger.critical(f"ERROR,json testCase file {json_path} has been tampered!")
             sys.exit(0)
     else:
         return deserialize_from_json(json_path)
@@ -143,9 +143,9 @@ def serialize_to_json(obj, json_path):
     :param obj: the object you want to serialize
     :param json_path: the path of json
     """
-    lg.logger.debug(f"delete old json in scripts.")
+    # lg.logger.debug(f"delete old json in scripts.")
     if os.path.exists(json_path):
         os.chmod(json_path, stat.S_IWRITE)
         os.remove(json_path)
     json.dump(obj, open(json_path, 'w'), default=lambda o: o.__dict__, sort_keys=True, indent=4)
-    lg.logger.info(f"serializeToJson success! {json_path}.")
+    # lg.logger.info(f"serializeToJson success! {json_path}.")

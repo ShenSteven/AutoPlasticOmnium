@@ -31,12 +31,13 @@ class Bootloader(object):
         self.initialize()
         self.ReqDelay = c_ushort(10)
         self.RespDelay = c_ushort(10)
+        self._interval = 0.02
         self.materReq_3C = PLinApi.TLINScheduleSlot()
         self.slaveReq_3D = PLinApi.TLINScheduleSlot()
 
     def initialize(self):
         # API configuration
-        print("init...")
+        lg.logger.debug("init...")
         self.m_objPLinApi = PLinApi.PLinApi()
         if not self.m_objPLinApi.isLoaded():
             raise Exception("PLin-API could not be loaded ! Exiting...")
@@ -61,18 +62,18 @@ class Bootloader(object):
             choice = input(str.format("\n * {0}", text))
         # return the response as a upper string
         choice = str(choice).upper()
-        print("\n")
+        lg.logger.debug("\n")
         return choice
 
     def displayAvailableConnection(self):
         # retrieve a list of available hardware
         hWInfoList = self.getAvailableHardware()
         # display result
-        lg.logger.debug(" List of available LIN hardware:")
         if len(hWInfoList) == 0:
-            lg.logger.debug("\t<No hardware found>")
+            lg.logger.error("\t<No hardware found>")
         else:
             # for each hardware display it's type, device and channel
+            lg.logger.debug(" List of available LIN hardware:")
             for hWInfo in hWInfoList:
                 if self.m_hHw.value == hWInfo[3]:
                     if self.m_HwMode.value == PLinApi.TLIN_HARDWAREMODE_MASTER.value:
@@ -80,17 +81,18 @@ class Bootloader(object):
                     else:
                         hwType = "slave"
                     # add information if the application is connecter to the hardware
-                    isConnected = str.format(
-                        "(connected as {0}, {1})", hwType, self.m_HwBaudrate.value)
+                    isConnected = str.format("(connected as {0}, {1})", hwType, self.m_HwBaudrate.value)
                 else:
                     isConnected = ""
-                print(str.format('\t{3}) {0} - dev. {1}, chan. {2} {4}', hWInfo[
+                lg.logger.debug(str.format('\t{3}) {0} - dev. {1}, chan. {2} {4}', hWInfo[
                     0], hWInfo[1], hWInfo[2], hWInfo[3], isConnected))
         return len(hWInfoList)
 
     def connect(self):
         hwlen = self.displayAvailableConnection()
         try:
+            if hwlen == 0:
+                return False
             if hwlen == 1:
                 choice = 1
             else:
@@ -99,10 +101,10 @@ class Bootloader(object):
             lHwMode = PLinApi.TLIN_HARDWAREMODE_MASTER
             lHwBaudrate = c_ushort(19200)
             if self.doLinConnect(lHw, lHwMode, lHwBaudrate):
-                self.displayNotification("Connection successful")
+                lg.logger.info("Connection successful")
                 return True
             else:
-                self.displayNotification("Connection failed")
+                lg.logger.error("Connection failed")
                 return False
         except Exception as ex:
             lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
@@ -112,14 +114,13 @@ class Bootloader(object):
         res = []
         lwCount = c_ushort(0)
         availableHWs = (PLinApi.HLINHW * 0)()
-        linResult = self.m_objPLinApi.GetAvailableHardware(availableHWs, 0, lwCount)
+        self.m_objPLinApi.GetAvailableHardware(availableHWs, 0, lwCount)
         if lwCount == 0:
             # use default value if either no hw is connected or an unexpected error occured
             lwCount = c_ushort(16)
         availableHWs = (PLinApi.HLINHW * lwCount.value)()
         lwBuffSize = c_ushort(lwCount.value * 2)
-        linResult = self.m_objPLinApi.GetAvailableHardware(
-            availableHWs, lwBuffSize, lwCount)
+        linResult = self.m_objPLinApi.GetAvailableHardware(availableHWs, lwBuffSize, lwCount)
         if linResult == PLinApi.TLIN_ERROR_OK:
             # Get information for each LIN hardware found
             lnHwType = c_int(0)
@@ -129,18 +130,13 @@ class Bootloader(object):
             for i in range(lwCount.value):
                 lwHw = availableHWs[i]
                 # Read the type of the hardware with the handle lwHw.
-                self.m_objPLinApi.GetHardwareParam(
-                    lwHw, PLinApi.TLIN_HARDWAREPARAM_TYPE, lnHwType, 0)
+                self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_TYPE, lnHwType, 0)
                 # Read the device number of the hardware with the handle lwHw.
-                self.m_objPLinApi.GetHardwareParam(
-                    lwHw, PLinApi.TLIN_HARDWAREPARAM_DEVICE_NUMBER, lnDevNo, 0)
+                self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_DEVICE_NUMBER, lnDevNo, 0)
                 # Read the channel number of the hardware with the handle lwHw.
-                self.m_objPLinApi.GetHardwareParam(
-                    lwHw, PLinApi.TLIN_HARDWAREPARAM_CHANNEL_NUMBER, lnChannel, 0)
-                # Read the mode of the hardware with the handle lwHw (Master,
-                # Slave or None).
-                self.m_objPLinApi.GetHardwareParam(
-                    lwHw, PLinApi.TLIN_HARDWAREPARAM_MODE, lnMode, 0)
+                self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_CHANNEL_NUMBER, lnChannel, 0)
+                # Read the mode of the hardware with the handle lwHw (Master,Slave or None).
+                self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_MODE, lnMode, 0)
                 # translate type value to string
                 if lnHwType.value == PLinApi.LIN_HW_TYPE_USB_PRO.value:
                     strName = "PCAN-USB Pro"
@@ -157,9 +153,8 @@ class Bootloader(object):
     def doLinConnect(self, hwHandle, hwMode, hwBaudrate):
         result = False
         if self.m_hHw.value != 0:
-            if not self.doLinDisconnect():
+            if not self.close():
                 return result
-
         if self.m_hClient.value == 0:
             self.m_objPLinApi.RegisterClient("PLIN-API Console", None, self.m_hClient)
         linResult = self.m_objPLinApi.ConnectClient(self.m_hClient, hwHandle)
@@ -192,7 +187,6 @@ class Bootloader(object):
         return result
 
     def runSchedule(self):
-        time.sleep(0.5)
         try:
             self.materReq_3C.FrameId[0] = c_ubyte(60)
             self.materReq_3C.Delay = self.ReqDelay
@@ -206,36 +200,32 @@ class Bootloader(object):
             pSchedule = (PLinApi.TLINScheduleSlot * 2)()
             pSchedule[0] = self.materReq_3C
             pSchedule[1] = self.slaveReq_3D
+            error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
+            if error_code != PLinApi.TLIN_ERROR_OK:
+                self.displayError(error_code)
             error_code = self.m_objPLinApi.SetSchedule(self.m_hClient, self.m_hHw, 7, pSchedule, 2)
             if error_code == PLinApi.TLIN_ERROR_OK:
                 error_code = self.m_objPLinApi.StartSchedule(self.m_hClient, self.m_hHw, 7)
                 if error_code == PLinApi.TLIN_ERROR_OK:
                     lg.logger.info("start schedule success...")
-                    time.sleep(1)
+                    time.sleep(0.5)
                     return True
                 else:
                     self.displayError(error_code)
-                    lg.logger.debug("SuspendSchedule....")
-                    error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
-                    self.displayError(error_code)
                     return False
             else:
+                self.displayError(error_code)
+                error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
+                self.displayError(error_code)
                 return False
-            # else:
-            #     linResult = self.m_objPLinApi.DisconnectClient(self.m_hClient, self.m_hHw)
-            #     self.m_objPLinApi.ResetHardware(self.m_hClient, self.m_hHw)
-            #     error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
-            #     lg.logger.debug("SuspendSchedule....")
-            #     self.displayError(error_code)
         except Exception as ex:
-            # self.doLinDisconnect()
             lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
             return False
 
     def SetFrameEntry(self, id, nad, pci, data, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
                       ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
         try:
-            time.sleep(0.02)
+            time.sleep(self._interval)
             framedata = nad + " " + pci + " " + data
             tempdata = framedata.split()
             lFrameEntry = PLinApi.TLINFrameEntry()
@@ -350,9 +340,7 @@ class Bootloader(object):
             lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
             return False
 
-    def doLinDisconnect(self):
-        linResult = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
-        lg.logger.debug("SuspendSchedule....")
+    def close(self):
         # If the application was registered with LIN as client.
         if self.m_hHw.value != 0:
             # The client was connected to a LIN hardware.
@@ -399,7 +387,8 @@ class Bootloader(object):
             if lfOwnClient == True:
                 # Disconnect if the application was connected to a LIN
                 # hardware.
-
+                linResult = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
+                lg.logger.debug("SuspendSchedule....")
                 linResult = self.m_objPLinApi.DisconnectClient(self.m_hClient, self.m_hHw)
                 if linResult == PLinApi.TLIN_ERROR_OK:
                     self.m_hHw = PLinApi.HLINHW(0)
@@ -417,22 +406,19 @@ class Bootloader(object):
         # Prints a notification
         #
 
-    def displayNotification(self, text="** Invalid choice **", waitSeconds=0.5):
-        lg.logging.debug(str.format("\t{0}", text))
+    def displayNotification(self, text="** Invalid choice **", waitSeconds=0.0):
+        lg.logger.warning(text)
         time.sleep(waitSeconds)
 
     def displayError(self, linError, isInput=False, waitTime=0):
         # get error string from code
         pTextBuff = create_string_buffer(255)
-        linResult = self.m_objPLinApi.GetErrorText(
-            linError, 0x09, pTextBuff, 255)
+        linResult = self.m_objPLinApi.GetErrorText(linError, 0x09, pTextBuff, 255)
         # display error message
         if linResult == PLinApi.TLIN_ERROR_OK and len(pTextBuff.value) != 0:
-            self.displayNotification(
-                str.format("** Error ** - {0} ", bytes.decode(pTextBuff.value)), waitTime)
+            self.displayNotification(str.format("** Error ** - {0} ", bytes.decode(pTextBuff.value)), waitTime)
         else:
-            self.displayNotification(
-                str.format("** Error ** - code={0}", linError), waitTime)
+            self.displayNotification(str.format("** Error ** - code={0}", linError), waitTime)
         if isInput:
             # wait for user approval
             # self.displayMenuInput("** Press <enter> to continue **")
@@ -447,7 +433,6 @@ class Bootloader(object):
         while pRcvMsg.Data[2] != (int(rsid, 16)) or pRcvMsg.Data[1] > 15:
             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             if time.time() - start_time > timeout:
-                self.doLinDisconnect()
                 lg.logger.error(f"timeout {timeout}s for respond,id")
                 return False, ''
             if pRcvMsg.Type != PLinApi.TLIN_MSGTYPE_STANDARD:
@@ -466,7 +451,7 @@ class Bootloader(object):
 
     def ConsecutiveFrame(self, id, nad, sn, data, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
                          ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
-        time.sleep(0.02)
+        time.sleep(self._interval)
         pci = '2' + sn
         self.SetFrameEntry(id, nad, pci, data, direction, ChecksumType)
         return True
@@ -486,10 +471,10 @@ class Bootloader(object):
             key4 = ((cal[0] & 0x0F) << 4) | ((cal[3] & 0x78) >> 3)
             key = '{:02X}'.format(key1) + " " + '{:02X}'.format(key2) + " " + '{:02X}'.format(
                 key3) + " " + '{:02X}'.format(key4)
-            lg.logger.debug(f'get ley: {key}', '')
+            lg.logger.debug(f'get key: {key}')
             return key
         except Exception as ex:
-            self.doLinDisconnect()
+            # self.doLinDisconnect()
             sys.exit(f'{currentframe().f_code.co_name}:{ex}')
 
     def TransferDataBlock(self, id, nad, pci, data, timeout):

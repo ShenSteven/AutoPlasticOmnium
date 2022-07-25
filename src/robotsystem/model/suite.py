@@ -113,12 +113,14 @@ class TestSuite:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
-                                 Qt.BlockingQueuedConnection,
-                                 Q_ARG(QBrush, color),
-                                 Q_ARG(int, self.index),
-                                 Q_ARG(int, -1),
-                                 Q_ARG(bool, False))
+        robotsystem.ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.index,
+                                                                                   -1, False)
+        # QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
+        #                          Qt.BlockingQueuedConnection,
+        #                          Q_ARG(QBrush, color),
+        #                          Q_ARG(int, self.index),
+        #                          Q_ARG(int, -1),
+        #                          Q_ARG(bool, False))
 
     def print_result_info(self):
         self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')

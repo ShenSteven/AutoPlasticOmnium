@@ -11,7 +11,7 @@ from threading import Thread
 import robotsystem.ui.images
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRegExp, QMetaObject
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRegExp, QMetaObject, QThread
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
@@ -45,6 +45,7 @@ class MySignals(QObject):
     loadseq = pyqtSignal(str)
     update_tableWidget = pyqtSignal((list,), (str,))
     updateLabel = pyqtSignal([QLabel, str, int, QBrush], [QLabel, str, int], [QLabel, str])
+    treeWidgetColor = pyqtSignal([QBrush, int, int, bool])
     timingSignal = pyqtSignal(bool)
     textEditClearSignal = pyqtSignal(str)
     lineEditEnableSignal = pyqtSignal(bool)
@@ -52,6 +53,8 @@ class MySignals(QObject):
     updateStatusBarSignal = pyqtSignal(str)
     updateActionSignal = pyqtSignal([QAction, QIcon, str], [QAction, QIcon])
     saveTextEditSignal = pyqtSignal(str)
+    controlEnableSignal = pyqtSignal(QAction, bool)
+    threadStopSignal = pyqtSignal(str)
     # showMessageBox = pyqtSignal([str, str, int])
 
 
@@ -69,6 +72,7 @@ def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = 
         label.setText(str_)
         if color is not None:
             label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
+        # QApplication.processEvents()
 
     thread = Thread(target=thread_update)
     thread.start()
@@ -150,21 +154,28 @@ def on_actionException():
     thread.start()
 
 
+def controlEnable(control, isEnable):
+    def thread_update():
+        control.setEnabled(isEnable)
+
+    thread = Thread(target=thread_update)
+    thread.start()
+
+
 class MainForm(QWidget):
-    my_signals = MySignals()
+    # my_signals = MySignals()
     main_form = None  # 单例模式
 
     def __init__(self):
         super().__init__()
+        self.my_signals = MySignals()
         self.timer = None
         self.ui = loadUi(join(dirname(abspath(__file__)), 'main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         init_create_dirs()
         MainForm.main_form = self  # 单例模式
         self.sec = 1
-        self.testcase: robotsystem.model.testcase.TestCase = robotsystem.model.testcase.TestCase(
-            rf'{gv.excel_file_path}',
-            f'{gv.cf.station.station_name}')
+        self.testcase: robotsystem.model.testcase.TestCase = gv.testcase
         self.testSequences = self.testcase.clone_suites
         self.init_textEditHandler()
         self.init_lab_factory(gv.cf.station.privileges)
@@ -175,8 +186,8 @@ class MainForm(QWidget):
         self.init_lineEdit()
         self.init_signals_connect()
         self.ShowTreeView(self.testSequences)
-        gv.testThread = Thread(target=self.test_thread, daemon=True)
-        gv.testThread.start()
+        gv.testThread = TestThread(self)
+        # gv.testThread.start()
 
     def init_textEditHandler(self):
         """create log handler for textEdit"""
@@ -283,6 +294,9 @@ class MainForm(QWidget):
         self.my_signals.updateActionSignal[QAction, QIcon, str].connect(updateAction)
         self.my_signals.updateStatusBarSignal[str].connect(self.updateStatusBar)
         self.my_signals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
+        self.my_signals.controlEnableSignal[QAction, bool].connect(controlEnable)
+        self.my_signals.treeWidgetColor[QBrush, int, int, bool].connect(self.update_treeWidget_color)
+        self.my_signals.threadStopSignal[str].connect(self.on_actionStop)
         # self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
 
         self.ui.actionCheckAll.triggered.connect(self.on_actionCheckAll)
@@ -494,13 +508,17 @@ class MainForm(QWidget):
             self.on_returnPressed()
 
     def on_actionStop(self):
-        if gv.startFlag:
-            if gv.FailNumOfCycleTest == 0:
-                gv.finalTestResult = True
-                self.SetTestStatus(TestStatus.PASS)
-            else:
-                self.SetTestStatus(TestStatus.FAIL)
-            gv.IsCycle = False
+        if gv.IsCycle:
+            if gv.startFlag:
+                if gv.FailNumOfCycleTest == 0:
+                    gv.finalTestResult = True
+                    gv.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.PASS)
+                else:
+                    gv.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.FAIL)
+                gv.IsCycle = False
+                saveTestResult()
+        else:
+            gv.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.ABORT)
 
     def on_actionClearLog(self):
         if not gv.startFlag:
@@ -618,7 +636,22 @@ class MainForm(QWidget):
         self.ui.treeWidget.topLevelItem(0).setExpanded(True)
         self.ui.treeWidget.blockSignals(False)
 
-    @QtCore.pyqtSlot(QBrush, int, int, bool)
+    # @QtCore.pyqtSlot(QBrush, int, int, bool)
+    # def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
+    #     if stepNo_ == -1:
+    #         if gv.IsCycle or not gv.startFlag:
+    #             return
+    #         self.ui.treeWidget.topLevelItem(suiteNO_).setExpanded(True)
+    #         self.ui.treeWidget.topLevelItem(suiteNO_).setBackground(0, color)
+    #         if allChild:
+    #             for i in range(self.ui.treeWidget.topLevelItem(suiteNO_).childCount()):
+    #                 self.ui.treeWidget.topLevelItem(suiteNO_).child(i).setBackground(0, color)
+    #     else:
+    #         self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
+    #         self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
+    #                                         hint=QAbstractItemView.EnsureVisible)
+    #     # QApplication.processEvents()
+
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
         if stepNo_ == -1:
             if gv.IsCycle or not gv.startFlag:
@@ -680,7 +713,7 @@ class MainForm(QWidget):
                         gv.total_pass_count + gv.total_fail_count + gv.total_abort_count)))
             except ZeroDivisionError:
                 self.ui.lb_count_yield.setText('Yield: 0.00%')
-            QApplication.processEvents()
+            # QApplication.processEvents()
 
         thread = Thread(target=update_status_bar)
         thread.start()
@@ -801,9 +834,6 @@ class MainForm(QWidget):
 
     def variable_init(self):
         """测试变量初始化"""
-        if not gv.testThread.is_alive():
-            gv.testThread = Thread(target=self.test_thread, daemon=True)
-            gv.testThread.start()
 
         if gv.SingleStepTest and self.testcase.Finished:
             pass
@@ -836,116 +866,152 @@ class MainForm(QWidget):
         self.ui.lb_failInfo.setHidden(True)
         self.ui.lb_testTime.setHidden(True)
         self.sec = 1
-        self.SetTestStatus(TestStatus.START)
+        gv.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.START)
 
-    def SetTestStatus(self, status: TestStatus):
-        """设置并处理不同的测试状态"""
-        try:
-            if status == TestStatus.START:
-                self.main_form.ui.treeWidget.blockSignals(True)
-                if not gv.SingleStepTest:
-                    self.my_signals.textEditClearSignal[str].emit('')
-                self.my_signals.lineEditEnableSignal[bool].emit(False)
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'Testing', 36, Qt.yellow)
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode, '', 20, Qt.yellow)
-                self.my_signals.timingSignal[bool].emit(True)
-                gv.startTime = datetime.now()
-                self.my_signals.setIconSignal[QAction, QIcon].emit(self.ui.actionStart,
-                                                                   QIcon(':/images/Pause-icon.png'))
-                gv.startFlag = True
-                lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
-                                f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
-                                f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
-                self.my_signals.update_tableWidget[str].emit('clear')
-                gv.pause_event.set()
-            elif status == TestStatus.FAIL:
-                gv.total_fail_count += 1
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'FAIL', 36, Qt.red)
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_testTime, str(self.sec), 11,
-                                                                           Qt.gray)
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode,
-                                                                           gv.error_details_first_fail, 20, Qt.red)
-                UpdateContinueFail(False)
-                if gv.setIpFlag:
-                    gv.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0", )
-            elif status == TestStatus.PASS:
-                gv.total_pass_count += 1
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'PASS', 36, Qt.green)
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode, str(self.sec), 20,
-                                                                           Qt.green)
-                UpdateContinueFail(True)
-            elif status == TestStatus.ABORT:
-                gv.total_abort_count += 1
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_status, 'Abort', 36, Qt.gray)
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_testTime, str(self.sec), 11,
-                                                                           Qt.gray)
-                self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode,
-                                                                           gv.error_details_first_fail, 20, Qt.gray)
-        except Exception as e:
-            lg.logger.exception(f"SetTestStatus Exception！！{e}")
-        finally:
-            try:
-                if status != TestStatus.START:
-                    self.my_signals.setIconSignal[QAction, QIcon].emit(self.ui.actionStart,
-                                                                       QIcon(':/images/Start-icon.png'))
-                    if gv.dut_comm is not None:
-                        gv.dut_comm.close()
-                    if gv.cf.station.fix_flag:
-                        gv.FixSerialPort.SendCommand('AT+TESTEND%', 'OK')
-                    # SFTP
-            except Exception as e:
-                lg.logger.exception(f"SetTestStatus Exception！！{e}")
-            finally:
-                try:
-                    if status != TestStatus.START:
-                        self.my_signals.lineEditEnableSignal[bool].emit(True)
-                        self.my_signals.updateStatusBarSignal[str].emit('')
-                        # save config/
-                        # gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
-                        self.my_signals.saveTextEditSignal[str].emit('')
-                        if not gv.finalTestResult:
-                            self.my_signals.updateLabel[QLabel, str, int, QBrush].emit(self.ui.lb_errorCode,
-                                                                                       gv.error_details_first_fail, 20,
-                                                                                       Qt.red)
-                        self.my_signals.timingSignal[bool].emit(False)
-                        lg.logger.debug(f"Test end,ElapsedTime:{self.sec}s.")
-                        gv.startFlag = False
-                        self.main_form.ui.treeWidget.blockSignals(False)
-                except Exception as e:
-                    lg.logger.exception(f"SetTestStatus Exception！！{e}")
 
-    def test_thread(self):
+class TestThread(QThread):
+    signal = pyqtSignal(MainForm, TestStatus)
+
+    def __init__(self, mywind: MainForm):
+        super(TestThread, self).__init__()
+        self.myWind = mywind
+        self.signal[MainForm, TestStatus].connect(self.SetTestStatus)
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        """
+        进行任务操作，主要的逻辑操作,返回结果
+        """
         try:
             while True:
                 if gv.startFlag:
                     if gv.IsCycle:
                         while gv.IsCycle:
-                            if self.main_form.testcase.run(gv.cf.station.fail_continue):
+                            if gv.testcase.run(gv.cf.station.fail_continue):
                                 gv.PassNumOfCycleTest += 1
                             else:
                                 gv.FailNumOfCycleTest += 1
+                            if gv.PassNumOfCycleTest + gv.FailNumOfCycleTest == gv.cf.station.loop_count:
+                                lg.logger.debug(f"***** All loop({gv.cf.station.loop_count}) have completed! *****")
+                                self.myWind.my_signals.threadStopSignal[str].emit('stop test.')
+                            else:
+                                time.sleep(gv.cf.station.loop_interval)
                     elif gv.SingleStepTest:
                         lg.logger.debug(f'Suite:{gv.SuiteNo},Step:{gv.StepNo}')
-                        result = self.main_form.testcase.clone_suites[gv.SuiteNo].steps[
+                        result = gv.testcase.clone_suites[gv.SuiteNo].steps[
                             gv.StepNo].run(
-                            self.main_form.testcase.clone_suites[gv.SuiteNo])
+                            gv.testcase.clone_suites[gv.SuiteNo])
                         gv.finalTestResult = result
-                        self.main_form.SetTestStatus(
-                            TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
+                        self.signal[MainForm, TestStatus].emit(self.myWind,
+                                                               TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
                     else:
-                        result = self.main_form.testcase.run(gv.cf.station.fail_continue)
+                        result = gv.testcase.run(gv.cf.station.fail_continue)
                         result1 = upload_Json_to_client(gv.cf.station.rs_url, gv.txtLogPath)
                         result2 = upload_result_to_mes(gv.mes_result)
                         gv.finalTestResult = result & result1 & result2
-                        self.main_form.SetTestStatus(
-                            TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
                         CollectResultToCsv()
                         saveTestResult()
+                        self.signal[MainForm, TestStatus].emit(self.myWind,
+                                                               TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
+                        time.sleep(0.5)
+                else:
+                    continue
         except Exception as e:
             lg.logger.exception(f"TestThread() Exception:{e}")
-            self.main_form.SetTestStatus(TestStatus.ABORT)
+            self.signal[MainForm, TestStatus].emit(self.myWind, TestStatus.ABORT)
         finally:
+            pass
+            gv.testThread.join(3)
             lg.logger.debug('finally')
+
+    def SetTestStatus(self, main_form: MainForm, status: TestStatus):
+        """设置并处理不同的测试状态"""
+        try:
+            if status == TestStatus.START:
+                if not gv.testThread.isRunning():
+                    gv.testThread = TestThread(main_form)
+                    gv.testThread.start()
+                main_form.ui.treeWidget.blockSignals(True)
+                if not gv.SingleStepTest:
+                    main_form.my_signals.textEditClearSignal[str].emit('')
+                main_form.my_signals.lineEditEnableSignal[bool].emit(False)
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_status, 'Testing', 36,
+                                                                                Qt.yellow)
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_errorCode, '', 20,
+                                                                                Qt.yellow)
+                main_form.my_signals.timingSignal[bool].emit(True)
+                gv.startTime = datetime.now()
+                main_form.my_signals.setIconSignal[QAction, QIcon].emit(main_form.ui.actionStart,
+                                                                        QIcon(':/images/Pause-icon.png'))
+                main_form.my_signals.controlEnableSignal[QAction, bool].emit(main_form.ui.actionStop, True)
+                gv.startFlag = True
+                lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
+                                f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
+                                f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
+                main_form.my_signals.update_tableWidget[str].emit('clear')
+                gv.pause_event.set()
+            elif status == TestStatus.FAIL:
+                gv.total_fail_count += 1
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_status, 'FAIL', 36,
+                                                                                Qt.red)
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_testTime,
+                                                                                str(main_form.sec), 11,
+                                                                                Qt.gray)
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_errorCode,
+                                                                                gv.error_details_first_fail, 20, Qt.red)
+                UpdateContinueFail(False)
+                if gv.setIpFlag:
+                    gv.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
+            elif status == TestStatus.PASS:
+                gv.total_pass_count += 1
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_status, 'PASS', 36,
+                                                                                Qt.green)
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_errorCode,
+                                                                                str(main_form.sec), 20,
+                                                                                Qt.green)
+                UpdateContinueFail(True)
+            elif status == TestStatus.ABORT:
+                gv.total_abort_count += 1
+                gv.testThread.terminate()
+                gv.testThread.wait(1)
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_status, 'Abort', 36,
+                                                                                Qt.gray)
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_testTime,
+                                                                                str(main_form.sec), 11,
+                                                                                Qt.gray)
+                main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_errorCode,
+                                                                                gv.error_details_first_fail, 20,
+                                                                                Qt.gray)
+                saveTestResult()
+        except Exception as e:
+            lg.logger.exception(f"SetTestStatus Exception！！{e}")
+        finally:
+            try:
+                if status != TestStatus.START:
+                    main_form.my_signals.setIconSignal[QAction, QIcon].emit(main_form.ui.actionStart,
+                                                                            QIcon(':/images/Start-icon.png'))
+                    main_form.my_signals.controlEnableSignal[QAction, bool].emit(main_form.ui.actionStop, False)
+                    main_form.my_signals.timingSignal[bool].emit(False)
+                    lg.logger.debug(f"Test end,ElapsedTime:{main_form.sec}s.")
+                    gv.startFlag = False
+                    main_form.my_signals.lineEditEnableSignal[bool].emit(True)
+                    main_form.my_signals.updateStatusBarSignal[str].emit('')
+                    main_form.my_signals.saveTextEditSignal[str].emit('')
+                    if not gv.finalTestResult:
+                        main_form.my_signals.updateLabel[QLabel, str, int, QBrush].emit(main_form.ui.lb_errorCode,
+                                                                                        gv.error_details_first_fail, 20,
+                                                                                        Qt.red)
+                    main_form.main_form.ui.treeWidget.blockSignals(False)
+            except Exception as e:
+                lg.logger.exception(f"SetTestStatus Exception！！{e}")
+            finally:
+                try:
+                    if status != TestStatus.START:
+                        pass
+                except Exception as e:
+                    lg.logger.exception(f"SetTestStatus Exception！！{e}")
 
 
 if __name__ == "__main__":

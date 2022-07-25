@@ -36,7 +36,7 @@ class TelnetComm(CommAbstract):
         date_bytes = date.encode('utf8')
         self.tel.write(date_bytes)
 
-    def SendCommand(self, command, timeout=10, exceptStr=None, newline=True):
+    def SendCommand(self, command, exceptStr=None, timeout=10, newline=True):
         # result = False
         strRecAll = ''
         start_time = time.time()

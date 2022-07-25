@@ -125,7 +125,7 @@
          </property>
          <widget class="QWidget" name="result">
           <attribute name="title">
-           <string>result</string>
+           <string>Result</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0">
            <property name="leftMargin">
@@ -178,7 +178,7 @@
          </widget>
          <widget class="QWidget" name="stepInfo">
           <attribute name="title">
-           <string>stepInfo</string>
+           <string>Property</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <property name="leftMargin">
@@ -347,7 +347,7 @@ font: 20pt &quot;宋体&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>1448</width>
-     <height>27</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="testcase">
@@ -422,6 +422,9 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -517,6 +520,9 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
   </action>
   <action name="actionStop">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/images/Stop-red-icon.png</normaloff>:/images/Stop-red-icon.png</iconset>

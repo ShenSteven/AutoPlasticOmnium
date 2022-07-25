@@ -33,8 +33,5 @@ class CommAbstract(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def SendCommand(self, command, DataToWaitFor, timeout=10):
+    def SendCommand(self, command, exceptStr, timeout=10, newline=True):
         pass
-
-
-

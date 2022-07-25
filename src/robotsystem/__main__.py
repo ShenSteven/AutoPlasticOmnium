@@ -33,4 +33,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # for x in dir():
+    #     print(x, ":", eval(x))
     main()

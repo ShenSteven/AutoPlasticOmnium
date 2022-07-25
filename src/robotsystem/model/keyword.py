@@ -140,8 +140,15 @@ def register(name, email, **kwargs):
 
 
 def subStr(SubStr1, SubStr2, revStr):
-    values = re.findall(f'{SubStr1}(.*?){SubStr2}', revStr)
-    if len(values) == 1:
+    if IsNullOrEmpty(SubStr1) and IsNullOrEmpty(SubStr2):
+        return None
+    elif IsNullOrEmpty(SubStr1):
+        values = re.findall(f'^(.*?){SubStr2}', revStr)
+    elif IsNullOrEmpty(SubStr2):
+        values = re.findall(f'{SubStr1}(.*?)$', revStr)
+    else:
+        values = re.findall(f'{SubStr1}(.*?){SubStr2}', revStr)
+    if len(values) == 1 and values[0] != '':
         testValue = values[0]
         lg.logger.debug(f'get TestValue:{testValue}')
         return testValue
@@ -177,8 +184,8 @@ def testKeyword(item, testSuite):
     try:
 
         if item.Keyword == 'Waiting':
-            lg.logger.debug(f'waiting {item.TimeOut}s')
-            time.sleep(item.TimeOut)
+            lg.logger.debug(f'waiting {item.Timeout}s')
+            time.sleep(item.Timeout)
             rReturn = True
 
         elif item.Keyword == 'SetVar':
@@ -207,7 +214,7 @@ def testKeyword(item, testSuite):
         elif item.Keyword == 'TelnetAndSendCmd':
             temp = TelnetComm(item.param1, gv.cf.dut.prompt)
             if temp.open(gv.cf.dut.prompt) and \
-                    temp.SendCommand(item.command, item.ExpectStr, item.TimeOut)[0]:
+                    temp.SendCommand(item.command, item.ExpectStr, item.Timeout)[0]:
                 return True
 
         elif item.Keyword == 'SerialPortOpen':
@@ -224,33 +231,31 @@ def testKeyword(item, testSuite):
         elif item.Keyword == 'PLINInitConnect':
             gv.PLin = Bootloader()
             if gv.PLin.connect():
-                time.sleep(0.5)
+                time.sleep(0.1)
                 rReturn = gv.PLin.runSchedule()
-                time.sleep(0.5)
+                time.sleep(0.1)
 
         elif item.Keyword == 'PLINDisConnect':
             rReturn = gv.PLin.DoLinDisconnect()
 
         elif item.Keyword == 'PLINSingleFrame':
-            rReturn, revStr = gv.PLin.SingleFrame(item.ID, item._NAD, item.PCI_LEN, item.command, item.Timeout)
-            if rReturn and re.search(item.CheckStr1, revStr):
-                if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
-                    item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
+            rReturn, revStr = gv.PLin.SingleFrame(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
+            if rReturn and item.CheckStr1 in revStr:
+                item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
 
         elif item.Keyword == 'PLINMultiFrame':
-            rReturn, revStr = gv.PLin.MultiFrame(item.ID, item._NAD, item.PCI_LEN, item.command, item.Timeout)
-            if rReturn and re.search(item.CheckStr1, revStr):
-                if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
-                    item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
+            rReturn, revStr = gv.PLin.MultiFrame(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
+            if rReturn and item.CheckStr1 in revStr:
+                item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
 
         elif item.Keyword == 'TransferData':
             s19datas = gv.PLin.get_data(f"{gv.current_dir}\\flash\\{item.command}")
-            lg.logger.Debug(s19datas)
-            rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item.TimeOut, item._PCI_LEN)
+            lg.logger.debug(s19datas)
+            rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item._PCI_LEN, int(item.Timeout))
 
         elif item.Keyword == 'CalcKey':
             item.testValue = gv.PLin.CalKey(item.command)
-            lg.logger.Debug(f"send key is {item.testValue}.")
+            lg.logger.debug(f"send key is {item.testValue}.")
             rReturn = True
 
         elif item.Keyword == 'GetCRC':
@@ -258,8 +263,8 @@ def testKeyword(item, testSuite):
             rReturn = not IsNullOrEmpty(item.testValue)
 
         else:
-            rReturn, revStr = gv.dut_comm.SendCommand(item.ComdOrParam, item.ExpectStr, item.TimeOut)
-            if rReturn and re.search(item.CheckStr1, revStr) and re.search(item.CheckStr2, revStr):
+            rReturn, revStr = gv.dut_comm.SendCommand(item.ComdOrParam, item.ExpectStr, int(item.Timeout))
+            if rReturn and item.CheckStr1 in revStr and item.CheckStr2 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
                     # assert
@@ -278,20 +283,17 @@ def testKeyword(item, testSuite):
         rReturn = False
         return rReturn, compInfo
     else:
-        lg.logger.debug("else pass..............")
         return rReturn, compInfo
     finally:
         pass
         # if item.Keyword == "SetIpaddrEnv" and rReturn:
         #     SetIpFlag = True
-        lg.logger.debug("finally1 ..............")
         if (item.StepName.startswith("GetDAQResistor") or
                 item.StepName.startswith("GetDAQTemp") or
                 item.Keyword == "NiDAQmxVolt" or
                 item.Keyword == "NiDAQmxCur"):
             gv.ArrayListDaq.append("N/A" if IsNullOrEmpty(item.testValue) else item.testValue)
             lg.logger.Debug(f"DQA add {item.testValue}")
-        lg.logger.debug("finally2 ..............")
 
 
 if __name__ == "__main__":

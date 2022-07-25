@@ -10,12 +10,14 @@ import json
 import os
 import sys
 from string import Template
+from threading import Thread
+
 import yaml
 from datetime import datetime
 import logging.config
 from os.path import join, exists
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QWidget
 import robotsystem.conf.globalvar as gv
 import robotsystem.conf.config
 
@@ -42,16 +44,20 @@ logging.config.dictConfig(yaml.safe_load(res_log_conf))
 logger = logging.getLogger('testlog')
 
 
-class QTextEditHandler(logging.Handler):
+class QTextEditHandler(logging.Handler, QWidget):
     """继承logging.Handler类，并重写emit方法，创建打印到控件QTextEdit的handler class，并按照日志级别设置字体颜色."""
+    mySignal = pyqtSignal()
 
     def __init__(self, stream=None):
         logging.Handler.__init__(self)
+        QWidget.__init__(self)
         if stream is None or stream == 'None':
             stream = sys.stdout
         self.stream = stream
+        self.mySignal.connect(self.scrollbarTo)
 
     def emit(self, record):
+        # return
         try:
             msg = self.format(record)
             stream = self.stream
@@ -68,12 +74,18 @@ class QTextEditHandler(logging.Handler):
             elif 'NOTSET' in msg:  #
                 self.stream.setTextColor(Qt.blue)
             stream.append(msg)
-            stream.ensureCursorVisible()
-            QApplication.processEvents()
+            # stream.ensureCursorVisible()
+            self.mySignal.emit()
+            # QApplication.processEvents()
         except RecursionError:  # See issue 36272
+            print('RecursionError')
             raise
         except Exception:
             self.handleError(record)
+            raise
+
+    def scrollbarTo(self):
+        self.stream.ensureCursorVisible()
 
 
 if __name__ == "__main__":
