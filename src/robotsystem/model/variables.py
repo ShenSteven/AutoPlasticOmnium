@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-@File   : testcase.py
+@File   : Variables.py
 @Author : Steven.Shen
 @Date   : 2022/6/5
 @Desc   :
@@ -9,7 +9,7 @@
 from datetime import datetime
 
 
-class TestGlobalVar:
+class Variables:
     def __init__(self, station_name, station_no, sn, dut_default_ip, log_path):
         self.SN = sn
         self.Station = station_name

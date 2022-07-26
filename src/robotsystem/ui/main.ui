@@ -27,7 +27,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>images/Letter-T-blue-icon.png</normaloff>images/Letter-T-blue-icon.png</iconset>
+    <normaloff>C:/Users/ocu02965/.designer/backup/images/Letter-T-blue-icon.png</normaloff>C:/Users/ocu02965/.designer/backup/images/Letter-T-blue-icon.png</iconset>
   </property>
   <property name="toolTip">
    <string/>
@@ -354,9 +354,16 @@ font: 20pt &quot;宋体&quot;;</string>
     <property name="title">
      <string>TestScript</string>
     </property>
+    <widget class="QMenu" name="menuSelect_Station">
+     <property name="title">
+      <string>Select Station</string>
+     </property>
+    </widget>
     <addaction name="actionOpenScript"/>
     <addaction name="actionSaveToScript"/>
     <addaction name="actionReloadScript"/>
+    <addaction name="separator"/>
+    <addaction name="menuSelect_Station"/>
    </widget>
    <widget class="QMenu" name="settings">
     <property name="title">
@@ -787,6 +794,23 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionBreakpoint">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/breakpoint-set.png</normaloff>:/images/breakpoint-set.png</iconset>
+   </property>
+   <property name="text">
+    <string>Breakpoint</string>
+   </property>
+   <property name="toolTip">
+    <string>Breakpoint</string>
+   </property>
+  </action>
+  <action name="actionMBLT">
+   <property name="text">
+    <string>MBLT</string>
    </property>
   </action>
  </widget>

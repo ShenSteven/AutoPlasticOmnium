@@ -14,7 +14,7 @@ from . import product
 from . import sqlite
 import robotsystem.conf.globalvar as gv
 import robotsystem.conf.logprint as lg
-from inspect import currentframe, getframeinfo
+from inspect import currentframe
 
 
 def init_database(database_name):

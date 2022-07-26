@@ -9,7 +9,9 @@
 import re
 from datetime import datetime
 from PyQt5.QtCore import Qt, Q_ARG, QMetaObject
-from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QBrush, QIcon
+from PyQt5.QtWidgets import QAction
+
 from . import product
 from . import sqlite
 from . import keyword
@@ -65,6 +67,7 @@ class Step:
     """
 
     def __init__(self, dict_=None):
+        self.breakpoint = str(False)
         self.ForCycleCounter = 1
         self.suiteIndex: int = 0
         self.index: int = 0
@@ -198,7 +201,7 @@ class Step:
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
         for a in re.findall(r'<(.*?)>', value):
             # varVal = gv.get_global_val(a)
-            varVal = getattr(gv.testGlobalVar, a)
+            varVal = getattr(gv.TestVariables, a)
             if varVal is None:
                 raise Exception(f'Variable:{a} not found in globalVal!!')
             else:
@@ -259,10 +262,10 @@ class Step:
                 self.status = str(test_result)
                 return True
 
-            if breakpoint == str(True) or gv.pauseFlag:
+            if self.breakpoint == str(True) or gv.pauseFlag:
                 gv.pauseFlag = True
-                # change icon ....
-                # robotsystem.ui.mainform.MainForm.main_for
+                robotsystem.ui.mainform.MainForm.main_form.my_signals.setIconSignal[QAction, QIcon].emit(
+                    robotsystem.ui.mainform.MainForm.main_form.ui.actionStart, QIcon(':/images/Start-icon.png'))
                 gv.pause_event.clear()
             else:
                 gv.pause_event.set()
@@ -291,7 +294,7 @@ class Step:
         finally:
             if not IsNullOrEmpty(self.SetGlobalVar):
                 if bool(self.status):
-                    setattr(gv.testGlobalVar, self.SetGlobalVar, self.testValue)
+                    setattr(gv.TestVariables, self.SetGlobalVar, self.testValue)
                     lg.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
                 else:
                     lg.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")

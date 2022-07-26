@@ -9,3 +9,5 @@
 /src/robotsystem/flash/
 /src/robotsystem/conf/setting.db
 /src/robotsystem/OutPut/result.db
+/venv/
+/scripts/*.json

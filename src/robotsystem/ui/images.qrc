@@ -1,5 +1,7 @@
 <RCC>
   <qresource>
+    <file>images/breakpoint-clear.png</file>
+    <file>images/breakpoint-set.png</file>
     <file>images/Letter-T-blue-icon.png</file>
     <file>images/test.ico</file>
     <file>images/app-json-icon.png</file>

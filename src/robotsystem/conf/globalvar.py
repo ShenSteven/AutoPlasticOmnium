@@ -12,7 +12,7 @@ from threading import Event, Lock
 import robotsystem.conf.config
 import platform
 import robotsystem.model.product
-import robotsystem.model.testglobalvar
+import robotsystem.model.variables
 import robotsystem.model.testcase
 
 win = platform.system() == 'Windows'
@@ -44,12 +44,12 @@ csv_list_result = []
 ArrayListDaq = []
 
 dut_comm = None
-FixSerialPort: None
-PLin: None
+FixSerialPort = None
+PLin = None
 
 IsDebug = False
 startFlag = False
-startFlagLock = Lock()
+# startFlagLock = Lock()
 pauseFlag = False
 IsCycle = False
 finalTestResult = False
@@ -94,7 +94,7 @@ StepNo = -1
 startTimeJsonFlag = True
 startTimeJson = datetime.now()
 
-testGlobalVar: robotsystem.model.testglobalvar.TestGlobalVar
+TestVariables: robotsystem.model.variables.Variables
 
 
 def set_global_val(name, value):

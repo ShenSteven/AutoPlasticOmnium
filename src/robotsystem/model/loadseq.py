@@ -20,18 +20,19 @@ from . import step
 from . import sqlite
 from .basicfunc import IsNullOrEmpty, get_sha256
 import robotsystem.conf.globalvar as gv
-# import robotsystem.conf.logprint as lg
 import robotsystem.ui.mainform
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations):
-    # lg.logger.debug("Start convert excel testcase to json script.")
+    import robotsystem.conf.logprint as lg
+    lg.logger.debug("Start convert excel testcase to json script.")
     for station in all_stations:
         load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json")
-    # lg.logger.debug("convert finish!")
+    lg.logger.debug("convert finish!")
 
 
 def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> list:
+    import robotsystem.conf.logprint as lg
     """load test sequence form a sheet in Excel and return the suites sequences list,
     if success,serialize the suites list to json.
     :param testcase_path: the path of Excel
@@ -45,7 +46,7 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
     item_header = []
     temp_suite_name = ""
     try:
-        # lg.logger.debug('start load_testcase_from_excel...')
+        lg.logger.debug('start load_testcase_from_excel...')
         workbook = load_workbook(testcase_path, read_only=True)
         worksheet = workbook[sheet_name]
         for i in list(worksheet.rows)[0]:  # 获取表头，第一行
@@ -71,7 +72,7 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
-        # lg.logger.critical(f"load testcase fail！{e}")
+        lg.logger.critical(f"load testcase fail！{e}")
         sys.exit(e.__context__)
     else:
         serialize_to_json(suites_list, test_script_path)
@@ -143,9 +144,10 @@ def serialize_to_json(obj, json_path):
     :param obj: the object you want to serialize
     :param json_path: the path of json
     """
-    # lg.logger.debug(f"delete old json in scripts.")
+    import robotsystem.conf.logprint as lg
+    lg.logger.debug(f"delete old json in scripts.")
     if os.path.exists(json_path):
         os.chmod(json_path, stat.S_IWRITE)
         os.remove(json_path)
     json.dump(obj, open(json_path, 'w'), default=lambda o: o.__dict__, sort_keys=True, indent=4)
-    # lg.logger.info(f"serializeToJson success! {json_path}.")
+    lg.logger.info(f"serializeToJson success! {json_path}.")
