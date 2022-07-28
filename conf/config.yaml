@@ -14,12 +14,10 @@ station:
     log_server: 10.90.104.85
     log_server_username: eero
     log_server_password: eero
-    fix_flag: false
     fix_com_port: COM3
     fix_com_baudRate: 115200
     GPIB_address: 9
     testcase: PLIN-BLF.xlsx
-    fail_continue: false
     mes_shop_floor: 10.90.104.126:8080
     mes_result: 10.90.104.104:8080
     rs_url: http://luxshare:bento@10.90.104.16:8100/api/1/
@@ -28,6 +26,8 @@ station:
     loop_interval: 0
     loop_count: 0
     setTimeZone:
+    fix_flag: false
+    fail_continue: false
 dut:
     prompt: root@OpenWrt:/#
     dut_ip: 192.168.1.101

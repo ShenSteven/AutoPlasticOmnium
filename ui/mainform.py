@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
 import conf.logprint as lg
-from model.basicfunc import IsNullOrEmpty
+from model.basicfunc import IsNullOrEmpty, save_config
 import sockets.serialport
 from model.sqlite import Sqlite
 import model.testcase
@@ -27,9 +27,9 @@ import model.variables
 import model.product
 import ui.images_rc
 
-
 # pyrcc5 images.qrc -o images.py
-# pyuic5 main.ui -o main_ui.py
+# pyuic5 ui_main.ui -o main_ui.py
+from ui.settings import SettingsDialog
 
 
 class TestStatus(Enum):
@@ -100,14 +100,6 @@ def on_setIcon(action_, icon: QIcon):
     thread.start()
 
 
-def on_actionConfig():
-    def actionOpenScript():
-        os.startfile(rf'{gv.config_yaml_path}')
-
-    thread = Thread(target=actionOpenScript)
-    thread.start()
-
-
 def on_actionLogFolder():
     def thread_update():
         if os.path.exists(gv.logFolderPath):
@@ -173,7 +165,7 @@ class MainForm(QWidget):
         self.continue_fail_count = 0
         self.my_signals = MySignals()
         self.timer = None
-        self.ui = loadUi(join(dirname(abspath(__file__)), 'main.ui'))
+        self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         init_create_dirs()
         MainForm.main_form = self  # 单例模式
@@ -339,7 +331,7 @@ class MainForm(QWidget):
         self.ui.actionOpenScript.triggered.connect(self.on_actionOpenScript)
         self.ui.actionSaveToScript.triggered.connect(self.on_actionSaveToScript)
         self.ui.actionReloadScript.triggered.connect(self.on_reloadSeqs)
-        self.ui.actionConfig.triggered.connect(on_actionConfig)
+        self.ui.actionConfig.triggered.connect(self.on_actionConfig)
         self.ui.actionPrivileges.triggered.connect(self.on_actionPrivileges)
         self.ui.actionStart.triggered.connect(self.on_actionStart)
         self.ui.actionStop.triggered.connect(self.on_actionStop)
@@ -549,6 +541,19 @@ class MainForm(QWidget):
                         args=(self.testcase.clone_suites, gv.test_script_json))
         thread.start()
 
+    def on_actionConfig(self):
+        settings_wind = SettingsDialog(self)
+        settings_wind.signal.emit()
+        settings_wind.exec_()
+        if settings_wind.isChange:
+            ask = QMessageBox.question(self, "Save configuration to file?",
+                                       "The configuration has been changed.Do you want to save it permanently?",
+                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if ask == QMessageBox.Yes:
+                save_config(gv.config_yaml_path, gv.cf)
+        settings_wind.destroy()
+        # os.startfile(rf'{gv.config_yaml_path}')
+
     def on_actionPrivileges(self):
         if gv.IsDebug:
             QMessageBox.information(self, 'Authority', 'This is lab test privileges.', QMessageBox.Yes)
@@ -592,7 +597,7 @@ class MainForm(QWidget):
             content = self.ui.textEdit.toPlainText()
             with open(gv.txtLogPath, 'wb') as f:
                 f.write(content.encode('utf8'))
-            lg.logger.debug(f"{info} Save test log OK.{gv.txtLogPath}")
+            lg.logger.debug(f"Save test log OK.{gv.txtLogPath}")
 
         thread = Thread(target=thread_update)
         thread.start()

@@ -213,6 +213,11 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="Chart">
+          <attribute name="title">
+           <string>Chart</string>
+          </attribute>
+         </widget>
         </widget>
        </item>
       </layout>
