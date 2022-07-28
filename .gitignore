@@ -6,8 +6,11 @@
 /build/
 /test/
 /.idea
-/src/robotsystem/flash/
-/src/robotsystem/conf/setting.db
-/src/robotsystem/OutPut/result.db
+/flash/
+/conf/setting.db
+/OutPut/result.db
 /venv/
 /scripts/*.json
+/OutPut/result.csv
+/ui/main.py
+/venv39/

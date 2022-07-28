@@ -12,10 +12,10 @@ import json
 import csv
 import requests
 from threading import Thread
-import robotsystem.ui.mainform as mf
-import robotsystem.conf.logprint as lg
-import robotsystem.conf.globalvar as gv
-from robotsystem.model.basicfunc import write_csv_file, create_csv_file
+import ui.mainform as mf
+import conf.logprint as lg
+import conf.globalvar as gv
+from model.basicfunc import write_csv_file, create_csv_file
 
 
 def check_connection(url):
@@ -37,7 +37,7 @@ def check_connection(url):
 
 
 def upload_Json_to_client(url, log_path):
-    return  True
+    return True
     """上传json内容和测试log到客户服务器"""
     json_upload_path = os.path.join(gv.logFolderPath, 'Json', f'{gv.SN}_{time.strftime("%H%M%S")}.json')
     gv.jsonOfResult = json_upload_path
@@ -129,7 +129,7 @@ def upload_result_to_mes(url):
     if gv.IsDebug:
         return True
     mes_result = json.dumps(gv.mesPhases, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-    lg.logger.debug(mes_result)
+    lg.logger.debug(f'mes info:{mes_result}')
     response = requests.post(url, mes_result)
     if response.status_code == 200:
         return True

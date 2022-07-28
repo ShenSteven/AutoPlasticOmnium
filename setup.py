@@ -27,7 +27,7 @@ requires = [
 ]
 
 about = {}
-with open(join(dirname(abspath(__file__)), 'src', '__version__.py'), 'r', encoding='utf-8') as f:
+with open(join(dirname(abspath(__file__)), 'src', 'conf/__version__.py'), 'r', encoding='utf-8') as f:
     exec(f.read(), about)
 
 with open(join(dirname(abspath(__file__)), 'README.md'), 'r', encoding='utf-8') as f:

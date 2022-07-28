@@ -8,20 +8,18 @@
 """
 import re
 from datetime import datetime
-from PyQt5.QtCore import Qt, Q_ARG, QMetaObject
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
-# from robotsystem.model.testcase import TestCase
-from . import product
-from . import step
+import model.product
+import model.step
 from .basicfunc import IsNullOrEmpty
-import robotsystem.conf.globalvar as gv
-import robotsystem.conf.logprint as lg
-import robotsystem.ui.mainform
-import robotsystem.model.testcase
+import conf.globalvar as gv
+import conf.logprint as lg
+import ui.mainform
 
 
-def fail_continue(test_step: step.Step, failContinue):
+def fail_continue(test_step: model.step.Step, failContinue):
     if test_step.FTC.lower() == 'n':
         return False
     elif test_step.FTC.lower() == 'y':
@@ -47,7 +45,7 @@ class TestSuite:
         self.phase_details = None
         self.elapsedTime = None
         self.ForStartStepNo = 0
-        self._forTotalCycle = 0
+        self.ForTotalCycle = 0
         self.ForCycleCounter = 1
         if dict_ is not None:
             self.__dict__.update(dict_)
@@ -55,6 +53,7 @@ class TestSuite:
     def run(self, test_case, global_fail_continue, stepNo=-1):
         """
         run test suite.
+        :param test_case:
         :param global_fail_continue: a boolean indicate step or continue when test fail.
         :param stepNo:
         :return:test result,pass or fail.
@@ -66,7 +65,7 @@ class TestSuite:
         lg.logger.debug(
             '- ' * 8 + f"<a name='testSuite:{self.SuiteName}'>Start testSuite:{self.SuiteName}</a>" + '- ' * 9)
         self.setColor(Qt.yellow)
-        suiteItem = product.SuiteItem()
+        suiteItem = model.product.SuiteItem()
         step_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
@@ -113,8 +112,8 @@ class TestSuite:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        robotsystem.ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.index,
-                                                                                   -1, False)
+        ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.index,
+                                                                       -1, False)
         # QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
         #                          Qt.BlockingQueuedConnection,
         #                          Q_ARG(QBrush, color),
@@ -131,32 +130,31 @@ class TestSuite:
         else:
             lg.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime}")
 
-    def process_for(self, test_case, step_item: step.Step):
+    def process_for(self, test_case, step_item: model.step.Step):
         """FOR 循环开始判断"""
         if not IsNullOrEmpty(step_item.For) and '(' in step_item.For and ')' in step_item.For:
-            gv.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
+            self.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
             test_case.ForStartSuiteNo = self.index
             self.ForStartStepNo = step_item.index
             test_case.ForFlag = False
-            lg.logger.debug(f"====================Start Cycle-{gv.ForTestCycle}===========================")
+            lg.logger.debug(f"====================Start Cycle-{self.ForCycleCounter}===========================")
 
-    # @staticmethod
-    def process_EndFor(self, test_case, step_item: step.Step):
+    def process_EndFor(self, test_case, step_item: model.step.Step):
         """FOR 循环结束判断"""
         if not IsNullOrEmpty(step_item.For) and step_item.For.lower().startswith('end'):
-            if gv.ForTestCycle < gv.ForTotalCycle:
+            if self.ForCycleCounter < self.ForTotalCycle:
                 test_case.ForFlag = True
                 self.ForCycleCounter += 1
                 return True
 
             test_case.ForFlag = False
-            lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForTestCycle}) Cycle test." + '=' * 10)
+            lg.logger.debug('=' * 10 + f"Have Complete all({self.ForCycleCounter}) Cycle test." + '=' * 10)
             self.ForCycleCounter = 1
             return False
         else:
             return False
 
-    def copy_to_json_obj(self, obj: product.SuiteItem):
+    def copy_to_json_obj(self, obj: model.product.SuiteItem):
         obj.phase_name = self.SuiteName
         obj.status = "passed" if self.suiteResult else "failed"
         obj.start_time = self.start_time

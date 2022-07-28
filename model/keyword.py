@@ -6,14 +6,13 @@
 @Date   : 2021/11/9
 @Desc   : 
 """
-import logging
 import re
 
-from robotsystem.peak.FBL_PLIN_USB import Bootloader
-from robotsystem.sockets.serialport import SerialPort
-from robotsystem.sockets.telnet import TelnetComm
-import robotsystem.conf.globalvar as gv
-import robotsystem.conf.logprint as lg
+import peak.FBL_PLIN_USB
+from sockets.serialport import SerialPort
+from sockets.telnet import TelnetComm
+import conf.globalvar as gv
+import conf.logprint as lg
 import subprocess
 import time
 import psutil
@@ -229,7 +228,7 @@ def testKeyword(item, testSuite):
                 rReturn = True
 
         elif item.Keyword == 'PLINInitConnect':
-            gv.PLin = Bootloader()
+            gv.PLin = peak.FBL_PLIN_USB.Bootloader()
             if gv.PLin.connect():
                 time.sleep(0.1)
                 rReturn = gv.PLin.runSchedule()
@@ -259,7 +258,7 @@ def testKeyword(item, testSuite):
             rReturn = True
 
         elif item.Keyword == 'GetCRC':
-            item.testValue = Bootloader.get_crc_apps19(f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
+            item.testValue = peak.FBL_PLIN_USB.Bootloader.get_crc_apps19(f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
             rReturn = not IsNullOrEmpty(item.testValue)
 
         else:

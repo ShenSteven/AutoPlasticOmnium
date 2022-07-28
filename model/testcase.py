@@ -9,11 +9,11 @@
 import copy
 import os
 from datetime import datetime
-from . import loadseq
-from . import product
-from . import sqlite
-import robotsystem.conf.globalvar as gv
-import robotsystem.conf.logprint as lg
+import model.loadseq
+import model.product
+import model.sqlite
+import conf.globalvar as gv
+import conf.logprint as lg
 from inspect import currentframe
 
 
@@ -21,7 +21,7 @@ def init_database(database_name):
     """init conf/setting.db, OutPut/result.db"""
     try:
         if not os.path.exists(database_name):
-            with sqlite.Sqlite(database_name) as db:
+            with model.sqlite.Sqlite(database_name) as db:
                 db.execute('''CREATE TABLE SHA256_ENCRYPTION
                                (NAME TEXT PRIMARY KEY     NOT NULL,
                                SHA256           TEXT    NOT NULL
@@ -36,7 +36,7 @@ def init_database(database_name):
                 db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_abort_count', '0')")
                 print(f"Table created successfully")
         if not os.path.exists(gv.database_result):
-            with sqlite.Sqlite(gv.database_result) as db:
+            with model.sqlite.Sqlite(gv.database_result) as db:
                 db.execute('''CREATE TABLE RESULT
                                              (ID            INTEGER PRIMARY KEY AUTOINCREMENT,
                                               SN            TEXT,
@@ -76,11 +76,11 @@ class TestCase:
         self.Finished = False
         init_database(gv.database_setting)
         if os.path.exists(self.test_script_json):
-            self.original_suites = loadseq.load_testcase_from_json(self.test_script_json)
+            self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json)
         else:
-            self.original_suites = loadseq.load_testcase_from_excel(self.testcase_path,
-                                                                    self.sheetName,
-                                                                    self.test_script_json)
+            self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path,
+                                                                          self.sheetName,
+                                                                          self.test_script_json)
         self.clone_suites = copy.deepcopy(self.original_suites)
 
     def run(self, global_fail_continue=False, stepNo=-1):
@@ -113,14 +113,14 @@ class TestCase:
             self.teardown()
             self.Finished = True
 
-    def copy_to_json(self, obj: product.JsonObject):
+    def copy_to_json(self, obj: model.product.JsonObject):
         obj.status = 'passed' if self.tResult else 'failed'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
         obj.error_code = gv.error_code_first_fail
         obj.error_details = gv.error_details_first_fail
 
-    def copy_to_mes(self, obj: product.MesInfo):
+    def copy_to_mes(self, obj: model.product.MesInfo):
         obj.status = 'PASS' if self.tResult else 'FAIL'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time

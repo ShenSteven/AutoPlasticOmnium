@@ -15,7 +15,7 @@ import time
 from ctypes import *
 from . import PLinApi
 from inspect import currentframe
-import robotsystem.conf.logprint as lg
+import conf.logprint as lg
 
 
 def bytes_to_string(byte_strs):

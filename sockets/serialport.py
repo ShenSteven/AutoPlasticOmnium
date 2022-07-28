@@ -9,9 +9,9 @@
 import re
 import time
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
-from robotsystem.model.basicfunc import IsNullOrEmpty
-from robotsystem.sockets.communication import CommAbstract
-import robotsystem.conf.logprint as lg
+from model.basicfunc import IsNullOrEmpty
+from sockets.communication import CommAbstract
+import conf.logprint as lg
 
 
 class SerialPort(CommAbstract):

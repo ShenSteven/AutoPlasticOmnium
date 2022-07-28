@@ -8,17 +8,17 @@
 """
 import re
 from datetime import datetime
-from PyQt5.QtCore import Qt, Q_ARG, QMetaObject
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QAction
 
-from . import product
-from . import sqlite
-from . import keyword
+import model.product
+import model.sqlite
+import model.keyword
 from .basicfunc import IsNullOrEmpty
-import robotsystem.conf.globalvar as gv
-import robotsystem.conf.logprint as lg
-import robotsystem.ui.mainform
+import conf.globalvar as gv
+import conf.logprint as lg
+import ui.mainform
 
 
 class Step:
@@ -226,8 +226,8 @@ class Step:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        robotsystem.ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex,
-                                                                                   self.index, False)
+        ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex,
+                                                                       self.index, False)
         # QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
         #                          Qt.BlockingQueuedConnection,
         #                          Q_ARG(QBrush, color),
@@ -235,7 +235,7 @@ class Step:
         #                          Q_ARG(int, self.index),
         #                          Q_ARG(bool, False))
 
-    def run(self, testSuite, suiteItem: product.SuiteItem = None):
+    def run(self, testSuite, suiteItem: model.product.SuiteItem = None):
         """run test step"""
         self.SuiteName = testSuite.SuiteName
         self.suiteIndex = testSuite.index
@@ -264,15 +264,15 @@ class Step:
 
             if self.breakpoint == str(True) or gv.pauseFlag:
                 gv.pauseFlag = True
-                robotsystem.ui.mainform.MainForm.main_form.my_signals.setIconSignal[QAction, QIcon].emit(
-                    robotsystem.ui.mainform.MainForm.main_form.ui.actionStart, QIcon(':/images/Start-icon.png'))
+                ui.mainform.MainForm.main_form.my_signals.setIconSignal[QAction, QIcon].emit(
+                    ui.mainform.MainForm.main_form.ui.actionStart, QIcon(':/images/Start-icon.png'))
                 gv.pause_event.clear()
             else:
                 gv.pause_event.set()
 
             for retry in range(self.retry, -1, -1):
                 if gv.pause_event.wait():
-                    test_result, info = keyword.testKeyword(self, testSuite)
+                    test_result, info = model.keyword.testKeyword(self, testSuite)
                 if test_result:
                     break
             self.setColor(Qt.green if test_result else Qt.red)
@@ -300,7 +300,7 @@ class Step:
                     lg.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             # record test date to DB.
             if self.Json.lower() == 'y':
-                with sqlite.Sqlite(gv.database_result) as db:
+                with model.sqlite.Sqlite(gv.database_result) as db:
                     lg.logger.debug('INSERT test result to result.db table RESULT.')
                     db.execute(
                         f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
@@ -406,7 +406,7 @@ class Step:
             lg.logger.error(result_info)
         if self.Json.lower() == 'y':
             self.elapsedTime = (datetime.now() - self.start_time).seconds
-            robotsystem.ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(
+            ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(
                 [gv.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
                  self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
@@ -424,11 +424,11 @@ class Step:
             gv.csv_list_header.append(name)
             gv.csv_list_result.append(self.testValue)
 
-    def report_to_json(self, testResult, suiteItem: product.SuiteItem = None):
+    def report_to_json(self, testResult, suiteItem: model.product.SuiteItem = None):
         """copy test data to json object"""
         if self.status == str(False):
             self.start_time_json = gv.startTimeJson
-        obj = product.StepItem()
+        obj = model.product.StepItem()
         if self.EeroName.endswith('_'):
             obj.test_name = self.EeroName + str(self.ForCycleCounter)
         else:
@@ -463,7 +463,7 @@ class Step:
 
         return obj
 
-    def generate_report(self, test_result, suiteItem: product.SuiteItem):
+    def generate_report(self, test_result, suiteItem: model.product.SuiteItem):
         """ according to self.json, if record test result and data into json file"""
         if self.Json is not None and self.Json.lower() == 'y':
             obj = self.report_to_json(test_result, suiteItem)
@@ -473,7 +473,16 @@ class Step:
             self.report_to_csv(obj.test_name)
 
     def process_teardown(self, test_result):
-        pass
+        if IsNullOrEmpty(self.TearDown) or test_result:
+            return
+        lg.logger.debug(f'run teardown command...')
+        try:
+            if self.TearDown == 'ECUReset':
+                gv.PLin.SingleFrame(self.ID, self._NAD, '02', '11 01', self.Timeout)
+            else:
+                lg.logger.warning(f'this teardown({self.TearDown}) no cation.')
+        except Exception as e:
+            lg.logger.exception(f"process_teardown:{e}")
 
     def init_online_limit(self):
         pass

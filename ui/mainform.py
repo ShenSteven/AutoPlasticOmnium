@@ -8,24 +8,24 @@ from datetime import datetime
 from enum import Enum
 from os.path import dirname, abspath, join
 from threading import Thread
-import robotsystem.ui.images
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRegExp, QMetaObject, QThread
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
-import robotsystem.conf.globalvar as gv
-import robotsystem.conf.logprint as lg
-import robotsystem.model.product
-import robotsystem.model.testcase
-import robotsystem.model.loadseq
-import robotsystem.model.sqlite
-import robotsystem.model.variables
-from robotsystem.model.basicfunc import IsNullOrEmpty
-import robotsystem.sockets.serialport
-from robotsystem.ui.reporting import upload_Json_to_client, upload_result_to_mes, CollectResultToCsv, saveTestResult
+import conf.globalvar as gv
+import conf.logprint as lg
+from model.basicfunc import IsNullOrEmpty
+import sockets.serialport
+from model.sqlite import Sqlite
+import model.testcase
+from ui.reporting import upload_Json_to_client, upload_result_to_mes, CollectResultToCsv, saveTestResult
 from inspect import currentframe
+import model.loadseq
+import model.variables
+import model.product
+import ui.images_rc
 
 
 # pyrcc5 images.qrc -o images.py
@@ -59,12 +59,15 @@ class MySignals(QObject):
 
 
 def init_create_dirs():
-    if not IsNullOrEmpty(gv.cf.station.setTimeZone):
-        os.system(f"tzutil /s \"{gv.cf.station.setTimeZone}\"")
-    os.makedirs(gv.logFolderPath + r"\Json", exist_ok=True)
-    os.makedirs(gv.OutPutPath, exist_ok=True)
-    os.makedirs(gv.DataPath, exist_ok=True)
-    os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
+    try:
+        if not IsNullOrEmpty(gv.cf.station.setTimeZone):
+            os.system(f"tzutil /s \"{gv.cf.station.setTimeZone}\"")
+        os.makedirs(gv.logFolderPath + r"\Json", exist_ok=True)
+        os.makedirs(gv.OutPutPath, exist_ok=True)
+        os.makedirs(gv.DataPath, exist_ok=True)
+        os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
+    except:
+        raise
 
 
 def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
@@ -87,15 +90,6 @@ def updateAction(action_, icon: QIcon = None, text: str = None):
 
     thread = Thread(target=thread_update)
     thread.start()
-
-
-def UpdateContinueFail(testResult: bool):
-    if gv.IsDebug or gv.cf.dut.test_mode.lower() == 'debug':
-        return
-    if testResult:
-        gv.continue_fail_count = 0
-    else:
-        gv.continue_fail_count += 1
 
 
 def on_setIcon(action_, icon: QIcon):
@@ -147,8 +141,8 @@ def on_actionCSVLog():
 
 def on_actionException():
     def thread_update():
-        if os.path.exists(gv.critical_log):
-            os.startfile(gv.critical_log)
+        if os.path.exists(lg.critical_log):
+            os.startfile(lg.critical_log)
 
     thread = Thread(target=thread_update)
     thread.start()
@@ -168,6 +162,15 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.SingleStepTest = False
+        self.StepNo = -1
+        self.SuiteNo = -1
+        self.FailNumOfCycleTest = 0
+        self.PassNumOfCycleTest = 0
+        self.total_abort_count = 0
+        self.total_fail_count = 0
+        self.total_pass_count = 0
+        self.continue_fail_count = 0
         self.my_signals = MySignals()
         self.timer = None
         self.ui = loadUi(join(dirname(abspath(__file__)), 'main.ui'))
@@ -175,7 +178,8 @@ class MainForm(QWidget):
         init_create_dirs()
         MainForm.main_form = self  # 单例模式
         self.sec = 1
-        self.testcase: robotsystem.model.testcase.TestCase = gv.testcase
+        self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
+                                                                         f'{gv.cf.station.station_name}')
         self.testSequences = self.testcase.clone_suites
         self.init_select_station()
         self.init_textEditHandler()
@@ -187,8 +191,8 @@ class MainForm(QWidget):
         self.init_lineEdit()
         self.init_signals_connect()
         self.ShowTreeView(self.testSequences)
-        gv.testThread = TestThread(self)
-        # gv.testThread.start()
+        self.testThread = TestThread(self)
+        self.testThread.start()
 
     def init_select_station(self):
         for item in gv.cf.station.station_all:
@@ -276,23 +280,23 @@ class MainForm(QWidget):
         self.ui.action192_168_1_101.setText(GetAllIpv4Address('10.90.'))
 
     def init_status_bar(self):
-        with robotsystem.model.sqlite.Sqlite(gv.database_setting) as db:
+        with Sqlite(gv.database_setting) as db:
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
-            gv.continue_fail_count = db.cur.fetchone()[0]
+            self.continue_fail_count = db.cur.fetchone()[0]
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_pass_count'")
-            gv.total_pass_count = db.cur.fetchone()[0]
+            self.total_pass_count = db.cur.fetchone()[0]
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_fail_count'")
-            gv.total_fail_count = db.cur.fetchone()[0]
+            self.total_fail_count = db.cur.fetchone()[0]
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_abort_count'")
-            gv.total_abort_count = db.cur.fetchone()[0]
+            self.total_abort_count = db.cur.fetchone()[0]
 
-        self.ui.lb_continuous_fail = QLabel(f'continuous_fail: {gv.continue_fail_count}')
-        self.ui.lb_count_pass = QLabel(f'PASS: {gv.total_pass_count}')
-        self.ui.lb_count_fail = QLabel(f'FAIL: {gv.total_fail_count}')
-        self.ui.lb_count_abort = QLabel(f'ABORT: {gv.total_abort_count}')
+        self.ui.lb_continuous_fail = QLabel(f'continuous_fail: {self.continue_fail_count}')
+        self.ui.lb_count_pass = QLabel(f'PASS: {self.total_pass_count}')
+        self.ui.lb_count_fail = QLabel(f'FAIL: {self.total_fail_count}')
+        self.ui.lb_count_abort = QLabel(f'ABORT: {self.total_abort_count}')
         try:
-            self.ui.lb_count_yield = QLabel('Yield: {:.2%}'.format(gv.total_pass_count / (
-                    gv.total_pass_count + gv.total_fail_count + gv.total_abort_count)))
+            self.ui.lb_count_yield = QLabel('Yield: {:.2%}'.format(self.total_pass_count / (
+                    self.total_pass_count + self.total_fail_count + self.total_abort_count)))
         except ZeroDivisionError:
             self.ui.lb_count_yield = QLabel('Yield: 0.00%')
         self.ui.statusbar.addPermanentWidget(self.ui.lb_continuous_fail, 3)
@@ -367,8 +371,8 @@ class MainForm(QWidget):
     def on_itemActivated(self, item, column=0):
         if item.parent() is None:
             # lg.logger.critical('itemActivate')
-            gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item)
-            gv.StepNo = 0
+            self.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item)
+            self.StepNo = 0
             self.ui.treeWidget.expandItem(item)
             self.ui.actionStepping.setEnabled(False)
             self.ui.actionEditStep.setEnabled(False)
@@ -377,8 +381,8 @@ class MainForm(QWidget):
             self.ui.textEdit.scrollToAnchor(anchor)
         else:
             # lg.logger.critical('itemActivate')
-            gv.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
-            gv.StepNo = item.parent().indexOfChild(item)
+            self.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
+            self.StepNo = item.parent().indexOfChild(item)
             self.ui.actionStepping.setEnabled(True)
             self.ui.actionEditStep.setEnabled(True)
             pp = item.parent().data(column, Qt.DisplayRole).split(' ', 1)[1]
@@ -423,7 +427,7 @@ class MainForm(QWidget):
             if os.path.exists(gv.test_script_json):
                 os.chmod(gv.test_script_json, stat.S_IWRITE)
                 os.remove(gv.test_script_json)
-            self.testcase = robotsystem.model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
+            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
             self.testSequences = self.testcase.clone_suites
 
         thread = Thread(target=thread_convert_and_load_script)
@@ -470,7 +474,7 @@ class MainForm(QWidget):
             menu.addAction(self.ui.actionUncheckAll)
             menu.addAction(self.ui.actionExpandAll)
             menu.addAction(self.ui.actionCollapseAll)
-            if getattr(gv.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo], 'breakpoint') == str(False):
+            if getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint') == str(False):
                 self.ui.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-set.png'))
             else:
                 self.ui.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-clear.png'))
@@ -492,12 +496,12 @@ class MainForm(QWidget):
         self.on_returnPressed()
 
     def on_actionBreakpoint(self):
-        if getattr(gv.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo], 'breakpoint') == str(False):
-            setattr(gv.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo], 'breakpoint', str(True))
+        if getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint') == str(False):
+            setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', str(True))
             self.ui.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-clear.png'))
             self.ui.treeWidget.currentItem().setIcon(0, QIcon(':/images/breakpoint-set.png'))
         else:
-            setattr(gv.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo], 'breakpoint', str(False))
+            setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', str(False))
             self.ui.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-set.png'))
             self.ui.treeWidget.currentItem().setIcon(0, QIcon(':/images/Document-txt-icon.png'))
 
@@ -510,8 +514,8 @@ class MainForm(QWidget):
 
     def on_actionConvertExcelToJson(self):
         thread = Thread(
-            target=robotsystem.model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
-                                                                          gv.cf.station.station_all))
+            target=model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
+                                                              gv.cf.station.station_all))
         thread.start()
 
     def on_actionOpenScript(self):
@@ -529,7 +533,7 @@ class MainForm(QWidget):
                                                                                             :action.text().index('(')]
                 gv.cf.station.station_no = gv.cf.station.station_name + '-3000'
                 gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
-                self.testcase.original_suites = robotsystem.model.loadseq.load_testcase_from_json(gv.test_script_json)
+                self.testcase.original_suites = model.loadseq.load_testcase_from_json(gv.test_script_json)
                 self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
                 self.testSequences = self.testcase.clone_suites
 
@@ -541,7 +545,7 @@ class MainForm(QWidget):
         lg.logger.debug(f'select {gv.test_script_json} finish!')
 
     def on_actionSaveToScript(self):
-        thread = Thread(target=robotsystem.model.loadseq.serialize_to_json,
+        thread = Thread(target=model.loadseq.serialize_to_json,
                         args=(self.testcase.clone_suites, gv.test_script_json))
         thread.start()
 
@@ -567,15 +571,15 @@ class MainForm(QWidget):
     def on_actionStop(self):
         if gv.IsCycle:
             if gv.startFlag:
-                if gv.FailNumOfCycleTest == 0:
+                if self.FailNumOfCycleTest == 0:
                     gv.finalTestResult = True
-                    gv.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.PASS)
+                    self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.PASS)
                 else:
-                    gv.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.FAIL)
+                    self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.FAIL)
                 gv.IsCycle = False
                 saveTestResult()
         else:
-            gv.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.ABORT)
+            self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.ABORT)
 
     def on_actionClearLog(self):
         if not gv.startFlag:
@@ -588,7 +592,7 @@ class MainForm(QWidget):
             content = self.ui.textEdit.toPlainText()
             with open(gv.txtLogPath, 'wb') as f:
                 f.write(content.encode('utf8'))
-            lg.logger.debug(f"Save test log OK.{gv.txtLogPath}")
+            lg.logger.debug(f"{info} Save test log OK.{gv.txtLogPath}")
 
         thread = Thread(target=thread_update)
         thread.start()
@@ -622,7 +626,7 @@ class MainForm(QWidget):
             self.ui.tabWidget.setCurrentIndex(1)
         for i in range(0, self.ui.tableWidget_2.rowCount()):
             self.ui.tableWidget_2.removeRow(0)
-        step_obj = self.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo]
+        step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         for prop_name in list(dir(step_obj)):
             prop_value = getattr(step_obj, prop_name)
             if isinstance(prop_value, str) and not prop_name.startswith('_'):
@@ -643,7 +647,7 @@ class MainForm(QWidget):
     def on_tableWidget2Edit(self, item):
         prop_name = self.ui.tableWidget_2.item(item.row(), item.column() - 1).text()
         prop_value = item.text()
-        setattr(self.testcase.clone_suites[gv.SuiteNo].steps[gv.StepNo], prop_name, prop_value)
+        setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], prop_name, prop_value)
 
     def on_actionExpandAll(self):
         self.ui.treeWidget.expandAll()
@@ -755,18 +759,18 @@ class MainForm(QWidget):
     def updateStatusBar(self, info):
         def update_status_bar():
             lg.logger.debug(f'{currentframe().f_code.co_name}:{info}')
-            with robotsystem.model.sqlite.Sqlite(gv.database_setting) as db:
-                db.execute(f"UPDATE COUNT SET VALUE='{gv.continue_fail_count}' where NAME ='continue_fail_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_pass_count}' where NAME ='total_pass_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_fail_count}' where NAME ='total_fail_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{gv.total_abort_count}' where NAME ='total_abort_count'")
-            self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.continue_fail_count}')
-            self.ui.lb_count_pass.setText(f'PASS: {gv.total_pass_count}')
-            self.ui.lb_count_fail.setText(f'FAIL: {gv.total_fail_count}')
-            self.ui.lb_count_abort.setText(f'ABORT: {gv.total_abort_count}')
+            with model.sqlite.Sqlite(gv.database_setting) as db:
+                db.execute(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{self.total_fail_count}' where NAME ='total_fail_count'")
+                db.execute(f"UPDATE COUNT SET VALUE='{self.total_abort_count}' where NAME ='total_abort_count'")
+            self.ui.lb_continuous_fail.setText(f'continuous_fail: {self.continue_fail_count}')
+            self.ui.lb_count_pass.setText(f'PASS: {self.total_pass_count}')
+            self.ui.lb_count_fail.setText(f'FAIL: {self.total_fail_count}')
+            self.ui.lb_count_abort.setText(f'ABORT: {self.total_abort_count}')
             try:
-                self.ui.lb_count_yield.setText('Yield: {:.2%}'.format(gv.total_pass_count / (
-                        gv.total_pass_count + gv.total_fail_count + gv.total_abort_count)))
+                self.ui.lb_count_yield.setText('Yield: {:.2%}'.format(self.total_pass_count / (
+                        self.total_pass_count + self.total_fail_count + self.total_abort_count)))
             except ZeroDivisionError:
                 self.ui.lb_count_yield.setText('Yield: 0.00%')
             # QApplication.processEvents()
@@ -791,8 +795,8 @@ class MainForm(QWidget):
         """通过串口读取治具中设置的测试工站名字"""
         if not gv.cf.station.fix_flag:
             return
-        gv.FixSerialPort = robotsystem.sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
-                                                                     gv.cf.station.fix_com_baudRate)
+        gv.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
+                                                         gv.cf.station.fix_com_baudRate)
         for i in range(0, 3):
             rReturn, revStr = gv.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
             if rReturn:
@@ -804,13 +808,21 @@ class MainForm(QWidget):
             QMessageBox.Critical(self, 'Read StationNO', "Read FixNum error,Please check it!")
             sys.exit(0)
 
+    def UpdateContinueFail(self, testResult: bool):
+        if gv.IsDebug or gv.cf.dut.test_mode.lower() == 'debug':
+            return
+        if testResult:
+            self.continue_fail_count = 0
+        else:
+            self.continue_fail_count += 1
+
     def ContinuousFailReset_Click(self):
         """连续fail超过规定值需要TE确认问题并输入密码后才能继续测试"""
         text, ok = QInputDialog.getText(self, 'Reset', 'Please input Reset Password:', echo=QLineEdit.Password)
         if ok:
             if text == 'test123':
-                gv.continue_fail_count = 0
-                self.ui.lb_continuous_fail.setText(f'continuous_fail: {gv.continue_fail_count}')
+                self.continue_fail_count = 0
+                self.ui.lb_continuous_fail.setText(f'continuous_fail: {self.continue_fail_count}')
                 self.ui.lb_continuous_fail.setStyleSheet(
                     f"background-color:{self.ui.statusbar.palette().window().color().name()};")
                 return True
@@ -821,11 +833,11 @@ class MainForm(QWidget):
             return False
 
     def CheckContinueFailNum(self):
-        with robotsystem.model.sqlite.Sqlite(gv.database_setting) as db:
+        with model.sqlite.Sqlite(gv.database_setting) as db:
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
-            gv.continue_fail_count = db.cur.fetchone()[0]
-            lg.logger.debug(str(gv.continue_fail_count))
-        if gv.continue_fail_count >= gv.cf.station.continue_fail_limit:
+            self.continue_fail_count = db.cur.fetchone()[0]
+            lg.logger.debug(str(self.continue_fail_count))
+        if self.continue_fail_count >= gv.cf.station.continue_fail_limit:
             self.ui.lb_continuous_fail.setStyleSheet(f"background-color:red;")
             if gv.IsDebug:
                 return True
@@ -864,10 +876,10 @@ class MainForm(QWidget):
 
     def on_returnPressed(self, stepping_flag=None):
         if stepping_flag is not None:
-            gv.SingleStepTest = True
+            self.SingleStepTest = True
         else:
-            gv.SingleStepTest = False
-        if gv.dut_model == 'unknown' and not gv.IsDebug:
+            self.SingleStepTest = False
+        if not gv.dut_model == 'unknown' and not gv.IsDebug:
             str_info = f'无法根据SN判断机种或者SN长度不对! 扫描:{len(self.ui.lineEdit.text())},规定:{gv.cf.dut.sn_len}.'
             QMetaObject.invokeMethod(self, 'showMessageBox', Qt.AutoConnection,
                                      QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
@@ -879,7 +891,7 @@ class MainForm(QWidget):
             return
 
         if gv.IsDebug:
-            if not gv.SingleStepTest:
+            if not self.SingleStepTest:
                 self.init_treeWidget_color()
         else:
             self.testSequences = copy.deepcopy(self.testcase.original_suites)
@@ -890,18 +902,18 @@ class MainForm(QWidget):
 
     def variable_init(self):
         """测试变量初始化"""
-        if gv.SingleStepTest and self.testcase.Finished:
+        if self.SingleStepTest and self.testcase.Finished:
             pass
         else:
-            gv.TestVariables = robotsystem.model.variables.Variables(gv.cf.station.station_name,
-                                                                     gv.cf.station.station_no, gv.SN,
-                                                                     gv.cf.dut.dut_ip, gv.cf.station.log_folder)
-        gv.stationObj = robotsystem.model.product.JsonObject(gv.SN, gv.cf.station.station_no,
-                                                             gv.cf.dut.test_mode,
-                                                             gv.cf.dut.qsdk_ver, gv.version)
+            gv.TestVariables = model.variables.Variables(gv.cf.station.station_name,
+                                                         gv.cf.station.station_no, gv.SN,
+                                                         gv.cf.dut.dut_ip, gv.cf.station.log_folder)
+        gv.stationObj = model.product.JsonObject(gv.SN, gv.cf.station.station_no,
+                                                 gv.cf.dut.test_mode,
+                                                 gv.cf.dut.qsdk_ver, gv.version)
         gv.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{gv.SN}/station/{gv.cf.station.station_no}/info'
         gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{gv.SN}/station/{gv.cf.station.station_name}'
-        gv.mesPhases = robotsystem.model.product.MesInfo(gv.SN, gv.cf.station.station_no, gv.version)
+        gv.mesPhases = model.product.MesInfo(gv.SN, gv.cf.station.station_no, gv.version)
         init_create_dirs()
         gv.csv_list_header = []
         gv.csv_list_result = []
@@ -912,27 +924,27 @@ class MainForm(QWidget):
         gv.DUTMesIP = ''
         gv.MesMac = ''
         gv.sec = 0
-        if not gv.SingleStepTest:
-            gv.SuiteNo = -1
-            gv.StepNo = -1
+        if not self.SingleStepTest:
+            self.SuiteNo = -1
+            self.StepNo = -1
         gv.WorkOrder = '1'
         gv.startTimeJsonFlag = True
         gv.startTimeJson = datetime.now()
         self.ui.lb_failInfo.setHidden(True)
         self.ui.lb_testTime.setHidden(True)
         self.sec = 1
-        gv.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.START)
+        self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.START)
 
 
 def SetTestStatus(myWind: MainForm, status: TestStatus):
     """设置并处理不同的测试状态"""
     try:
         if status == TestStatus.START:
-            if not gv.testThread.isRunning():
-                gv.testThread = TestThread(myWind)
-                gv.testThread.start()
+            if not myWind.testThread.isRunning():
+                myWind.testThread = TestThread(myWind)
+                myWind.testThread.start()
             myWind.ui.treeWidget.blockSignals(True)
-            if not gv.SingleStepTest:
+            if not myWind.SingleStepTest:
                 myWind.my_signals.textEditClearSignal[str].emit('')
             myWind.my_signals.lineEditEnableSignal[bool].emit(False)
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Testing', 36,
@@ -951,7 +963,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
             myWind.my_signals.update_tableWidget[str].emit('clear')
             gv.pause_event.set()
         elif status == TestStatus.FAIL:
-            gv.total_fail_count += 1
+            myWind.total_fail_count += 1
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'FAIL', 36,
                                                                          Qt.red)
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_testTime,
@@ -959,21 +971,21 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                                                                          Qt.gray)
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
                                                                          gv.error_details_first_fail, 20, Qt.red)
-            UpdateContinueFail(False)
+            myWind.UpdateContinueFail(False)
             if gv.setIpFlag:
                 gv.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
         elif status == TestStatus.PASS:
-            gv.total_pass_count += 1
+            myWind.total_pass_count += 1
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'PASS', 36,
                                                                          Qt.green)
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
                                                                          str(myWind.sec), 20,
                                                                          Qt.green)
-            UpdateContinueFail(True)
+            myWind.UpdateContinueFail(True)
         elif status == TestStatus.ABORT:
-            gv.total_abort_count += 1
-            gv.testThread.terminate()
-            gv.testThread.wait(1)
+            myWind.total_abort_count += 1
+            myWind.testThread.terminate()
+            myWind.testThread.wait(1)
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Abort', 36,
                                                                          Qt.gray)
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_testTime,
@@ -1015,9 +1027,9 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
 class TestThread(QThread):
     signal = pyqtSignal(MainForm, TestStatus)
 
-    def __init__(self, mywind: MainForm):
+    def __init__(self, myWind: MainForm):
         super(TestThread, self).__init__()
-        self.myWind = mywind
+        self.myWind = myWind
         self.signal[MainForm, TestStatus].connect(SetTestStatus)
 
     def __del__(self):
@@ -1032,27 +1044,27 @@ class TestThread(QThread):
                 if gv.startFlag:
                     if gv.IsCycle:
                         while gv.IsCycle:
-                            if gv.testcase.run(gv.cf.station.fail_continue):
-                                gv.PassNumOfCycleTest += 1
+                            if self.myWind.testcase.run(gv.cf.station.fail_continue):
+                                self.myWind.PassNumOfCycleTest += 1
                             else:
-                                gv.FailNumOfCycleTest += 1
-                            if gv.PassNumOfCycleTest + gv.FailNumOfCycleTest == gv.cf.station.loop_count:
+                                self.myWind.FailNumOfCycleTest += 1
+                            if self.myWind.PassNumOfCycleTest + self.myWind.FailNumOfCycleTest == gv.cf.station.loop_count:
                                 lg.logger.debug(f"***** All loop({gv.cf.station.loop_count}) have completed! *****")
                                 self.myWind.my_signals.threadStopSignal[str].emit('stop test.')
                                 time.sleep(0.5)
                             else:
                                 time.sleep(gv.cf.station.loop_interval)
-                    elif gv.SingleStepTest:
-                        lg.logger.debug(f'Suite:{gv.SuiteNo},Step:{gv.StepNo}')
-                        result = gv.testcase.clone_suites[gv.SuiteNo].steps[
-                            gv.StepNo].run(
-                            gv.testcase.clone_suites[gv.SuiteNo])
+                    elif self.myWind.SingleStepTest:
+                        lg.logger.debug(f'Suite:{self.myWind.SuiteNo},Step:{self.myWind.StepNo}')
+                        result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[
+                            self.myWind.StepNo].run(
+                            self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
                         gv.finalTestResult = result
                         self.signal[MainForm, TestStatus].emit(self.myWind,
                                                                TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
                     else:
-                        result = gv.testcase.run(gv.cf.station.fail_continue)
+                        result = self.myWind.testcase.run(gv.cf.station.fail_continue)
                         result1 = upload_Json_to_client(gv.cf.station.rs_url, gv.txtLogPath)
                         result2 = upload_result_to_mes(gv.mes_result)
                         gv.finalTestResult = result & result1 & result2

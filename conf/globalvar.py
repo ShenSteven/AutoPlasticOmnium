@@ -7,21 +7,32 @@
 @Desc   : 全局变量
 """
 from datetime import datetime
-from os.path import join
-from threading import Event, Lock
-import robotsystem.conf.config
+from os.path import join, abspath, dirname
+from threading import Event
+import conf.config
 import platform
-import robotsystem.model.product
-import robotsystem.model.variables
-import robotsystem.model.testcase
+import model.product
+import model.variables
+from main import bundle_dir
+
+
+def get_about():
+    """get app about information"""
+    about_app = {}
+    with open(join(dirname(abspath(__file__)), '__version__.py'), 'r', encoding='utf-8') as f:
+        exec(f.read(), about_app)
+    return about_app
+
+
+about = get_about()
 
 win = platform.system() == 'Windows'
 linux = platform.system() == 'Linux'
-current_dir = robotsystem.current_dir
-config_yaml_path = join(current_dir, 'conf', 'config.yaml')
-logging_yaml = join(current_dir, 'conf', 'logging.yaml')
-cf = robotsystem.conf.config.read_config(config_yaml_path, robotsystem.conf.config.Configs)  # load test global variable
 tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
+
+current_dir = bundle_dir
+config_yaml_path = abspath(join(dirname(__file__), 'config.yaml'))
+cf = conf.config.read_config(config_yaml_path, conf.config.Configs)
 
 SN = ''
 dut_ip = ''
@@ -32,11 +43,11 @@ dut_model = 'unknown'
 
 error_code_first_fail = ''
 error_details_first_fail = ''
-version = robotsystem.about['__version__']
+version = about['__version__']
 
 logFolderPath = ''
-critical_log = ''
-errors_log = ''
+# critical_log = ''
+# errors_log = ''
 txtLogPath = ''
 jsonOfResult = ''
 csv_list_header = []
@@ -49,20 +60,19 @@ PLin = None
 
 IsDebug = False
 startFlag = False
-# startFlagLock = Lock()
 pauseFlag = False
+pause_event = Event()
 IsCycle = False
 finalTestResult = False
 setIpFlag = False
-SingleStepTest = False
+# SingleStepTest = False
 IfCond = True
 failCount = 0
-
-ForTotalCycle = 0
-ForTestCycle = 1
-ForStartSuiteNo = 0
-ForStartStepNo = 0
-ForFlag = False
+# ForTotalCycle = 0
+# ForTestCycle = 1
+# ForStartSuiteNo = 0
+# ForStartStepNo = 0
+# ForFlag = False
 
 OutPutPath = rf'{current_dir}\OutPut'
 DataPath = rf'{current_dir}\Data'
@@ -76,25 +86,22 @@ shop_floor_url = ''
 database_setting = rf'{current_dir}\conf\setting.db'
 database_result = rf'{current_dir}\OutPut\result.db'
 
-continue_fail_count = 0
-total_pass_count = 0
-total_fail_count = 0
-total_abort_count = 0
+# continue_fail_count = 0
+# total_pass_count = 0
+# total_fail_count = 0
+# total_abort_count = 0
 
-testcase = robotsystem.model.testcase.TestCase(rf'{excel_file_path}', f'{cf.station.station_name}')
-mesPhases: robotsystem.model.product.MesInfo
-stationObj: robotsystem.model.product.JsonObject
-testThread = None
-pause_event = Event()
+TestVariables: model.variables.Variables
+mesPhases: model.product.MesInfo
+stationObj: model.product.JsonObject
+# testThread = None
 
-PassNumOfCycleTest = 0
-FailNumOfCycleTest = 0
-SuiteNo = -1
-StepNo = -1
+# PassNumOfCycleTest = 0
+# FailNumOfCycleTest = 0
+# SuiteNo = -1
+# StepNo = -1
 startTimeJsonFlag = True
 startTimeJson = datetime.now()
-
-TestVariables: robotsystem.model.variables.Variables
 
 
 def set_global_val(name, value):
