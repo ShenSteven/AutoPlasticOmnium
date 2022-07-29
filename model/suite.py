@@ -75,8 +75,6 @@ class TestSuite:
                     stepNo = -1
 
                 self.process_for(test_case, self.steps[i])
-                # 把测试套的全局变量赋值给下面的测试步骤
-                # if not IsNullOrEmpty(self.suiteVar):
                 step_item.suiteVar = self.suiteVar
                 step_result = self.steps[i].run(self, suiteItem)
                 step_result_list.append(step_result)
@@ -90,7 +88,6 @@ class TestSuite:
             self.suiteResult = all(step_result_list)
             self.print_result_info()
             self.process_mesVer()
-            # 加入station实例,记录测试结果 用于序列化Json文件
             if gv.stationObj.test_phases is not None:
                 self.copy_to_json_obj(suiteItem)
                 gv.stationObj.test_phases.append(suiteItem)

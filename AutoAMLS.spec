@@ -1,10 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-block_cipher = None
+block_cipher = pyi_crypto.PyiBlockCipher(key="'steven1986.11'")
 
 added_files = [
     ('ui/images/*', 'ui/images'),
-    ('ui/main.ui', 'ui'),
+    ('ui/ui_main.ui', 'ui'),
     ('conf/*.yaml', 'conf'),
     ('conf/*.db', 'conf'),
     ('conf/__version__.py', 'conf'),
@@ -26,7 +26,7 @@ a = Analysis(
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
-    noarchive=True,
+    noarchive=False,
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
@@ -36,7 +36,7 @@ exe = EXE(
     [('v', None, 'OPTION')],
     exclude_binaries=True,
     name='AutoAMLS',
-    debug=True,
+    debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,

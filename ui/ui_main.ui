@@ -26,8 +26,8 @@
    <string>AutoAMLS</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>C:/Users/ocu02965/.designer/backup/images/Letter-T-blue-icon.png</normaloff>C:/Users/ocu02965/.designer/backup/images/Letter-T-blue-icon.png</iconset>
+   <iconset resource="images.qrc">
+    <normaloff>:/images/Letter-T-blue-icon.png</normaloff>:/images/Letter-T-blue-icon.png</iconset>
   </property>
   <property name="toolTip">
    <string/>

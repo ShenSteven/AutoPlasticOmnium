@@ -116,40 +116,6 @@ class Step:
         self.NAD: str = ''
         self.PCI_LEN: str = ''
 
-        # self.SuiteName = ''
-        # self.StepName = ''
-        # self.EeroName = None
-        # self.Keyword = ''
-        # self.ErrorCode = None
-        # self.ErrorDetails = None
-        # self.Retry = None
-        # self.Timeout = None
-        # self.IfElse = ''
-        # self.For = ''
-        # self.SubStr1 = None
-        # self.SubStr2 = None
-        # self.Model = None
-        # self.CmdOrParam = None
-        # self.ExpectStr = None
-        # self.CheckStr1 = None
-        # self.CheckStr2 = None
-        # self.NoContain = None
-        # self.SPEC = None
-        # self.LSL = None
-        # self.USL = None
-        # self.Unit = None
-        # self.MesVar = None
-        # self.ByPF = ''
-        # self.FTC = ''
-        # self.Json = ''
-        # self.SetGlobalVar = None
-        # self.param1 = None
-        # self.TearDown = None
-        # # PLIN
-        # self.ID = None
-        # self.NAD = None
-        # self.PCI_LEN = None
-
         if dict_ is not None:
             self.__dict__.update(dict_)
 
@@ -176,17 +142,9 @@ class Step:
     def command(self):
         return Step.parse_var(self.CmdOrParam)
 
-    # @command.setter
-    # def command(self, value):
-    #     self._command = Step.parse_var(value)
-
     @property
     def spec(self):
         return Step.parse_var(self.SPEC)
-
-    # @spec.setter
-    # def spec(self, value):
-    #     self._spec = Step.parse_var(value)
 
     @property
     def _NAD(self):
@@ -227,12 +185,6 @@ class Step:
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
         ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
-        # QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
-        #                          Qt.BlockingQueuedConnection,
-        #                          Q_ARG(QBrush, color),
-        #                          Q_ARG(int, self.suiteIndex),
-        #                          Q_ARG(int, self.index),
-        #                          Q_ARG(bool, False))
 
     def run(self, testSuite, suiteItem: model.product.SuiteItem = None):
         """run test step"""
