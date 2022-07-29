@@ -156,7 +156,6 @@ def subStr(SubStr1, SubStr2, revStr):
 
 
 def testKeyword(item, testSuite):
-    # time.sleep(0.02)
     # invoke_return = QMetaObject.invokeMethod(
     #     ui.mainform.MainForm.main_form,
     #     'showMessageBox',

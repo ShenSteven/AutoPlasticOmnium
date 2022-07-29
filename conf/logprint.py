@@ -46,7 +46,7 @@ logger = logging.getLogger('testlog')
 
 class QTextEditHandler(logging.Handler, QWidget):
     """继承logging.Handler类，并重写emit方法，创建打印到控件QTextEdit的handler class，并按照日志级别设置字体颜色."""
-    mySignal = pyqtSignal()
+    mySignal = pyqtSignal(str)
 
     def __init__(self, stream=None):
         logging.Handler.__init__(self)
@@ -54,35 +54,32 @@ class QTextEditHandler(logging.Handler, QWidget):
         if stream is None or stream == 'None':
             stream = sys.stdout
         self.stream = stream
-        self.mySignal.connect(self.scrollbarTo)
+        self.mySignal[str].connect(self.append_scrollbar)
 
     def emit(self, record):
-        # return
         try:
             msg = self.format(record)
-            stream = self.stream
-            if 'INFO' in msg:  # pass
-                self.stream.setTextColor(Qt.blue)
-            elif 'DEBUG' in msg:  # debug info
-                self.stream.setTextColor(Qt.black)
-            elif 'ERROR' in msg:  # fail
-                self.stream.setTextColor(Qt.red)
-            elif 'CRITICAL' in msg:  # except
-                self.stream.setTextColor(Qt.darkRed)
-            elif 'WARNING' in msg:  # warn
-                self.stream.setTextColor(Qt.darkYellow)
-            elif 'NOTSET' in msg:  #
-                self.stream.setTextColor(Qt.blue)
-            stream.append(msg)
-            self.mySignal.emit()
+            self.mySignal[str].emit(msg)
         except RecursionError:  # See issue 36272
-            print('RecursionError')
             raise
         except Exception:
             self.handleError(record)
             raise
 
-    def scrollbarTo(self):
+    def append_scrollbar(self, msg):
+        if 'INFO' in msg:  # pass
+            self.stream.setTextColor(Qt.blue)
+        elif 'DEBUG' in msg:  # debug info
+            self.stream.setTextColor(Qt.black)
+        elif 'ERROR' in msg:  # fail
+            self.stream.setTextColor(Qt.red)
+        elif 'CRITICAL' in msg:  # except
+            self.stream.setTextColor(Qt.darkRed)
+        elif 'WARNING' in msg:  # warn
+            self.stream.setTextColor(Qt.darkYellow)
+        elif 'NOTSET' in msg:  #
+            self.stream.setTextColor(Qt.blue)
+        self.stream.append(msg)
         self.stream.ensureCursorVisible()
 
 

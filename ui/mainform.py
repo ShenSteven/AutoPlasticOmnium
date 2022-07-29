@@ -730,7 +730,6 @@ class MainForm(QWidget):
             self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
             self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
                                             hint=QAbstractItemView.EnsureVisible)
-        QApplication.processEvents()
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
     def showMessageBox(self, title, text, level):

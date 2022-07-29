@@ -226,8 +226,7 @@ class Step:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex,
-                                                                       self.index, False)
+        ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
         # QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
         #                          Qt.BlockingQueuedConnection,
         #                          Q_ARG(QBrush, color),
