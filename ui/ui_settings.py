@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QDialog
 
 
 class Ui_SettingsDialog(object):
@@ -42,3 +43,6 @@ class Ui_SettingsDialog(object):
     def retranslateUi(self, SettingsDialog):
         _translate = QtCore.QCoreApplication.translate
         SettingsDialog.setWindowTitle(_translate("SettingsDialog", "Settings"))
+
+
+import ui.images_rc

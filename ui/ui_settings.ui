@@ -3,7 +3,7 @@
  <class>SettingsDialog</class>
  <widget class="QDialog" name="SettingsDialog">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::WindowModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -19,6 +19,9 @@
   <property name="windowIcon">
    <iconset resource="images.qrc">
     <normaloff>:/images/Settings-icon.png</normaloff>:/images/Settings-icon.png</iconset>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <property name="spacing">
