@@ -75,7 +75,7 @@ def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = 
         label.setText(str_)
         if color is not None:
             label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
-        # QApplication.processEvents()
+        QApplication.processEvents()
 
     thread = Thread(target=thread_update)
     thread.start()
@@ -543,7 +543,6 @@ class MainForm(QWidget):
 
     def on_actionConfig(self):
         settings_wind = SettingsDialog(self)
-        settings_wind.signal.emit()
         settings_wind.exec_()
         if settings_wind.isChange:
             ask = QMessageBox.question(self, "Save configuration to file?",

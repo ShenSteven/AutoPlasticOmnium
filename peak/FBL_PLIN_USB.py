@@ -16,6 +16,7 @@ from ctypes import *
 from . import PLinApi
 from inspect import currentframe
 import conf.logprint as lg
+import conf.globalvar as gv
 
 
 def bytes_to_string(byte_strs):
@@ -29,9 +30,9 @@ class Bootloader(object):
 
     def __init__(self):
         self.initialize()
-        self.ReqDelay = c_ushort(10)
-        self.RespDelay = c_ushort(10)
-        self._interval = 0.02
+        self.ReqDelay = c_ushort(gv.cf.BLF.ReqDelay)
+        self.RespDelay = c_ushort(gv.cf.BLF.RespDelay)
+        self._interval = gv.cf.BLF.ReqDelay + gv.cf.BLF.RespDelay
         self.materReq_3C = PLinApi.TLINScheduleSlot()
         self.slaveReq_3D = PLinApi.TLINScheduleSlot()
 
@@ -225,7 +226,7 @@ class Bootloader(object):
     def SetFrameEntry(self, id, nad, pci, data, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
                       ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
         try:
-            time.sleep(self._interval)
+            time.sleep(self._interval / 1000)
             framedata = nad + " " + pci + " " + data
             tempdata = framedata.split()
             lFrameEntry = PLinApi.TLINFrameEntry()
@@ -250,6 +251,49 @@ class Bootloader(object):
                 if linResult == PLinApi.TLIN_ERROR_OK:
                     lg.logger.debug(
                         f"TX  {id},{bytes_to_string(lFrameEntry.InitialData)},{lFrameEntry.Direction},{lFrameEntry.ChecksumType}")
+                    return True
+                else:
+                    self.displayError(linResult)
+                    lg.logger.error(f"Failed to UpdateByteArray message:id:{id},{lFrameEntry.InitialData}")
+                    return False
+            else:
+                self.displayError(linResult)
+                lg.logger.error(f"Failed to SetFrameEntry message:id:{id},{lFrameEntry.InitialData}")
+                return False
+        except Exception as ex:
+            # self.doLinDisconnect()
+            lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
+            return False
+
+    def SetFrameEntry2(self, id, nad, pci, data, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
+                       ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
+        try:
+            time.sleep(self._interval / 1000)
+            time.sleep(gv.cf.BLF.ReqDelay / 1000)
+            framedata = nad + " " + pci + " " + data
+            tempdata = framedata.split()
+            lFrameEntry = PLinApi.TLINFrameEntry()
+            lFrameEntry.Length = c_ubyte(8)
+            lFrameEntry.FrameId = c_ubyte(int(id, 16))
+            lFrameEntry.ChecksumType = ChecksumType
+            lFrameEntry.Direction = direction
+            lFrameEntry.Flags = PLinApi.FRAME_FLAG_RESPONSE_ENABLE
+            lFrameEntry.InitialData = (c_ubyte * 8)()
+            for i in range(8):
+                try:
+                    lFrameEntry.InitialData[i] = c_ubyte(int(tempdata[i].strip(), 16))
+                except IndexError:
+                    lFrameEntry.InitialData[i] = c_ubyte(int('FF', 16))
+                except Exception as ex:
+                    lg.logger.debug(ex)
+            linResult = self.m_objPLinApi.SetFrameEntry(self.m_hClient, self.m_hHw, lFrameEntry)
+            if linResult == PLinApi.TLIN_ERROR_OK:
+                linResult = self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
+                                                              c_ubyte(0),
+                                                              lFrameEntry.Length, lFrameEntry.InitialData)
+                if linResult == PLinApi.TLIN_ERROR_OK:
+                    # lg.logger.debug(
+                    #     f"TX  {id},{bytes_to_string(lFrameEntry.InitialData)},{lFrameEntry.Direction},{lFrameEntry.ChecksumType}")
                     return True
                 else:
                     self.displayError(linResult)
@@ -451,9 +495,16 @@ class Bootloader(object):
 
     def ConsecutiveFrame(self, id, nad, sn, data, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
                          ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
-        time.sleep(self._interval)
+        time.sleep(self._interval / 1000)
         pci = '2' + sn
         self.SetFrameEntry(id, nad, pci, data, direction, ChecksumType)
+        return True
+
+    def ConsecutiveFrame2(self, id, nad, sn, data, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
+                          ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
+        # time.sleep(self._interval / 1000)
+        pci = '2' + sn
+        self.SetFrameEntry2(id, nad, pci, data, direction, ChecksumType)
         return True
 
     def CalKey(self, seed):
@@ -497,7 +548,7 @@ class Bootloader(object):
                     else:
                         consedata = ' '.join(tempdata[3 + i * 6:3 + i * 6 + 6])
 
-                    self.ConsecutiveFrame(id, nad, '{:X}'.format(j), consedata)
+                    self.ConsecutiveFrame2(id, nad, '{:X}'.format(j), consedata)
                     j = j + 1
                 RSID = '76'
                 return self.SFResp(id, RSID, timeout)[0]

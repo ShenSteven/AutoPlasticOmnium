@@ -61,3 +61,7 @@ dut:
     - Checkroute
     - CheckEeroABA
     - SetDHCP
+BLF:
+    ReqDelay: 10
+    RespDelay: 5
+

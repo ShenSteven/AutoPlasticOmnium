@@ -429,7 +429,7 @@ class Step:
         lg.logger.debug(f'run teardown command...')
         try:
             if self.TearDown == 'ECUReset':
-                gv.PLin.SingleFrame(self.ID, self._NAD, '02', '11 01', self.Timeout)
+                gv.PLin.SingleFrame(self.ID, self._NAD, '02', '11 01', int(self.Timeout))
             else:
                 lg.logger.warning(f'this teardown({self.TearDown}) no cation.')
         except Exception as e:
