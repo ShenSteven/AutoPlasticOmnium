@@ -20,6 +20,7 @@ from model.basicfunc import IsNullOrEmpty, save_config
 import sockets.serialport
 from model.sqlite import Sqlite
 import model.testcase
+from peak.peaklin import PeakLin
 from ui.reporting import upload_Json_to_client, upload_result_to_mes, CollectResultToCsv, saveTestResult
 from inspect import currentframe
 import model.loadseq
@@ -291,7 +292,10 @@ class MainForm(QWidget):
                     self.total_pass_count + self.total_fail_count + self.total_abort_count)))
         except ZeroDivisionError:
             self.ui.lb_count_yield = QLabel('Yield: 0.00%')
-        self.ui.statusbar.addPermanentWidget(self.ui.lb_continuous_fail, 3)
+        self.ui.connect_status_image = QLabel('')
+        self.ui.connect_status_txt = QLabel('')
+        # self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 2)
+        # self.ui.statusbar.addPermanentWidget(self.ui.connect_status_txt, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_pass, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_fail, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_abort, 2)
@@ -344,6 +348,7 @@ class MainForm(QWidget):
         self.ui.actionEnable_lab.triggered.connect(self.on_actionEnable_lab)
         self.ui.actionDisable_factory.triggered.connect(self.on_actionDisable_factory)
         self.ui.actionAbout.triggered.connect(self.on_actionAbout)
+        self.ui.actionPeakLin.triggered.connect(self.on_peak_lin)
 
         self.ui.lineEdit.textEdited.connect(self.on_textEdited)
         self.ui.lineEdit.returnPressed.connect(self.on_returnPressed)
@@ -553,6 +558,13 @@ class MainForm(QWidget):
         settings_wind.destroy()
         # os.startfile(rf'{gv.config_yaml_path}')
 
+    def on_peak_lin(self):
+        if gv.PLin is None:
+            gv.PLin = PeakLin(self)
+            gv.PLin.exec_()
+        else:
+            gv.PLin.show()
+
     def on_actionPrivileges(self):
         if gv.IsDebug:
             QMessageBox.information(self, 'Authority', 'This is lab test privileges.', QMessageBox.Yes)
@@ -659,6 +671,15 @@ class MainForm(QWidget):
 
     def on_actionCollapseAll(self):
         self.ui.treeWidget.collapseAll()
+
+    def on_connect_status(self, flag: bool, strs):
+        if flag:
+            self.ui.connect_status_image.setPicture()
+        else:
+            self.ui.connect_status_image.setPicture()
+        self.ui.connect_status_txt.setText(strs)
+        self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 1)
+        self.ui.statusbar.addPermanentWidget(self.ui.connect_status_txt, 2)
 
     def ShowTreeView(self, sequences=None, checkall=True):
         if sequences is None:

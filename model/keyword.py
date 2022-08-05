@@ -8,6 +8,9 @@
 """
 import re
 
+from PyQt5.QtWidgets import QAction
+import ui.mainform
+import peak.peaklin
 import peak.FBL_PLIN_USB
 from sockets.serialport import SerialPort
 from sockets.telnet import TelnetComm
@@ -227,11 +230,27 @@ def testKeyword(item, testSuite):
                 rReturn = True
 
         elif item.Keyword == 'PLINInitConnect':
-            gv.PLin = peak.FBL_PLIN_USB.Bootloader()
-            if gv.PLin.connect():
+            if gv.PLin is None:
+                # lg.logger.debug("gv.PLin is None")
+                gv.PLin = peak.peaklin.PeakLin()
+                ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
+                    ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
+                gv.PLin.refreshHardware()
+                gv.PLin.hardwareCbx_IndexChanged()
+                if gv.PLin.doLinConnect():
+                    time.sleep(0.1)
+                    rReturn = gv.PLin.runSchedule()
+                    time.sleep(0.1)
+            else:
+                # lg.logger.debug("......................")
                 time.sleep(0.1)
                 rReturn = gv.PLin.runSchedule()
                 time.sleep(0.1)
+            # gv.PLin = peak.FBL_PLIN_USB.Bootloader()
+            # if gv.PLin.connect():
+            #     time.sleep(0.1)
+            #     rReturn = gv.PLin.runSchedule()
+            #     time.sleep(0.1)
 
         elif item.Keyword == 'PLINDisConnect':
             rReturn = gv.PLin.DoLinDisconnect()
@@ -257,7 +276,8 @@ def testKeyword(item, testSuite):
             rReturn = True
 
         elif item.Keyword == 'GetCRC':
-            item.testValue = peak.FBL_PLIN_USB.Bootloader.get_crc_apps19(f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
+            item.testValue = peak.FBL_PLIN_USB.Bootloader.get_crc_apps19(
+                f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
             rReturn = not IsNullOrEmpty(item.testValue)
 
         else:
