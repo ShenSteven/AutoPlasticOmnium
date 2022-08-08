@@ -404,7 +404,7 @@ class PeakLin(QDialog, Ui_PeakLin):
     def SetFrameEntry(self, id, nad, pci, data, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
                       ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
         try:
-            time.sleep(gv.cf.BLF.ReqDelay / 1000)
+            time.sleep(self._interval / 1000)
             framedata = nad + " " + pci + " " + data
             tempdata = framedata.split()
             lFrameEntry = PLinApi.TLINFrameEntry()

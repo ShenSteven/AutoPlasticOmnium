@@ -231,7 +231,6 @@ def testKeyword(item, testSuite):
 
         elif item.Keyword == 'PLINInitConnect':
             if gv.PLin is None:
-                # lg.logger.debug("gv.PLin is None")
                 gv.PLin = peak.peaklin.PeakLin()
                 ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
                     ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
@@ -242,18 +241,17 @@ def testKeyword(item, testSuite):
                     rReturn = gv.PLin.runSchedule()
                     time.sleep(0.1)
             else:
-                # lg.logger.debug("......................")
                 time.sleep(0.1)
                 rReturn = gv.PLin.runSchedule()
                 time.sleep(0.1)
-            # gv.PLin = peak.FBL_PLIN_USB.Bootloader()
-            # if gv.PLin.connect():
-            #     time.sleep(0.1)
-            #     rReturn = gv.PLin.runSchedule()
-            #     time.sleep(0.1)
+            ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
+                rReturn,
+                f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
 
         elif item.Keyword == 'PLINDisConnect':
             rReturn = gv.PLin.DoLinDisconnect()
+            ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
+                True, "Not connected | ")
 
         elif item.Keyword == 'PLINSingleFrame':
             rReturn, revStr = gv.PLin.SingleFrame(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))

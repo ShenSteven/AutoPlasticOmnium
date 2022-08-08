@@ -11,7 +11,7 @@ from threading import Thread
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRegExp, QMetaObject, QThread
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
@@ -56,6 +56,7 @@ class MySignals(QObject):
     saveTextEditSignal = pyqtSignal(str)
     controlEnableSignal = pyqtSignal(QAction, bool)
     threadStopSignal = pyqtSignal(str)
+    updateConnectStatusSignal = pyqtSignal(bool, str)
     # showMessageBox = pyqtSignal([str, str, int])
 
 
@@ -319,6 +320,7 @@ class MainForm(QWidget):
         self.my_signals.controlEnableSignal[QAction, bool].connect(controlEnable)
         self.my_signals.treeWidgetColor[QBrush, int, int, bool].connect(self.update_treeWidget_color)
         self.my_signals.threadStopSignal[str].connect(self.on_actionStop)
+        self.my_signals.updateConnectStatusSignal[bool, str].connect(self.on_connect_status)
         # self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
 
         self.ui.actionCheckAll.triggered.connect(self.on_actionCheckAll)
@@ -674,12 +676,13 @@ class MainForm(QWidget):
 
     def on_connect_status(self, flag: bool, strs):
         if flag:
-            self.ui.connect_status_image.setPicture()
+            self.ui.connect_status_image.setPixmap(QPixmap(":/images/connect_ok.png"))
         else:
-            self.ui.connect_status_image.setPicture()
+            self.ui.connect_status_image.setPixmap(QPixmap(":/images/disconnect-icon.png"))
         self.ui.connect_status_txt.setText(strs)
-        self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 1)
+        self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 0.5)
         self.ui.statusbar.addPermanentWidget(self.ui.connect_status_txt, 2)
+        # QApplication.processEvents()
 
     def ShowTreeView(self, sequences=None, checkall=True):
         if sequences is None:
