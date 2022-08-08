@@ -10,8 +10,8 @@ import argparse
 import requests
 import sys
 
-local_url = "http://luxshare:bento@localhost:8101/api/1/"
-rs_url = "http://luxshare:bento@10.90.104.16:8101/api/1/"  # SF results server IP. Most testings occur in SF
+local_url = "http://luxxxx:bento@localhost:8101/api/1/"
+rs_url = "http://luxxxx:bento@10.90.104.16:8101/api/1/"  # SF results server IP. Most testings occur in SF
 base_url = ""
 
 

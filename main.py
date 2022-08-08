@@ -15,13 +15,20 @@ import ui.mainform as mf
 
 # get app dir path
 bundle_dir = ''
-if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-    print('running in a PyInstaller bundle')
-    bundle_dir = sys._MEIPASS
-else:
-    print('running in a normal Python process')
-    bundle_dir = dirname(abspath(__file__))
-print(bundle_dir)
+
+
+def get_app_dir_path():
+    global bundle_dir
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        print('running in a PyInstaller bundle')
+        bundle_dir = sys._MEIPASS
+    else:
+        print('running in a normal Python process')
+        bundle_dir = dirname(abspath(__file__))
+    print(bundle_dir)
+
+
+get_app_dir_path()
 
 
 def excepthook(cls, exception, traceback):

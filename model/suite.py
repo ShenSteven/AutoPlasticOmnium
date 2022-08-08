@@ -122,9 +122,9 @@ class TestSuite:
         self.elapsedTime = datetime.strptime(self.finish_time, '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(
             self.start_time, '%Y-%m-%d %H:%M:%S.%f')
         if self.suiteResult:
-            lg.logger.info(f"{self.SuiteName} Test Pass!,ElapsedTime:{self.elapsedTime}")
+            lg.logger.info(f"{self.SuiteName} Test Pass!,ElapsedTime:{self.elapsedTime.seconds}")
         else:
-            lg.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime}")
+            lg.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
 
     def process_for(self, test_case, step_item: model.step.Step):
         """FOR 循环开始判断"""

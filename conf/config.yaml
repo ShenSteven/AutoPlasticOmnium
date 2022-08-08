@@ -1,7 +1,6 @@
 station:
     privileges: lab
     station_all:
-    - LTT
     - FL #(前左):0x1E
     - FR #(前右):0x50
     - RL #(后左):0x1F
@@ -20,7 +19,7 @@ station:
     testcase: PLIN-BLF.xlsx
     mes_shop_floor: 10.90.104.126:8080
     mes_result: 10.90.104.104:8080
-    rs_url: http://luxshare:bento@10.90.104.16:8100/api/1/
+    rs_url: http://xxxxxx/api/1/
     csv_column: csv_column.txt
     continue_fail_limit: 3
     loop_interval: 0
@@ -37,31 +36,18 @@ dut:
     ssh_username: root
     ssh_password: root
     dut_models:
-    - cento
-    - gateway
-    - leaf
-    - firefly
+    - xxx1
     dut_regex:
-        cento: '[A-Z0-9]+$'
-        gateway: '[A-Z0-9]+$'
-        leaf: '[A-Z0-9]+$'
-        firefly: '[A-Z0-9]+$'
+        cento212: '[A-Z0-9]+$'
     data_api:
-        cento: cento_data_api_client.py
-        gateway: anytown_data_api_client.py
-        leaf: anytown_data_api_client.py
-        firefly: firefly_data_api_client.py
+        cento212: cento_data_api_client.py
     sn_len: 16
     qsdk_ver: 029
     test_mode: production
     debug_skip:
-    - SetIpaddrEnv
-    - GetIpaddrEnv
-    - CheckEeroTest
-    - Checkroute
-    - CheckEeroABA
-    - SetDHCP
+    -
+    -
 BLF:
     ReqDelay: 10
-    RespDelay: 5
+    RespDelay: 10
 

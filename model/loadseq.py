@@ -11,10 +11,9 @@ import sqlite3
 import stat
 import json
 import sys
+from inspect import currentframe
+
 from openpyxl import load_workbook
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtCore import QMetaObject, Qt
-from PyQt5 import QtCore
 import model.suite
 import model.step
 import model.sqlite
@@ -71,8 +70,10 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
-        # lg.logger.critical(f"load testcase fail！{e}")
-        sys.exit(e.__context__)
+        ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
+                                                                                     f'{currentframe().f_code.co_name}:{e} ',
+                                                                                     5)
+        sys.exit(e)
     else:
         serialize_to_json(suites_list, test_script_path)
         return suites_list
@@ -86,39 +87,42 @@ def load_testcase_from_json(json_path, verify=False):
         with model.sqlite.Sqlite(gv.database_setting) as db:
             db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{json_path}'")
             sha256 = db.cur.fetchone()[0]
-            # lg.logger.debug(f"  dbSHA:{sha256}")
+            print(f"  dbSHA:{sha256}")
         JsonSHA = get_sha256(json_path)
-        # lg.logger.debug(f"jsonSHA:{JsonSHA}")
+        print(f"jsonSHA:{JsonSHA}")
         if sha256 == JsonSHA:
             return deserialize_from_json(json_path)
         else:
-            QMetaObject.invokeMethod(ui.mainform.MainForm.main_form, 'showMessageBox', Qt.AutoConnection,
-                                     QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
-                                     QtCore.Q_ARG(str, 'ERROR!'),
-                                     QtCore.Q_ARG(str, f'script {json_path} has been tampered!'),
-                                     QtCore.Q_ARG(int, 5))
-            # lg.logger.critical(f"ERROR,json testCase file {json_path} has been tampered!")
-            sys.exit(0)
+            ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
+                                                                                         f'{currentframe().f_code.co_name}:script {json_path} has been tampered!',
+                                                                                         5)
+            sys.exit(f'{currentframe().f_code.co_name}:script {json_path} has been tampered!')
     else:
         return deserialize_from_json(json_path)
 
 
 def deserialize_from_json(json_path):
-    """Deserialize form json.
-    :param json_path: json file path.
-    :return:object
-    """
-    sequences_dict = json.load(open(json_path, 'r'))
-    sequences_obj_list = []
-    for suit_dict in sequences_dict:
-        step_obj_list = []
-        for step_dict in suit_dict['steps']:
-            step_obj = model.step.Step(step_dict)
-            step_obj_list.append(step_obj)
-        suit_obj = model.suite.TestSuite(dict_=suit_dict)
-        suit_obj.steps = step_obj_list
-        sequences_obj_list.append(suit_obj)
-    return sequences_obj_list
+    try:
+        """Deserialize form json.
+        :param json_path: json file path.
+        :return:object
+        """
+        sequences_dict = json.load(open(json_path, 'r'))
+        sequences_obj_list = []
+        for suit_dict in sequences_dict:
+            step_obj_list = []
+            for step_dict in suit_dict['steps']:
+                step_obj = model.step.Step(step_dict)
+                step_obj_list.append(step_obj)
+            suit_obj = model.suite.TestSuite(dict_=suit_dict)
+            suit_obj.steps = step_obj_list
+            sequences_obj_list.append(suit_obj)
+        return sequences_obj_list
+    except Exception as e:
+        ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+                                                                                     f'{currentframe().f_code.co_name}:{e} ',
+                                                                                     5)
+        sys.exit(e)
 
 
 def wrapper_save_sha256(fun):
@@ -143,10 +147,16 @@ def serialize_to_json(obj, json_path):
     :param obj: the object you want to serialize
     :param json_path: the path of json
     """
-    import conf.logprint as lg
-    lg.logger.debug(f"delete old json in scripts.")
-    if os.path.exists(json_path):
-        os.chmod(json_path, stat.S_IWRITE)
-        os.remove(json_path)
-    json.dump(obj, open(json_path, 'w'), default=lambda o: o.__dict__, sort_keys=True, indent=4)
-    lg.logger.info(f"serializeToJson success! {json_path}.")
+    try:
+        import conf.logprint as lg
+        lg.logger.debug(f"delete old json in scripts.")
+        if os.path.exists(json_path):
+            os.chmod(json_path, stat.S_IWRITE)
+            os.remove(json_path)
+        json.dump(obj, open(json_path, 'w'), default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        lg.logger.info(f"serializeToJson success! {json_path}.")
+    except Exception as e:
+        ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+                                                                                     f'{currentframe().f_code.co_name}:{e} ',
+                                                                                     5)
+        sys.exit(e)

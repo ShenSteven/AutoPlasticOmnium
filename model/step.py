@@ -345,10 +345,12 @@ class Step:
         return str(by_result)
 
     def print_test_info(self, tResult):
-        self.elapsedTime = (datetime.now() - self.start_time).seconds
+        # self.elapsedTime = (datetime.now() - self.start_time).seconds
+        ts = datetime.now() - self.start_time
+        self.elapsedTime = ts.seconds + ts.microseconds / 1000000
         if self.Keyword == 'Waiting':
             return
-        result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}us," \
+        result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
                       f"Symptom:{self.error_code}:{self.error_details}," \
                       f"spec:{self.spec},Min:{self.LSL},Value:{self.testValue},Max:{self.USL}"
         if tResult:
@@ -356,7 +358,9 @@ class Step:
         else:
             lg.logger.error(result_info)
         if self.Json.lower() == 'y':
-            self.elapsedTime = (datetime.now() - self.start_time).seconds
+            # self.elapsedTime = (datetime.now() - self.start_time).seconds
+            ts = datetime.now() - self.start_time
+            self.elapsedTime = ts.seconds + ts.microseconds / 1000000
             ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(
                 [gv.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
                  self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])

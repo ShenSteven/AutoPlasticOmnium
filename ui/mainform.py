@@ -57,7 +57,7 @@ class MySignals(QObject):
     controlEnableSignal = pyqtSignal(QAction, bool)
     threadStopSignal = pyqtSignal(str)
     updateConnectStatusSignal = pyqtSignal(bool, str)
-    # showMessageBox = pyqtSignal([str, str, int])
+    showMessageBox = pyqtSignal([str, str, int])
 
 
 def init_create_dirs():
@@ -321,7 +321,7 @@ class MainForm(QWidget):
         self.my_signals.treeWidgetColor[QBrush, int, int, bool].connect(self.update_treeWidget_color)
         self.my_signals.threadStopSignal[str].connect(self.on_actionStop)
         self.my_signals.updateConnectStatusSignal[bool, str].connect(self.on_connect_status)
-        # self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
+        self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
 
         self.ui.actionCheckAll.triggered.connect(self.on_actionCheckAll)
         self.ui.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
@@ -530,18 +530,18 @@ class MainForm(QWidget):
             if isinstance(action, QAction):
                 gv.cf.station.station_name = action.text() if "(" not in action.text() else action.text()[
                                                                                             :action.text().index('(')]
-                gv.cf.station.station_no = gv.cf.station.station_name + '-3000'
+                gv.cf.station.station_no = gv.cf.station.station_name + '-01'
                 gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
                 self.testcase.original_suites = model.loadseq.load_testcase_from_json(gv.test_script_json)
                 self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
                 self.testSequences = self.testcase.clone_suites
+                lg.logger.debug(f'select {gv.test_script_json} finish!')
 
         thread = Thread(target=select_station)
         thread.start()
         thread.join()
         if self.testSequences is not None:
             self.ShowTreeView(self.testSequences, gv.IsDebug)
-        lg.logger.debug(f'select {gv.test_script_json} finish!')
 
     def on_actionSaveToScript(self):
         thread = Thread(target=model.loadseq.serialize_to_json,
@@ -680,7 +680,7 @@ class MainForm(QWidget):
         else:
             self.ui.connect_status_image.setPixmap(QPixmap(":/images/disconnect-icon.png"))
         self.ui.connect_status_txt.setText(strs)
-        self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 0.5)
+        self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 0.6)
         self.ui.statusbar.addPermanentWidget(self.ui.connect_status_txt, 2)
         # QApplication.processEvents()
 
@@ -725,21 +725,6 @@ class MainForm(QWidget):
         self.ui.treeWidget.blockSignals(False)
 
     # @QtCore.pyqtSlot(QBrush, int, int, bool)
-    # def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
-    #     if stepNo_ == -1:
-    #         if gv.IsCycle or not gv.startFlag:
-    #             return
-    #         self.ui.treeWidget.topLevelItem(suiteNO_).setExpanded(True)
-    #         self.ui.treeWidget.topLevelItem(suiteNO_).setBackground(0, color)
-    #         if allChild:
-    #             for i in range(self.ui.treeWidget.topLevelItem(suiteNO_).childCount()):
-    #                 self.ui.treeWidget.topLevelItem(suiteNO_).child(i).setBackground(0, color)
-    #     else:
-    #         self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
-    #         self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
-    #                                         hint=QAbstractItemView.EnsureVisible)
-    #     # QApplication.processEvents()
-
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
         if stepNo_ == -1:
             if gv.IsCycle or not gv.startFlag:

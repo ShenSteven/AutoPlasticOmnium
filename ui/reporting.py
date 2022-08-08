@@ -19,6 +19,7 @@ from model.basicfunc import write_csv_file, create_csv_file
 
 
 def check_connection(url):
+    return True
     # will return "Connected" if the server is running
     try:
         url = url + "ping"
@@ -88,7 +89,7 @@ def CollectResultToCsv():
         with open(csvColumnPath, 'w') as f:
             header = '\t'.join(fix_header)
             f.write(header)
-        fix_header_value = [gv.dut_model, gv.cf.station.station_name, "Luxshare", gv.WorkOrder,
+        fix_header_value = [gv.dut_model, gv.cf.station.station_name, "Luxxxxx", gv.WorkOrder,
                             gv.cf.station.station_no,
                             "1", gv.SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.version,
                             time.strftime("%Y/%m/%d %H:%M:%S"), str(mf.MainForm.main_form.sec),
@@ -126,6 +127,7 @@ def saveTestResult():
 
 
 def upload_result_to_mes(url):
+    return True
     if gv.IsDebug:
         return True
     mes_result = json.dumps(gv.mesPhases, default=lambda o: o.__dict__, sort_keys=True, indent=4)

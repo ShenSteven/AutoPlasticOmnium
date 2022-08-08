@@ -72,7 +72,7 @@ if __name__ == "__main__":
     tl = TelnetComm('192.168.1.101', "root@OpenWrt:/#")
     if tl.SendCommand("dmesg | grep 'mmcblk0' | head -1 | awk '{print $5}'", 10):
         if tl.SendCommand('\n'):
-            if tl.SendCommand('luxshare_tool --get-serial-env', 10, '1N'):
-                if tl.SendCommand('luxshare_tool --get-mac-env'):
+            if tl.SendCommand('luxxxx_tool --get-serial-env', 10, '1N'):
+                if tl.SendCommand('luxxxxx_tool --get-mac-env'):
                     if tl.SendCommand("dmesg | grep 'mmcblk0' | head -1 | awk '{print $5}'"):
                         pass

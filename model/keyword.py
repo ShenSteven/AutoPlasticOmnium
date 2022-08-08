@@ -7,11 +7,9 @@
 @Desc   : 
 """
 import re
-
 from PyQt5.QtWidgets import QAction
 import ui.mainform
 import peak.peaklin
-import peak.FBL_PLIN_USB
 from sockets.serialport import SerialPort
 from sockets.telnet import TelnetComm
 import conf.globalvar as gv
@@ -274,7 +272,7 @@ def testKeyword(item, testSuite):
             rReturn = True
 
         elif item.Keyword == 'GetCRC':
-            item.testValue = peak.FBL_PLIN_USB.Bootloader.get_crc_apps19(
+            item.testValue = peak.peaklin.PeakLin.get_crc_apps19(
                 f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
             rReturn = not IsNullOrEmpty(item.testValue)
 

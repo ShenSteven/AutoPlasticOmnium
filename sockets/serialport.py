@@ -69,6 +69,6 @@ class SerialPort(CommAbstract):
 
 if __name__ == "__main__":
     com = SerialPort('COM7', 115200, 1, 1)
-    com.SendCommand('', 'luxshare SW Version :', 100)
+    com.SendCommand('', 'luxxxx SW Version :', 100)
     com.SendCommand('\n', 'root@OpenWrt:/#', 3)
-    com.SendCommand('luxshare_tool --get-mac-env', 'root@OpenWrt:/#')
+    com.SendCommand('luxxxx_tool --get-mac-env', 'root@OpenWrt:/#')

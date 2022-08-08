@@ -8,6 +8,7 @@
 """
 import copy
 import os
+import sys
 from datetime import datetime
 import model.loadseq
 import model.product
@@ -75,6 +76,8 @@ class TestCase:
         self.ForFlag = False
         self.Finished = False
         init_database(gv.database_setting)
+        if not getattr(sys, 'frozen', False):
+            model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all)
         if os.path.exists(self.test_script_json):
             self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json)
         else:
