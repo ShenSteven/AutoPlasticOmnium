@@ -345,7 +345,6 @@ class Step:
         return str(by_result)
 
     def print_test_info(self, tResult):
-        # self.elapsedTime = (datetime.now() - self.start_time).seconds
         ts = datetime.now() - self.start_time
         self.elapsedTime = ts.seconds + ts.microseconds / 1000000
         if self.Keyword == 'Waiting':
@@ -358,7 +357,6 @@ class Step:
         else:
             lg.logger.error(result_info)
         if self.Json.lower() == 'y':
-            # self.elapsedTime = (datetime.now() - self.start_time).seconds
             ts = datetime.now() - self.start_time
             self.elapsedTime = ts.seconds + ts.microseconds / 1000000
             ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(

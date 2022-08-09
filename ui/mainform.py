@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 import stat
+import threading
 import time
 from datetime import datetime
 from enum import Enum
@@ -151,8 +152,17 @@ def controlEnable(control, isEnable):
 
 
 class MainForm(QWidget):
-    # my_signals = MySignals()
-    main_form = None  # 单例模式
+    main_form = None
+    _lock = threading.RLock()
+
+    def __new__(cls, *args, **kwargs):
+
+        if cls.main_form:  # 如果已经有单例了就不再去抢锁，避免IO等待
+            return cls.main_form
+        with cls._lock:  # 使用with语法，方便抢锁释放锁
+            if not cls.main_form:
+                cls.main_form = super().__new__(cls, *args, **kwargs)
+            return cls.main_form
 
     def __init__(self):
         super().__init__()
@@ -170,7 +180,7 @@ class MainForm(QWidget):
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         init_create_dirs()
-        MainForm.main_form = self  # 单例模式
+        # MainForm.main_form = self  # 单例模式
         self.sec = 1
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
                                                                          f'{gv.cf.station.station_name}')
@@ -193,18 +203,24 @@ class MainForm(QWidget):
             print(item)
             station_qaction = QAction(self)
             station_qaction.setObjectName(item)
-            if item == "FL":
+            if item.startswith("FL_"):
                 item += "(前左)"
-            elif item == "FR":
+            elif item.startswith("FR_"):
                 item += "(前右)"
-            elif item == "RL":
+            elif item.startswith("RL_"):
                 item += "(后左)"
-            elif item == "RML":
+            elif item.startswith("RML_"):
                 item += "(后中左)"
-            elif item == "RMR":
+            elif item.startswith("RMR_"):
                 item += "(后中右)"
-            elif item == "RR":
+            elif item.startswith("RR_"):
                 item += "(后右)"
+            elif item.startswith("RM_"):
+                item += "(后右)"
+            elif item.startswith("FLB_"):
+                item += "(前左保杠)"
+            elif item.startswith("FRB_"):
+                item += "(前右保杠)"
             station_qaction.setText(item)
             self.ui.menuSelect_Station.addAction(station_qaction)
             station_qaction.triggered.connect(self.on_select_station)
@@ -213,18 +229,19 @@ class MainForm(QWidget):
         """create log handler for textEdit"""
         textEdit_handler = lg.QTextEditHandler(stream=self.ui.textEdit)
         textEdit_handler.formatter = lg.logger.handlers[0].formatter
-        textEdit_handler.level = 10
+        textEdit_handler.level = lg.logger.handlers[0].level
         textEdit_handler.name = 'textEdit_handler'
         logging.getLogger('testlog').addHandler(textEdit_handler)
 
     def init_lineEdit(self):
         self.ui.lineEdit.setFocus()
         self.ui.lineEdit.setMaxLength(gv.cf.dut.sn_len)
-        reg = QRegExp('^[A-Z0-9]{16,16}')  # 自定义文本验证器
+        # 自定义文本验证器
+        reg = QRegExp('^[A-Z0-9]{' + f'{gv.cf.dut.sn_len},' + f'{gv.cf.dut.sn_len}' + '}')
         pValidator = QRegExpValidator(self.ui.lineEdit)
         pValidator.setRegExp(reg)
-        if not gv.IsDebug:
-            self.ui.lineEdit.setValidator(pValidator)
+        # if not gv.IsDebug:
+        #     self.ui.lineEdit.setValidator(pValidator)
 
     def init_childLabel(self):
         self.ui.lb_failInfo = QLabel('Next:O-SFT /Current:O', self.ui.lb_status)
@@ -261,6 +278,14 @@ class MainForm(QWidget):
             self.ui.actionStop.setEnabled(False)
             self.ui.actionClearLog.setEnabled(False)
 
+            self.ui.actionStart.setEnabled(True)
+            self.ui.actionConfig.setEnabled(False)
+            self.ui.actionOpenScript.setEnabled(False)
+            self.ui.actionOpen_TestCase.setEnabled(False)
+            self.ui.actionConvertExcelToJson.setEnabled(False)
+            self.ui.actionEnable_lab.setEnabled(False)
+            self.ui.actionDisable_factory.setEnabled(False)
+
     def init_label_info(self):
         def GetAllIpv4Address(networkSegment):
             import psutil
@@ -295,8 +320,6 @@ class MainForm(QWidget):
             self.ui.lb_count_yield = QLabel('Yield: 0.00%')
         self.ui.connect_status_image = QLabel('')
         self.ui.connect_status_txt = QLabel('')
-        # self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 2)
-        # self.ui.statusbar.addPermanentWidget(self.ui.connect_status_txt, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_pass, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_fail, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_abort, 2)
@@ -433,7 +456,7 @@ class MainForm(QWidget):
         thread.start()
         thread.join()
         if self.testSequences is not None:
-            self.ShowTreeView(self.testSequences, gv.IsDebug)
+            self.ShowTreeView(self.testSequences)
         lg.logger.debug('reload finish!')
 
     def on_itemChanged(self, item, column=0):
@@ -530,7 +553,7 @@ class MainForm(QWidget):
             if isinstance(action, QAction):
                 gv.cf.station.station_name = action.text() if "(" not in action.text() else action.text()[
                                                                                             :action.text().index('(')]
-                gv.cf.station.station_no = gv.cf.station.station_name + '-01'
+                gv.cf.station.station_no = gv.cf.station.station_name
                 gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
                 self.testcase.original_suites = model.loadseq.load_testcase_from_json(gv.test_script_json)
                 self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
@@ -541,7 +564,7 @@ class MainForm(QWidget):
         thread.start()
         thread.join()
         if self.testSequences is not None:
-            self.ShowTreeView(self.testSequences, gv.IsDebug)
+            self.ShowTreeView(self.testSequences)
 
     def on_actionSaveToScript(self):
         thread = Thread(target=model.loadseq.serialize_to_json,
@@ -558,7 +581,6 @@ class MainForm(QWidget):
             if ask == QMessageBox.Yes:
                 save_config(gv.config_yaml_path, gv.cf)
         settings_wind.destroy()
-        # os.startfile(rf'{gv.config_yaml_path}')
 
     def on_peak_lin(self):
         if gv.PLin is None:
@@ -682,7 +704,6 @@ class MainForm(QWidget):
         self.ui.connect_status_txt.setText(strs)
         self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 0.6)
         self.ui.statusbar.addPermanentWidget(self.ui.connect_status_txt, 2)
-        # QApplication.processEvents()
 
     def ShowTreeView(self, sequences=None, checkall=True):
         if sequences is None:
@@ -899,8 +920,8 @@ class MainForm(QWidget):
                                      QtCore.Q_ARG(str, str_info),
                                      QtCore.Q_ARG(int, 5))
             return
-        if not self.CheckContinueFailNum() and not gv.IsDebug:
-            return
+        # if not self.CheckContinueFailNum() and not gv.IsDebug:
+        # return
 
         if gv.IsDebug:
             if not self.SingleStepTest:

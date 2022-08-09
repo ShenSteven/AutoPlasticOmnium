@@ -1,14 +1,21 @@
 station:
-    privileges: lab
+    privileges: labs
     station_all:
-    - FL #(前左):0x1E
-    - FR #(前右):0x50
-    - RL #(后左):0x1F
-    - RML #(后中左):0x51
-    - RMR #(后中右):0x52
-    - RR #(后右):0x53
-    station_name: FL
-    station_no: FL-3000
+    - FL_M4 #(前左):0x1E
+    - FR_M4 #(前右):0x50
+    - RL_M4 #(后左):0x1F
+    - RML_M4 #(后中左):0x51
+    - RMR_M4 #(后中右):0x52
+    - RR_M4 #(后右):0x53
+    - FL_SX5GEV #(前左):0x1E
+    - FR_SX5GEV #(前右):0x50
+    - RL_SX5GEV #(后左):0x1F
+    - RM_SX5GEV #(后中):0x51
+    - RR_SX5GEV #(后右):0x53
+    - FLB_SX5GEV #(前左保杠):0x52
+    - FRB_SX5GEV #(前右保杠):0x54
+    station_name: FL_M4
+    station_no: FL_M4
     log_folder: D:\TestLog
     log_server: 10.90.104.85
     log_server_username: eero
@@ -45,8 +52,8 @@ dut:
     qsdk_ver: 029
     test_mode: production
     debug_skip:
-    -
-    -
+    - SetIpaddrEnv
+    - SetDHCP
 BLF:
     ReqDelay: 10
     RespDelay: 10

@@ -1,4 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
+from pathlib import Path
+import os
 
 block_cipher = pyi_crypto.PyiBlockCipher(key="'steven1986.11'")
 
@@ -8,10 +10,11 @@ added_files = [
     ('conf/*.yaml', 'conf'),
     ('conf/*.db', 'conf'),
     ('conf/__version__.py', 'conf'),
-    ('scripts/*', 'scripts'),
-    ('flash/FL', 'flash/FL')
-]
+    ('scripts/*.json', 'scripts') ]
 
+flash_files = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
+      list(Path().absolute().rglob(r"flash\*"))]
+added_files.extend(flash_files)
 
 a = Analysis(
     ['main.py'],
