@@ -10,6 +10,7 @@ added_files = [
     ('conf/*.yaml', 'conf'),
     ('conf/*.db', 'conf'),
     ('conf/__version__.py', 'conf'),
+    ('manual.docx', '.'),
     ('scripts/*.json', 'scripts') ]
 
 flash_files = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
