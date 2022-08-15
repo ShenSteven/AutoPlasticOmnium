@@ -32,7 +32,6 @@ get_app_dir_path()
 
 
 def excepthook(cls, exception, traceback):
-    # lg.logger.exception(format_exception(cls, exception, traceback))
     QMessageBox.critical(None, "Error", "".join(format_exception(cls, exception, traceback)))
 
 
@@ -45,7 +44,7 @@ def main():
     try:
         app.exec_()
     except KeyboardInterrupt:
-        # lg.logger.exception('KeyboardInterrupt')
+        # lg.logger.fatal('KeyboardInterrupt')
         pass
 
 

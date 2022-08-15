@@ -59,7 +59,7 @@ def init_database(database_name):
                                              );''')
                 print(f"Table created successfully")
     except Exception as e:
-        lg.logger.exception(f'{currentframe().f_code.co_name}:{e}')
+        lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
 
 
 class TestCase:
@@ -106,7 +106,7 @@ class TestCase:
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return self.tResult
         except Exception as e:
-            lg.logger.exception(f'{currentframe().f_code.co_name}:{e}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
             self.tResult = False
             return self.tResult
         finally:

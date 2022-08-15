@@ -9,8 +9,7 @@
 import re
 import time
 from telnetlib import Telnet
-from model.basicfunc import IsNullOrEmpty
-from sockets.communication import CommAbstract
+from sockets.communication import CommAbstract, IsNullOrEmpty
 import conf.logprint as lg
 
 
@@ -37,7 +36,6 @@ class TelnetComm(CommAbstract):
         self.tel.write(date_bytes)
 
     def SendCommand(self, command, exceptStr=None, timeout=10, newline=True):
-        # result = False
         strRecAll = ''
         start_time = time.time()
         if exceptStr is None:
@@ -60,7 +58,7 @@ class TelnetComm(CommAbstract):
                 result = False
             return result, strRecAll
         except Exception as e:
-            lg.logger.exception(e)
+            lg.logger.fatal(e)
             return False, strRecAll
         finally:
             if not self.prompt == exceptStr:

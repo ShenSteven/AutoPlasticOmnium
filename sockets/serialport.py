@@ -37,8 +37,6 @@ class SerialPort(CommAbstract):
         self.ser.write(date.encode('utf-8'))
 
     def SendCommand(self, command, exceptStr, timeout=10, newline=True):
-
-        # result = False
         strRecAll = ''
         start_time = time.time()
         try:
@@ -63,7 +61,7 @@ class SerialPort(CommAbstract):
                 result = False
             return result, strRecAll
         except Exception as e:
-            lg.logger.exception(e)
+            lg.logger.fatal(e)
             return False, strRecAll
 
 

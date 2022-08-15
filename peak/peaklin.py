@@ -412,7 +412,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                 self.displayError(error_code)
                 return False
         except Exception as ex:
-            lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False
 
     def SetFrameEntry(self, id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
@@ -455,7 +455,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                 return False
         except Exception as ex:
             # self.doLinDisconnect()
-            lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False
 
     def SingleFrame(self, id, nad, pci, data, timeout=2.0):
@@ -466,7 +466,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             else:
                 return False, ""
         except Exception as ex:
-            lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False, ""
 
     def MultiFrame(self, id, nad, pci, data, timeout=2):
@@ -497,7 +497,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                 return False, ""
         except Exception as ex:
             # self.doLinDisconnect()
-            lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False, ""
 
     def TransferData(self, id, nad, filedata, bytesNumOfBlock, timeout=2.0):
@@ -531,7 +531,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             return True
         except Exception as ex:
             # self.doLinDisconnect()
-            lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False
 
     # def close(self):
@@ -679,7 +679,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                 return False
         except Exception as ex:
             # self.doLinDisconnect()
-            lg.logger.exception(f'{currentframe().f_code.co_name}:{ex}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False
 
     def get_data(self, file_s19_cmd):
@@ -711,7 +711,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                                 lg.logger.debug(f'get app s19 crc = {s19crc}')
                                 break
         except FileNotFoundError:
-            lg.logger.exception("File not found")
+            lg.logger.fatal("File not found")
             raise
         return s19crc
 

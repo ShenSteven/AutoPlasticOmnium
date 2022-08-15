@@ -24,7 +24,7 @@ def save_config(yaml_file, obj):
             f.seek(0)
             yaml.safe_dump(ya, stream=f, default_flow_style=False, sort_keys=False, indent=4)
         except Exception as e:
-            lg.logger.exception(f"save_config! {e}")
+            lg.logger.fatal(f"save_config! {e}")
             f.seek(0)
             f.write(readall)
         else:
@@ -77,7 +77,7 @@ def create_csv_file(filename, header, updateColumn=False):
                             file.writerows(rows)
                         lg.logger.info(f'update csvHeader success!')
     except Exception as e:
-        lg.logger.exception(e)
+        lg.logger.fatal(e)
 
 
 def write_csv_file(filename, row):
@@ -87,7 +87,7 @@ def write_csv_file(filename, row):
             file.writerow(row)
         lg.logger.debug(f'CollectResultToCsv {filename}')
     except Exception as e:
-        lg.logger.exception(e)
+        lg.logger.fatal(e)
 
 
 def IsNullOrEmpty(strObj: str):

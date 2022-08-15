@@ -39,6 +39,6 @@ loggers:
     handlers: [ console ]
   testlog:
     level: DEBUG
-    handlers: [ file_handler,critical_file_handler,error_file_handler ]
+    handlers: [console, file_handler,critical_file_handler,error_file_handler ]
     propagate: no
 

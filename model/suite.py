@@ -95,7 +95,7 @@ class TestSuite:
             return self.suiteResult
         except Exception as e:
             self.setColor(Qt.darkRed)
-            lg.logger.exception(f"run testSuite {self.SuiteName} Exception！！{e}")
+            lg.logger.fatal(f"run testSuite {self.SuiteName} Exception！！{e}")
             self.suiteResult = False
             return self.suiteResult
         finally:

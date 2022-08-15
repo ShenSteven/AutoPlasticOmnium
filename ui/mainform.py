@@ -69,8 +69,8 @@ def init_create_dirs():
         os.makedirs(gv.OutPutPath, exist_ok=True)
         os.makedirs(gv.DataPath, exist_ok=True)
         os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
-    except:
-        raise
+    except Exception as e:
+        lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
 
 
 def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
@@ -227,6 +227,11 @@ class MainForm(QWidget):
 
     def init_textEditHandler(self):
         """create log handler for textEdit"""
+        log_console = logging.getLogger('testlog').handlers[0]
+        # file_handler = logging.getLogger('testlog').handlers[1]
+        if getattr(sys, 'frozen', False):
+            logging.getLogger('testlog').removeHandler(log_console)
+            # logging.getLogger('testlog').removeHandler(file_handler)
         textEdit_handler = lg.QTextEditHandler(stream=self.ui.textEdit)
         textEdit_handler.formatter = lg.logger.handlers[0].formatter
         textEdit_handler.level = lg.logger.handlers[0].level
@@ -1029,7 +1034,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                                                                          Qt.gray)
             saveTestResult()
     except Exception as e:
-        lg.logger.exception(f"SetTestStatus Exception！！{e}")
+        lg.logger.fatal(f"SetTestStatus Exception！！{e}")
     finally:
         try:
             if status != TestStatus.START:
@@ -1048,13 +1053,13 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                                                                                  Qt.red)
                 myWind.main_form.ui.treeWidget.blockSignals(False)
         except Exception as e:
-            lg.logger.exception(f"SetTestStatus Exception！！{e}")
+            lg.logger.fatal(f"SetTestStatus Exception！！{e}")
         # finally:
         #     try:
         #         if status != TestStatus.START:
         #             pass
         #     except Exception as e:
-        #         lg.logger.exception(f"SetTestStatus Exception！！{e}")
+        #         lg.logger.fatal(f"SetTestStatus Exception！！{e}")
 
 
 class TestThread(QThread):
@@ -1109,7 +1114,7 @@ class TestThread(QThread):
                 else:
                     continue
         except Exception as e:
-            lg.logger.exception(f"TestThread() Exception:{e}")
+            lg.logger.fatal(f"TestThread() Exception:{e}")
             self.signal[MainForm, TestStatus].emit(self.myWind, TestStatus.ABORT)
         finally:
             pass

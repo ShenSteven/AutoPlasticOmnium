@@ -64,7 +64,7 @@ def ping(host, timeout=1):
         lg.logger.debug(f'ping {host} Timeout.')
         return False
     except Exception as e:
-        lg.logger.exception(e)
+        lg.logger.fatal(e)
         return False
 
 
@@ -80,7 +80,7 @@ def run_cmd(command, timeout=1):
             lg.logger.error(f"error:{ret.stderr}")
             return False
     except Exception as e:
-        lg.logger.exception(e)
+        lg.logger.fatal(e)
         return False
 
 
@@ -97,7 +97,7 @@ def kill_process(process_name, killall=True):
                         break
         return True
     except Exception as e:
-        lg.logger.exception(e)
+        lg.logger.fatal(e)
         return False
 
 
@@ -121,7 +121,7 @@ def start_process(full_path, process_name):
         else:
             return True
     except Exception as e:
-        lg.logger.exception(e)
+        lg.logger.fatal(e)
         return False
 
 
@@ -131,7 +131,7 @@ def restart_process(full_path, process_name):
         if kill_process(process_name):
             return start_process(full_path, process_name)
     except Exception as e:
-        lg.logger.exception(e)
+        lg.logger.fatal(e)
         return False
 
 
@@ -293,7 +293,7 @@ def testKeyword(item, testSuite):
             else:
                 rReturn = False
     except Exception as e:
-        lg.logger.exception(f'{currentframe().f_code.co_name}:{e}')
+        lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
         rReturn = False
         return rReturn, compInfo
     else:

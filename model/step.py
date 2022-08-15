@@ -236,7 +236,7 @@ class Step:
             self.generate_report(test_result, suiteItem)
             self.process_mesVer()
         except Exception as e:
-            lg.logger.exception(f"run Exception！！{e}")
+            lg.logger.fatal(f"run Exception！！{e}")
             self.setColor(Qt.darkRed)
             self.status = False
             return False
@@ -435,7 +435,7 @@ class Step:
             else:
                 lg.logger.warning(f'this teardown({self.TearDown}) no cation.')
         except Exception as e:
-            lg.logger.exception(f"process_teardown:{e}")
+            lg.logger.fatal(f"process_teardown:{e}")
 
     def init_online_limit(self):
         pass
