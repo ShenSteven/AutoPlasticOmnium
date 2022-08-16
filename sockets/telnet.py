@@ -8,6 +8,7 @@
 """
 import re
 import time
+import traceback
 from telnetlib import Telnet
 from sockets.communication import CommAbstract, IsNullOrEmpty
 import conf.logprint as lg
@@ -58,7 +59,7 @@ class TelnetComm(CommAbstract):
                 result = False
             return result, strRecAll
         except Exception as e:
-            lg.logger.fatal(e)
+            lg.logger.fatal(f'{e}, {traceback.format_exc()}')
             return False, strRecAll
         finally:
             if not self.prompt == exceptStr:

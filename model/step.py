@@ -7,11 +7,11 @@
 @Desc   : 
 """
 import re
+import traceback
 from datetime import datetime
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QAction
-
 import model.product
 import model.sqlite
 import model.keyword
@@ -236,7 +236,7 @@ class Step:
             self.generate_report(test_result, suiteItem)
             self.process_mesVer()
         except Exception as e:
-            lg.logger.fatal(f"run Exception！！{e}")
+            lg.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
             self.setColor(Qt.darkRed)
             self.status = False
             return False
@@ -359,7 +359,7 @@ class Step:
         if self.Json.lower() == 'y':
             ts = datetime.now() - self.start_time
             self.elapsedTime = ts.seconds + ts.microseconds / 1000000
-            ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(
+            ui.mainform.MainForm.main_form.my_signals.update_tableWidget[list].emit(
                 [gv.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
                  self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
@@ -379,7 +379,7 @@ class Step:
 
     def report_to_json(self, testResult, suiteItem: model.product.SuiteItem = None):
         """copy test data to json object"""
-        if self.status == str(False):
+        if self.status != str(True):
             self.start_time_json = gv.startTimeJson
         obj = model.product.StepItem()
         if self.EeroName.endswith('_'):

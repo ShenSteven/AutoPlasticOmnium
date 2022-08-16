@@ -7,10 +7,10 @@
 @Desc   : 
 """
 import re
+import traceback
 from datetime import datetime
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
-
 import model.product
 import model.step
 from .basicfunc import IsNullOrEmpty
@@ -95,7 +95,7 @@ class TestSuite:
             return self.suiteResult
         except Exception as e:
             self.setColor(Qt.darkRed)
-            lg.logger.fatal(f"run testSuite {self.SuiteName} Exception！！{e}")
+            lg.logger.fatal(f"run testSuite {self.SuiteName} Exception！！{e},{traceback.format_exc()}")
             self.suiteResult = False
             return self.suiteResult
         finally:

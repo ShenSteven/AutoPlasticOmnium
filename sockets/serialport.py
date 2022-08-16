@@ -8,6 +8,8 @@
 """
 import re
 import time
+import traceback
+
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 from model.basicfunc import IsNullOrEmpty
 from sockets.communication import CommAbstract
@@ -21,11 +23,17 @@ class SerialPort(CommAbstract):
                           stopbits=STOPBITS_ONE, parity=PARITY_NONE)
 
     def open(self, *args):
-        if not self.ser.isOpen():
+        try:
+            if self.ser.isOpen():
+                self.close()
             self.ser.open()
+            lg.logger.info(f'{self.ser.port} serialPort.Open()!!')
+            return True
+        except Exception as e:
+            lg.logger.fatal(f'{e}, {traceback.format_exc()}')
+            return False
 
     def close(self):
-
         self.ser.close()
         lg.logger.debug(f"{self.ser.port} serialPort close {'success' if not self.ser.is_open else 'fail'} !!")
 
@@ -33,10 +41,9 @@ class SerialPort(CommAbstract):
         self.ser.read()
 
     def write(self, date: str):
-        # date_bytes = date.encode('utf-8')
         self.ser.write(date.encode('utf-8'))
 
-    def SendCommand(self, command, exceptStr, timeout=10, newline=True):
+    def SendCommand(self, command, exceptStr=None, timeout=10, newline=True):
         strRecAll = ''
         start_time = time.time()
         try:
@@ -49,10 +56,16 @@ class SerialPort(CommAbstract):
             lg.logger.debug(f"{self.ser.port}_SendComd-->{command}")
             self.ser.reset_output_buffer()
             self.ser.reset_input_buffer()
-            self.write(command)
+            if command is not None:
+                self.write(command)
             self.ser.flush()
+            if IsNullOrEmpty(exceptStr):
+                exceptStr = ''
+                time.sleep(timeout * 0.8)
             strRecAll = self.ser.read_until(exceptStr.encode('utf-8')).decode('utf-8')
             lg.logger.debug(strRecAll)
+            if IsNullOrEmpty(exceptStr):
+                return True, strRecAll
             if re.search(exceptStr, strRecAll):
                 lg.logger.info(f'wait until {exceptStr} success in {round(time.time() - start_time, 3)}s')
                 result = True
@@ -61,7 +74,7 @@ class SerialPort(CommAbstract):
                 result = False
             return result, strRecAll
         except Exception as e:
-            lg.logger.fatal(e)
+            lg.logger.fatal(f'{e}, {traceback.format_exc()}')
             return False, strRecAll
 
 

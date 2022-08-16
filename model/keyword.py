@@ -7,6 +7,7 @@
 @Desc   : 
 """
 import re
+import traceback
 from PyQt5.QtWidgets import QAction
 import ui.mainform
 import peak.peaklin
@@ -17,6 +18,7 @@ import conf.logprint as lg
 import subprocess
 import time
 import psutil
+from sockets.visa import VisaComm
 from .basicfunc import IsNullOrEmpty
 from inspect import currentframe
 
@@ -193,17 +195,17 @@ def testKeyword(item, testSuite):
             time.sleep(0.1)
 
         elif item.Keyword == 'KillProcess':
-            rReturn = kill_process(item.ComdOrParam)
+            rReturn = kill_process(item.command)
 
         elif item.Keyword == 'StartProcess':
-            rReturn = start_process(item.ComdOrParam, item.ExpectStr)
+            rReturn = start_process(item.command, item.ExpectStr)
 
         elif item.Keyword == 'RestartProcess':
-            rReturn = restart_process(item.ComdOrParam, item.ExpectStr)
+            rReturn = restart_process(item.command, item.ExpectStr)
 
         elif item.Keyword == 'PingDUT':
             run_cmd('arp -d')
-            rReturn = ping(item.ComdOrParam)
+            rReturn = ping(item.command)
 
         elif item.Keyword == 'TelnetLogin':
             if not isinstance(gv.dut_comm, TelnetComm):
@@ -214,7 +216,7 @@ def testKeyword(item, testSuite):
             temp = TelnetComm(item.param1, gv.cf.dut.prompt)
             if temp.open(gv.cf.dut.prompt) and \
                     temp.SendCommand(item.command, item.ExpectStr, item.Timeout)[0]:
-                return True
+                return True, ''
 
         elif item.Keyword == 'SerialPortOpen':
             if not isinstance(gv.dut_comm, SerialPort):
@@ -228,23 +230,7 @@ def testKeyword(item, testSuite):
                 rReturn = True
 
         elif item.Keyword == 'PLINInitConnect':
-            if gv.PLin is None:
-                gv.PLin = peak.peaklin.PeakLin()
-                ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
-                    ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
-                gv.PLin.refreshHardware()
-                gv.PLin.hardwareCbx_IndexChanged()
-                if gv.PLin.doLinConnect():
-                    time.sleep(0.1)
-                    rReturn = gv.PLin.runSchedule()
-                    time.sleep(0.1)
-            else:
-                time.sleep(0.1)
-                rReturn = gv.PLin.runSchedule()
-                time.sleep(0.1)
-            ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
-                rReturn,
-                f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
+            rReturn = plin_init_connect(rReturn)
 
         elif item.Keyword == 'PLINDisConnect':
             rReturn = gv.PLin.DoLinDisconnect()
@@ -276,38 +262,85 @@ def testKeyword(item, testSuite):
                 f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
             rReturn = not IsNullOrEmpty(item.testValue)
 
+        elif item.Keyword == 'NiVisaCmd':
+            rReturn, revStr = gv.InstrComm.SendCommand(item.command, item.ExpectStr, int(item.Timeout))
+            if rReturn and item.CheckStr1 in revStr:
+                if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
+                    item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
+                elif str_to_int(item.CheckStr2)[0]:
+                    item.testValue = "%.2f" % float(revStr.split(',')[str_to_int(item.CheckStr2)[1]-1])
+                else:
+                    return True, ''
+                compInfo, rReturn = assert_value(compInfo, item, rReturn)
+            else:
+                rReturn = False
+
+        elif item.Keyword == 'NiVisaOpenInstr':
+            gv.InstrComm = VisaComm()
+            rReturn = gv.InstrComm.open(item.command)
+
         else:
-            rReturn, revStr = gv.dut_comm.SendCommand(item.ComdOrParam, item.ExpectStr, int(item.Timeout))
+            rReturn, revStr = gv.dut_comm.SendCommand(item.command, item.ExpectStr, int(item.Timeout))
             if rReturn and item.CheckStr1 in revStr and item.CheckStr2 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
-                    # assert
-                    if not IsNullOrEmpty(item.Spec) and IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
-                        rReturn = True if item.testValue in item.Spec else False
-                    if not IsNullOrEmpty(item.USL) or not IsNullOrEmpty(item.LSL):
-                        rReturn, compInfo = CompareLimit(item.LSL, item.USL, item.testValue)
-                    else:
-                        lg.logger.Warn(f"assert is unknown,Spec:{item.Spec},LSL:{item.LSL}USL:{item.USL}.")
+                    compInfo, rReturn = assert_value(compInfo, item, rReturn)
                 else:
-                    return True
+                    return True, ''
             else:
                 rReturn = False
     except Exception as e:
-        lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+        lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
         rReturn = False
         return rReturn, compInfo
     else:
         return rReturn, compInfo
     finally:
-        pass
-        # if item.Keyword == "SetIpaddrEnv" and rReturn:
-        #     SetIpFlag = True
         if (item.StepName.startswith("GetDAQResistor") or
                 item.StepName.startswith("GetDAQTemp") or
                 item.Keyword == "NiDAQmxVolt" or
                 item.Keyword == "NiDAQmxCur"):
             gv.ArrayListDaq.append("N/A" if IsNullOrEmpty(item.testValue) else item.testValue)
-            lg.logger.Debug(f"DQA add {item.testValue}")
+            lg.logger.debug(f"DQA add {item.testValue}")
+
+
+def assert_value(compInfo, item, rReturn):
+    if not IsNullOrEmpty(item.spec) and IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
+        rReturn = True if item.testValue in item.Spec else False
+    if not IsNullOrEmpty(item.USL) or not IsNullOrEmpty(item.LSL):
+        rReturn, compInfo = CompareLimit(item.LSL, item.USL, item.testValue)
+    else:
+        lg.logger.warning(f"assert is unknown,Spec:{item.spec},LSL:{item.LSL}USL:{item.USL}.")
+    return compInfo, rReturn
+
+
+def plin_init_connect(rReturn):
+    if gv.PLin is None:
+        gv.PLin = peak.peaklin.PeakLin()
+        ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
+            ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
+        gv.PLin.refreshHardware()
+        gv.PLin.hardwareCbx_IndexChanged()
+        if gv.PLin.doLinConnect():
+            time.sleep(0.1)
+            rReturn = gv.PLin.runSchedule()
+            time.sleep(0.1)
+    else:
+        time.sleep(0.1)
+        rReturn = gv.PLin.runSchedule()
+        time.sleep(0.1)
+    ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
+        rReturn,
+        f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
+    return rReturn
+
+
+def str_to_int(strs):
+    try:
+        num = int(strs)
+        return True, num
+    except:
+        return False, 0
 
 
 if __name__ == "__main__":

@@ -160,7 +160,6 @@ class PeakLin(QDialog, Ui_PeakLin):
             ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
                                                                                          f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
                                                                                          5)
-            # QMessageBox.critical(self, "Error", self.getFormattedError(linResult), QMessageBox.Yes)
 
     def getFormattedError(self, linError):
         # get error string from code
@@ -294,7 +293,6 @@ class PeakLin(QDialog, Ui_PeakLin):
                     ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
                                                                                                  f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
                                                                                                  5)
-                    # QMessageBox.critical(self, "Error", self.getFormattedError(linResult), QMessageBox.Yes)
                     return False
             else:
                 return True
@@ -454,7 +452,6 @@ class PeakLin(QDialog, Ui_PeakLin):
                 lg.logger.error(f"Failed to SetFrameEntry message:id:{id},{lFrameEntry.InitialData}")
                 return False
         except Exception as ex:
-            # self.doLinDisconnect()
             lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False
 
@@ -474,7 +471,6 @@ class PeakLin(QDialog, Ui_PeakLin):
         _len = len(tempdata)
         try:
             first_data = ' '.join(tempdata[0:5])
-            # print(first_data)
             if self.SetFrameEntry(id, nad, pci, first_data):  # send first frame
                 j = 1
                 remainder = (_len - 5) % 6
@@ -496,7 +492,6 @@ class PeakLin(QDialog, Ui_PeakLin):
             else:
                 return False, ""
         except Exception as ex:
-            # self.doLinDisconnect()
             lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False, ""
 
@@ -505,8 +500,8 @@ class PeakLin(QDialog, Ui_PeakLin):
         _len = len(tempdata)
         maxBytesNumOfBlock = int(bytesNumOfBlock.replace(" ", ""), 16)
         payloadOfBlock = maxBytesNumOfBlock - 2
-        blockNum = _len // payloadOfBlock  # 36 01, 36 02
-        lastblockNum = _len % payloadOfBlock  # 36 01, 36 02
+        blockNum = _len // payloadOfBlock
+        lastblockNum = _len % payloadOfBlock
         j = 1
         try:
             for i in range(blockNum + 1):
@@ -530,73 +525,8 @@ class PeakLin(QDialog, Ui_PeakLin):
                 j = j + 1
             return True
         except Exception as ex:
-            # self.doLinDisconnect()
             lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False
-
-    # def close(self):
-    #     # If the application was registered with LIN as client.
-    #     if self.m_hHw.value != 0:
-    #         # The client was connected to a LIN hardware.
-    #         # Before disconnect from the hardware check
-    #         # the connected clients and determine if the
-    #         # hardware configuration have to reset or not.
-    #         #
-    #         # Initialize the locale variables.
-    #         lfOtherClient = False
-    #         lfOwnClient = False
-    #         lhClientsSize = c_ushort(255)
-    #         lhClients = (PLinApi.HLINCLIENT * lhClientsSize.value)()
-    #         # Get the connected clients from the LIN hardware.
-    #         linResult = self.m_objPLinApi.GetHardwareParam(
-    #             self.m_hHw, PLinApi.TLIN_HARDWAREPARAM_CONNECTED_CLIENTS, lhClients, lhClientsSize)
-    #         if linResult == PLinApi.TLIN_ERROR_OK:
-    #             # No errors !
-    #             # Check all client handles.
-    #             for i in range(1, lhClientsSize.value):
-    #                 # If client handle is invalid
-    #                 if lhClients[i] == 0:
-    #                     continue
-    #                 # Set the boolean to true if the handle isn't the
-    #                 # handle of this application.
-    #                 # Even the boolean is set to true it can never
-    #                 # set to false.
-    #                 lfOtherClient = lfOtherClient | (
-    #                         lhClients[i] != self.m_hClient.value)
-    #                 # Set the boolean to true if the handle is the
-    #                 # handle of this application.
-    #                 # Even the boolean is set to true it can never
-    #                 # set to false.
-    #                 lfOwnClient = lfOwnClient | (
-    #                         lhClients[i] == self.m_hClient.value)
-    #         # If another application is also connected to
-    #         # the LIN hardware do not reset the configuration.
-    #         if lfOtherClient == False:
-    #             # No other application connected !
-    #             # Reset the configuration of the LIN hardware.
-    #             linResult = self.m_objPLinApi.ResetHardwareConfig(
-    #                 self.m_hClient, self.m_hHw)
-    #         # If this application is connected to the hardware
-    #         # then disconnect the client. Otherwise not.
-    #         if lfOwnClient == True:
-    #             # Disconnect if the application was connected to a LIN
-    #             # hardware.
-    #             linResult = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
-    #             lg.logger.debug("SuspendSchedule....")
-    #             linResult = self.m_objPLinApi.DisconnectClient(self.m_hClient, self.m_hHw)
-    #             if linResult == PLinApi.TLIN_ERROR_OK:
-    #                 self.m_hHw = PLinApi.HLINHW(0)
-    #                 return True
-    #             else:
-    #                 # Error while disconnecting from hardware.
-    #                 self.displayError(linResult)
-    #                 return False
-    #         else:
-    #             return True
-    #     else:
-    #         # m_hHw not connected
-    #         return True
-    #
 
     def SFResp(self, id, rsid, timeout):
         if id.lower() == '3c':
@@ -648,7 +578,6 @@ class PeakLin(QDialog, Ui_PeakLin):
             lg.logger.debug(f'get key: {key}')
             return key
         except Exception as ex:
-            # self.doLinDisconnect()
             sys.exit(f'{currentframe().f_code.co_name}:{ex}')
 
     def TransferDataBlock(self, id, nad, pci, data, timeout):
@@ -678,7 +607,6 @@ class PeakLin(QDialog, Ui_PeakLin):
             else:
                 return False
         except Exception as ex:
-            # self.doLinDisconnect()
             lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex}')
             return False
 

@@ -1,21 +1,22 @@
 station:
-    privileges: labs
+    privileges: lab
     station_all:
-    - FL_M4 #(前左):0x1E
-    - FR_M4 #(前右):0x50
-    - RL_M4 #(后左):0x1F
-    - RML_M4 #(后中左):0x51
-    - RMR_M4 #(后中右):0x52
-    - RR_M4 #(后右):0x53
-    - FL_SX5GEV #(前左):0x1E
-    - FR_SX5GEV #(前右):0x50
-    - RL_SX5GEV #(后左):0x1F
-    - RM_SX5GEV #(后中):0x51
-    - RR_SX5GEV #(后右):0x53
-    - FLB_SX5GEV #(前左保杠):0x52
-    - FRB_SX5GEV #(前右保杠):0x54
-    station_name: FL_M4
-    station_no: FL_M4
+    - LTT
+#    - FL_M4 #(前左):0x1E
+#    - FR_M4 #(前右):0x50
+#    - RL_M4 #(后左):0x1F
+#    - RML_M4 #(后中左):0x51
+#    - RMR_M4 #(后中右):0x52
+#    - RR_M4 #(后右):0x53
+#    - FL_SX5GEV #(前左):0x1E
+#    - FR_SX5GEV #(前右):0x50
+#    - RL_SX5GEV #(后左):0x1F
+#    - RM_SX5GEV #(后中):0x51
+#    - RR_SX5GEV #(后右):0x53
+#    - FLB_SX5GEV #(前左保杠):0x52
+#    - FRB_SX5GEV #(前右保杠):0x54
+    station_name: LTT
+    station_no: LTT
     log_folder: D:\TestLog
     log_server: 10.90.104.85
     log_server_username: eero

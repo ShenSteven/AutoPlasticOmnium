@@ -63,7 +63,6 @@ class Configs:
         self.BLF = DutConf(dict_['BLF'])
 
 
-
 def read_config(yaml_file, objType) -> Configs:
     with open(yaml_file, 'r', encoding='utf-8') as f:
         yaml_data = yaml.safe_load(f)

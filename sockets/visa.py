@@ -8,7 +8,7 @@
 """
 import re
 import time
-
+import traceback
 import pyvisa
 from sockets.communication import CommAbstract, IsNullOrEmpty
 from inspect import currentframe
@@ -28,12 +28,13 @@ class VisaComm(CommAbstract):
         self.prompt = prompt
         self._mbSession = None
         self.rm = pyvisa.ResourceManager()
-        lg.logger.debug(self.rm.list_resources())
+        # lg.logger.debug(self.rm.list_resources())
 
     def open(self, resourceName=None):
         try:
             if resourceName in self.rm.list_resources():
                 self._mbSession = self.rm.open_resource(resourceName)
+                self._mbSession.write("*RST")
                 IDN = self._mbSession.query("*IDN?")
                 lg.logger.debug(IDN)
                 return True
@@ -73,30 +74,29 @@ class VisaComm(CommAbstract):
     def close(self):
         self._mbSession.close()
 
-    def SendCommand(self, command, exceptStr='', timeout=3, newline=True):
+    def SendCommand(self, command, exceptStr=None, timeout=3, newline=True):
         strRecAll = ''
         start_time = time.time()
         self._mbSession.timeout = timeout * 1000
         try:
             if '?' not in command:
                 self.write(command)
-                return True
+                return True, ''
             else:
                 strRecAll = self.query(command)
-            if not IsNullOrEmpty(exceptStr):
-                if re.search(exceptStr, strRecAll):
-                    lg.logger.info(
-                        f'send: {command} wait: {exceptStr} success in {round(time.time() - start_time, 3)}s')
-                    result = True
-                else:
-                    lg.logger.error(
-                        f'send: {command} wait: {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
-                    result = False
-            else:
+            if IsNullOrEmpty(exceptStr):
+                return True, strRecAll
+            if re.search(exceptStr, strRecAll):
+                lg.logger.info(
+                    f'send: {command} wait: {exceptStr} success in {round(time.time() - start_time, 3)}s')
                 result = True
+            else:
+                lg.logger.error(
+                    f'send: {command} wait: {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
+                result = False
             return result, strRecAll
         except Exception as e:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
             return False, strRecAll
 
 

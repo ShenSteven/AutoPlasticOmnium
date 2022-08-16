@@ -9,6 +9,7 @@
 import copy
 import os
 import sys
+import traceback
 from datetime import datetime
 import model.loadseq
 import model.product
@@ -106,7 +107,7 @@ class TestCase:
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return self.tResult
         except Exception as e:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
             self.tResult = False
             return self.tResult
         finally:

@@ -5,6 +5,7 @@ import sys
 import stat
 import threading
 import time
+import traceback
 from datetime import datetime
 from enum import Enum
 from os.path import dirname, abspath, join
@@ -1034,7 +1035,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                                                                          Qt.gray)
             saveTestResult()
     except Exception as e:
-        lg.logger.fatal(f"SetTestStatus Exception！！{e}")
+        lg.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
     finally:
         try:
             if status != TestStatus.START:
@@ -1114,7 +1115,7 @@ class TestThread(QThread):
                 else:
                     continue
         except Exception as e:
-            lg.logger.fatal(f"TestThread() Exception:{e}")
+            lg.logger.fatal(f"TestThread() Exception:{e},{traceback.format_exc()}")
             self.signal[MainForm, TestStatus].emit(self.myWind, TestStatus.ABORT)
         finally:
             pass

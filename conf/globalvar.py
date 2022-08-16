@@ -57,6 +57,7 @@ ArrayListDaq = []
 dut_comm = None
 FixSerialPort = None
 PLin = None
+InstrComm = None
 
 IsDebug = False
 startFlag = False
