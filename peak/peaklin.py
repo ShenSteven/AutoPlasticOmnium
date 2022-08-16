@@ -154,7 +154,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                     self.hardwareCbx.insertItem(self.hardwareCbx.count(), strHw)
             # select first item
             # self.hardwareCbx.blockSignals(True)
-            # self.hardwareCbx.setCurrentIndex(0)
+            self.hardwareCbx.setCurrentIndex(0)
             # self.hardwareCbx.blockSignals(False)
         else:
             ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
@@ -197,7 +197,8 @@ class PeakLin(QDialog, Ui_PeakLin):
             linResult = self.m_objPLinApi.GetHardwareParam(hwHandle, PLinApi.TLIN_HARDWAREPARAM_MODE, lnMode, 0)
             linResult = self.m_objPLinApi.GetHardwareParam(hwHandle, PLinApi.TLIN_HARDWAREPARAM_BAUDRATE, lnCurrBaud, 0)
             # check if initialization is required
-            hwMode = self.m_dataHwModes[self.modeCbx.currentText()]
+            # hwMode = self.m_dataHwModes[self.modeCbx.currentText()]
+            hwMode = PLinApi.TLIN_HARDWAREMODE_MASTER
             try:
                 # convert baudrates selection to int
                 hwBaudrate = c_ushort(int(self.baudrateCbx.currentText()))
@@ -318,35 +319,6 @@ class PeakLin(QDialog, Ui_PeakLin):
         else:
             pass
 
-    # def cbbChannel_SelectedIndexChanged(self, currentValue):
-    #     lg.logger.debug(currentValue)
-    #     lg.logger.debug(self.hardwareCbx.currentIndex())
-    #     lg.logger.debug(self.hardwareCbx.currentText())
-    #     lg.logger.debug(self.m_dataHws)
-    #     lwHw = self.m_dataHws[currentValue]
-    #     if lwHw.value != 0:
-    #         self.connectBt.setEnabled(True)
-    #         self.identifyBt.setEnabled(True)
-    #         lnMode = c_int(0)
-    #         lnCurrBaud = c_int(0)
-    #         linResult = self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_MODE, lnMode, 0)
-    #         linResult = self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_BAUDRATE, lnCurrBaud, 0)
-    #         # Update hardware mode comboBox
-    #         if lnMode.value == PLinApi.TLIN_HARDWAREMODE_MASTER.value:
-    #             self.modeCbx.setCurrentIndex(0)
-    #         else:
-    #             self.modeCbx.setCurrentIndex(1)
-    #         # Assign the Baudrate to the Control.
-    #         if str(lnCurrBaud.value) in self.m_dataHwBaudrates:
-    #             self.baudrateCbx.setCurrentIndex(list(self.m_dataHwBaudrates.keys()).index(str(lnCurrBaud.value)))
-    #         elif lnCurrBaud.value == 0:
-    #             self.baudrateCbx.setCurrentIndex(len(self.m_dataHwBaudrates) - 1)
-    #         else:
-    #             self.baudrateCbx.setCurrentText(str(lnCurrBaud.value))
-    #     else:
-    #         self.connectBt.setEnabled(False)
-    #         self.identifyBt.setEnabled(False)
-
     def hardwareCbx_IndexChanged(self):
         # lg.logger.debug(lwHw)
         lg.logger.debug(self.hardwareCbx.currentIndex())
@@ -360,10 +332,11 @@ class PeakLin(QDialog, Ui_PeakLin):
             linResult = self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_MODE, lnMode, 0)
             linResult = self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_BAUDRATE, lnCurrBaud, 0)
             # Update hardware mode comboBox
-            if lnMode.value == PLinApi.TLIN_HARDWAREMODE_MASTER.value:
-                self.modeCbx.setCurrentIndex(0)
-            else:
-                self.modeCbx.setCurrentIndex(1)
+            lg.logger.debug(f'get lnMode = {lnMode.value}')
+            # if lnMode.value == PLinApi.TLIN_HARDWAREMODE_MASTER.value:
+            self.modeCbx.setCurrentIndex(0)
+            # else:
+            #     self.modeCbx.setCurrentIndex(1)
             # Assign the Baudrate to the Control.
             if str(lnCurrBaud.value) in self.m_dataHwBaudrates:
                 self.baudrateCbx.setCurrentIndex(list(self.m_dataHwBaudrates.keys()).index(str(lnCurrBaud.value)))
