@@ -8,6 +8,7 @@
 """
 import re
 import traceback
+import nidaqmx
 from PyQt5.QtWidgets import QAction
 import ui.mainform
 import peak.peaklin
@@ -262,13 +263,31 @@ def testKeyword(item, testSuite):
                 f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
             rReturn = not IsNullOrEmpty(item.testValue)
 
+        elif item.Keyword == 'NiDAQmxVolt':
+            with nidaqmx.Task() as task:
+                task.ai_channels.add_ai_voltage_chan(item.CmdOrParam, min_val=-10, max_val=10)
+                data = task.read(number_of_samples_per_channel=1)
+                lg.logger.debug(f"get {item.CmdOrParam} sensor Volt: {data}.")
+                item.testValue = "%.2f" % ((data[0] - 0.02) * 10)
+                lg.logger.debug(f"DAQmx {item.CmdOrParam} Volt: {item.testValue}.")
+            compInfo, rReturn = assert_value(compInfo, item, rReturn)
+
+        elif item.Keyword == 'NiDAQmxCur':
+            with nidaqmx.Task() as task:
+                task.ai_channels.add_ai_voltage_chan(item.CmdOrParam, min_val=-10, max_val=10)
+                data = task.read(number_of_samples_per_channel=1)
+                lg.logger.debug(f"get {item.CmdOrParam} sensor Volt: {data}.")
+                item.testValue = "%.2f" % ((data[0] - 0.02) * 2)
+                lg.logger.debug(f"DAQmx {item.CmdOrParam} Current: {item.testValue}.")
+            compInfo, rReturn = assert_value(compInfo, item, rReturn)
+
         elif item.Keyword == 'NiVisaCmd':
             rReturn, revStr = gv.InstrComm.SendCommand(item.command, item.ExpectStr, int(item.Timeout))
             if rReturn and item.CheckStr1 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
                 elif str_to_int(item.CheckStr2)[0]:
-                    item.testValue = "%.2f" % float(revStr.split(',')[str_to_int(item.CheckStr2)[1]-1])
+                    item.testValue = "%.2f" % float(revStr.split(',')[str_to_int(item.CheckStr2)[1] - 1])
                 else:
                     return True, ''
                 compInfo, rReturn = assert_value(compInfo, item, rReturn)

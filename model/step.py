@@ -125,6 +125,8 @@ class Step:
             self._isTest = not gv.IfCond
         if not IsNullOrEmpty(self.Model) and gv.dut_model.lower() not in self.Model.lower():
             self._isTest = False
+        if ui.mainform.MainForm.main_form.SingleStepTest:
+            self._isTest = True
         return self._isTest
 
     @isTest.setter
