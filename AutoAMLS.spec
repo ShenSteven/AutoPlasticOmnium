@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from pathlib import Path
 import os
+from PyInstaller.utils.hooks import collect_data_files, copy_metadata
 
 block_cipher = pyi_crypto.PyiBlockCipher(key="'steven1986.11'")
 
@@ -16,6 +17,8 @@ added_files = [
 flash_files = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
       list(Path().absolute().rglob(r"flash\*"))]
 added_files.extend(flash_files)
+
+added_files += copy_metadata('nidaqmx')
 
 a = Analysis(
     ['main.py'],

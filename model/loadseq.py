@@ -107,7 +107,8 @@ def deserialize_from_json(json_path):
         :param json_path: json file path.
         :return:object
         """
-        sequences_dict = json.load(open(json_path, 'r'))
+        with open(json_path, 'r') as rf:
+            sequences_dict = json.load(rf)
         sequences_obj_list = []
         for suit_dict in sequences_dict:
             step_obj_list = []
@@ -153,7 +154,8 @@ def serialize_to_json(obj, json_path):
         if os.path.exists(json_path):
             os.chmod(json_path, stat.S_IWRITE)
             os.remove(json_path)
-        json.dump(obj, open(json_path, 'w'), default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        with open(json_path, 'w') as wf:
+            json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=True, indent=4)
         lg.logger.info(f"serializeToJson success! {json_path}.")
     except Exception as e:
         ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',

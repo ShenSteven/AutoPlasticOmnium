@@ -10,7 +10,6 @@ import sys
 from os.path import dirname, abspath
 from traceback import format_exception
 from PyQt5.QtWidgets import QApplication, QMessageBox
-# import conf.logprint as lg
 import ui.mainform as mf
 
 # get app dir path
@@ -49,6 +48,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # for x in dir():
-    #     print(x, ":", eval(x))
     main()
