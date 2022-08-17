@@ -23,12 +23,11 @@ import sockets.serialport
 from model.sqlite import Sqlite
 import model.testcase
 from peak.peaklin import PeakLin
-from ui.reporting import upload_Json_to_client, upload_result_to_mes, CollectResultToCsv, saveTestResult
+from model.reporting import upload_Json_to_client, upload_result_to_mes, CollectResultToCsv, saveTestResult
 from inspect import currentframe
 import model.loadseq
 import model.variables
 import model.product
-import ui.images_rc
 
 # pyrcc5 images.qrc -o images.py
 # pyuic5 ui_main.ui -o main_ui.py

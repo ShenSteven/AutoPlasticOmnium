@@ -264,6 +264,7 @@ def testKeyword(item, testSuite):
             rReturn = not IsNullOrEmpty(item.testValue)
 
         elif item.Keyword == 'NiDAQmxVolt':
+            # https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019Pf1SAE&l=zh-CN
             with nidaqmx.Task() as task:
                 task.ai_channels.add_ai_voltage_chan(item.CmdOrParam, min_val=-10, max_val=10)
                 data = task.read(number_of_samples_per_channel=1)
