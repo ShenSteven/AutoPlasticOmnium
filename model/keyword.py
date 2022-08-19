@@ -174,9 +174,9 @@ def testKeyword(item, testSuite):
     # else:
     #     lg.logger.debug('no')
 
-    lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
-    time.sleep(0.02)
-    return True, ''
+    # lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
+    # time.sleep(0.02)
+    # return True, ''
     rReturn = False
     compInfo = ''
     # gv.main_form.testSequences[item.suite_index].globalVar = item.globalVar
