@@ -67,6 +67,7 @@ class TestCase:
     """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
     def __init__(self, testcase_path, sheet_name):
+        self.suite_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = ''
         self.tResult = True
@@ -88,22 +89,23 @@ class TestCase:
         self.clone_suites = copy.deepcopy(self.original_suites)
 
     def run(self, global_fail_continue=False, stepNo=-1):
-        suite_result_list = []
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
                 if self.ForFlag:
-                    i = self.ForStartSuiteNo
-                    stepNo = self.clone_suites[i].ForStartStepNo
+                    if i < self.ForStartSuiteNo:
+                        continue
+                    else:
+                        stepNo = gv.ForStartStepNo
                 else:
                     stepNo = -1
                 suite_result = self.clone_suites[i].run(self, global_fail_continue, stepNo)
-                suite_result_list.append(suite_result)
+                self.suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break
-                if self.ForFlag and i == (len(self.clone_suites) - 1):
-                    i = - 1
+                if self.ForFlag:
+                    return self.run(global_fail_continue)
 
-            self.tResult = all(suite_result_list)
+            self.tResult = all(self.suite_result_list)
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return self.tResult
         except Exception as e:

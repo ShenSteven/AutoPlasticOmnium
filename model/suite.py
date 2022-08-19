@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 import model.product
 import model.step
-from .basicfunc import IsNullOrEmpty
+from .basicfunc import IsNullOrEmpty, create_csv_file, write_csv_file
 import conf.globalvar as gv
 import conf.logprint as lg
 import ui.mainform
@@ -26,6 +26,15 @@ def fail_continue(test_step: model.step.Step, failContinue):
         return True
     else:
         return failContinue
+
+
+def daq_collect():
+    daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ.csv'
+    lg.logger.debug(f"collect DAQ data to {daq_data_path}")
+    gv.ArrayListDaq.insert(0, [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')])
+    create_csv_file(daq_data_path, [])
+    write_csv_file(daq_data_path, gv.ArrayListDaq)
+    gv.ArrayListDaq = []
 
 
 class TestSuite:
@@ -44,9 +53,6 @@ class TestSuite:
         self.error_code = None
         self.phase_details = None
         self.elapsedTime = None
-        self.ForStartStepNo = 0
-        self.ForTotalCycle = 0
-        self.ForCycleCounter = 1
         if dict_ is not None:
             self.__dict__.update(dict_)
 
@@ -110,7 +116,7 @@ class TestSuite:
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
         ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.index, -1, False)
-        # QMetaObject.invokeMethod(robotsystem.ui.mainform.MainForm.main_form, 'update_treeWidget_color',
+        # QMetaObject.invokeMethod(ui.mainform.MainForm.main_form, 'update_treeWidget_color',
         #                          Qt.BlockingQueuedConnection,
         #                          Q_ARG(QBrush, color),
         #                          Q_ARG(int, self.index),
@@ -129,23 +135,24 @@ class TestSuite:
     def process_for(self, test_case, step_item: model.step.Step):
         """FOR 循环开始判断"""
         if not IsNullOrEmpty(step_item.For) and '(' in step_item.For and ')' in step_item.For:
-            self.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
+            gv.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
             test_case.ForStartSuiteNo = self.index
-            self.ForStartStepNo = step_item.index
+            gv.ForStartStepNo = step_item.index
             test_case.ForFlag = False
-            lg.logger.debug(f"====================Start Cycle-{self.ForCycleCounter}===========================")
+            lg.logger.debug(f"====================Start Cycle-{gv.ForCycleCounter}===========================")
 
     def process_EndFor(self, test_case, step_item: model.step.Step):
         """FOR 循环结束判断"""
         if not IsNullOrEmpty(step_item.For) and step_item.For.lower().startswith('end'):
-            if self.ForCycleCounter < self.ForTotalCycle:
+            daq_collect()
+            if gv.ForCycleCounter < gv.ForTotalCycle:
                 test_case.ForFlag = True
-                self.ForCycleCounter += 1
+                gv.ForCycleCounter += 1
                 return True
 
             test_case.ForFlag = False
-            lg.logger.debug('=' * 10 + f"Have Complete all({self.ForCycleCounter}) Cycle test." + '=' * 10)
-            self.ForCycleCounter = 1
+            lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForCycleCounter}) Cycle test." + '=' * 10)
+            gv.ForCycleCounter = 1
             return False
         else:
             return False

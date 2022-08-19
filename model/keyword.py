@@ -174,8 +174,9 @@ def testKeyword(item, testSuite):
     # else:
     #     lg.logger.debug('no')
 
-    # lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
-    # return True, ''
+    lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
+    time.sleep(0.02)
+    return True, ''
     rReturn = False
     compInfo = ''
     # gv.main_form.testSequences[item.suite_index].globalVar = item.globalVar
@@ -194,6 +195,9 @@ def testKeyword(item, testSuite):
             item.testValue = item.command
             rReturn = True
             time.sleep(0.1)
+
+        elif item.Keyword == 'StartFor':
+            return True, ''
 
         elif item.Keyword == 'KillProcess':
             rReturn = kill_process(item.command)

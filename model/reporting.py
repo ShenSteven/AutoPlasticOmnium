@@ -97,6 +97,7 @@ def CollectResultToCsv():
                             gv.mesPhases.first_fail, gv.error_details_first_fail, "UTC", gv.cf.dut.test_mode,
                             gv.mesPhases.JSON_UPLOAD, gv.mesPhases.MES_UPLOAD]
         fix_header_value.extend(gv.csv_list_result)
+        lg.logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
         write_csv_file(gv.CSVFilePath, fix_header_value)
 
     thread = Thread(target=thread_update)

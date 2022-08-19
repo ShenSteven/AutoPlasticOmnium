@@ -69,10 +69,11 @@ setIpFlag = False
 # SingleStepTest = False
 IfCond = True
 failCount = 0
-# ForTotalCycle = 0
-# ForTestCycle = 1
+
+ForTotalCycle = 0
+ForCycleCounter = 1
 # ForStartSuiteNo = 0
-# ForStartStepNo = 0
+ForStartStepNo = 0
 # ForFlag = False
 
 OutPutPath = rf'{current_dir}\OutPut'

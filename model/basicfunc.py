@@ -85,7 +85,6 @@ def write_csv_file(filename, row):
         with open(filename, 'a', newline='') as f:
             file = csv.writer(f)
             file.writerow(row)
-        lg.logger.debug(f'CollectResultToCsv {filename}')
     except Exception as e:
         lg.logger.fatal(e)
 

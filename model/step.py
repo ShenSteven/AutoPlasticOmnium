@@ -68,7 +68,6 @@ class Step:
 
     def __init__(self, dict_=None):
         self.breakpoint = str(False)
-        self.ForCycleCounter = 1
         self.suiteIndex: int = 0
         self.index: int = 0
         self.testValue = None
@@ -193,7 +192,6 @@ class Step:
         self.SuiteName = testSuite.SuiteName
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
-        self.ForCycleCounter = testSuite.ForCycleCounter
         if IsNullOrEmpty(self.EeroName):
             self.EeroName = self.StepName
         info = ''
@@ -385,7 +383,7 @@ class Step:
             self.start_time_json = gv.startTimeJson
         obj = model.product.StepItem()
         if self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(self.ForCycleCounter)
+            obj.test_name = self.EeroName + str(gv.ForCycleCounter)
         else:
             obj.test_name = self.EeroName
         obj.status = 'passed' if testResult else 'failed'
