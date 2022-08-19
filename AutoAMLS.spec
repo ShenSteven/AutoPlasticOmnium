@@ -12,7 +12,8 @@ added_files = [
     ('conf/*.db', 'conf'),
     ('conf/__version__.py', 'conf'),
     ('manual.docx', '.'),
-    ('scripts/*.json', 'scripts') ]
+    ('scripts/*.json', 'scripts'),
+    ('scripts/*.xlsx', 'scripts')]
 
 flash_files = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
       list(Path().absolute().rglob(r"flash\*"))]

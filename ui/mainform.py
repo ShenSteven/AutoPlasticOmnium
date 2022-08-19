@@ -449,8 +449,10 @@ class MainForm(QWidget):
         thread.start()
 
     def on_reloadSeqs(self):
+        lg.logger.debug('start reload script,please wait a moment...')
+        QApplication.processEvents()
+
         def thread_convert_and_load_script():
-            lg.logger.debug('start reload script...')
             if os.path.exists(gv.test_script_json):
                 os.chmod(gv.test_script_json, stat.S_IWRITE)
                 os.remove(gv.test_script_json)
@@ -710,7 +712,7 @@ class MainForm(QWidget):
         self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 0.6)
         self.ui.statusbar.addPermanentWidget(self.ui.connect_status_txt, 2)
 
-    def ShowTreeView(self, sequences=None, checkall=True):
+    def ShowTreeView(self, sequences=None, checkall=None):
         if sequences is None:
             return
         self.ui.treeWidget.blockSignals(True)
@@ -724,8 +726,11 @@ class MainForm(QWidget):
                 suite_node.setCheckState(0, Qt.Checked)
                 suite.isTest = True
             else:
-                suite_node.setCheckState(0, Qt.Unchecked)
-                suite.isTest = False
+                if checkall is None:
+                    suite_node.setCheckState(0, Qt.Checked if suite.isTest else Qt.Unchecked)
+                else:
+                    suite_node.setCheckState(0, Qt.Unchecked)
+                    suite.isTest = False
             if gv.IsDebug:
                 suite_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             else:
@@ -737,8 +742,11 @@ class MainForm(QWidget):
                     step_node.setCheckState(0, Qt.Checked)
                     step.isTest = True
                 else:
-                    step_node.setCheckState(0, Qt.Unchecked)
-                    step.isTest = False
+                    if checkall is None:
+                        step_node.setCheckState(0, Qt.Checked if step.isTest else Qt.Unchecked)
+                    else:
+                        step_node.setCheckState(0, Qt.Unchecked)
+                        step.isTest = False
                 if gv.IsDebug:
                     step_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 else:
