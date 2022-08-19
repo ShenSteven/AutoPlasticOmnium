@@ -31,7 +31,7 @@ def fail_continue(test_step: model.step.Step, failContinue):
 def daq_collect():
     daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ.csv'
     lg.logger.debug(f"collect DAQ data to {daq_data_path}")
-    gv.ArrayListDaq.insert(0, [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')])
+    gv.ArrayListDaq.insert(0, [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
     create_csv_file(daq_data_path, [])
     write_csv_file(daq_data_path, gv.ArrayListDaq)
     gv.ArrayListDaq = []
@@ -76,10 +76,8 @@ class TestSuite:
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
             for i, step_item in enumerate(self.steps, start=0):
-                if stepNo != -1:
-                    i = stepNo
-                    stepNo = -1
-
+                if i < stepNo:
+                    continue
                 self.process_for(test_case, self.steps[i])
                 step_item.suiteVar = self.suiteVar
                 step_result = self.steps[i].run(self, suiteItem)
