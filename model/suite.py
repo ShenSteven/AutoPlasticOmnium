@@ -29,11 +29,11 @@ def fail_continue(test_step: model.step.Step, failContinue):
 
 
 def daq_collect():
-    daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ.csv'
-    lg.logger.debug(f"collect DAQ data to {daq_data_path}")
-    gv.ArrayListDaq.insert(0, [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
-    create_csv_file(daq_data_path, [])
-    write_csv_file(daq_data_path, gv.ArrayListDaq)
+    lg.logger.debug(f"collect DAQ data to {gv.daq_data_path}")
+    create_csv_file(gv.daq_data_path, gv.ArrayListDaqHeader)
+    data_list = [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+    data_list.extend(gv.ArrayListDaq)
+    write_csv_file(gv.daq_data_path, data_list)
     gv.ArrayListDaq = []
 
 

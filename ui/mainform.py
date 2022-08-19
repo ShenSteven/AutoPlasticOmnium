@@ -23,7 +23,7 @@ import sockets.serialport
 from model.sqlite import Sqlite
 import model.testcase
 from peak.peaklin import PeakLin
-from model.reporting import upload_Json_to_client, upload_result_to_mes, CollectResultToCsv, saveTestResult
+from model.reporting import upload_Json_to_client, upload_result_to_mes, collect_data_to_csv, saveTestResult
 from inspect import currentframe
 import model.loadseq
 import model.variables
@@ -954,7 +954,8 @@ class MainForm(QWidget):
         gv.mesPhases = model.product.MesInfo(gv.SN, gv.cf.station.station_no, gv.version)
         init_create_dirs()
         gv.csv_list_header = []
-        gv.csv_list_result = []
+        gv.csv_list_data = []
+        gv.daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         gv.error_code_first_fail = ''
         gv.error_details_first_fail = ''
         gv.finalTestResult = False
@@ -1106,7 +1107,7 @@ class TestThread(QThread):
                         result1 = upload_Json_to_client(gv.cf.station.rs_url, gv.txtLogPath)
                         result2 = upload_result_to_mes(gv.mes_result)
                         gv.finalTestResult = result & result1 & result2
-                        CollectResultToCsv()
+                        collect_data_to_csv()
                         saveTestResult()
                         self.signal[MainForm, TestStatus].emit(self.myWind,
                                                                TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)

@@ -74,7 +74,7 @@ def upload_Json_to_client(url, log_path):
         return False
 
 
-def CollectResultToCsv():
+def collect_data_to_csv():
     def thread_update():
         gv.CSVFilePath = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
         csvColumnPath = fr'{gv.scriptFolder}\csv_column.txt'
@@ -96,7 +96,7 @@ def CollectResultToCsv():
                             gv.finalTestResult,
                             gv.mesPhases.first_fail, gv.error_details_first_fail, "UTC", gv.cf.dut.test_mode,
                             gv.mesPhases.JSON_UPLOAD, gv.mesPhases.MES_UPLOAD]
-        fix_header_value.extend(gv.csv_list_result)
+        fix_header_value.extend(gv.csv_list_data)
         lg.logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
         write_csv_file(gv.CSVFilePath, fix_header_value)
 

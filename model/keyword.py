@@ -188,7 +188,7 @@ def testKeyword(item, testSuite):
 
         if item.Keyword == 'Waiting':
             lg.logger.debug(f'waiting {item.Timeout}s')
-            time.sleep(item.Timeout)
+            time.sleep(float(item.Timeout))
             rReturn = True
 
         elif item.Keyword == 'SetVar':
@@ -220,7 +220,7 @@ def testKeyword(item, testSuite):
         elif item.Keyword == 'TelnetAndSendCmd':
             temp = TelnetComm(item.param1, gv.cf.dut.prompt)
             if temp.open(gv.cf.dut.prompt) and \
-                    temp.SendCommand(item.command, item.ExpectStr, item.Timeout)[0]:
+                    temp.SendCommand(item.command, item.ExpectStr, int(item.Timeout))[0]:
                 return True, ''
 
         elif item.Keyword == 'SerialPortOpen':
@@ -325,6 +325,7 @@ def testKeyword(item, testSuite):
                 item.Keyword == "NiDAQmxVolt" or
                 item.Keyword == "NiDAQmxCur"):
             gv.ArrayListDaq.append("N/A" if IsNullOrEmpty(item.testValue) else item.testValue)
+            gv.ArrayListDaqHeader.append(item.StepName)
             lg.logger.debug(f"DQA add {item.testValue}")
 
 

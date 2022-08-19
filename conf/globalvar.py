@@ -51,8 +51,10 @@ logFolderPath = ''
 txtLogPath = ''
 jsonOfResult = ''
 csv_list_header = []
-csv_list_result = []
+csv_list_data = []
 ArrayListDaq = []
+ArrayListDaqHeader = ['SN', 'DateTime']
+daq_data_path = ''
 
 dut_comm = None
 FixSerialPort = None

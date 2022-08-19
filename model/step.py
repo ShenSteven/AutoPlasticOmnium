@@ -250,7 +250,7 @@ class Step:
                 else:
                     lg.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             # record test date to DB.
-            if self.Json.lower() == 'y':
+            if self.isTest and self.Json.lower() == 'y':
                 with model.sqlite.Sqlite(gv.database_result) as db:
                     lg.logger.debug('INSERT test result to result.db table RESULT.')
                     db.execute(
@@ -369,13 +369,13 @@ class Step:
             return
         if not IsNullOrEmpty(self.USL) or not IsNullOrEmpty(self.LSL):
             gv.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
-            gv.csv_list_result.extend([self.testValue, self.LSL, self.USL])
+            gv.csv_list_data.extend([self.testValue, self.LSL, self.USL])
         elif not IsNullOrEmpty(self.spec):
             gv.csv_list_header.extend([name, f"{name}_SPEC"])
-            gv.csv_list_result.extend([self.testValue, self.spec])
+            gv.csv_list_data.extend([self.testValue, self.spec])
         else:
             gv.csv_list_header.append(name)
-            gv.csv_list_result.append(self.testValue)
+            gv.csv_list_data.append(self.testValue)
 
     def report_to_json(self, testResult, suiteItem: model.product.SuiteItem = None):
         """copy test data to json object"""
