@@ -249,19 +249,22 @@ class Step:
                     lg.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
                 else:
                     lg.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
-            # record test date to DB.
-            if self.isTest and self.Json.lower() == 'y':
-                with model.sqlite.Sqlite(gv.database_result) as db:
-                    lg.logger.debug('INSERT test result to result.db table RESULT.')
-                    db.execute(
-                        f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
-                        f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
-                        f"VALUES (NULL,'{gv.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
-                        f"'{gv.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
-                        f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}',"
-                        f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
-                        f"'{test_result}','{self.status}')")
+            self.record_date_to_db(test_result)
             self.clear()
+
+    def record_date_to_db(self, test_result):
+        """ record test date to DB."""
+        if self.isTest and self.Json.lower() == 'y':
+            with model.sqlite.Sqlite(gv.database_result) as db:
+                lg.logger.debug('INSERT test result to result.db table RESULT.')
+                db.execute(
+                    f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
+                    f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
+                    f"VALUES (NULL,'{gv.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
+                    f"'{gv.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
+                    f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}',"
+                    f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
+                    f"'{test_result}','{self.status}')")
 
     def set_errorCode_details(self, result=False, info=''):
         if result:

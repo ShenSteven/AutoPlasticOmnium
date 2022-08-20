@@ -19,50 +19,6 @@ import conf.logprint as lg
 from inspect import currentframe
 
 
-def init_database(database_name):
-    """init conf/setting.db, OutPut/result.db"""
-    try:
-        if not os.path.exists(database_name):
-            with model.sqlite.Sqlite(database_name) as db:
-                db.execute('''CREATE TABLE SHA256_ENCRYPTION
-                               (NAME TEXT PRIMARY KEY     NOT NULL,
-                               SHA256           TEXT    NOT NULL
-                               );''')
-                db.execute('''CREATE TABLE COUNT
-                                           (NAME TEXT PRIMARY KEY     NOT NULL,
-                                           VALUE           INT    NOT NULL
-                                           );''')
-                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('continue_fail_count', '0')")
-                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_pass_count', '0')")
-                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_fail_count', '0')")
-                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_abort_count', '0')")
-                print(f"Table created successfully")
-        if not os.path.exists(gv.database_result):
-            with model.sqlite.Sqlite(gv.database_result) as db:
-                db.execute('''CREATE TABLE RESULT
-                                             (ID            INTEGER PRIMARY KEY AUTOINCREMENT,
-                                              SN            TEXT,
-                                              STATION_NAME  TEXT    NOT NULL,
-                                              STATION_NO    TEXT    NOT NULL,
-                                              MODEL         TEXT    NOT NULL,
-                                              SUITE_NAME    TEXT    NOT NULL,
-                                              ITEM_NAME     TEXT    NOT NULL,
-                                              SPEC          TEXT,
-                                              LSL           TEXT,
-                                              VALUE         TEXT,
-                                              USL           TEXT,
-                                              ELAPSED_TIME  INT,
-                                              ERROR_CODE    TEXT,
-                                              ERROR_DETAILS TEXT,
-                                              START_TIME    TEXT    NOT NULL,
-                                              TEST_RESULT   TEXT    NOT NULL,
-                                              STATUS        TEXT    NOT NULL
-                                             );''')
-                print(f"Table created successfully")
-    except Exception as e:
-        lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
-
-
 class TestCase:
     """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
@@ -77,7 +33,7 @@ class TestCase:
         self.ForStartSuiteNo = 0
         self.ForFlag = False
         self.Finished = False
-        init_database(gv.database_setting)
+        model.sqlite.init_database(gv.database_setting)
         if not getattr(sys, 'frozen', False):
             model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all)
         if os.path.exists(self.test_script_json):
@@ -88,7 +44,7 @@ class TestCase:
                                                                           self.test_script_json)
         self.clone_suites = copy.deepcopy(self.original_suites)
 
-    def run(self, global_fail_continue=False, stepNo=-1):
+    def run(self, global_fail_continue=False):
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
                 if self.ForFlag:
@@ -135,6 +91,7 @@ class TestCase:
 
     def clear(self):
         self.tResult = True
+        self.suite_result_list = []
 
     def teardown(self):
         if gv.dut_comm is not None:

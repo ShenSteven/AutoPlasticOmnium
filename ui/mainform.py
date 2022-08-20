@@ -80,7 +80,7 @@ def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = 
             label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
         QApplication.processEvents()
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
 
 
@@ -91,7 +91,7 @@ def updateAction(action_, icon: QIcon = None, text: str = None):
         if text is not None:
             action_.setText(text)
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
 
 
@@ -99,7 +99,7 @@ def on_setIcon(action_, icon: QIcon):
     def thread_update():
         action_.setIcon(icon)
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
 
 
@@ -108,7 +108,7 @@ def on_actionLogFolder():
         if os.path.exists(gv.logFolderPath):
             os.startfile(gv.logFolderPath)
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
 
 
@@ -119,7 +119,7 @@ def on_actionOpenLog():
         else:
             lg.logger.warning(f"no find test log")
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
 
 
@@ -130,7 +130,7 @@ def on_actionCSVLog():
         else:
             lg.logger.warning(f"no find test log")
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
 
 
@@ -139,7 +139,7 @@ def on_actionException():
         if os.path.exists(lg.critical_log):
             os.startfile(lg.critical_log)
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
 
 
@@ -147,7 +147,7 @@ def controlEnable(control, isEnable):
     def thread_update():
         control.setEnabled(isEnable)
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
 
 
@@ -166,6 +166,7 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.TestFinish = False
         self.SingleStepTest = False
         self.StepNo = -1
         self.SuiteNo = -1
@@ -445,7 +446,7 @@ class MainForm(QWidget):
                     self.ui.tableWidget.removeRow(0)
             QApplication.processEvents()
 
-        thread = Thread(target=thread_update_tableWidget)
+        thread = Thread(target=thread_update_tableWidget, daemon=True)
         thread.start()
 
     def on_reloadSeqs(self):
@@ -459,7 +460,7 @@ class MainForm(QWidget):
             self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
             self.testSequences = self.testcase.clone_suites
 
-        thread = Thread(target=thread_convert_and_load_script)
+        thread = Thread(target=thread_convert_and_load_script, daemon=True)
         thread.start()
         thread.join()
         if self.testSequences is not None:
@@ -538,20 +539,20 @@ class MainForm(QWidget):
         def thread_actionOpen_TestCase():
             os.startfile(self.testcase.testcase_path)
 
-        thread = Thread(target=thread_actionOpen_TestCase)
+        thread = Thread(target=thread_actionOpen_TestCase, daemon=True)
         thread.start()
 
     def on_actionConvertExcelToJson(self):
         thread = Thread(
             target=model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
-                                                              gv.cf.station.station_all))
+                                                              gv.cf.station.station_all), daemon=True)
         thread.start()
 
     def on_actionOpenScript(self):
         def actionOpenScript():
             os.startfile(self.testcase.test_script_json)
 
-        thread = Thread(target=actionOpenScript)
+        thread = Thread(target=actionOpenScript, daemon=True)
         thread.start()
 
     def on_select_station(self):
@@ -567,16 +568,19 @@ class MainForm(QWidget):
                 self.testSequences = self.testcase.clone_suites
                 lg.logger.debug(f'select {gv.test_script_json} finish!')
 
-        thread = Thread(target=select_station)
+        thread = Thread(target=select_station, daemon=True)
         thread.start()
         thread.join()
         if self.testSequences is not None:
             self.ShowTreeView(self.testSequences)
 
     def on_actionSaveToScript(self):
-        thread = Thread(target=model.loadseq.serialize_to_json,
-                        args=(self.testcase.clone_suites, gv.test_script_json))
-        thread.start()
+        if self.TestFinish:
+            QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
+        else:
+            thread = Thread(target=model.loadseq.serialize_to_json,
+                            args=(self.testcase.clone_suites, gv.test_script_json), daemon=True)
+            thread.start()
 
     def on_actionConfig(self):
         settings_wind = SettingsDialog(self)
@@ -641,7 +645,7 @@ class MainForm(QWidget):
                 f.write(content.encode('utf8'))
             lg.logger.debug(f"Save test log OK.{gv.txtLogPath}")
 
-        thread = Thread(target=thread_update)
+        thread = Thread(target=thread_update, daemon=True)
         thread.start()
 
     def on_actionEnable_lab(self):
@@ -795,7 +799,7 @@ class MainForm(QWidget):
                 self.ui.lineEdit.setText('')
                 self.ui.lineEdit.setFocus()
 
-        thread = Thread(target=thread_update)
+        thread = Thread(target=thread_update, daemon=True)
         thread.start()
 
     def on_textEditClear(self, info):
@@ -821,7 +825,7 @@ class MainForm(QWidget):
                 self.ui.lb_count_yield.setText('Yield: 0.00%')
             # QApplication.processEvents()
 
-        thread = Thread(target=update_status_bar)
+        thread = Thread(target=update_status_bar, daemon=True)
         thread.start()
 
     def timerEvent(self, a):
@@ -1046,6 +1050,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
         lg.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
     finally:
         try:
+            myWind.TestFinish = True
             if status != TestStatus.START:
                 myWind.my_signals.setIconSignal[QAction, QIcon].emit(myWind.ui.actionStart,
                                                                      QIcon(':/images/Start-icon.png'))
