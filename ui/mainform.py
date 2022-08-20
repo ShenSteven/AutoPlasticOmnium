@@ -166,7 +166,7 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.TestFinish = False
+        self.SaveScriptDisableFlag = False
         self.SingleStepTest = False
         self.StepNo = -1
         self.SuiteNo = -1
@@ -466,6 +466,7 @@ class MainForm(QWidget):
         if self.testSequences is not None:
             self.ShowTreeView(self.testSequences)
         lg.logger.debug('reload finish!')
+        self.SaveScriptDisableFlag = False
 
     def on_itemChanged(self, item, column=0):
         if gv.startFlag:
@@ -575,7 +576,7 @@ class MainForm(QWidget):
             self.ShowTreeView(self.testSequences)
 
     def on_actionSaveToScript(self):
-        if self.TestFinish:
+        if self.SaveScriptDisableFlag:
             QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
         else:
             thread = Thread(target=model.loadseq.serialize_to_json,
@@ -1050,7 +1051,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
         lg.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
     finally:
         try:
-            myWind.TestFinish = True
+            myWind.SaveScriptDisableFlag = True
             if status != TestStatus.START:
                 myWind.my_signals.setIconSignal[QAction, QIcon].emit(myWind.ui.actionStart,
                                                                      QIcon(':/images/Start-icon.png'))
