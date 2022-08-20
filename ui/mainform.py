@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
 import conf.logprint as lg
-from model.basicfunc import IsNullOrEmpty, save_config
+from model.basicfunc import IsNullOrEmpty, save_config, run_cmd
 import sockets.serialport
 from model.sqlite import Sqlite
 import model.testcase
@@ -379,6 +379,7 @@ class MainForm(QWidget):
         self.ui.actionEnable_lab.triggered.connect(self.on_actionEnable_lab)
         self.ui.actionDisable_factory.triggered.connect(self.on_actionDisable_factory)
         self.ui.actionAbout.triggered.connect(self.on_actionAbout)
+        self.ui.actionRestart.triggered.connect(self.on_actionRestart)
         self.ui.actionPeakLin.triggered.connect(self.on_peak_lin)
 
         self.ui.lineEdit.textEdited.connect(self.on_textEdited)
@@ -661,6 +662,17 @@ class MainForm(QWidget):
 
     def on_actionAbout(self):
         QMessageBox.about(self, 'About', 'Python3.8+PyQt5\nTechnical support: StevenShen\nWeChat:chenhlzqbx')
+
+    def on_actionRestart(self):
+        def thread_update():
+            run_cmd(f'restart.exe -n AutoAMLS.exe -p AutoAMLS.exe')
+
+        thread = Thread(target=thread_update)
+        ask = QMessageBox.question(self, "Restart Application?",
+                                   "Do you want restart this program?",
+                                   QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        if ask == QMessageBox.Yes:
+            thread.start()
 
     def debug_switch(self, isDebug: bool):
         self.ui.actionConvertExcelToJson.setEnabled(isDebug)

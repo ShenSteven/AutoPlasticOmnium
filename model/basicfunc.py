@@ -9,10 +9,107 @@
 import json
 import os
 import csv
+import platform
+import subprocess
+import time
 from datetime import datetime
+import psutil
 import yaml
 import conf.logprint as lg
 import hashlib
+
+
+def ping(host, timeout=1):
+    """
+    Returns True if host (str) responds to a ping request.
+    Remember that a host may not respond to a ping (ICMP) request even if the host test_name is valid.
+    """
+    IsWind = platform.system() == 'Windows'
+    param = '-n' if IsWind else '-cf'
+    command = f'ping {param} 1 {host}'
+    try:
+        ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             encoding=("gbk" if IsWind else "utf8"), timeout=timeout)
+        if ret.returncode == 0 and 'TTL=' in ret.stdout:
+            lg.logger.debug(ret.stdout)
+            return True
+        else:
+            lg.logger.error(f"error:{ret.stdout},{ret.stderr}")
+            return False
+    except subprocess.TimeoutExpired:
+        lg.logger.debug(f'ping {host} Timeout.')
+        return False
+    except Exception as e:
+        lg.logger.fatal(e)
+        return False
+
+
+def run_cmd(command, timeout=1):
+    """send command, command executed successfully return true,otherwise false"""
+    try:
+        IsWind = platform.system() == 'Windows'
+        ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             encoding=("gbk" if IsWind else "utf8"), timeout=timeout)
+        if ret.returncode == 0:  # 表示命令下发成功，不对命令内容结果做判断
+            lg.logger.debug(ret.stdout)
+            return True
+        else:
+            lg.logger.error(f"error:{ret.stderr}")
+            return False
+    except Exception as e:
+        lg.logger.fatal(e)
+        return False
+
+
+def kill_process(process_name, killall=True):
+    try:
+        for pid in psutil.pids():
+            if psutil.pid_exists(pid):
+                p = psutil.Process(pid)
+                if p.name() == process_name:
+                    p.kill()
+                    lg.logger.debug(f"kill pid-{pid},test_name-{p.name()}")
+                    time.sleep(1)
+                    if not killall:
+                        break
+        return True
+    except Exception as e:
+        lg.logger.fatal(e)
+        return False
+
+
+def process_exists(process_name):
+    pids = psutil.pids()
+    ps = [psutil.Process(pid) for pid in pids]
+    process_names = [p.name for p in ps]
+    if process_name in process_names:
+        return True
+    else:
+        return False
+
+
+def start_process(full_path, process_name):
+    """if process exists, return , otherwise start it and check"""
+    try:
+        if not process_exists(process_name):
+            run_cmd(full_path)
+            time.sleep(3)
+            return process_exists(process_name)
+        else:
+            return True
+    except Exception as e:
+        lg.logger.fatal(e)
+        return False
+
+
+def restart_process(full_path, process_name):
+    """kill and start"""
+    try:
+        if kill_process(process_name):
+            return start_process(full_path, process_name)
+    except Exception as e:
+        lg.logger.fatal(e)
+        return False
 
 
 def save_config(yaml_file, obj):

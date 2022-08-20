@@ -40,7 +40,7 @@ def post(results, endpoint="results", files=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("simulated firefly data api client")
     parser.add_argument("-x", "--local", action="store_true", help="run against a localhost api instance")
-    parser.add_argument("-s", "--stationObj", action="append", help="stationObj test_name")
+    parser.add_argument("-s", "--station", action="append", help="station test_name")
     parser.add_argument("-f", "--file", action="append", help="Json FilePath")
     parser.add_argument("-l", "--log", action="append", help="test log")
 

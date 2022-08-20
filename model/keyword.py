@@ -16,147 +16,10 @@ from sockets.serialport import SerialPort
 from sockets.telnet import TelnetComm
 import conf.globalvar as gv
 import conf.logprint as lg
-import subprocess
 import time
-import psutil
 from sockets.visa import VisaComm
-from .basicfunc import IsNullOrEmpty
+from .basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping
 from inspect import currentframe
-
-
-def CompareLimit(limitMin, limitMax, value, is_round=False):
-    if IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):
-        return True, ''
-    if IsNullOrEmpty(value):
-        return False, ''
-    temp = round(float(value)) if is_round else float(value)
-    if IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 只需比较最大值
-        lg.logger.debug("compare Limit_max...")
-        return temp <= float(limitMax), ''
-    if not IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):  # 只需比较最小值
-        lg.logger.debug("compare Limit_min...")
-        return temp >= float(limitMin), ''
-    if not IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 比较最小最大值
-        lg.logger.debug("compare Limit_min and Limit_max...")
-        if float(limitMin) <= temp <= float(limitMax):
-            return True, ''
-        else:
-            if temp < float(limitMin):
-                return False, 'TooLow'
-            else:
-                return False, 'TooHigh'
-
-
-def ping(host, timeout=1):
-    """
-    Returns True if host (str) responds to a ping request.
-    Remember that a host may not respond to a ping (ICMP) request even if the host test_name is valid.
-    """
-    param = '-n' if gv.win else '-cf'
-    command = f'ping {param} 1 {host}'
-    try:
-        ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             encoding=("gbk" if gv.win else "utf8"), timeout=timeout)
-        if ret.returncode == 0 and 'TTL=' in ret.stdout:
-            lg.logger.debug(ret.stdout)
-            return True
-        else:
-            lg.logger.error(f"error:{ret.stdout},{ret.stderr}")
-            return False
-    except subprocess.TimeoutExpired:
-        lg.logger.debug(f'ping {host} Timeout.')
-        return False
-    except Exception as e:
-        lg.logger.fatal(e)
-        return False
-
-
-def run_cmd(command, timeout=1):
-    """send command, command executed successfully return true,otherwise false"""
-    try:
-        ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             encoding=("gbk" if gv.win else "utf8"), timeout=timeout)
-        if ret.returncode == 0:  # 表示命令下发成功，不对命令内容结果做判断
-            lg.logger.debug(ret.stdout)
-            return True
-        else:
-            lg.logger.error(f"error:{ret.stderr}")
-            return False
-    except Exception as e:
-        lg.logger.fatal(e)
-        return False
-
-
-def kill_process(process_name, killall=True):
-    try:
-        for pid in psutil.pids():
-            if psutil.pid_exists(pid):
-                p = psutil.Process(pid)
-                if p.name() == process_name:
-                    p.kill()
-                    lg.logger.debug(f"kill pid-{pid},test_name-{p.name()}")
-                    time.sleep(1)
-                    if not killall:
-                        break
-        return True
-    except Exception as e:
-        lg.logger.fatal(e)
-        return False
-
-
-def process_exists(process_name):
-    pids = psutil.pids()
-    ps = [psutil.Process(pid) for pid in pids]
-    process_names = [p.name for p in ps]
-    if process_name in process_names:
-        return True
-    else:
-        return False
-
-
-def start_process(full_path, process_name):
-    """if process exists, return , otherwise start it and check"""
-    try:
-        if not process_exists(process_name):
-            run_cmd(full_path)
-            time.sleep(3)
-            return process_exists(process_name)
-        else:
-            return True
-    except Exception as e:
-        lg.logger.fatal(e)
-        return False
-
-
-def restart_process(full_path, process_name):
-    """kill and start"""
-    try:
-        if kill_process(process_name):
-            return start_process(full_path, process_name)
-    except Exception as e:
-        lg.logger.fatal(e)
-        return False
-
-
-def register(name, email, **kwargs):
-    print('test_name:%s, age:%s, others:%s', (name, email, kwargs))
-
-
-def subStr(SubStr1, SubStr2, revStr):
-    if IsNullOrEmpty(SubStr1) and IsNullOrEmpty(SubStr2):
-        return None
-    elif IsNullOrEmpty(SubStr1):
-        values = re.findall(f'^(.*?){SubStr2}', revStr)
-    elif IsNullOrEmpty(SubStr2):
-        values = re.findall(f'{SubStr1}(.*?)$', revStr)
-    else:
-        values = re.findall(f'{SubStr1}(.*?){SubStr2}', revStr)
-    if len(values) == 1 and values[0] != '':
-        testValue = values[0]
-        lg.logger.debug(f'get TestValue:{testValue}')
-        return testValue
-    else:
-        raise Exception(f'get TestValue exception:{values}')
 
 
 def testKeyword(item, testSuite):
@@ -329,6 +192,50 @@ def testKeyword(item, testSuite):
             lg.logger.debug(f"DQA add {item.testValue}")
 
 
+def CompareLimit(limitMin, limitMax, value, is_round=False):
+    if IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):
+        return True, ''
+    if IsNullOrEmpty(value):
+        return False, ''
+    temp = round(float(value)) if is_round else float(value)
+    if IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 只需比较最大值
+        lg.logger.debug("compare Limit_max...")
+        return temp <= float(limitMax), ''
+    if not IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):  # 只需比较最小值
+        lg.logger.debug("compare Limit_min...")
+        return temp >= float(limitMin), ''
+    if not IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 比较最小最大值
+        lg.logger.debug("compare Limit_min and Limit_max...")
+        if float(limitMin) <= temp <= float(limitMax):
+            return True, ''
+        else:
+            if temp < float(limitMin):
+                return False, 'TooLow'
+            else:
+                return False, 'TooHigh'
+
+
+def register(name, email, **kwargs):
+    print('test_name:%s, age:%s, others:%s', (name, email, kwargs))
+
+
+def subStr(SubStr1, SubStr2, revStr):
+    if IsNullOrEmpty(SubStr1) and IsNullOrEmpty(SubStr2):
+        return None
+    elif IsNullOrEmpty(SubStr1):
+        values = re.findall(f'^(.*?){SubStr2}', revStr)
+    elif IsNullOrEmpty(SubStr2):
+        values = re.findall(f'{SubStr1}(.*?)$', revStr)
+    else:
+        values = re.findall(f'{SubStr1}(.*?){SubStr2}', revStr)
+    if len(values) == 1 and values[0] != '':
+        testValue = values[0]
+        lg.logger.debug(f'get TestValue:{testValue}')
+        return testValue
+    else:
+        raise Exception(f'get TestValue exception:{values}')
+
+
 def assert_value(compInfo, item, rReturn):
     if not IsNullOrEmpty(item.spec) and IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
         rReturn = True if item.testValue in item.Spec else False
@@ -337,6 +244,14 @@ def assert_value(compInfo, item, rReturn):
     else:
         lg.logger.warning(f"assert is unknown,Spec:{item.spec},LSL:{item.LSL}USL:{item.USL}.")
     return compInfo, rReturn
+
+
+def str_to_int(strs):
+    try:
+        num = int(strs)
+        return True, num
+    except:
+        return False, 0
 
 
 def plin_init_connect(rReturn):
@@ -358,14 +273,6 @@ def plin_init_connect(rReturn):
         rReturn,
         f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
     return rReturn
-
-
-def str_to_int(strs):
-    try:
-        num = int(strs)
-        return True, num
-    except:
-        return False, 0
 
 
 if __name__ == "__main__":

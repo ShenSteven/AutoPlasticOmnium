@@ -12,6 +12,7 @@ added_files = [
     ('conf/*.db', 'conf'),
     ('conf/__version__.py', 'conf'),
     ('manual.docx', '.'),
+    ('restart.exe', '.'),
     ('scripts/*.json', 'scripts'),
     ('scripts/*.xlsx', 'scripts')]
 
