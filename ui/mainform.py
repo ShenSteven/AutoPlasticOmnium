@@ -410,6 +410,7 @@ class MainForm(QWidget):
             self.ui.textEdit.scrollToAnchor(anchor)
         else:
             # lg.logger.critical('itemActivate')
+            self.on_actionEditStep()
             self.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
             self.StepNo = item.parent().indexOfChild(item)
             self.ui.actionStepping.setEnabled(True)
@@ -501,7 +502,7 @@ class MainForm(QWidget):
             menu.addAction(self.ui.actionStepping)
             menu.addAction(self.ui.actionLooping)
             menu.addAction(self.ui.actionBreakpoint)
-            menu.addAction(self.ui.actionEditStep)
+            # menu.addAction(self.ui.actionEditStep)
             menu.addAction(self.ui.actionCheckAll)
             menu.addAction(self.ui.actionUncheckAll)
             menu.addAction(self.ui.actionExpandAll)
@@ -686,8 +687,8 @@ class MainForm(QWidget):
 
     def on_actionEditStep(self):
         self.ui.tableWidget_2.blockSignals(True)
-        if self.ui.tabWidget.currentIndex() != 1:
-            self.ui.tabWidget.setCurrentIndex(1)
+        if self.ui.tabWidget.currentWidget() != self.ui.stepInfo:
+            self.ui.tabWidget.setCurrentWidget(self.ui.stepInfo)
         for i in range(0, self.ui.tableWidget_2.rowCount()):
             self.ui.tableWidget_2.removeRow(0)
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
@@ -998,6 +999,7 @@ class MainForm(QWidget):
         self.ui.lb_testTime.setHidden(True)
         self.sec = 1
         self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.START)
+        self.ui.tabWidget.setCurrentWidget(self.ui.result)
 
 
 def SetTestStatus(myWind: MainForm, status: TestStatus):

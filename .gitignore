@@ -11,6 +11,7 @@
 /OutPut/result.db
 /venv/
 /scripts/*.json
+/scripts/*.txt
 /OutPut/result.csv
 /ui/main.py
 /venv39/
