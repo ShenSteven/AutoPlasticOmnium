@@ -410,7 +410,6 @@ class MainForm(QWidget):
             self.ui.textEdit.scrollToAnchor(anchor)
         else:
             # lg.logger.critical('itemActivate')
-            self.on_actionEditStep()
             self.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item.parent())
             self.StepNo = item.parent().indexOfChild(item)
             self.ui.actionStepping.setEnabled(True)
@@ -419,6 +418,7 @@ class MainForm(QWidget):
             cc = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
             anchor = f'testStep:{pp}-{cc}'
             self.ui.textEdit.scrollToAnchor(anchor)
+            self.on_actionEditStep()
 
     def on_tableWidget_clear(self):
         for i in range(0, self.ui.tableWidget.rowCount()):
