@@ -6,6 +6,7 @@
 @Date   : 2021/11/9
 @Desc   : 
 """
+import os
 import re
 import traceback
 import nidaqmx
@@ -118,6 +119,8 @@ def testKeyword(item, testSuite):
         elif item.Keyword == 'TransferData':
             s19datas = gv.PLin.get_data(f"{gv.current_dir}\\flash\\{item.command}")
             lg.logger.debug(s19datas)
+            fmt = os.path.getmtime(f"{gv.current_dir}\\flash\\{item.command}")
+            item.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(fmt))
             rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item._PCI_LEN, int(item.Timeout))
 
         elif item.Keyword == 'CalcKey':
