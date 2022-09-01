@@ -265,6 +265,9 @@ def plin_init_connect(rReturn):
             time.sleep(0.1)
             rReturn = gv.PLin.runSchedule()
             time.sleep(0.1)
+        else:
+            gv.PLin = None
+            return rReturn
     else:
         time.sleep(0.1)
         rReturn = gv.PLin.runSchedule()

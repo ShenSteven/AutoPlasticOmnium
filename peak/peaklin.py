@@ -363,11 +363,14 @@ class PeakLin(QDialog, Ui_PeakLin):
             pSchedule[0] = self.Master3C
             pSchedule[1] = self.Slave3D
             error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
+            lg.logger.debug('SuspendSchedule...')
             if error_code != PLinApi.TLIN_ERROR_OK:
+                lg.logger.debug('SuspendSchedule fail...')
                 self.displayError(error_code)
                 if error_code == PLinApi.TLIN_ERROR_ILLEGAL_CLIENT:
                     self.on_DoLinConnect()
             error_code = self.m_objPLinApi.SetSchedule(self.m_hClient, self.m_hHw, iScheduleNumber, pSchedule, 2)
+            lg.logger.debug('SetSchedule...')
             if error_code == PLinApi.TLIN_ERROR_OK:
                 error_code = self.m_objPLinApi.StartSchedule(self.m_hClient, self.m_hHw, iScheduleNumber)
                 if error_code == PLinApi.TLIN_ERROR_OK:
