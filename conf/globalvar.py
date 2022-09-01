@@ -95,7 +95,7 @@ database_result = rf'{current_dir}\OutPut\result.db'
 # total_fail_count = 0
 # total_abort_count = 0
 
-TestVariables: model.variables.Variables
+TestVariables: model.variables.Variables = None
 mesPhases: model.product.MesInfo
 stationObj: model.product.JsonObject
 # testThread = None

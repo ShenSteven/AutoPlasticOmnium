@@ -158,6 +158,8 @@ class Step:
     @staticmethod
     def parse_var(value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
+        if gv.TestVariables is None:
+            return value
         for a in re.findall(r'<(.*?)>', value):
             # varVal = gv.get_global_val(a)
             varVal = getattr(gv.TestVariables, a)

@@ -283,14 +283,14 @@ class MainForm(QWidget):
             self.ui.actionStart.setEnabled(False)
             self.ui.actionStop.setEnabled(False)
             self.ui.actionClearLog.setEnabled(False)
-
-            self.ui.actionStart.setEnabled(True)
-            self.ui.actionConfig.setEnabled(False)
-            self.ui.actionOpenScript.setEnabled(False)
-            self.ui.actionOpen_TestCase.setEnabled(False)
-            self.ui.actionConvertExcelToJson.setEnabled(False)
-            self.ui.actionEnable_lab.setEnabled(False)
-            self.ui.actionDisable_factory.setEnabled(False)
+            if getattr(sys, 'frozen', False):
+                self.ui.actionStart.setEnabled(True)
+                self.ui.actionConfig.setEnabled(False)
+                self.ui.actionOpenScript.setEnabled(False)
+                self.ui.actionOpen_TestCase.setEnabled(False)
+                self.ui.actionConvertExcelToJson.setEnabled(False)
+                self.ui.actionEnable_lab.setEnabled(False)
+                self.ui.actionDisable_factory.setEnabled(False)
 
     def init_label_info(self):
         def GetAllIpv4Address(networkSegment):
