@@ -13,7 +13,7 @@ handlers:
     stream: ext://sys.stdout
   file_handler:
     class: logging.FileHandler
-    level: DEBUG
+    level: ERROR
     formatter: simple
     filename: $log_file
     encoding: utf8

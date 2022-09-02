@@ -583,7 +583,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False
 
-    def get_data(self, file_s19_cmd):
+    def get_datas(self, file_s19_cmd):
         s19data = ''
         try:
             with open(file_s19_cmd, 'rb') as f:
@@ -594,7 +594,9 @@ class PeakLin(QDialog, Ui_PeakLin):
         except FileNotFoundError:
             lg.logger.debug("File not found")
             raise
-        return " ".join(re.findall(".{2}", s19data))
+        datas = " ".join(re.findall(".{2}", s19data))
+        lg.logger.debug(datas)
+        return datas
 
     @staticmethod
     def get_crc_apps19(file_dir_path):

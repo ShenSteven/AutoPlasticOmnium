@@ -60,6 +60,11 @@ def testKeyword(item, testSuite):
             rReturn = True
             time.sleep(0.1)
 
+        elif item.Keyword == 'AppS19Info':
+            file_path = f"{gv.current_dir}\\flash\\{item.command}"
+            item.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(file_path)))
+            rReturn = True
+
         elif item.Keyword == 'StartFor':
             return True, ''
 
@@ -117,10 +122,8 @@ def testKeyword(item, testSuite):
                 item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
 
         elif item.Keyword == 'TransferData':
-            s19datas = gv.PLin.get_data(f"{gv.current_dir}\\flash\\{item.command}")
-            lg.logger.debug(s19datas)
-            fmt = os.path.getmtime(f"{gv.current_dir}\\flash\\{item.command}")
-            item.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(fmt))
+            file_path = f"{gv.current_dir}\\flash\\{item.command}"
+            s19datas = gv.PLin.get_datas(file_path)
             rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item._PCI_LEN, int(item.Timeout))
 
         elif item.Keyword == 'CalcKey':
