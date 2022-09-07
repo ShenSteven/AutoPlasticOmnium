@@ -369,7 +369,8 @@ class PeakLin(QDialog, Ui_PeakLin):
                 self.displayError(error_code)
                 if error_code == PLinApi.TLIN_ERROR_ILLEGAL_CLIENT:
                     self.on_DoLinConnect()
-            error_code = self.m_objPLinApi.SetSchedule(self.m_hClient, self.m_hHw, iScheduleNumber, pSchedule, 2)
+            error_code = self.m_objPLinApi.SetSchedule(self.m_hClient, self.m_hHw, iScheduleNumber, pSchedule,
+                                                       len(pSchedule))
             lg.logger.debug('SetSchedule...')
             if error_code == PLinApi.TLIN_ERROR_OK:
                 error_code = self.m_objPLinApi.StartSchedule(self.m_hClient, self.m_hHw, iScheduleNumber)
