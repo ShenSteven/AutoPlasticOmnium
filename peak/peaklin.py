@@ -519,7 +519,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             if pRcvMsg.Type != PLinApi.TLIN_MSGTYPE_STANDARD.value:
                 continue
             if pRcvMsg.Data[2] == (int('7F', 16)) and pRcvMsg.Data[1] < 16:
-                lg.logger.debug(
+                lg.logger.error(
                     f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
                 if pRcvMsg.Data[4] == (int("78", 16)):
                     continue

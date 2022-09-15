@@ -1,7 +1,7 @@
 station:
     privileges: labs
     station_all:
-    - LTT
+    #- LTT
     - FL_M4 #(前左):0x1E
     - FR_M4 #(前右):0x50
     - RL_M4 #(后左):0x1F
@@ -15,6 +15,8 @@ station:
     - RR_SX5GEV #(后右):0x53
     - FLB_SX5GEV #(前左保杠):0x52
     - FRB_SX5GEV #(前右保杠):0x54
+    - ReadVer_SX5GEV
+    - ReadVer_M4
     station_name: FL_M4
     station_no: FL_M4
     log_folder: D:\TestLog
