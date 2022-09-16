@@ -1,5 +1,5 @@
 station:
-    privileges: labs
+    privileges: lab
     station_all:
     #- LTT
     - FL_M4 #(前左):0x1E
