@@ -201,7 +201,6 @@ class MainForm(QWidget):
 
     def init_select_station(self):
         for item in gv.cf.station.station_all:
-            print(item)
             station_qaction = QAction(self)
             station_qaction.setObjectName(item)
             if item.startswith("FL_"):
@@ -792,19 +791,23 @@ class MainForm(QWidget):
                                             hint=QAbstractItemView.EnsureVisible)
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
-    def showMessageBox(self, title, text, level):
+    def showMessageBox(self, title, text, level=2):
         if level == 0:
             return QMessageBox.information(self, title, text, QMessageBox.Yes)
         elif level == 1:
             return QMessageBox.warning(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         elif level == 2:
             aa = QMessageBox.question(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            lg.logger.debug(aa)
             return aa
         elif level == 3:
             return QMessageBox.about(self, title, text)
         else:
             return QMessageBox.critical(self, title, text, QMessageBox.Yes)
+
+    @QtCore.pyqtSlot(str, str, result=list)
+    def showQInputDialog(self, title, label):
+        results = QInputDialog.getText(self, title, label)
+        return list(results)
 
     def lineEditEnable(self, isEnable):
         def thread_update():

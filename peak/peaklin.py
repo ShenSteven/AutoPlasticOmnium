@@ -21,13 +21,20 @@ import time
 from ctypes import *
 from . import PLinApi
 from inspect import currentframe
+from decimal import Decimal, ROUND_UP
 
 
 def bytes_to_string(byte_strs):
     str_list = []
-    for i in range(8):
+    for i in range(len(byte_strs)):
         str_list.append('{:02X}'.format(byte_strs[i]))
     return str.join(' ', str_list)
+
+
+def right_round(num, keep_n):
+    if isinstance(num, float):
+        num = str(num)
+    return Decimal(num).quantize((Decimal('0.' + '0' * keep_n)), rounding=ROUND_UP)
 
 
 class PeakLin(QDialog, Ui_PeakLin):
@@ -390,6 +397,16 @@ class PeakLin(QDialog, Ui_PeakLin):
             lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False
 
+    def SuspendDiagSchedule(self):
+        error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
+        lg.logger.debug('SuspendSchedule...')
+        if error_code != PLinApi.TLIN_ERROR_OK:
+            lg.logger.debug('SuspendSchedule fail...')
+            self.displayError(error_code)
+            return False
+        else:
+            return True
+
     def SetFrameEntry(self, _id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
                       ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
         try:
@@ -530,6 +547,53 @@ class PeakLin(QDialog, Ui_PeakLin):
             f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
         return True, bytes_to_string(pRcvMsg.Data)
 
+    def SingleFrameCF(self, _id, nad, pci, data, timeout=2.0):
+        try:
+            if self.SetFrameEntry(_id, nad, pci, data):  # send first frame
+                RSID = '{:02X}'.format((int(data.split()[0], 16) + int("40", 16)))
+                return self.SFRespCF(_id, RSID, timeout)
+            else:
+                return False, ""
+        except Exception as ex:
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            return False, ""
+
+    def SFRespCF(self, _id, rsid, timeout):
+        if _id.upper() == '3C':
+            _id = '3D'
+        pRcvMsg = PLinApi.TLINRcvMsg()
+        start_time = time.time()
+        self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+        # get FirstFrame
+        while pRcvMsg.Data[1] < 16 or pRcvMsg.Data[1] > 31:
+            self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+            if time.time() - start_time > timeout:
+                lg.logger.error(f"timeout {timeout}s for respond,id")
+                return False, ''
+            if pRcvMsg.Type != PLinApi.TLIN_MSGTYPE_STANDARD.value:
+                continue
+        lg.logger.debug(
+            f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
+        # parse FirstFrame
+        if pRcvMsg.Data[3] == (int(rsid, 16)):
+            data_len = pRcvMsg.Data[2]
+            datas = [pRcvMsg.Data[3], pRcvMsg.Data[4], pRcvMsg.Data[5], pRcvMsg.Data[6], pRcvMsg.Data[7]]
+        else:
+            lg.logger.error(
+                f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
+            return False, ''
+        # get Consecutive frames
+        CFCounter = right_round((data_len - 5) / 6, 0)
+        for i in range(0, int(CFCounter)):
+            time.sleep(self._interval / 1000)
+            self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+            lg.logger.debug(
+                f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
+            for j in range(2, 8):
+                datas.append(pRcvMsg.Data[j])
+
+        return True, bytes_to_string(datas)
+
     def ConsecutiveFrame(self, _id, nad, sn, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
                          ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
         time.sleep(self._interval / 1000)
@@ -583,6 +647,34 @@ class PeakLin(QDialog, Ui_PeakLin):
         except Exception as ex:
             lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False
+
+    def plin_write(self, frameId, data, timeout=None):
+        # initialize LIN message to sent
+        pMsg = PLinApi.TLINMsg()
+        # set frame id to Protected ID
+        nPID = c_ubyte(int(frameId, 16))
+        self.m_objPLinApi.GetPID(nPID)
+        pMsg.FrameId = c_ubyte(nPID.value)
+        pMsg.Direction = PLinApi.TLIN_DIRECTION_PUBLISHER
+        pMsg.ChecksumType = PLinApi.TLIN_CHECKSUMTYPE_ENHANCED
+        data_bytes = data.split()
+        pMsg.Length = c_ubyte(len(data_bytes))
+        for i in range(len(data_bytes)):
+            try:
+                pMsg.Data[i] = c_ubyte(int(data_bytes[i].strip(), 16))
+            except Exception as ex:
+                lg.logger.exception(ex)
+        # set checksum
+        self.m_objPLinApi.CalculateChecksum(pMsg)
+        # write LIN message
+        linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
+        if linResult == PLinApi.TLIN_ERROR_OK:
+            self.displayNotification("Message successfully written")
+            return True, ''
+        else:
+            self.displayError(linResult)
+            lg.logger.error("Failed to write message")
+            return False, ''
 
     def get_datas(self, file_s19_cmd):
         s19data = ''

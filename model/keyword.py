@@ -10,7 +10,10 @@ import os
 import re
 import traceback
 import nidaqmx
-from PyQt5.QtWidgets import QAction
+from PyQt5 import QtCore
+from PyQt5.QtCore import QMetaObject, Qt
+from PyQt5.QtWidgets import QAction, QMessageBox
+
 import ui.mainform
 import peak.peaklin
 from sockets.serialport import SerialPort
@@ -23,21 +26,7 @@ from .basicfunc import IsNullOrEmpty, kill_process, start_process, restart_proce
 from inspect import currentframe
 
 
-def testKeyword(item, testSuite):
-    # invoke_return = QMetaObject.invokeMethod(
-    #     ui.mainform.MainForm.main_form,
-    #     'showMessageBox',
-    #     Qt.BlockingQueuedConnection,
-    #     QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
-    #     QtCore.Q_ARG(str, 'ERROR!'),
-    #     QtCore.Q_ARG(str, 'Text to msgBox'),
-    #     QtCore.Q_ARG(int, 2))
-    # lg.logger.debug(f"invoke_return:{invoke_return}")
-    # if invoke_return == QMessageBox.Yes or invoke_return == QMessageBox.Ok:
-    #     lg.logger.debug("yes ok")
-    # else:
-    #     lg.logger.debug('no')
-
+def testKeyword(item, testSuite=None):
     # lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
     # time.sleep(0.02)
     # return True, ''
@@ -59,6 +48,34 @@ def testKeyword(item, testSuite):
             item.testValue = item.command
             rReturn = True
             time.sleep(0.1)
+
+        elif item.Keyword == 'MessageBoxShow':
+            invoke_return = QMetaObject.invokeMethod(
+                ui.mainform.MainForm.main_form,
+                'showMessageBox',
+                Qt.BlockingQueuedConnection,
+                QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
+                QtCore.Q_ARG(str, item.ExpectStr),
+                QtCore.Q_ARG(str, item.command),
+                QtCore.Q_ARG(int, 2))
+            if invoke_return == QMessageBox.Yes or invoke_return == QMessageBox.Ok:
+                rReturn = True
+            else:
+                rReturn = False
+
+        elif item.Keyword == 'QInputDialog':
+            invoke_return = QMetaObject.invokeMethod(
+                ui.mainform.MainForm.main_form,
+                'showQInputDialog',
+                Qt.BlockingQueuedConnection,
+                QtCore.Q_RETURN_ARG(list),
+                QtCore.Q_ARG(str, item.ExpectStr),
+                QtCore.Q_ARG(str, item.command))
+            lg.logger.debug(f'dialog input:{invoke_return[0]}')
+            if not invoke_return[1]:
+                rReturn = False
+            else:
+                rReturn = True
 
         elif item.Keyword == 'AppS19Info':
             file_path = f"{gv.current_dir}\\flash\\{item.command}"
@@ -115,6 +132,19 @@ def testKeyword(item, testSuite):
             rReturn, revStr = gv.PLin.SingleFrame(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
             if rReturn and item.CheckStr1 in revStr:
                 item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
+            compInfo, rReturn = assert_value(compInfo, item, rReturn)
+
+        elif item.Keyword == 'PLINSingleFrameCF':
+            rReturn, revStr = gv.PLin.SingleFrameCF(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
+            if rReturn and item.CheckStr1 in revStr:
+                item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
+            compInfo, rReturn = assert_value(compInfo, item, rReturn)
+
+        elif item.Keyword == 'PLINWrite':
+            rReturn, revStr = gv.PLin.plin_write(item.ID, item.command)
+            if rReturn and item.CheckStr1 in revStr:
+                item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
+            compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
         elif item.Keyword == 'PLINMultiFrame':
             rReturn, revStr = gv.PLin.MultiFrame(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
@@ -125,6 +155,9 @@ def testKeyword(item, testSuite):
             file_path = f"{gv.current_dir}\\flash\\{item.command}"
             s19datas = gv.PLin.get_datas(file_path)
             rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item._PCI_LEN, int(item.Timeout))
+
+        elif item.Keyword == 'SuspendDiagSchedule':
+            rReturn = gv.PLin.SuspendDiagSchedule()
 
         elif item.Keyword == 'CalcKey':
             item.testValue = gv.PLin.CalKey(item.command)
@@ -237,18 +270,20 @@ def subStr(SubStr1, SubStr2, revStr):
     if len(values) == 1 and values[0] != '':
         testValue = values[0]
         lg.logger.debug(f'get TestValue:{testValue}')
-        return testValue
+        return testValue.strip()
     else:
         raise Exception(f'get TestValue exception:{values}')
 
 
 def assert_value(compInfo, item, rReturn):
-    if not IsNullOrEmpty(item.spec) and IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
-        rReturn = True if item.testValue in item.Spec else False
-    if not IsNullOrEmpty(item.USL) or not IsNullOrEmpty(item.LSL):
+    if not IsNullOrEmpty(item.spec):
+        rReturn = True if item.testValue in item.spec else False
+    elif not IsNullOrEmpty(item.USL) or not IsNullOrEmpty(item.LSL):
         rReturn, compInfo = CompareLimit(item.LSL, item.USL, item.testValue)
+    elif IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
+        pass
     else:
-        lg.logger.warning(f"assert is unknown,Spec:{item.spec},LSL:{item.LSL}USL:{item.USL}.")
+        lg.logger.warning(f"assert is unknown,SPEC:{item.spec},LSL:{item.LSL}USL:{item.USL}.")
     return compInfo, rReturn
 
 
