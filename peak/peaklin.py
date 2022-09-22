@@ -668,8 +668,10 @@ class PeakLin(QDialog, Ui_PeakLin):
         self.m_objPLinApi.CalculateChecksum(pMsg)
         # write LIN message
         linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
+        lg.logger.debug(
+            f"RX  {frameId},{bytes_to_string(pMsg.Data)},{pMsg.Direction},{pMsg.ChecksumType},{'{:02X}'.format(pMsg.Checksum)}")
         if linResult == PLinApi.TLIN_ERROR_OK:
-            self.displayNotification("Message successfully written")
+            lg.logger.info("Message successfully written")
             return True, ''
         else:
             self.displayError(linResult)
