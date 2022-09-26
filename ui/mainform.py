@@ -683,6 +683,7 @@ class MainForm(QWidget):
         self.ui.actionClearLog.setEnabled(isDebug)
         self.ui.actionSaveLog.setEnabled(isDebug)
         self.ui.actionConfig.setEnabled(isDebug)
+        self.ShowTreeView(self.testSequences)
 
     def on_actionEditStep(self):
         self.ui.tableWidget_2.blockSignals(True)
