@@ -154,6 +154,29 @@ def wrapper_time(fun):
     return inner
 
 
+# def create_csv_file(filename, header, updateColumn=False):
+#     try:
+#         if not os.path.exists(filename):
+#             with open(filename, 'w', newline='') as f:
+#                 file = csv.writer(f)
+#                 file.writerow(header)
+#             lg.logger.debug(f'create_csv_file:{filename}')
+#         else:
+#             if updateColumn:
+#                 with open(filename, 'r') as rf:
+#                     reader = csv.reader(rf)
+#                     # cl = [row[1] for row in reader]  # 获取第1列
+#                     rows = [row for row in reader]
+#                     with open(filename, 'w', newline='') as wf:
+#                         if [0] != header:
+#                             rows[0] = header
+#                             file = csv.writer(wf)
+#                             file.writerows(rows)
+#                         lg.logger.info(f'update csvHeader success!')
+#     except Exception as e:
+#         lg.logger.fatal(e)
+
+
 def create_csv_file(filename, header, updateColumn=False):
     try:
         if not os.path.exists(filename):
@@ -163,18 +186,17 @@ def create_csv_file(filename, header, updateColumn=False):
             lg.logger.debug(f'create_csv_file:{filename}')
         else:
             if updateColumn:
-                with open(filename, 'r') as rf:
-                    reader = csv.reader(rf)
-                    # cl = [row[1] for row in reader]  # 获取第1列
+                with open(filename, 'r+', newline='') as rwf:
+                    reader = csv.reader(rwf)
                     rows = [row for row in reader]
-                    with open(filename, 'w', newline='') as wf:
-                        if [0] != header:
-                            rows[0] = header
-                            file = csv.writer(wf)
-                            file.writerows(rows)
-                        lg.logger.info(f'update csvHeader success!')
+                    if [0] != header:
+                        rows[0] = header
+                        rwf.seek(0)
+                        file = csv.writer(rwf)
+                        file.writerows(rows)
+                    lg.logger.debug(f'update csvHeader success!')
     except Exception as e:
-        lg.logger.fatal(e)
+        lg.logger.debug(e)
 
 
 def write_csv_file(filename, row):

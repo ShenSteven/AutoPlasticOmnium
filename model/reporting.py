@@ -100,8 +100,9 @@ def collect_data_to_csv():
         lg.logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
         write_csv_file(gv.CSVFilePath, fix_header_value)
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
+    thread.join()
 
 
 def saveTestResult():
@@ -123,8 +124,9 @@ def saveTestResult():
                 writer.writerows(all_rows)
         lg.logger.debug(f'saveTestResult to:{reportPath}')
 
-    thread = Thread(target=thread_update)
+    thread = Thread(target=thread_update, daemon=True)
     thread.start()
+    thread.join()
 
 
 def upload_result_to_mes(url):
