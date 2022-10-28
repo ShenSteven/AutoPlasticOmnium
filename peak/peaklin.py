@@ -369,21 +369,14 @@ class PeakLin(QDialog, Ui_PeakLin):
             pSchedule = (PLinApi.TLINScheduleSlot * 2)()
             pSchedule[0] = self.Master3C
             pSchedule[1] = self.Slave3D
-            error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
-            lg.logger.debug('SuspendSchedule...')
-            if error_code != PLinApi.TLIN_ERROR_OK:
-                lg.logger.debug('SuspendSchedule fail...')
-                self.displayError(error_code)
-                if error_code == PLinApi.TLIN_ERROR_ILLEGAL_CLIENT:
-                    self.on_DoLinConnect()
+            self.SuspendDiagSchedule()
             error_code = self.m_objPLinApi.SetSchedule(self.m_hClient, self.m_hHw, iScheduleNumber, pSchedule,
                                                        len(pSchedule))
-            lg.logger.debug('SetSchedule...')
             if error_code == PLinApi.TLIN_ERROR_OK:
                 error_code = self.m_objPLinApi.StartSchedule(self.m_hClient, self.m_hHw, iScheduleNumber)
                 if error_code == PLinApi.TLIN_ERROR_OK:
                     lg.logger.info("start schedule success...")
-                    time.sleep(0.5)
+                    time.sleep(0.001)
                     return True
                 else:
                     self.displayError(error_code)
@@ -399,10 +392,12 @@ class PeakLin(QDialog, Ui_PeakLin):
 
     def SuspendDiagSchedule(self):
         error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
-        lg.logger.debug('SuspendSchedule...')
+        self.m_objPLinApi.DeleteSchedule(self.m_hClient, self.m_hHw, 0)
         if error_code != PLinApi.TLIN_ERROR_OK:
             lg.logger.debug('SuspendSchedule fail...')
             self.displayError(error_code)
+            if error_code == PLinApi.TLIN_ERROR_ILLEGAL_CLIENT:
+                self.on_DoLinConnect()
             return False
         else:
             return True
@@ -737,3 +732,115 @@ class PeakLin(QDialog, Ui_PeakLin):
     def displayNotification(self, text="** Invalid choice **", waitSeconds=0.0):
         lg.logger.warning(text)
         time.sleep(waitSeconds)
+
+    # def runSchedule3C(self):
+    #     try:
+    #         iScheduleNumber = 0
+    #         self.Master3C.FrameId[0] = c_ubyte(60)
+    #         self.Master3C.Delay = self.ReqDelay
+    #         self.Master3C.Type = PLinApi.TLIN_SLOTTYPE_MASTER_REQUEST
+    #         for i in range(1, 8):
+    #             self.Master3C.FrameId[i] = c_ubyte(0)
+    #         pSchedule = (PLinApi.TLINScheduleSlot * 1)()
+    #         pSchedule[0] = self.Master3C
+    #         self.SuspendDiagSchedule()
+    #         error_code = self.m_objPLinApi.SetSchedule(self.m_hClient, self.m_hHw, iScheduleNumber, pSchedule,
+    #                                                    len(pSchedule))
+    #         lg.logger.debug('SetSchedule3C...')
+    #         if error_code == PLinApi.TLIN_ERROR_OK:
+    #             error_code = self.m_objPLinApi.StartSchedule(self.m_hClient, self.m_hHw, iScheduleNumber)
+    #             if error_code == PLinApi.TLIN_ERROR_OK:
+    #                 lg.logger.info("start 3C schedule success...")
+    #                 return True
+    #             else:
+    #                 self.displayError(error_code)
+    #                 return False
+    #         else:
+    #             self.displayError(error_code)
+    #             error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
+    #             self.displayError(error_code)
+    #             return False
+    #     except Exception as ex:
+    #         lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+    #         return False
+    #
+    # def runSchedule3D(self):
+    #     try:
+    #         iScheduleNumber = 0
+    #         self.Slave3D.FrameId[0] = c_ubyte(61)
+    #         self.Slave3D.Delay = self.RespDelay
+    #         self.Slave3D.Type = PLinApi.TLIN_SLOTTYPE_SLAVE_RESPONSE
+    #         for i in range(1, 8):
+    #             self.Slave3D.FrameId[i] = c_ubyte(0)
+    #         pSchedule = (PLinApi.TLINScheduleSlot * 1)()
+    #         pSchedule[0] = self.Slave3D
+    #         self.SuspendDiagSchedule()
+    #         error_code = self.m_objPLinApi.SetSchedule(self.m_hClient, self.m_hHw, iScheduleNumber, pSchedule,
+    #                                                    len(pSchedule))
+    #         lg.logger.debug('SetSchedule3D...')
+    #         if error_code == PLinApi.TLIN_ERROR_OK:
+    #             error_code = self.m_objPLinApi.StartSchedule(self.m_hClient, self.m_hHw, iScheduleNumber)
+    #             if error_code == PLinApi.TLIN_ERROR_OK:
+    #                 lg.logger.info("start 3D schedule success...")
+    #                 return True
+    #             else:
+    #                 self.displayError(error_code)
+    #                 return False
+    #         else:
+    #             self.displayError(error_code)
+    #             error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
+    #             self.displayError(error_code)
+    #             return False
+    #     except Exception as ex:
+    #         lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+    #         return False
+
+    def ConsecutiveFrame2(self, _id, nad, sn, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
+                          ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
+        pci = '2' + sn
+        self.SetFrameEntry(_id, nad, pci, data, log, direction, ChecksumType)
+        return True
+
+    def SetFrameEntry2(self, _id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
+                       ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
+        try:
+            time.sleep(gv.cf.BLF.ReqDelay / 1000)
+            time.sleep(self._interval / 1000)
+            frameData = nad + " " + pci + " " + data
+            tempData = frameData.split()
+            lFrameEntry = PLinApi.TLINFrameEntry()
+            lFrameEntry.Length = c_ubyte(8)
+            lFrameEntry.FrameId = c_ubyte(int(_id, 16))
+            lFrameEntry.ChecksumType = ChecksumType
+            lFrameEntry.Direction = direction
+            lFrameEntry.Flags = PLinApi.FRAME_FLAG_RESPONSE_ENABLE
+            lFrameEntry.InitialData = (c_ubyte * 8)()
+            for i in range(8):
+                try:
+                    lFrameEntry.InitialData[i] = c_ubyte(int(tempData[i].strip(), 16))
+                except IndexError:
+                    lFrameEntry.InitialData[i] = c_ubyte(int('FF', 16))
+                except Exception as ex:
+                    lg.logger.debug(ex)
+            linResult = self.m_objPLinApi.SetFrameEntry(self.m_hClient, self.m_hHw, lFrameEntry)
+            if linResult == PLinApi.TLIN_ERROR_OK:
+                self.runSchedule()
+                linResult = self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
+                                                              c_ubyte(0),
+                                                              lFrameEntry.Length, lFrameEntry.InitialData)
+                if linResult == PLinApi.TLIN_ERROR_OK:
+                    if log:
+                        lg.logger.debug(
+                            f"TX  {_id},{bytes_to_string(lFrameEntry.InitialData)},{lFrameEntry.Direction},{lFrameEntry.ChecksumType}")
+                    return True
+                else:
+                    self.displayError(linResult)
+                    lg.logger.error(f"Failed to UpdateByteArray message:id:{_id},{lFrameEntry.InitialData}")
+                    return False
+            else:
+                self.displayError(linResult)
+                lg.logger.error(f"Failed to SetFrameEntry message:id:{_id},{lFrameEntry.InitialData}")
+                return False
+        except Exception as ex:
+            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            return False

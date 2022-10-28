@@ -277,9 +277,15 @@ def subStr(SubStr1, SubStr2, revStr):
 
 def assert_value(compInfo, item, rReturn):
     if not IsNullOrEmpty(item.spec):
-        rReturn = True if item.testValue in item.spec else False
+        try:
+            rReturn = True if item.testValue in item.spec else False
+        except TypeError as e:
+            lg.logger.error(f'{currentframe().f_code.co_name}:{e}')
     elif not IsNullOrEmpty(item.USL) or not IsNullOrEmpty(item.LSL):
-        rReturn, compInfo = CompareLimit(item.LSL, item.USL, item.testValue)
+        try:
+            rReturn, compInfo = CompareLimit(item.LSL, item.USL, item.testValue)
+        except TypeError as e:
+            lg.logger.error(f'{currentframe().f_code.co_name}:{e}')
     elif IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
         pass
     else:
