@@ -665,7 +665,7 @@ class MainForm(QWidget):
 
     def on_actionRestart(self):
         def thread_update():
-            run_cmd(f'restart.exe -n AutoAMLS.exe -p AutoAMLS.exe')
+            run_cmd(f'restart.exe -n AutoPlasticOmnium.exe -p AutoPlasticOmnium.exe')
 
         thread = Thread(target=thread_update)
         ask = QMessageBox.question(self, "Restart Application?",

@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>AutoAMLS</string>
+   <string>AutoPlasticOmnium</string>
   </property>
   <property name="windowIcon">
    <iconset resource="images.qrc">
@@ -352,7 +352,7 @@ font: 20pt &quot;宋体&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>1448</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="testcase">
