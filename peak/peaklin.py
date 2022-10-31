@@ -402,47 +402,47 @@ class PeakLin(QDialog, Ui_PeakLin):
         else:
             return True
 
-    def SetFrameEntry(self, _id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
-                      ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
-        try:
-            time.sleep(gv.cf.BLF.ReqDelay / 1000)
-            frameData = nad + " " + pci + " " + data
-            tempData = frameData.split()
-            lFrameEntry = PLinApi.TLINFrameEntry()
-            lFrameEntry.Length = c_ubyte(8)
-            lFrameEntry.FrameId = c_ubyte(int(_id, 16))
-            lFrameEntry.ChecksumType = ChecksumType
-            lFrameEntry.Direction = direction
-            lFrameEntry.Flags = PLinApi.FRAME_FLAG_RESPONSE_ENABLE
-            lFrameEntry.InitialData = (c_ubyte * 8)()
-            for i in range(8):
-                try:
-                    lFrameEntry.InitialData[i] = c_ubyte(int(tempData[i].strip(), 16))
-                except IndexError:
-                    lFrameEntry.InitialData[i] = c_ubyte(int('FF', 16))
-                except Exception as ex:
-                    lg.logger.debug(ex)
-            linResult = self.m_objPLinApi.SetFrameEntry(self.m_hClient, self.m_hHw, lFrameEntry)
-            if linResult == PLinApi.TLIN_ERROR_OK:
-                linResult = self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
-                                                              c_ubyte(0),
-                                                              lFrameEntry.Length, lFrameEntry.InitialData)
-                if linResult == PLinApi.TLIN_ERROR_OK:
-                    if log:
-                        lg.logger.debug(
-                            f"TX  {_id},{bytes_to_string(lFrameEntry.InitialData)},{lFrameEntry.Direction},{lFrameEntry.ChecksumType}")
-                    return True
-                else:
-                    self.displayError(linResult)
-                    lg.logger.error(f"Failed to UpdateByteArray message:id:{_id},{lFrameEntry.InitialData}")
-                    return False
-            else:
-                self.displayError(linResult)
-                lg.logger.error(f"Failed to SetFrameEntry message:id:{_id},{lFrameEntry.InitialData}")
-                return False
-        except Exception as ex:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
-            return False
+    # def SetFrameEntry(self, _id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
+    #                   ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
+    #     try:
+    #         time.sleep(gv.cf.BLF.ReqDelay / 1000)
+    #         frameData = nad + " " + pci + " " + data
+    #         tempData = frameData.split()
+    #         lFrameEntry = PLinApi.TLINFrameEntry()
+    #         lFrameEntry.Length = c_ubyte(8)
+    #         lFrameEntry.FrameId = c_ubyte(int(_id, 16))
+    #         lFrameEntry.ChecksumType = ChecksumType
+    #         lFrameEntry.Direction = direction
+    #         lFrameEntry.Flags = PLinApi.FRAME_FLAG_RESPONSE_ENABLE
+    #         lFrameEntry.InitialData = (c_ubyte * 8)()
+    #         for i in range(8):
+    #             try:
+    #                 lFrameEntry.InitialData[i] = c_ubyte(int(tempData[i].strip(), 16))
+    #             except IndexError:
+    #                 lFrameEntry.InitialData[i] = c_ubyte(int('FF', 16))
+    #             except Exception as ex:
+    #                 lg.logger.debug(ex)
+    #         linResult = self.m_objPLinApi.SetFrameEntry(self.m_hClient, self.m_hHw, lFrameEntry)
+    #         if linResult == PLinApi.TLIN_ERROR_OK:
+    #             linResult = self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
+    #                                                           c_ubyte(0),
+    #                                                           lFrameEntry.Length, lFrameEntry.InitialData)
+    #             if linResult == PLinApi.TLIN_ERROR_OK:
+    #                 if log:
+    #                     lg.logger.debug(
+    #                         f"TX  {_id},{bytes_to_string(lFrameEntry.InitialData)},{lFrameEntry.Direction},{lFrameEntry.ChecksumType}")
+    #                 return True
+    #             else:
+    #                 self.displayError(linResult)
+    #                 lg.logger.error(f"Failed to UpdateByteArray message:id:{_id},{lFrameEntry.InitialData}")
+    #                 return False
+    #         else:
+    #             self.displayError(linResult)
+    #             lg.logger.error(f"Failed to SetFrameEntry message:id:{_id},{lFrameEntry.InitialData}")
+    #             return False
+    #     except Exception as ex:
+    #         lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+    #         return False
 
     def SingleFrame(self, _id, nad, pci, data, timeout=2.0):
         try:
@@ -590,12 +590,12 @@ class PeakLin(QDialog, Ui_PeakLin):
 
         return True, bytes_to_string(datas)
 
-    def ConsecutiveFrame(self, _id, nad, sn, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
-                         ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
-        time.sleep(self._interval / 1000)
-        pci = '2' + sn
-        self.SetFrameEntry(_id, nad, pci, data, log, direction, ChecksumType)
-        return True
+    # def ConsecutiveFrame(self, _id, nad, sn, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
+    #                      ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
+    #     time.sleep(self._interval / 1000)
+    #     pci = '2' + sn
+    #     self.SetFrameEntry(_id, nad, pci, data, log, direction, ChecksumType)
+    #     return True
 
     def CalKey(self, seed):
         try:
@@ -619,7 +619,7 @@ class PeakLin(QDialog, Ui_PeakLin):
         _len = len(tempData)
         try:
             first_data = ' '.join(tempData[0:3])
-            if self.SetFrameEntry2(_id, nad, pci, first_data):  # send first frame
+            if self.SetFrameEntry(_id, nad, pci, first_data):  # send first frame
                 j = 1
                 remainder = (_len - 3) % 6
                 quotient = (_len - 3) // 6
@@ -634,7 +634,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                     else:
                         consedata = ' '.join(tempData[3 + i * 6:3 + i * 6 + 6])
 
-                    self.ConsecutiveFrame2(_id, nad, '{:X}'.format(j), consedata, True)
+                    self.ConsecutiveFrame(_id, nad, '{:X}'.format(j), consedata, True)
                     j = j + 1
                 if self.SFResp(_id, '76', timeout)[0]:
                     return True
@@ -737,14 +737,14 @@ class PeakLin(QDialog, Ui_PeakLin):
         lg.logger.warning(text)
         time.sleep(waitSeconds)
 
-    def ConsecutiveFrame2(self, _id, nad, sn, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
-                          ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
+    def ConsecutiveFrame(self, _id, nad, sn, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
+                         ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
         pci = '2' + sn
-        self.SetFrameEntry2(_id, nad, pci, data, log, direction, ChecksumType)
+        self.SetFrameEntry(_id, nad, pci, data, log, direction, ChecksumType)
         return True
 
-    def SetFrameEntry2(self, _id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
-                       ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
+    def SetFrameEntry(self, _id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
+                      ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
         try:
             frameData = nad + " " + pci + " " + data
             tempData = frameData.split()
