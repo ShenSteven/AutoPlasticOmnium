@@ -769,8 +769,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                     pRcvMsg = PLinApi.TLINRcvMsg()
                     self.m_objPLinApi.ResetClient(self.m_hClient)
                     self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
-                                                      c_ubyte(0),
-                                                      lFrameEntry.Length, lFrameEntry.InitialData)
+                                                      c_ubyte(0), lFrameEntry.Length, lFrameEntry.InitialData)
                     while pRcvMsg.FrameId != c_ubyte(int('3C', 16)):
                         time.sleep(gv.cf.BLF.MRtoMRDelay / 1000)
                         self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
