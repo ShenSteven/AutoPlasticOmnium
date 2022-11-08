@@ -557,9 +557,12 @@ class MainForm(QWidget):
         thread.start()
 
     def on_actionOpenScript(self):
+
         def actionOpenScript():
             os.startfile(self.testcase.test_script_json)
 
+        if getattr(sys, 'frozen', False):
+            return
         thread = Thread(target=actionOpenScript, daemon=True)
         thread.start()
 
