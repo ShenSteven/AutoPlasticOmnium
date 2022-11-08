@@ -1077,8 +1077,6 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                 myWind.my_signals.timingSignal[bool].emit(False)
                 lg.logger.debug(f"Test end,ElapsedTime:{myWind.sec}s.")
                 gv.startFlag = False
-                gv.IsRunning1 = False
-                gv.IsRunning2 = False
                 myWind.my_signals.lineEditEnableSignal[bool].emit(True)
                 myWind.my_signals.updateStatusBarSignal[str].emit('')
                 myWind.my_signals.saveTextEditSignal[str].emit('')

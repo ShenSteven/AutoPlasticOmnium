@@ -442,18 +442,6 @@ class PeakLin(QDialog, Ui_PeakLin):
         else:
             return True
 
-    def SuspendDiagScheduleALE(self):
-        error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
-        self.m_objPLinApi.DeleteSchedule(self.m_hClient, self.m_hHw, 0)
-        if error_code != PLinApi.TLIN_ERROR_OK:
-            lg.logger.debug('SuspendSchedule fail...')
-            self.displayError(error_code)
-            if error_code == PLinApi.TLIN_ERROR_ILLEGAL_CLIENT:
-                self.on_DoLinConnect()
-            return False
-        else:
-            return True
-
     # def SetFrameEntry(self, _id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
     #                   ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
     #     try:
@@ -739,76 +727,76 @@ class PeakLin(QDialog, Ui_PeakLin):
         lg.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(pMsg.Data)}")
         return False, ''
 
-    def plin_writeALE32(self, _id, data):
-        # def thread_update():
-        pMsg = PLinApi.TLINMsg()
-        nPID = c_ubyte(int(_id, 16))
-        data_bytes = data.split()
-
-        self.m_objPLinApi.GetPID(nPID)
-        pMsg.FrameId = c_ubyte(nPID.value)
-        pMsg.Direction = PLinApi.TLIN_DIRECTION_PUBLISHER
-        pMsg.ChecksumType = PLinApi.TLIN_CHECKSUMTYPE_ENHANCED
-        pMsg.Length = c_ubyte(len(data_bytes))
-        for i in range(len(data_bytes)):
-            try:
-                pMsg.Data[i] = c_ubyte(int(data_bytes[i].strip(), 16))
-            except Exception as ex:
-                lg.logger.exception(ex)
-        self.m_objPLinApi.CalculateChecksum(pMsg)
-        # readTxCount = 0
-        pRcvMsg = PLinApi.TLINRcvMsg()
-        # self.m_objPLinApi.ResetClient(self.m_hClient)
-        while gv.IsRunning1:
-            linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
-            lg.logger.debug(f"Tx  {_id},{bytes_to_string(pMsg.Data)}")
-            self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-            time.sleep(gv.cf.BLF.ReqDelay / 100)
-
-    def plin_writeALE33(self, _id, data):
-        # def thread_update():
-        pMsg = PLinApi.TLINMsg()
-        nPID = c_ubyte(int(_id, 16))
-        data_bytes = data.split()
-
-        self.m_objPLinApi.GetPID(nPID)
-        pMsg.FrameId = c_ubyte(nPID.value)
-        pMsg.Direction = PLinApi.TLIN_DIRECTION_PUBLISHER
-        pMsg.ChecksumType = PLinApi.TLIN_CHECKSUMTYPE_ENHANCED
-        pMsg.Length = c_ubyte(len(data_bytes))
-        for i in range(len(data_bytes)):
-            try:
-                pMsg.Data[i] = c_ubyte(int(data_bytes[i].strip(), 16))
-            except Exception as ex:
-                lg.logger.exception(ex)
-        self.m_objPLinApi.CalculateChecksum(pMsg)
-
-        while gv.IsRunning2:
-            readTxCount = 0
-            pRcvMsg = PLinApi.TLINRcvMsg()
-            self.m_objPLinApi.ResetClient(self.m_hClient)
-            linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
-            lg.logger.debug(f"Tx  {_id},{bytes_to_string(pMsg.Data)}")
-            self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-            while pRcvMsg.FrameId != c_ubyte(nPID.value):
-                time.sleep(gv.cf.BLF.MRtoMRDelay / 1000)
-                self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-                readTxCount += 1
-                if pRcvMsg.Data[1] == pMsg.Data[1] \
-                        and pRcvMsg.Data[2] == pMsg.Data[2] \
-                        and pRcvMsg.Data[5] == pMsg.Data[5] \
-                        and pRcvMsg.Data[6] == pMsg.Data[6]:
-                    lg.logger.debug(f"Tx  {_id},{bytes_to_string(pRcvMsg.Data)}")
-                    return True
-                if readTxCount == gv.cf.BLF.readTxCount:
-                    lg.logger.warning(f'readTxCount:{gv.cf.BLF.readTxCount}')
-                    lg.logger.warning(f"rTx  {_id},{bytes_to_string(pMsg.Data)}")
-                    return True
-        # lg.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(pMsg.Data)}")
-        # return True
-
-    # thread = Thread(target=thread_update, daemon=True)
-    # thread.start()
+    # def plin_writeALE32(self, _id, data):
+    #     # def thread_update():
+    #     pMsg = PLinApi.TLINMsg()
+    #     nPID = c_ubyte(int(_id, 16))
+    #     data_bytes = data.split()
+    #
+    #     self.m_objPLinApi.GetPID(nPID)
+    #     pMsg.FrameId = c_ubyte(nPID.value)
+    #     pMsg.Direction = PLinApi.TLIN_DIRECTION_PUBLISHER
+    #     pMsg.ChecksumType = PLinApi.TLIN_CHECKSUMTYPE_ENHANCED
+    #     pMsg.Length = c_ubyte(len(data_bytes))
+    #     for i in range(len(data_bytes)):
+    #         try:
+    #             pMsg.Data[i] = c_ubyte(int(data_bytes[i].strip(), 16))
+    #         except Exception as ex:
+    #             lg.logger.exception(ex)
+    #     self.m_objPLinApi.CalculateChecksum(pMsg)
+    #     # readTxCount = 0
+    #     pRcvMsg = PLinApi.TLINRcvMsg()
+    #     # self.m_objPLinApi.ResetClient(self.m_hClient)
+    #     while gv.IsRunning1:
+    #         linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
+    #         lg.logger.debug(f"Tx  {_id},{bytes_to_string(pMsg.Data)}")
+    #         self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+    #         time.sleep(gv.cf.BLF.ReqDelay / 100)
+    #
+    # def plin_writeALE33(self, _id, data):
+    #     # def thread_update():
+    #     pMsg = PLinApi.TLINMsg()
+    #     nPID = c_ubyte(int(_id, 16))
+    #     data_bytes = data.split()
+    #
+    #     self.m_objPLinApi.GetPID(nPID)
+    #     pMsg.FrameId = c_ubyte(nPID.value)
+    #     pMsg.Direction = PLinApi.TLIN_DIRECTION_PUBLISHER
+    #     pMsg.ChecksumType = PLinApi.TLIN_CHECKSUMTYPE_ENHANCED
+    #     pMsg.Length = c_ubyte(len(data_bytes))
+    #     for i in range(len(data_bytes)):
+    #         try:
+    #             pMsg.Data[i] = c_ubyte(int(data_bytes[i].strip(), 16))
+    #         except Exception as ex:
+    #             lg.logger.exception(ex)
+    #     self.m_objPLinApi.CalculateChecksum(pMsg)
+    #
+    #     while gv.IsRunning2:
+    #         readTxCount = 0
+    #         pRcvMsg = PLinApi.TLINRcvMsg()
+    #         self.m_objPLinApi.ResetClient(self.m_hClient)
+    #         linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
+    #         lg.logger.debug(f"Tx  {_id},{bytes_to_string(pMsg.Data)}")
+    #         self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+    #         while pRcvMsg.FrameId != c_ubyte(nPID.value):
+    #             time.sleep(gv.cf.BLF.MRtoMRDelay / 1000)
+    #             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+    #             readTxCount += 1
+    #             if pRcvMsg.Data[1] == pMsg.Data[1] \
+    #                     and pRcvMsg.Data[2] == pMsg.Data[2] \
+    #                     and pRcvMsg.Data[5] == pMsg.Data[5] \
+    #                     and pRcvMsg.Data[6] == pMsg.Data[6]:
+    #                 lg.logger.debug(f"Tx  {_id},{bytes_to_string(pRcvMsg.Data)}")
+    #                 return True
+    #             if readTxCount == gv.cf.BLF.readTxCount:
+    #                 lg.logger.warning(f'readTxCount:{gv.cf.BLF.readTxCount}')
+    #                 lg.logger.warning(f"rTx  {_id},{bytes_to_string(pMsg.Data)}")
+    #                 return True
+    #     # lg.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(pMsg.Data)}")
+    #     # return True
+    #
+    # # thread = Thread(target=thread_update, daemon=True)
+    # # thread.start()
 
     def plin_Get_pMsg(self, _id, data):
         pMsg = PLinApi.TLINMsg()
@@ -834,11 +822,11 @@ class PeakLin(QDialog, Ui_PeakLin):
                 return
             pRcvMsg = PLinApi.TLINRcvMsg()
             self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg32)
-            # lg.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
+            lg.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             time.sleep(gv.cf.BLF.ReqDelay / 1000)
             self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg33)
-            # lg.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
+            lg.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             time.sleep(120 / 1000)
             if once:
