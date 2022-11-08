@@ -9,6 +9,8 @@
 import os
 import re
 import traceback
+from threading import Thread
+
 import nidaqmx
 from PyQt5 import QtCore
 from PyQt5.QtCore import QMetaObject, Qt
@@ -42,6 +44,20 @@ def testKeyword(item, testSuite=None):
         if item.Keyword == 'Waiting':
             lg.logger.debug(f'waiting {item.Timeout}s')
             time.sleep(float(item.Timeout))
+            rReturn = True
+
+        elif item.Keyword == 'WaitingALE':
+            # lg.logger.debug(f'waiting {item.Timeout}s')
+            # time.sleep(float(item.Timeout))
+            # # gv.stepThread1.join()
+            # # gv.stepThread2.join()
+            # gv.IsRunning1 = False
+            # gv.IsRunning2 = False
+            # rReturn = True
+            # time.sleep(1)
+
+            # gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, int(item.Timeout), True if item.retry == 1 else False)
+            gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, int(item.Timeout))
             rReturn = True
 
         elif item.Keyword == 'SetVar':
@@ -123,6 +139,9 @@ def testKeyword(item, testSuite=None):
         elif item.Keyword == 'PLINInitConnect':
             rReturn = plin_init_connect(rReturn)
 
+        elif item.Keyword == 'PLINInitConnectELV':
+            rReturn = plin_init_connectELV(rReturn)
+
         elif item.Keyword == 'PLINDisConnect':
             rReturn = gv.PLin.DoLinDisconnect()
             ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
@@ -140,11 +159,37 @@ def testKeyword(item, testSuite=None):
                 item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
-        elif item.Keyword == 'PLINWrite':
+        elif item.Keyword == 'PLINWriteALE32' or item.Keyword == 'PLINWriteALE33':
             rReturn, revStr = gv.PLin.plin_write(item.ID, item.command)
             if rReturn and item.CheckStr1 in revStr:
                 item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
+
+        elif item.Keyword == 'PLINWriteALE322':
+            gv.stepThread1 = Thread(target=gv.PLin.plin_writeALE32, daemon=True,
+                                    args=(item.ID, item.command))
+            gv.stepThread1.start()
+            gv.IsRunning1 = True
+
+            rReturn = True
+
+        elif item.Keyword == 'PLINWriteALE332':
+            gv.stepThread2 = Thread(target=gv.PLin.plin_writeALE33, daemon=True,
+                                    args=(item.ID, item.command))
+            gv.stepThread2.start()
+            gv.IsRunning2 = True
+
+            rReturn = True
+
+        elif item.Keyword == 'PLINGetMsg32':
+            gv.pMsg32 = gv.PLin.plin_Get_pMsg(item.ID, item.command)
+            rReturn = True
+        elif item.Keyword == 'PLINGetMsg33':
+            gv.pMsg33 = gv.PLin.plin_Get_pMsg(item.ID, item.command)
+            rReturn = True
+        elif item.Keyword == 'PLINWriteALE':
+            gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, item.Timeout)
+            rReturn = True
 
         elif item.Keyword == 'PLINMultiFrame':
             rReturn, revStr = gv.PLin.MultiFrame(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
@@ -158,6 +203,9 @@ def testKeyword(item, testSuite=None):
 
         elif item.Keyword == 'SuspendDiagSchedule':
             rReturn = gv.PLin.SuspendDiagSchedule()
+
+        elif item.Keyword == 'SuspendDiagScheduleALE':
+            rReturn = gv.PLin.SuspendDiagScheduleALE()
 
         elif item.Keyword == 'CalcKey':
             item.testValue = gv.PLin.CalKey(item.command)
@@ -310,8 +358,33 @@ def plin_init_connect(rReturn):
         gv.PLin.hardwareCbx_IndexChanged()
         if gv.PLin.doLinConnect():
             time.sleep(0.1)
+            rReturn = gv.PLin.runScheduleDiag()
+            time.sleep(0.1)
+        else:
+            gv.PLin = None
+            return rReturn
+    else:
+        time.sleep(0.1)
+        rReturn = gv.PLin.runScheduleDiag()
+        time.sleep(0.1)
+    ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
+        rReturn,
+        f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
+    return rReturn
+
+
+def plin_init_connectELV(rReturn):
+    if gv.PLin is None:
+        gv.PLin = peak.peaklin.PeakLin()
+        ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
+            ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
+        gv.PLin.refreshHardware()
+        gv.PLin.hardwareCbx_IndexChanged()
+        if gv.PLin.doLinConnect():
+            time.sleep(0.1)
             rReturn = gv.PLin.runSchedule()
             time.sleep(0.1)
+            rReturn = True
         else:
             gv.PLin = None
             return rReturn
@@ -319,6 +392,7 @@ def plin_init_connect(rReturn):
         time.sleep(0.1)
         rReturn = gv.PLin.runSchedule()
         time.sleep(0.1)
+        rReturn = True
     ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
         rReturn,
         f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")

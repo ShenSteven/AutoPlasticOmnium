@@ -17,15 +17,16 @@ station:
     - FRB_SX5GEV #(前右保杠):0x54
     - ReadVer_SX5GEV
     - ReadVer_M4
-#    - FL_SX5GEV_EOL #(前左):0x1E
+    - ALE
+    - FL_SX5GEV_EOL #(前左):0x1E
 #    - FR_SX5GEV_EOL #(前右):0x50
 #    - RL_SX5GEV_EOL #(后左):0x1F
 #    - RM_SX5GEV_EOL #(后中):0x51
 #    - RR_SX5GEV_EOL #(后右):0x53
 #    - FLB_SX5GEV_EOL #(前左保杠):0x52
 #    - FRB_SX5GEV_EOL #(前右保杠):0x54
-    station_name: FL_SX5GEV
-    station_no: FL_SX5GEV
+    station_name: ALE
+    station_no: ALE
     log_folder: D:\TestLog
     log_server: 10.90.104.85
     log_server_username: eero
@@ -67,6 +68,6 @@ dut:
 BLF:
     ReqDelay: 10
     RespDelay: 10
-    readTxCount: 100
+    readTxCount: 1000
     MRtoMRDelay: 0.2
 

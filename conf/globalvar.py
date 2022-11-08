@@ -61,6 +61,7 @@ FixSerialPort = None
 PLin = None
 InstrComm = None
 
+
 IsDebug = False
 startFlag = False
 pauseFlag = False
@@ -99,6 +100,12 @@ TestVariables: model.variables.Variables = None
 mesPhases: model.product.MesInfo
 stationObj: model.product.JsonObject
 # testThread = None
+stepThread1 = None
+stepThread2 =None
+IsRunning1 = False
+IsRunning2 = False
+pMsg32 = None
+pMsg33 = None
 
 # PassNumOfCycleTest = 0
 # FailNumOfCycleTest = 0
