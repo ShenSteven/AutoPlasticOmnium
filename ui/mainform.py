@@ -451,6 +451,9 @@ class MainForm(QWidget):
         thread.start()
 
     def on_reloadSeqs(self):
+        if gv.startFlag:
+            QMessageBox.information(self, 'Infor', 'Test is running, can not reload!', QMessageBox.Yes)
+            return
         lg.logger.debug('start reload script,please wait a moment...')
         QApplication.processEvents()
 
@@ -545,6 +548,9 @@ class MainForm(QWidget):
         thread.start()
 
     def on_actionConvertExcelToJson(self):
+        if gv.startFlag:
+            QMessageBox.information(self, 'Infor', 'Test is running, can not do it!', QMessageBox.Yes)
+            return
         thread = Thread(
             target=model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
                                                               gv.cf.station.station_all), daemon=True)
