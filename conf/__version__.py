@@ -4,7 +4,7 @@
 __title__ = 'robotsystem-pyqt5'
 __description__ = 'automation framework for test automation and robotic process automation.'
 __url__ = 'https://requests.readthedocs.io'
-__version__ = '0.1.7'
+__version__ = '0.1.8'
 __build__ = 0x022701
 __author__ = 'Steven Shen'
 __author_email__ = '394109529@qq.com'
