@@ -1,5 +1,5 @@
 station:
-    privileges: labs
+    privileges: lab
     station_all:
     #- LTT
     - FL_M4 #(前左):0x1E
@@ -67,6 +67,6 @@ dut:
 BLF:
     ReqDelay: 10
     RespDelay: 10
-    readTxCount: 20
+    readTxCount: 100
     MRtoMRDelay: 0.2
 

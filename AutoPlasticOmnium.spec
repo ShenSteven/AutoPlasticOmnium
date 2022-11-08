@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 from PyInstaller.utils.hooks import collect_data_files, copy_metadata
 
-block_cipher = pyi_crypto.PyiBlockCipher(key="'steven1986.11'")
+block_cipher = None #pyi_crypto.PyiBlockCipher(key="'steven1986.11'")
 
 added_files = [
     ('ui/images/*', 'ui/images'),

@@ -661,7 +661,7 @@ class MainForm(QWidget):
         self.debug_switch(gv.IsDebug)
 
     def on_actionAbout(self):
-        QMessageBox.about(self, 'About', 'Python3.8+PyQt5\nTechnical support: StevenShen\nWeChat:chenhlzqbx')
+        QMessageBox.about(self, 'About', 'Python3.11+PyQt5\nTechnical support: StevenShen\nWeChat:chenhlzqbx')
 
     def on_actionRestart(self):
         def thread_update():
@@ -727,7 +727,7 @@ class MainForm(QWidget):
         else:
             self.ui.connect_status_image.setPixmap(QPixmap(":/images/disconnect-icon.png"))
         self.ui.connect_status_txt.setText(strs)
-        self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 0.6)
+        self.ui.statusbar.addPermanentWidget(self.ui.connect_status_image, 1)
         self.ui.statusbar.addPermanentWidget(self.ui.connect_status_txt, 2)
 
     def ShowTreeView(self, sequences=None, checkall=None):
