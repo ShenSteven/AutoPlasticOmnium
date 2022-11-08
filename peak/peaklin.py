@@ -834,11 +834,11 @@ class PeakLin(QDialog, Ui_PeakLin):
                 return
             pRcvMsg = PLinApi.TLINRcvMsg()
             self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg32)
-            lg.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
+            # lg.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             time.sleep(gv.cf.BLF.ReqDelay / 1000)
             self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg33)
-            lg.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
+            # lg.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             time.sleep(120 / 1000)
             if once:
