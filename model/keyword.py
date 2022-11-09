@@ -9,13 +9,10 @@
 import os
 import re
 import traceback
-from threading import Thread
-
 import nidaqmx
 from PyQt5 import QtCore
 from PyQt5.QtCore import QMetaObject, Qt
 from PyQt5.QtWidgets import QAction, QMessageBox
-
 import ui.mainform
 import peak.peaklin
 from sockets.serialport import SerialPort
@@ -45,8 +42,6 @@ def testKeyword(item, testSuite=None):
             lg.logger.debug(f'waiting {item.Timeout}s')
             time.sleep(float(item.Timeout))
             rReturn = True
-
-
 
         elif item.Keyword == 'SetVar':
             item.testValue = item.command
@@ -147,39 +142,14 @@ def testKeyword(item, testSuite=None):
                 item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
-        # elif item.Keyword == 'PLINWriteALE32' or item.Keyword == 'PLINWriteALE33':
-        #     rReturn, revStr = gv.PLin.plin_write(item.ID, item.command)
-        #     if rReturn and item.CheckStr1 in revStr:
-        #         item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
-        #     compInfo, rReturn = assert_value(compInfo, item, rReturn)
-        #
-        # elif item.Keyword == 'PLINWriteALE322':
-        #     gv.stepThread1 = Thread(target=gv.PLin.plin_writeALE32, daemon=True,
-        #                             args=(item.ID, item.command))
-        #     gv.stepThread1.start()
-        #     gv.IsRunning1 = True
-        #
-        #     rReturn = True
-        #
-        # elif item.Keyword == 'PLINWriteALE332':
-        #     gv.stepThread2 = Thread(target=gv.PLin.plin_writeALE33, daemon=True,
-        #                             args=(item.ID, item.command))
-        #     gv.stepThread2.start()
-        #     gv.IsRunning2 = True
-        #
-        #     rReturn = True
-        #
         elif item.Keyword == 'PLINGetMsg32':
             gv.pMsg32 = gv.PLin.plin_Get_pMsg(item.ID, item.command)
             rReturn = True
         elif item.Keyword == 'PLINGetMsg33':
             gv.pMsg33 = gv.PLin.plin_Get_pMsg(item.ID, item.command)
             rReturn = True
-        # elif item.Keyword == 'PLINWriteALE':
-        #     gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, item.Timeout)
-        #     rReturn = True
 
-        elif item.Keyword == 'WaitingALE':
+        elif item.Keyword == 'WaitingALE' or item.Keyword == 'PLINWriteALE':
             # gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, int(item.Timeout), True if item.retry == 1 else False)
             gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, int(item.Timeout))
             rReturn = True
@@ -196,9 +166,6 @@ def testKeyword(item, testSuite=None):
 
         elif item.Keyword == 'SuspendDiagSchedule':
             rReturn = gv.PLin.SuspendDiagSchedule()
-
-        # elif item.Keyword == 'SuspendDiagScheduleALE':
-        #     rReturn = gv.PLin.SuspendDiagScheduleALE()
 
         elif item.Keyword == 'CalcKey':
             item.testValue = gv.PLin.CalKey(item.command)
