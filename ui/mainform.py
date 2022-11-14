@@ -221,6 +221,10 @@ class MainForm(QWidget):
                 item += "(前左保杠)"
             elif item.startswith("FRB_"):
                 item += "(前右保杠)"
+            elif item.startswith("FLG_"):
+                item += "(前左格栅)"
+            elif item.startswith("FRG_"):
+                item += "(前右格栅)"
             station_qaction.setText(item)
             self.ui.menuSelect_Station.addAction(station_qaction)
             station_qaction.triggered.connect(self.on_select_station)
