@@ -6,6 +6,7 @@
 @Date   : 2021/10/15
 @Desc   : 
 """
+import inspect
 import os
 import sqlite3
 import stat
@@ -81,27 +82,39 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
         workbook.close()
 
 
-def load_testcase_from_json(json_path, verify=False):
-    """用json反序列化方式加载测试用例序列"""
-    if verify:
-        with model.sqlite.Sqlite(gv.database_setting) as db:
-            db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{json_path}'")
-            sha256 = db.cur.fetchone()[0]
-            print(f"  dbSHA:{sha256}")
-        JsonSHA = get_sha256(json_path)
-        print(f"jsonSHA:{JsonSHA}")
-        if sha256 == JsonSHA:
-            return deserialize_from_json(json_path)
-        else:
-            ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
-                                                                                         f'{currentframe().f_code.co_name}:script {json_path} has been tampered!',
-                                                                                         5)
-            sys.exit(f'{currentframe().f_code.co_name}:script {json_path} has been tampered!')
-    else:
-        return deserialize_from_json(json_path)
+def param_wrapper_verify_sha256(flag):
+    def wrapper_verify_sha2562(fun):
+        """get sha256 of json script in oder to verify MD5"""
+        sig = inspect.signature(fun)
+
+        def inner(*args, **kwargs):
+            bound_args = sig.bind(*args, **kwargs)
+            bound_args.apply_defaults()
+            if flag or bound_args.args[1]:
+                with model.sqlite.Sqlite(gv.database_setting) as db:
+                    db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{bound_args.args[0]}'")
+                    sha256 = db.cur.fetchone()[0]
+                    print(f"  dbSHA:{sha256}")
+                JsonSHA = get_sha256(bound_args.args[0])
+                print(f"jsonSHA:{JsonSHA}")
+                if sha256 == JsonSHA:
+                    result = fun(*bound_args.args, **bound_args.kwargs)
+                else:
+                    ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
+                                                                                                 f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!',
+                                                                                                 5)
+                    sys.exit(f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!')
+            else:
+                result = fun(*bound_args.args, **bound_args.kwargs)
+            return result
+
+        return inner
+
+    return wrapper_verify_sha2562
 
 
-def deserialize_from_json(json_path):
+@param_wrapper_verify_sha256(False)
+def load_testcase_from_json(json_path, isverify=False):
     try:
         """Deserialize form json.
         :param json_path: json file path.
@@ -127,17 +140,21 @@ def deserialize_from_json(json_path):
 
 
 def wrapper_save_sha256(fun):
-    """get sha256 of json script in oder to verify MD5"""
+    """save sha256 of json script in oder to verify MD5"""
+    sig = inspect.signature(fun)
 
-    def inner(*args):
-        fun(*args)
-        sha256 = get_sha256(args[1])
+    def inner(*args, **kwargs):
+        bound_args = sig.bind(*args, **kwargs)
+        bound_args.apply_defaults()
+        result = fun(*bound_args.args, **bound_args.kwargs)
+        sha256 = get_sha256(bound_args.args[1])
         with model.sqlite.Sqlite(gv.database_setting) as db:
             try:
-                db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{args[1]}', '{sha256}')")
+                db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{bound_args.args[1]}', '{sha256}')")
             except sqlite3.IntegrityError:
-                db.execute(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{args[1]}'")
+                db.execute(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{bound_args.args[1]}'")
         # os.chmod(args[1], stat.S_IREAD)
+        return result
 
     return inner
 

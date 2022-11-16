@@ -154,29 +154,6 @@ def wrapper_time(fun):
     return inner
 
 
-# def create_csv_file(filename, header, updateColumn=False):
-#     try:
-#         if not os.path.exists(filename):
-#             with open(filename, 'w', newline='') as f:
-#                 file = csv.writer(f)
-#                 file.writerow(header)
-#             lg.logger.debug(f'create_csv_file:{filename}')
-#         else:
-#             if updateColumn:
-#                 with open(filename, 'r') as rf:
-#                     reader = csv.reader(rf)
-#                     # cl = [row[1] for row in reader]  # 获取第1列
-#                     rows = [row for row in reader]
-#                     with open(filename, 'w', newline='') as wf:
-#                         if [0] != header:
-#                             rows[0] = header
-#                             file = csv.writer(wf)
-#                             file.writerows(rows)
-#                         lg.logger.info(f'update csvHeader success!')
-#     except Exception as e:
-#         lg.logger.fatal(e)
-
-
 def create_csv_file(filename, header, updateColumn=False):
     try:
         if not os.path.exists(filename):
