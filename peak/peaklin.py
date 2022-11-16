@@ -10,7 +10,7 @@ import traceback
 from PyQt5.QtWidgets import QDialog  # QMessageBox
 from future.moves import collections
 import ui.mainform
-from ui.ui_lin import Ui_PeakLin
+from peak.ui_lin import Ui_PeakLin
 import conf.logprint as lg
 import conf.globalvar as gv
 import binascii
