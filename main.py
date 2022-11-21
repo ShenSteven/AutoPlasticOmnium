@@ -11,9 +11,36 @@ from os.path import dirname, abspath
 from traceback import format_exception
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import ui.mainform as mf
+from os.path import dirname, abspath, join
+from PyQt5.uic import loadUi
+import runin.rmainform as rmf
 
 # get app dir path
 bundle_dir = ''
+
+
+# runinMainWin = None
+# loginWin = None
+
+
+class LoginWind:
+    def __init__(self):
+        self.ui = loadUi(join(dirname(abspath(__file__)), 'runin/ui_login.ui'))
+        self.ui.lineEdit.returnPressed.connect(self.onSignIn)
+
+    def onSignIn(self):
+        # global runinMainWin
+        runinMainWin = rmf.RuninMainForm()
+        runinMainWin.show()
+        self.ui.hide()
+
+
+def get_about(about_abspath):
+    """get app about information"""
+    about_app = {}
+    with open(join(dirname(abspath(__file__)), about_abspath), 'r', encoding='utf-8') as f:
+        exec(f.read(), about_app)
+    return about_app
 
 
 def get_app_dir_path():
@@ -38,12 +65,19 @@ def main():
     sys.excepthook = excepthook
     app = QApplication([])
     print("applicationDirPath:", app.applicationDirPath())
-    mainWin = mf.MainForm()
-    mainWin.ui.show()
+    about_abspath = 'conf/__version__.py'
+    if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
+        # global loginWin
+        loginWin = LoginWind()
+        loginWin.ui.show()
+    else:
+        mainWin = mf.MainForm()
+        mainWin.ui.show()
     try:
         app.exec_()
     except KeyboardInterrupt:
-        # lg.logger.fatal('KeyboardInterrupt')
+        import conf.logprint as lg
+        lg.logger.fatal('KeyboardInterrupt')
         pass
 
 

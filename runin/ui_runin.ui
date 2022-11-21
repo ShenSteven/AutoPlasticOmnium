@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>RuninMain</class>
+ <widget class="QMainWindow" name="RuninMain">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -178,16 +178,56 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="Cell" name="widget" native="true">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>240</y>
-         <width>120</width>
-         <height>80</height>
-        </rect>
-       </property>
-      </widget>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="Cell" name="widget" native="true"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="Cell" name="widget_2" native="true"/>
+       </item>
+       <item row="0" column="2">
+        <widget class="Cell" name="widget_3" native="true"/>
+       </item>
+       <item row="0" column="3">
+        <widget class="Cell" name="widget_4" native="true"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="Cell" name="widget_7" native="true"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="Cell" name="widget_6" native="true"/>
+       </item>
+       <item row="1" column="2">
+        <widget class="Cell" name="widget_5" native="true"/>
+       </item>
+       <item row="1" column="3">
+        <widget class="Cell" name="widget_8" native="true"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="Cell" name="widget_11" native="true"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="Cell" name="widget_10" native="true"/>
+       </item>
+       <item row="2" column="2">
+        <widget class="Cell" name="widget_9" native="true"/>
+       </item>
+       <item row="2" column="3">
+        <widget class="Cell" name="widget_12" native="true"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="Cell" name="widget_15" native="true"/>
+       </item>
+       <item row="3" column="1">
+        <widget class="Cell" name="widget_14" native="true"/>
+       </item>
+       <item row="3" column="2">
+        <widget class="Cell" name="widget_13" native="true"/>
+       </item>
+       <item row="3" column="3">
+        <widget class="Cell" name="widget_16" native="true"/>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
@@ -197,7 +237,7 @@
   <customwidget>
    <class>Cell</class>
    <extends>QWidget</extends>
-   <header>model.cell</header>
+   <header>cell</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

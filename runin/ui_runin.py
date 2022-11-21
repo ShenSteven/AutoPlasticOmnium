@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_RuninMain.ui'
+# Form implementation generated from reading ui file 'ui_runin.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.7
 #
@@ -11,15 +11,15 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1490, 900)
-        MainWindow.setMinimumSize(QtCore.QSize(1490, 900))
+class Ui_RuninMain(object):
+    def setupUi(self, RuninMain):
+        RuninMain.setObjectName("RuninMain")
+        RuninMain.resize(1490, 900)
+        RuninMain.setMinimumSize(QtCore.QSize(1490, 900))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/images/Letter-T-blue-icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        RuninMain.setWindowIcon(icon)
+        self.centralwidget = QtWidgets.QWidget(RuninMain)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -113,21 +113,72 @@ class Ui_MainWindow(object):
         self.body.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.body.setFrameShadow(QtWidgets.QFrame.Raised)
         self.body.setObjectName("body")
+        self.gridLayout = QtWidgets.QGridLayout(self.body)
+        self.gridLayout.setObjectName("gridLayout")
+        self.widget = Cell(self.body)
+        self.widget.setObjectName("widget")
+        self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
+        self.widget_2 = Cell(self.body)
+        self.widget_2.setObjectName("widget_2")
+        self.gridLayout.addWidget(self.widget_2, 0, 1, 1, 1)
+        self.widget_3 = Cell(self.body)
+        self.widget_3.setObjectName("widget_3")
+        self.gridLayout.addWidget(self.widget_3, 0, 2, 1, 1)
+        self.widget_4 = Cell(self.body)
+        self.widget_4.setObjectName("widget_4")
+        self.gridLayout.addWidget(self.widget_4, 0, 3, 1, 1)
+        self.widget_7 = Cell(self.body)
+        self.widget_7.setObjectName("widget_7")
+        self.gridLayout.addWidget(self.widget_7, 1, 0, 1, 1)
+        self.widget_6 = Cell(self.body)
+        self.widget_6.setObjectName("widget_6")
+        self.gridLayout.addWidget(self.widget_6, 1, 1, 1, 1)
+        self.widget_5 = Cell(self.body)
+        self.widget_5.setObjectName("widget_5")
+        self.gridLayout.addWidget(self.widget_5, 1, 2, 1, 1)
+        self.widget_8 = Cell(self.body)
+        self.widget_8.setObjectName("widget_8")
+        self.gridLayout.addWidget(self.widget_8, 1, 3, 1, 1)
+        self.widget_11 = Cell(self.body)
+        self.widget_11.setObjectName("widget_11")
+        self.gridLayout.addWidget(self.widget_11, 2, 0, 1, 1)
+        self.widget_10 = Cell(self.body)
+        self.widget_10.setObjectName("widget_10")
+        self.gridLayout.addWidget(self.widget_10, 2, 1, 1, 1)
+        self.widget_9 = Cell(self.body)
+        self.widget_9.setObjectName("widget_9")
+        self.gridLayout.addWidget(self.widget_9, 2, 2, 1, 1)
+        self.widget_12 = Cell(self.body)
+        self.widget_12.setObjectName("widget_12")
+        self.gridLayout.addWidget(self.widget_12, 2, 3, 1, 1)
+        self.widget_15 = Cell(self.body)
+        self.widget_15.setObjectName("widget_15")
+        self.gridLayout.addWidget(self.widget_15, 3, 0, 1, 1)
+        self.widget_14 = Cell(self.body)
+        self.widget_14.setObjectName("widget_14")
+        self.gridLayout.addWidget(self.widget_14, 3, 1, 1, 1)
+        self.widget_13 = Cell(self.body)
+        self.widget_13.setObjectName("widget_13")
+        self.gridLayout.addWidget(self.widget_13, 3, 2, 1, 1)
+        self.widget_16 = Cell(self.body)
+        self.widget_16.setObjectName("widget_16")
+        self.gridLayout.addWidget(self.widget_16, 3, 3, 1, 1)
         self.verticalLayout.addWidget(self.body)
         self.verticalLayout.setStretch(0, 2)
         self.verticalLayout.setStretch(1, 98)
-        MainWindow.setCentralWidget(self.centralwidget)
+        RuninMain.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslateUi(RuninMain)
+        QtCore.QMetaObject.connectSlotsByName(RuninMain)
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, RuninMain):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "RUNIN/ORT"))
-        self.lb_location.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Location：</span></p></body></html>"))
-        self.lb_sn.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">SN：</span></p></body></html>"))
-        self.lb_info.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" color:#ff0000;\">Location is testing!</span></p></body></html>"))
-        self.lb_testMode.setText(_translate("MainWindow", "<html><head/><body><p>Production</p></body></html>"))
-        self.lb_station.setText(_translate("MainWindow", "<html><head/><body><p>RUNIN-xxxxA</p></body></html>"))
-        self.lb_ip.setText(_translate("MainWindow", "<html><head/><body><p>IP:</p></body></html>"))
-# import images_rc
+        RuninMain.setWindowTitle(_translate("RuninMain", "RUNIN/ORT"))
+        self.lb_location.setText(_translate("RuninMain", "<html><head/><body><p><span style=\" font-weight:600;\">Location：</span></p></body></html>"))
+        self.lb_sn.setText(_translate("RuninMain", "<html><head/><body><p><span style=\" font-weight:600;\">SN：</span></p></body></html>"))
+        self.lb_info.setText(_translate("RuninMain", "<html><head/><body><p><span style=\" color:#ff0000;\">Location is testing!</span></p></body></html>"))
+        self.lb_testMode.setText(_translate("RuninMain", "<html><head/><body><p>Production</p></body></html>"))
+        self.lb_station.setText(_translate("RuninMain", "<html><head/><body><p>RUNIN-xxxxA</p></body></html>"))
+        self.lb_ip.setText(_translate("RuninMain", "<html><head/><body><p>IP:</p></body></html>"))
+from .cell import Cell
+import ui.images_rc

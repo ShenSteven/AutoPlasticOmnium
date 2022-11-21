@@ -110,6 +110,9 @@ startTimeJson = datetime.now()
 pMsg32 = None
 pMsg33 = None
 
+RuninMainWin = None
+LoginWin = None
+
 
 def set_global_val(name, value):
     globals()[name] = value

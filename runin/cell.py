@@ -8,7 +8,7 @@
 """
 from PyQt5.QtWidgets import QApplication, QFrame
 
-from ui_cell import Ui_testcell
+from .ui_cell import Ui_testcell
 
 
 class Cell(QFrame, Ui_testcell):
