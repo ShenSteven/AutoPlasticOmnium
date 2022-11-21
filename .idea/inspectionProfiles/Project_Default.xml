@@ -14,6 +14,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="peak.PeakLin" />
+          <option value="images_rc" />
         </list>
       </option>
     </inspection_tool>

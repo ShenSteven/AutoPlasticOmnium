@@ -34,9 +34,9 @@ class VisaComm(CommAbstract):
         try:
             if resourceName in self.rm.list_resources():
                 self._mbSession = self.rm.open_resource(resourceName)
-                self._mbSession.write("*RST")
-                IDN = self._mbSession.query("*IDN?")
-                lg.logger.debug(IDN)
+                # self._mbSession.write("*RST")
+                # IDN = self._mbSession.query("*IDN?")
+                # lg.logger.debug(IDN)
                 return True
             else:
                 raise f"resourceName:{resourceName} is not found in ResourceManager!"
@@ -102,16 +102,18 @@ class VisaComm(CommAbstract):
 
 if __name__ == "__main__":
     vis = VisaComm()
-    vis.open('USB0::0x0957::0x8407::US21D4120S::INSTR')
-    # vis.query("*IDN?")
-    vis.SendCommand("*IDN?")
-    vis.SendCommand("VOLT 15.8")
-    time.sleep(1)
-    vis.SendCommand('Meas:VOLT?')
-    vis.SendCommand('Meas:VOLT?')
-    # vis.read()
-    vis.close()
-    # my_instrument = rm.open_resource('GPIB0::14::INSTR')
-    # print(my_instrument.query('*IDN?'))
-    # my_instrument.write('*IDN?')
-    # print(my_instrument.read())
+    vis.open('GPIB0::5::INSTR')
+    # vis.SendCommand("*IDN?")
+    # time.sleep(1)
+    # vis.SendCommand("VOLT 18.5,(@1)")
+    # # vis.SendCommand('VOLT:PROT:LEV 60,(@1)')
+    # # vis.SendCommand('CURR 1.5,(@1)')
+    # # vis.SendCommand('CURR:PROT:STAT ON,(@1)')
+    # vis.SendCommand('OUTP ON,(@1)')
+    # # vis.SendCommand('*OPC?')
+    # vis.SendCommand('MEAS:VOLT? (@1)')
+    # # vis.SendCommand('Syst:err?')
+    # # vis.close()
+    # time.sleep(3)
+    # vis.open('GPIB0::5::INSTR')
+    # vis.SendCommand("VOLT 8,(@1)")
