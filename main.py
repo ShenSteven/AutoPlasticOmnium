@@ -29,9 +29,10 @@ class LoginWind:
         self.ui.lineEdit.returnPressed.connect(self.onSignIn)
 
     def onSignIn(self):
-        # global runinMainWin
+        # ScanfixName = self.ui.lineEdit.Text.trim()
+        # self.FixtureNumber = ScanfixName[0:10]
         runinMainWin = rmf.RuninMainForm()
-        runinMainWin.show()
+        runinMainWin.ui.show()
         self.ui.hide()
 
 
@@ -58,6 +59,8 @@ get_app_dir_path()
 
 
 def excepthook(cls, exception, traceback):
+    import conf.logprint as lg
+    lg.logger.fatal("".join(format_exception(cls, exception, traceback)))
     QMessageBox.critical(None, "Error", "".join(format_exception(cls, exception, traceback)))
 
 
@@ -67,7 +70,6 @@ def main():
     print("applicationDirPath:", app.applicationDirPath())
     about_abspath = 'conf/__version__.py'
     if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
-        # global loginWin
         loginWin = LoginWind()
         loginWin.ui.show()
     else:

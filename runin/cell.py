@@ -8,10 +8,10 @@
 """
 from PyQt5.QtWidgets import QApplication, QFrame
 
-from .ui_cell import Ui_testcell
+from runin.ui_cell import Ui_testcell
 
 
-class Cell(QFrame, Ui_testcell):
+class cell(QFrame, Ui_testcell):
 
     def __init__(self, parent=None):
         QFrame.__init__(self, parent)
@@ -21,6 +21,6 @@ class Cell(QFrame, Ui_testcell):
 
 if __name__ == "__main__":
     app = QApplication([])
-    mainWin = Cell()
+    mainWin = cell()
     mainWin.show()
     app.exec_()
