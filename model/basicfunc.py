@@ -48,17 +48,18 @@ def run_cmd(command, timeout=1):
     """send command, command executed successfully return true,otherwise false"""
     try:
         IsWind = platform.system() == 'Windows'
+        lg.logger.debug(f'run_cmd-->{command}')
         ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              encoding=("gbk" if IsWind else "utf8"), timeout=timeout)
         if ret.returncode == 0:  # 表示命令下发成功，不对命令内容结果做判断
             lg.logger.debug(ret.stdout)
-            return True
+            return True, ret.stdout
         else:
             lg.logger.error(f"error:{ret.stderr}")
-            return False
+            return False, ret.stdout
     except Exception as e:
         lg.logger.fatal(e)
-        return False
+        return False, None
 
 
 def kill_process(process_name, killall=True):

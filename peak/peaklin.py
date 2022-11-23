@@ -744,9 +744,11 @@ class PeakLin(QDialog, Ui_PeakLin):
         try:
             with open(file_s19_cmd, 'rb') as f:
                 for line in f:
-                    le = len(line)
-                    msg = line[10:(le - 4)]  # Address and checksum are not part of message and they won't be send
-                    s19data += msg.decode("utf-8")
+                    if line.decode("utf-8").startswith('S1') or line.decode("utf-8").startswith('S2') or line.decode(
+                            "utf-8").startswith('S3'):
+                        le = len(line)
+                        msg = line[10:(le - 4)]  # Address and checksum are not part of message and they won't be send
+                        s19data += msg.decode("utf-8")
         except FileNotFoundError:
             lg.logger.debug("File not found")
             raise

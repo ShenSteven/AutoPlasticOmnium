@@ -162,6 +162,7 @@ def testKeyword(item, testSuite=None):
         elif item.Keyword == 'TransferData':
             file_path = f"{gv.current_dir}\\flash\\{item.command}"
             s19datas = gv.PLin.get_datas(file_path)
+            lg.logger.debug(file_path)
             rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item._PCI_LEN, int(item.Timeout))
 
         elif item.Keyword == 'SuspendDiagSchedule':
@@ -176,6 +177,23 @@ def testKeyword(item, testSuite=None):
             item.testValue = peak.peaklin.PeakLin.get_crc_apps19(
                 f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
             rReturn = not IsNullOrEmpty(item.testValue)
+
+        elif item.Keyword == 'SrecGetStartAdd':
+            rReturn, revStr = run_cmd(
+                rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{item.command}")
+            if rReturn:
+                item.testValue = ' '.join(re.findall(".{2}", revStr.split()[-3].zfill(8)))
+            else:
+                pass
+
+        elif item.Keyword == 'SrecGetLen':
+            rReturn, revStr = run_cmd(
+                rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{item.command}")
+            if rReturn:
+                data_len = int(revStr.split()[-1], 16) - int(revStr.split()[-3], 16) + 1
+                item.testValue = ' '.join(re.findall(".{2}", hex(data_len)[2:].upper().zfill(8)))
+            else:
+                pass
 
         elif item.Keyword == 'NiDAQmxVolt':
             # https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019Pf1SAE&l=zh-CN
