@@ -225,6 +225,8 @@ class MainForm(QWidget):
                 item += "(前左格栅)"
             elif item.startswith("FRG_"):
                 item += "(前右格栅)"
+            elif item.startswith("ReadVer_"):
+                item += "(读版本)"
             station_qaction.setText(item)
             self.ui.menuSelect_Station.addAction(station_qaction)
             station_qaction.triggered.connect(self.on_select_station)
@@ -236,6 +238,8 @@ class MainForm(QWidget):
         if getattr(sys, 'frozen', False):
             logging.getLogger('testlog').removeHandler(log_console)
             # logging.getLogger('testlog').removeHandler(file_handler)
+        else:
+            gv.cf.station.privileges = 'lab'
         textEdit_handler = lg.QTextEditHandler(stream=self.ui.textEdit)
         textEdit_handler.formatter = lg.logger.handlers[0].formatter
         textEdit_handler.level = lg.logger.handlers[0].level
@@ -576,6 +580,8 @@ class MainForm(QWidget):
             if isinstance(action, QAction):
                 gv.cf.station.station_name = action.text() if "(" not in action.text() else action.text()[
                                                                                             :action.text().index('(')]
+                if gv.cf.station.station_name.startswith('ReadVer_'):
+                    gv.IsDebug = True
                 gv.cf.station.station_no = gv.cf.station.station_name
                 gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
                 self.testcase.original_suites = model.loadseq.load_testcase_from_json(gv.test_script_json)
