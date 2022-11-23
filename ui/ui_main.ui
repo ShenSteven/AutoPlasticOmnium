@@ -27,7 +27,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="images.qrc">
-    <normaloff>:/images/Letter-T-blue-icon.png</normaloff>:/images/Letter-T-blue-icon.png</iconset>
+    <normaloff>:/images/PO.png</normaloff>:/images/PO.png</iconset>
   </property>
   <property name="toolTip">
    <string/>

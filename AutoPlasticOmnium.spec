@@ -12,7 +12,7 @@ added_files = [
     ('conf/*.db', 'conf'),
     ('conf/__version__.py', 'conf'),
     ('manual.docx', '.'),
-    ('restart.exe', '.'),
+    ('tool/*', 'tool'),
     ('scripts/*.json', 'scripts'),
     ('scripts/*.xlsx', 'scripts')]
 
@@ -55,7 +55,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='test.ico',
+    icon='ui/images/PO.ico',
 )
 coll = COLLECT(
     exe,
