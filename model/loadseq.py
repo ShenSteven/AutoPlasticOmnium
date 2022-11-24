@@ -13,7 +13,7 @@ import stat
 import json
 import sys
 from inspect import currentframe
-
+from types import NoneType
 from openpyxl import load_workbook
 import model.suite
 import model.step
@@ -45,7 +45,7 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
     item_header = []
     temp_suite_name = ""
     try:
-        # lg.logger.debug('start load_testcase_from_excel...')
+        print(f'start load_testcase_from_excel sheet:{sheet_name}...')
         workbook = load_workbook(testcase_path, read_only=True)
         worksheet = workbook[sheet_name]
         for i in list(worksheet.rows)[0]:  # 获取表头，第一行
@@ -64,8 +64,16 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
             for header, cell in dict(zip(item_header, line)).items():
                 test_step.index = temp_suite.totalNumber
                 test_step.suiteIndex = temp_suite.index
-                setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
-                # setattr(test_step, header, cell.value)
+                # setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
+                T = (type(getattr(test_step, header)))
+                default_value = getattr(test_step, header)
+                if type(cell.value) is NoneType:
+                    cell.value = default_value
+                    # if T is int:
+                    #     cell.value = default_value
+                    # elif T is str:
+                    #     cell.value = default_value
+                setattr(test_step, header, T(cell.value))
                 test_step.SuiteName = temp_suite_name
 
             temp_suite.totalNumber += 1

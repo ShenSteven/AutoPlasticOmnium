@@ -539,12 +539,12 @@ class MainForm(QWidget):
         self.on_returnPressed()
 
     def on_actionBreakpoint(self):
-        if getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint') == str(False):
-            setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', str(True))
+        if not getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
+            setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', True)
             self.ui.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-clear.png'))
             self.ui.treeWidget.currentItem().setIcon(0, QIcon(':/images/breakpoint-set.png'))
         else:
-            setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', str(False))
+            setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', False)
             self.ui.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-set.png'))
             self.ui.treeWidget.currentItem().setIcon(0, QIcon(':/images/Document-txt-icon.png'))
 

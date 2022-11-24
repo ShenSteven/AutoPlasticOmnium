@@ -105,7 +105,7 @@ def testKeyword(item, testSuite=None):
         elif item.Keyword == 'TelnetAndSendCmd':
             temp = TelnetComm(item.param1, gv.cf.dut.prompt)
             if temp.open(gv.cf.dut.prompt) and \
-                    temp.SendCommand(item.command, item.ExpectStr, int(item.Timeout))[0]:
+                    temp.SendCommand(item.command, item.ExpectStr, item.Timeout)[0]:
                 return True, ''
 
         elif item.Keyword == 'SerialPortOpen':
@@ -131,13 +131,13 @@ def testKeyword(item, testSuite=None):
                 True, "Not connected | ")
 
         elif item.Keyword == 'PLINSingleFrame':
-            rReturn, revStr = gv.PLin.SingleFrame(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
+            rReturn, revStr = gv.PLin.SingleFrame(item.ID, item._NAD, item.PCI_LEN, item.command, item.Timeout)
             if rReturn and item.CheckStr1 in revStr:
                 item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
         elif item.Keyword == 'PLINSingleFrameCF':
-            rReturn, revStr = gv.PLin.SingleFrameCF(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
+            rReturn, revStr = gv.PLin.SingleFrameCF(item.ID, item._NAD, item.PCI_LEN, item.command, item.Timeout)
             if rReturn and item.CheckStr1 in revStr:
                 item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
@@ -151,11 +151,11 @@ def testKeyword(item, testSuite=None):
 
         elif item.Keyword == 'WaitingALE' or item.Keyword == 'PLINWriteALE':
             # gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, int(item.Timeout), True if item.retry == 1 else False)
-            gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, int(item.Timeout))
+            gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, item.Timeout)
             rReturn = True
 
         elif item.Keyword == 'PLINMultiFrame':
-            rReturn, revStr = gv.PLin.MultiFrame(item.ID, item._NAD, item.PCI_LEN, item.command, int(item.Timeout))
+            rReturn, revStr = gv.PLin.MultiFrame(item.ID, item._NAD, item.PCI_LEN, item.command, item.Timeout)
             if rReturn and item.CheckStr1 in revStr:
                 item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
 
@@ -163,7 +163,7 @@ def testKeyword(item, testSuite=None):
             file_path = f"{gv.current_dir}\\flash\\{item.command}"
             s19datas = gv.PLin.get_datas(file_path)
             lg.logger.debug(file_path)
-            rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item._PCI_LEN, int(item.Timeout))
+            rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item._PCI_LEN, item.Timeout)
 
         elif item.Keyword == 'SuspendDiagSchedule':
             rReturn = gv.PLin.SuspendDiagSchedule()
@@ -215,7 +215,7 @@ def testKeyword(item, testSuite=None):
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
         elif item.Keyword == 'NiVisaCmd':
-            rReturn, revStr = gv.InstrComm.SendCommand(item.command, item.ExpectStr, int(item.Timeout))
+            rReturn, revStr = gv.InstrComm.SendCommand(item.command, item.ExpectStr, item.Timeout)
             if rReturn and item.CheckStr1 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)
@@ -232,7 +232,7 @@ def testKeyword(item, testSuite=None):
             rReturn = gv.InstrComm.open(item.command)
 
         else:
-            rReturn, revStr = gv.dut_comm.SendCommand(item.command, item.ExpectStr, int(item.Timeout))
+            rReturn, revStr = gv.dut_comm.SendCommand(item.command, item.ExpectStr, item.Timeout)
             if rReturn and item.CheckStr1 in revStr and item.CheckStr2 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr)

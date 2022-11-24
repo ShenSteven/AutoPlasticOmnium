@@ -41,7 +41,7 @@ class Step:
         SuiteName: str = ''：测试套名字
         StepName: str = None: 当前测试step名字
         ErrorCode: str = None: 测试错误码
-        Retry: str = None: 测试失败retry次数
+        Retry: int = None: 测试失败retry次数
         Timeout: int = None: 测试步骤超时时间
         SubStr1: str = None: 截取字符串 如截取abc中的b SubStr1=a，SubStr2=cf
         SubStr2: str = None
@@ -67,7 +67,7 @@ class Step:
     """
 
     def __init__(self, dict_=None):
-        self.breakpoint = str(False)
+        self.breakpoint: bool = False
         self.suiteIndex: int = 0
         self.index: int = 0
         self.testValue = None
@@ -87,8 +87,8 @@ class Step:
         self.Keyword: str = ''
         self.ErrorCode: str = ''
         self.ErrorDetails: str = ''
-        self.Retry: str = ''
-        self.Timeout: str = ''
+        self.Retry: int = 0
+        self.Timeout: int = 0
         self.IfElse: str = ''
         self.For: str = ''
         self.SubStr1: str = ''
@@ -132,12 +132,12 @@ class Step:
     def isTest(self, value):
         self._isTest = value
 
-    @property
-    def retry(self):
-        if IsNullOrEmpty(self.Retry):
-            return 0
-        else:
-            return int(self.Retry)
+    # @property
+    # def retry(self):
+    #     # if IsNullOrEmpty(self.Retry):
+    #     #     return 0
+    #     # else:
+    #     return int(self.Retry)
 
     @property
     def command(self):
@@ -215,7 +215,7 @@ class Step:
                 self.status = str(test_result)
                 return True
 
-            if self.breakpoint == str(True) or gv.pauseFlag:
+            if self.breakpoint or gv.pauseFlag:
                 gv.pauseFlag = True
                 ui.mainform.MainForm.main_form.my_signals.setIconSignal[QAction, QIcon].emit(
                     ui.mainform.MainForm.main_form.ui.actionStart, QIcon(':/images/Start-icon.png'))
@@ -223,7 +223,7 @@ class Step:
             else:
                 gv.pause_event.set()
 
-            for retry in range(self.retry, -1, -1):
+            for retry in range(self.Retry, -1, -1):
                 if gv.pause_event.wait():
                     test_result, info = model.keyword.testKeyword(self, testSuite)
                 if test_result:
@@ -436,7 +436,7 @@ class Step:
         lg.logger.debug(f'run teardown command...')
         try:
             if self.TearDown == 'ECUReset':
-                gv.PLin.SingleFrame(self.ID, self._NAD, '02', '11 01', int(self.Timeout))
+                gv.PLin.SingleFrame(self.ID, self._NAD, '02', '11 01', self.Timeout)
             else:
                 lg.logger.warning(f'this teardown({self.TearDown}) no cation.')
         except Exception as e:
