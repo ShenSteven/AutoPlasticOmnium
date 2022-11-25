@@ -73,5 +73,5 @@ BLF:
     ReqDelay: 10
     RespDelay: 10
     readTxCount: 1000
-    MRtoMRDelay: 0.2
+    MRtoMRDelay: 0.1
 

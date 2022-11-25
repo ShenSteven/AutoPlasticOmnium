@@ -828,28 +828,28 @@ class PeakLin(QDialog, Ui_PeakLin):
                     lg.logger.debug(ex)
             linResult = self.m_objPLinApi.SetFrameEntry(self.m_hClient, self.m_hHw, lFrameEntry)
             if linResult == PLinApi.TLIN_ERROR_OK:
-                for i in range(11):
-                    readTxCount = 0
-                    pRcvMsg = PLinApi.TLINRcvMsg()
-                    self.m_objPLinApi.ResetClient(self.m_hClient)
-                    self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
-                                                      c_ubyte(0), lFrameEntry.Length, lFrameEntry.InitialData)
-                    while pRcvMsg.FrameId != c_ubyte(int('3C', 16)):
-                        time.sleep(gv.cf.BLF.MRtoMRDelay / 1000)
-                        self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-                        readTxCount += 1
-                        if pRcvMsg.Data[1] == lFrameEntry.InitialData[1] \
-                                and pRcvMsg.Data[2] == lFrameEntry.InitialData[2] \
-                                and pRcvMsg.Data[3] == lFrameEntry.InitialData[3]:
-                            if log:
-                                lg.logger.debug(f"Tx  {_id},{bytes_to_string(pRcvMsg.Data)}")
-                            return True
-                        if readTxCount == gv.cf.BLF.readTxCount:
-                            lg.logger.warning(f'readTxCount:{gv.cf.BLF.readTxCount}')
-                            break
+                # for i in range(11):
+                readTxCount = 0
+                pRcvMsg = PLinApi.TLINRcvMsg()
+                self.m_objPLinApi.ResetClient(self.m_hClient)
+                self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
+                                                  c_ubyte(0), lFrameEntry.Length, lFrameEntry.InitialData)
+                while pRcvMsg.FrameId != c_ubyte(int('3C', 16)):
+                    time.sleep(gv.cf.BLF.MRtoMRDelay / 1000)
+                    self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+                    readTxCount += 1
+                    if pRcvMsg.Data[1] == lFrameEntry.InitialData[1] \
+                            and pRcvMsg.Data[2] == lFrameEntry.InitialData[2] \
+                            and pRcvMsg.Data[3] == lFrameEntry.InitialData[3]:
+                        if log:
+                            lg.logger.debug(f"Tx  {_id},{bytes_to_string(pRcvMsg.Data)}")
+                        return True
+                    if readTxCount == gv.cf.BLF.readTxCount:
+                        lg.logger.warning(f'readTxCount:{gv.cf.BLF.readTxCount}')
+                        break
 
-                    lg.logger.warning(f"rTx  {_id},{bytes_to_string(lFrameEntry.InitialData)}")
-                    time.sleep(1 / 1000)
+                    # lg.logger.warning(f"rTx  {_id},{bytes_to_string(lFrameEntry.InitialData)}")
+                    # time.sleep(1 / 1000)
             lg.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(lFrameEntry.InitialData)}")
             return False
         except Exception as ex:
