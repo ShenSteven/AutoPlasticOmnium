@@ -7,33 +7,14 @@
 @Desc   : 
 """
 import sys
-from os.path import dirname, abspath
+from os.path import dirname, abspath, join
 from traceback import format_exception
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import ui.mainform as mf
-from os.path import dirname, abspath, join
-from PyQt5.uic import loadUi
 import runin.rmainform as rmf
 
 # get app dir path
 bundle_dir = ''
-
-
-# runinMainWin = None
-# loginWin = None
-
-
-class LoginWind:
-    def __init__(self):
-        self.ui = loadUi(join(dirname(abspath(__file__)), 'runin/ui_login.ui'))
-        self.ui.lineEdit.returnPressed.connect(self.onSignIn)
-
-    def onSignIn(self):
-        # ScanfixName = self.ui.lineEdit.Text.trim()
-        # self.FixtureNumber = ScanfixName[0:10]
-        runinMainWin = rmf.RuninMainForm()
-        runinMainWin.ui.show()
-        self.ui.hide()
 
 
 def get_about(about_abspath):
@@ -70,7 +51,7 @@ def main():
     print("applicationDirPath:", app.applicationDirPath())
     about_abspath = 'conf/__version__.py'
     if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
-        loginWin = LoginWind()
+        loginWin = rmf.LoginWind()
         loginWin.ui.show()
     else:
         mainWin = mf.MainForm()

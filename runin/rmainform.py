@@ -11,7 +11,7 @@ import threading
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QMessageBox
 from os.path import dirname, abspath, join
 from PyQt5.uic import loadUi
-
+import conf.globalvar as gv
 from runin.ui_runin import Ui_RuninMain
 
 
@@ -25,9 +25,9 @@ from runin.ui_runin import Ui_RuninMain
 
 class LoginWind:
     def __init__(self):
-        self.AbFace = None
-        self.ScanFixName = None
-        self.FixtureNumber = None
+        self.AbFace = ''
+        self.ScanFixName = ''
+        self.FixtureNumber = ''
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_login.ui'))
         self.ui.lineEdit.returnPressed.connect(self.onSignIn)
 
@@ -49,11 +49,13 @@ class LoginWind:
                 self.ui.lineEdit.setText('')
                 self.ui.lineEdit.setFocus()
                 self.ui.label_2.setText("RUNIN/ORT-xxxxX")
-                self.FixtureNumber = None
-                self.AbFace = None
+                self.FixtureNumber = ''
+                self.AbFace = ''
                 return
 
             self.ui.lineEdit.Enabled = False
+            gv.cf.station.station_name = self.FixtureNumber[0:self.FixtureNumber.index('-')]
+            gv.cf.station.station_no = self.FixtureNumber + self.AbFace
             runinMainWin = RuninMainForm()
             runinMainWin.ui.show()
             self.ui.hide()
@@ -74,9 +76,10 @@ class RuninMainForm(QWidget):
                 cls.main_form = super().__new__(cls, *args, **kwargs)
             return cls.main_form
 
-    def __init__(self):
+    def __init__(self, row=None, column=None):
         super().__init__()
-        print('__file__', join(dirname(abspath(__file__))))
+        self.RowCount = row
+        self.ColCount = column
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_runin.ui'))
 
 
