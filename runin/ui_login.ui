@@ -41,6 +41,9 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="text">
+     <string>RUNIN-1234A</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">

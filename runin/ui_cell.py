@@ -11,14 +11,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_testcell(object):
-    def setupUi(self, testcell):
-        testcell.setObjectName("testcell")
-        testcell.resize(236, 110)
-        testcell.setStyleSheet("background-color: rgb(154, 142, 139);")
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(testcell)
+class Ui_cell(object):
+    def setupUi(self, cell):
+        cell.setObjectName("cell")
+        cell.resize(236, 110)
+        cell.setStyleSheet("background-color: rgb(154, 142, 139);")
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(cell)
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.frame = QtWidgets.QFrame(testcell)
+        self.frame = QtWidgets.QFrame(cell)
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
@@ -84,15 +84,15 @@ class Ui_testcell(object):
         self.horizontalLayout_3.addLayout(self.verticalLayout)
         self.horizontalLayout_4.addWidget(self.frame)
 
-        self.retranslateUi(testcell)
-        QtCore.QMetaObject.connectSlotsByName(testcell)
+        self.retranslateUi(cell)
+        QtCore.QMetaObject.connectSlotsByName(cell)
 
-    def retranslateUi(self, testcell):
+    def retranslateUi(self, cell):
         _translate = QtCore.QCoreApplication.translate
-        testcell.setWindowTitle(_translate("testcell", "Form"))
-        self.lb_cellNum.setText(_translate("testcell", "80"))
-        self.lb_sn.setText(_translate("testcell", "NA5F004BE8DNNX42"))
-        self.lb_testName.setText(_translate("testcell", "CPUStressTest"))
-        self.lb_model.setText(_translate("testcell", "leaf"))
-        self.lb_testTime.setText(_translate("testcell", "00:00:00"))
-        self.lbl_failCount.setText(_translate("testcell", "1"))
+        cell.setWindowTitle(_translate("cell", "Form"))
+        self.lb_cellNum.setText(_translate("cell", "80"))
+        self.lb_sn.setText(_translate("cell", "NA5F004BE8DNNX42"))
+        self.lb_testName.setText(_translate("cell", "CPUStressTest"))
+        self.lb_model.setText(_translate("cell", "leaf"))
+        self.lb_testTime.setText(_translate("cell", "00:00:00"))
+        self.lbl_failCount.setText(_translate("cell", "1"))

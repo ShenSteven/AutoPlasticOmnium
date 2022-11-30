@@ -74,4 +74,7 @@ BLF:
     RespDelay: 10
     readTxCount: 1000
     MRtoMRDelay: 0.1
+RUNIN:
+    row: 10
+    col: 8
 

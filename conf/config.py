@@ -61,6 +61,7 @@ class Configs:
         self.station = StationConf(dict_['station'])
         self.dut = DutConf(dict_['dut'])
         self.BLF = DutConf(dict_['BLF'])
+        self.RUNIN = DutConf(dict_['RUNIN'])
 
 
 def read_config(yaml_file, objType) -> Configs:

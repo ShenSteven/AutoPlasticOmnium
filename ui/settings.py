@@ -79,11 +79,11 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
                 elif isinstance(setting, int):
                     lineEdit.setStyleSheet(f"color: rgb(0, 0, 255);")
                 self.horizontalLayout.addWidget(lineEdit)
-            self.updateGui()
+            # self.updateGui()
             self.verticalLayout.addLayout(self.horizontalLayout)
 
-    def updateGui(self):
-        self.verticalLayout.addLayout(self.horizontalLayout)
+    # def updateGui(self):
+    #     self.verticalLayout.addLayout(self.horizontalLayout)
 
     def valueChange(self):
         control = self.sender()

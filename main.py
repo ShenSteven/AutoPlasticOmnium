@@ -50,14 +50,15 @@ def main():
     app = QApplication([])
     print("applicationDirPath:", app.applicationDirPath())
     about_abspath = 'conf/__version__.py'
-    if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
-        loginWin = rmf.LoginWind()
-        loginWin.ui.show()
-    else:
-        mainWin = mf.MainForm()
-        mainWin.ui.show()
     try:
-        app.exec_()
+        if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
+            loginWin = rmf.LoginWind()
+            loginWin.ui.show()
+        else:
+            mainWin = mf.MainForm()
+            mainWin.ui.show()
+
+        sys.exit(app.exec_())
     except KeyboardInterrupt:
         import conf.logprint as lg
         lg.logger.fatal('KeyboardInterrupt')

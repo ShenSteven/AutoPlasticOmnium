@@ -8,19 +8,30 @@
 """
 from PyQt5.QtWidgets import QApplication, QFrame
 
-from runin.ui_cell import Ui_testcell
+from runin.ui_cell import Ui_cell
 
 
-class cell(QFrame, Ui_testcell):
+class Cell(QFrame, Ui_cell):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, row=-1, col=-1):
         QFrame.__init__(self, parent)
-        Ui_testcell.__init__(self)
+        Ui_cell.__init__(self)
         self.setupUi(self)
+        self.row_index = row
+        self.col_index = col
+        self.init_cell()
+
+    def init_cell(self):
+        self.lb_cellNum.setText('')
+        self.lb_sn.setText('')
+        self.lb_model.setText('')
+        self.lb_testTime.setText('')
+        self.lbl_failCount.setText('')
+        self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
 
 
 if __name__ == "__main__":
     app = QApplication([])
-    mainWin = cell()
+    mainWin = Cell()
     mainWin.show()
     app.exec_()
