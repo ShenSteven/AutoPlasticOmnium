@@ -19,6 +19,7 @@ class Cell(QFrame, Ui_cell):
         self.setupUi(self)
         self.row_index = row
         self.col_index = col
+        self.CellLogTxt = ''
         self.init_cell()
 
     def init_cell(self):
