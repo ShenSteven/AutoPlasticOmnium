@@ -15,7 +15,7 @@ import model.loadseq
 import model.product
 import model.sqlite
 import conf.globalvar as gv
-import conf.logprint as lg
+# import conf.logprint as lg
 from inspect import currentframe
 
 
@@ -65,7 +65,7 @@ class TestCase:
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return self.tResult
         except Exception as e:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
+            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
             self.tResult = False
             return self.tResult
         finally:

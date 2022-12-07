@@ -15,8 +15,9 @@ import time
 from datetime import datetime
 import psutil
 import yaml
-import conf.logprint as lg
+# import conf.logprint as lg
 import hashlib
+import conf.globalvar as gv
 
 
 def ping(host, timeout=1):
@@ -31,16 +32,16 @@ def ping(host, timeout=1):
         ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              encoding=("gbk" if IsWind else "utf8"), timeout=timeout)
         if ret.returncode == 0 and 'TTL=' in ret.stdout:
-            lg.logger.debug(ret.stdout)
+            gv.lg.logger.debug(ret.stdout)
             return True
         else:
-            lg.logger.error(f"error:{ret.stdout},{ret.stderr}")
+            gv.lg.logger.error(f"error:{ret.stdout},{ret.stderr}")
             return False
     except subprocess.TimeoutExpired:
-        lg.logger.debug(f'ping {host} Timeout.')
+        gv.lg.logger.debug(f'ping {host} Timeout.')
         return False
     except Exception as e:
-        lg.logger.fatal(e)
+        gv.lg.logger.fatal(e)
         return False
 
 
@@ -48,17 +49,17 @@ def run_cmd(command, timeout=1):
     """send command, command executed successfully return true,otherwise false"""
     try:
         IsWind = platform.system() == 'Windows'
-        lg.logger.debug(f'run_cmd-->{command}')
+        gv.lg.logger.debug(f'run_cmd-->{command}')
         ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              encoding=("gbk" if IsWind else "utf8"), timeout=timeout)
         if ret.returncode == 0:  # 表示命令下发成功，不对命令内容结果做判断
-            lg.logger.debug(ret.stdout)
+            gv.lg.logger.debug(ret.stdout)
             return True, ret.stdout
         else:
-            lg.logger.error(f"error:{ret.stderr}")
+            gv.lg.logger.error(f"error:{ret.stderr}")
             return False, ret.stdout
     except Exception as e:
-        lg.logger.fatal(e)
+        gv.lg.logger.fatal(e)
         return False, None
 
 
@@ -69,13 +70,13 @@ def kill_process(process_name, killall=True):
                 p = psutil.Process(pid)
                 if p.name() == process_name:
                     p.kill()
-                    lg.logger.debug(f"kill pid-{pid},test_name-{p.name()}")
+                    gv.lg.logger.debug(f"kill pid-{pid},test_name-{p.name()}")
                     time.sleep(1)
                     if not killall:
                         break
         return True
     except Exception as e:
-        lg.logger.fatal(e)
+        gv.lg.logger.fatal(e)
         return False
 
 
@@ -99,7 +100,7 @@ def start_process(full_path, process_name):
         else:
             return True
     except Exception as e:
-        lg.logger.fatal(e)
+        gv.lg.logger.fatal(e)
         return False
 
 
@@ -109,7 +110,7 @@ def restart_process(full_path, process_name):
         if kill_process(process_name):
             return start_process(full_path, process_name)
     except Exception as e:
-        lg.logger.fatal(e)
+        gv.lg.logger.fatal(e)
         return False
 
 
@@ -122,12 +123,12 @@ def save_config(yaml_file, obj):
             f.seek(0)
             yaml.safe_dump(ya, stream=f, default_flow_style=False, sort_keys=False, indent=4)
         except Exception as e:
-            lg.logger.fatal(f"save_config! {e}")
+            gv.lg.logger.fatal(f"save_config! {e}")
             f.seek(0)
             f.write(readall)
         else:
             pass
-            lg.logger.info(f"save conf.yaml success!")
+            gv.lg.logger.info(f"save conf.yaml success!")
 
 
 def wrapper(flag):
@@ -138,7 +139,7 @@ def wrapper(flag):
                 start = datetime.now()
             ret = func(**kwargs)
             if flag:
-                lg.logger.debug(f'elapsed time:{datetime.now() - start}')
+                gv.lg.logger.debug(f'elapsed time:{datetime.now() - start}')
             return ret
 
         return inners
@@ -150,7 +151,7 @@ def wrapper_time(fun):
     def inner(*args):
         start = datetime.now()
         fun(*args)
-        lg.logger.debug(f'elapsed time:{datetime.now() - start}')
+        gv.lg.logger.debug(f'elapsed time:{datetime.now() - start}')
 
     return inner
 
@@ -161,7 +162,7 @@ def create_csv_file(filename, header, updateColumn=False):
             with open(filename, 'w', newline='') as f:
                 file = csv.writer(f)
                 file.writerow(header)
-            lg.logger.debug(f'create_csv_file:{filename}')
+            gv.lg.logger.debug(f'create_csv_file:{filename}')
         else:
             if updateColumn:
                 with open(filename, 'r+', newline='') as rwf:
@@ -172,9 +173,9 @@ def create_csv_file(filename, header, updateColumn=False):
                         rwf.seek(0)
                         file = csv.writer(rwf)
                         file.writerows(rows)
-                    lg.logger.debug(f'update csvHeader success!')
+                    gv.lg.logger.debug(f'update csvHeader success!')
     except Exception as e:
-        lg.logger.debug(e)
+        gv.lg.logger.debug(e)
 
 
 def write_csv_file(filename, row):
@@ -183,7 +184,7 @@ def write_csv_file(filename, row):
             file = csv.writer(f)
             file.writerow(row)
     except Exception as e:
-        lg.logger.fatal(e)
+        gv.lg.logger.fatal(e)
 
 
 def IsNullOrEmpty(strObj: str):

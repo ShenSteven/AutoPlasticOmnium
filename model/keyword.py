@@ -18,7 +18,7 @@ import peak.peaklin
 from sockets.serialport import SerialPort
 from sockets.telnet import TelnetComm
 import conf.globalvar as gv
-import conf.logprint as lg
+# import conf.logprint as lg
 import time
 from sockets.visa import VisaComm
 from .basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping
@@ -26,20 +26,20 @@ from inspect import currentframe
 
 
 def testKeyword(item, testSuite=None):
-    # lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
+    # gv.lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
     # time.sleep(0.02)
     # return True, ''
     rReturn = False
     compInfo = ''
     # gv.main_form.testSequences[item.suite_index].globalVar = item.globalVar
     if gv.cf.dut.test_mode == 'debug' or gv.IsDebug and item.Keyword in gv.cf.dut.debug_skip:
-        lg.logger.debug('This is debug mode.Skip this step.')
+        gv.lg.logger.debug('This is debug mode.Skip this step.')
         return True, ''
 
     try:
 
         if item.Keyword == 'Waiting':
-            lg.logger.debug(f'waiting {item.Timeout}s')
+            gv.lg.logger.debug(f'waiting {item.Timeout}s')
             time.sleep(float(item.Timeout))
             rReturn = True
 
@@ -70,7 +70,7 @@ def testKeyword(item, testSuite=None):
                 QtCore.Q_RETURN_ARG(list),
                 QtCore.Q_ARG(str, item.ExpectStr),
                 QtCore.Q_ARG(str, item.command))
-            lg.logger.debug(f'dialog input:{invoke_return[0]}')
+            gv.lg.logger.debug(f'dialog input:{invoke_return[0]}')
             if not invoke_return[1]:
                 rReturn = False
             else:
@@ -162,7 +162,7 @@ def testKeyword(item, testSuite=None):
         elif item.Keyword == 'TransferData':
             file_path = f"{gv.current_dir}\\flash\\{item.command}"
             s19datas = gv.PLin.get_datas(file_path)
-            lg.logger.debug(file_path)
+            gv.lg.logger.debug(file_path)
             rReturn = gv.PLin.TransferData(item.ID, item._NAD, s19datas, item._PCI_LEN, item.Timeout)
 
         elif item.Keyword == 'SuspendDiagSchedule':
@@ -170,7 +170,7 @@ def testKeyword(item, testSuite=None):
 
         elif item.Keyword == 'CalcKey':
             item.testValue = gv.PLin.CalKey(item.command)
-            lg.logger.debug(f"send key is {item.testValue}.")
+            gv.lg.logger.debug(f"send key is {item.testValue}.")
             rReturn = True
 
         elif item.Keyword == 'GetCRC':
@@ -200,18 +200,18 @@ def testKeyword(item, testSuite=None):
             with nidaqmx.Task() as task:
                 task.ai_channels.add_ai_voltage_chan(item.CmdOrParam, min_val=-10, max_val=10)
                 data = task.read(number_of_samples_per_channel=1)
-                lg.logger.debug(f"get {item.CmdOrParam} sensor Volt: {data}.")
+                gv.lg.logger.debug(f"get {item.CmdOrParam} sensor Volt: {data}.")
                 item.testValue = "%.2f" % ((data[0] - 0.02) * 10)
-                lg.logger.debug(f"DAQmx {item.CmdOrParam} Volt: {item.testValue}.")
+                gv.lg.logger.debug(f"DAQmx {item.CmdOrParam} Volt: {item.testValue}.")
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
         elif item.Keyword == 'NiDAQmxCur':
             with nidaqmx.Task() as task:
                 task.ai_channels.add_ai_voltage_chan(item.CmdOrParam, min_val=-10, max_val=10)
                 data = task.read(number_of_samples_per_channel=1)
-                lg.logger.debug(f"get {item.CmdOrParam} sensor Volt: {data}.")
+                gv.lg.logger.debug(f"get {item.CmdOrParam} sensor Volt: {data}.")
                 item.testValue = "%.2f" % ((data[0] - 0.02) * 2)
-                lg.logger.debug(f"DAQmx {item.CmdOrParam} Current: {item.testValue}.")
+                gv.lg.logger.debug(f"DAQmx {item.CmdOrParam} Current: {item.testValue}.")
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
         elif item.Keyword == 'NiVisaCmd':
@@ -242,7 +242,7 @@ def testKeyword(item, testSuite=None):
             else:
                 rReturn = False
     except Exception as e:
-        lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
+        gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
         rReturn = False
         return rReturn, compInfo
     else:
@@ -254,7 +254,7 @@ def testKeyword(item, testSuite=None):
                 item.Keyword == "NiDAQmxCur"):
             gv.ArrayListDaq.append("N/A" if IsNullOrEmpty(item.testValue) else item.testValue)
             gv.ArrayListDaqHeader.append(item.StepName)
-            lg.logger.debug(f"DQA add {item.testValue}")
+            gv.lg.logger.debug(f"DQA add {item.testValue}")
 
 
 def CompareLimit(limitMin, limitMax, value, is_round=False):
@@ -264,13 +264,13 @@ def CompareLimit(limitMin, limitMax, value, is_round=False):
         return False, ''
     temp = round(float(value)) if is_round else float(value)
     if IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 只需比较最大值
-        lg.logger.debug("compare Limit_max...")
+        gv.lg.logger.debug("compare Limit_max...")
         return temp <= float(limitMax), ''
     if not IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):  # 只需比较最小值
-        lg.logger.debug("compare Limit_min...")
+        gv.lg.logger.debug("compare Limit_min...")
         return temp >= float(limitMin), ''
     if not IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 比较最小最大值
-        lg.logger.debug("compare Limit_min and Limit_max...")
+        gv.lg.logger.debug("compare Limit_min and Limit_max...")
         if float(limitMin) <= temp <= float(limitMax):
             return True, ''
         else:
@@ -295,7 +295,7 @@ def subStr(SubStr1, SubStr2, revStr):
         values = re.findall(f'{SubStr1}(.*?){SubStr2}', revStr)
     if len(values) == 1 and values[0] != '':
         testValue = values[0]
-        lg.logger.debug(f'get TestValue:{testValue}')
+        gv.lg.logger.debug(f'get TestValue:{testValue}')
         return testValue.strip()
     else:
         raise Exception(f'get TestValue exception:{values}')
@@ -306,16 +306,16 @@ def assert_value(compInfo, item, rReturn):
         try:
             rReturn = True if item.testValue in item.spec else False
         except TypeError as e:
-            lg.logger.error(f'{currentframe().f_code.co_name}:{e}')
+            gv.lg.logger.error(f'{currentframe().f_code.co_name}:{e}')
     elif not IsNullOrEmpty(item.USL) or not IsNullOrEmpty(item.LSL):
         try:
             rReturn, compInfo = CompareLimit(item.LSL, item.USL, item.testValue)
         except TypeError as e:
-            lg.logger.error(f'{currentframe().f_code.co_name}:{e}')
+            gv.lg.logger.error(f'{currentframe().f_code.co_name}:{e}')
     elif IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
         pass
     else:
-        lg.logger.warning(f"assert is unknown,SPEC:{item.spec},LSL:{item.LSL}USL:{item.USL}.")
+        gv.lg.logger.warning(f"assert is unknown,SPEC:{item.spec},LSL:{item.LSL}USL:{item.USL}.")
     return compInfo, rReturn
 
 

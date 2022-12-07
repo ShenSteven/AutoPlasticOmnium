@@ -12,6 +12,7 @@ from traceback import format_exception
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import ui.mainform as mf
 import runin.rmainform as rmf
+import conf.globalvar as gv
 
 # get app dir path
 bundle_dir = ''
@@ -40,8 +41,8 @@ get_app_dir_path()
 
 
 def excepthook(cls, exception, traceback):
-    import conf.logprint as lg
-    lg.logger.fatal("".join(format_exception(cls, exception, traceback)))
+    # import conf.globalvar as gv
+    gv.lg.logger.fatal("".join(format_exception(cls, exception, traceback)))
     QMessageBox.critical(None, "Error", "".join(format_exception(cls, exception, traceback)))
 
 
@@ -60,8 +61,8 @@ def main():
 
         sys.exit(app.exec_())
     except KeyboardInterrupt:
-        import conf.logprint as lg
-        lg.logger.fatal('KeyboardInterrupt')
+        # import conf.globalvar as gv
+        gv.lg.logger.fatal('KeyboardInterrupt')
         pass
 
 

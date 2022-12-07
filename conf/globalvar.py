@@ -6,14 +6,17 @@
 @Date   : 2021/9/8
 @Desc   : 全局变量
 """
+import os
 from datetime import datetime
-from os.path import join, abspath, dirname
+from os.path import join, abspath, dirname, exists
 from threading import Event
 import conf.config
 import platform
 import model.product
 import model.variables
-from main import bundle_dir
+from conf.logprint import LogPrint
+# from main import bundle_dir
+import main
 
 
 def get_about():
@@ -30,7 +33,8 @@ win = platform.system() == 'Windows'
 linux = platform.system() == 'Linux'
 tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
 
-current_dir = bundle_dir
+current_dir = main.bundle_dir
+print("current_dir:", current_dir)
 config_yaml_path = abspath(join(dirname(__file__), 'config.yaml'))
 cf = conf.config.read_config(config_yaml_path, conf.config.Configs)
 
@@ -46,8 +50,9 @@ error_details_first_fail = ''
 version = about['__version__']
 
 logFolderPath = ''
-# critical_log = ''
-# errors_log = ''
+logPath = ''
+critical_log = ''
+errors_log = ''
 txtLogPath = ''
 jsonOfResult = ''
 csv_list_header = []
@@ -125,5 +130,23 @@ def get_global_val(name, defValue=None):
         return defValue
 
 
+def create_sub_log_folder():
+    global logFolderPath, critical_log, errors_log
+    logFolderPath = join(cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
+    try:
+        if not exists(logFolderPath):
+            os.makedirs(logFolderPath)
+    except FileNotFoundError:
+        cf.station.log_folder = join(current_dir, 'testlog')
+        logFolderPath = join(cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
+        if not exists(logFolderPath):
+            os.makedirs(logFolderPath)
+    critical_log = join(cf.station.log_folder, 'critical.log').replace('\\', '/')
+    errors_log = join(cf.station.log_folder, 'errors.log').replace('\\', '/')
+
+
+create_sub_log_folder()
+logger_path = os.path.join(logFolderPath, f"logger_{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
+lg = LogPrint(logger_path, critical_log, errors_log)
 if __name__ == '__main__':
     pass

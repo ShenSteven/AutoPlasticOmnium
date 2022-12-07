@@ -7,41 +7,28 @@
 @Desc   : 
 """
 import json
-import os
 import sys
 from string import Template
-
 import yaml
-from datetime import datetime
 import logging.config
-from os.path import join, exists, abspath, dirname
+from os.path import join, abspath, dirname
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget
-import conf.globalvar as gv
 import conf.config
 
-# test log_file path
-gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
-try:
-    if not exists(gv.logFolderPath):
-        os.makedirs(gv.logFolderPath)
-except FileNotFoundError:
-    gv.cf.station.log_folder = join(gv.current_dir, 'testlog')
-    gv.logFolderPath = join(gv.cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
-    if not exists(gv.logFolderPath):
-        os.makedirs(gv.logFolderPath)
 
-log_file = os.path.join(gv.logFolderPath, f"file_handler_{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
-critical_log = join(gv.cf.station.log_folder, 'critical.log').replace('\\', '/')
-errors_log = join(gv.cf.station.log_folder, 'errors.log').replace('\\', '/')
+class LogPrint:
+    def __init__(self, log_file, critical_log, errors_log):
+        self.logger = None
+        self.reconfig_logger(log_file, critical_log, errors_log)
 
-# load logger config
-logging_yaml = abspath(join(dirname(__file__), 'logging.yaml'))
-log_conf = conf.config.read_yaml(logging_yaml)
-res_log_conf = Template(json.dumps(log_conf)).safe_substitute(
-    {'log_file': log_file, 'critical_log': critical_log, 'errors_log': errors_log})
-logging.config.dictConfig(yaml.safe_load(res_log_conf))
-logger = logging.getLogger('testlog')
+    def reconfig_logger(self, log_file, critical_log, errors_log):
+        logging_yaml = abspath(join(dirname(__file__), 'logging.yaml'))
+        log_conf = conf.config.read_yaml(logging_yaml)
+        res_log_conf = Template(json.dumps(log_conf)).safe_substitute(
+            {'log_file': log_file, 'critical_log': critical_log, 'errors_log': errors_log})
+        logging.config.dictConfig(yaml.safe_load(res_log_conf))
+        self.logger = logging.getLogger('testlog')
 
 
 class QTextEditHandler(logging.Handler, QWidget):

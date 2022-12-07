@@ -11,8 +11,8 @@ import time
 import traceback
 from telnetlib import Telnet
 from sockets.communication import CommAbstract, IsNullOrEmpty
-import conf.logprint as lg
-
+# import conf.logprint as lg
+import conf.globalvar as gv
 
 class TelnetComm(CommAbstract):
     def __init__(self, host, prompt, port=23):
@@ -20,14 +20,14 @@ class TelnetComm(CommAbstract):
         self.tel = Telnet(host, port, timeout=2, )
         self.tel.debuglevel = 1000
         login_prompt = self.tel.read_until(prompt.encode('utf8'), 2).decode('utf8')
-        lg.logger.debug(login_prompt)
+        gv.lg.logger.debug(login_prompt)
 
     def open(self, *args):
         self.tel.open(self.tel.host, self.tel.port)
 
     def close(self):
         self.tel.close()
-        lg.logger.debug(f"{self.tel.port} serialPort close success!!")
+        gv.lg.logger.debug(f"{self.tel.port} serialPort close success!!")
 
     def read(self):
         self.tel.read_all()
@@ -47,24 +47,24 @@ class TelnetComm(CommAbstract):
                 command += "\n"
             else:
                 pass
-            lg.logger.debug(f"telnet_SendComd-->{command}")
+            gv.lg.logger.debug(f"telnet_SendComd-->{command}")
             self.write(command)
             strRecAll = self.tel.read_until(exceptStr.encode('utf-8'), timeout).decode('utf-8')
-            lg.logger.debug(strRecAll)
+            gv.lg.logger.debug(strRecAll)
             if re.search(exceptStr, strRecAll):
-                lg.logger.info(f'send: {command} wait: {exceptStr} success in {round(time.time() - start_time, 3)}s')
+                gv.lg.logger.info(f'send: {command} wait: {exceptStr} success in {round(time.time() - start_time, 3)}s')
                 result = True
             else:
-                lg.logger.error(f'send: {command} wait: {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
+                gv.lg.logger.error(f'send: {command} wait: {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
                 result = False
             return result, strRecAll
         except Exception as e:
-            lg.logger.fatal(f'{e}, {traceback.format_exc()}')
+            gv.lg.logger.fatal(f'{e}, {traceback.format_exc()}')
             return False, strRecAll
         finally:
             if not self.prompt == exceptStr:
                 strRec = self.tel.read_until(self.prompt.encode('utf-8'), timeout).decode('utf-8')
-                lg.logger.debug(strRec)
+                gv.lg.logger.debug(strRec)
 
 
 if __name__ == "__main__":

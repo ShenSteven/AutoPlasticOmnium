@@ -15,7 +15,7 @@ import model.product
 import model.step
 from .basicfunc import IsNullOrEmpty, create_csv_file, write_csv_file
 import conf.globalvar as gv
-import conf.logprint as lg
+# import conf.logprint as lg
 import ui.mainform
 
 
@@ -29,7 +29,7 @@ def fail_continue(test_step: model.step.Step, failContinue):
 
 
 def daq_collect():
-    lg.logger.debug(f"collect DAQ data to {gv.daq_data_path}")
+    gv.lg.logger.debug(f"collect DAQ data to {gv.daq_data_path}")
     create_csv_file(gv.daq_data_path, gv.ArrayListDaqHeader)
     data_list = [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
     data_list.extend(gv.ArrayListDaq)
@@ -68,7 +68,7 @@ class TestSuite:
             self.setColor(Qt.gray)
             self.suiteResult = True
             return self.suiteResult
-        lg.logger.debug(
+        gv.lg.logger.debug(
             '- ' * 8 + f"<a name='testSuite:{self.SuiteName}'>Start testSuite:{self.SuiteName}</a>" + '- ' * 9)
         self.setColor(Qt.yellow)
         suiteItem = model.product.SuiteItem()
@@ -99,7 +99,7 @@ class TestSuite:
             return self.suiteResult
         except Exception as e:
             self.setColor(Qt.darkRed)
-            lg.logger.fatal(f"run testSuite {self.SuiteName} Exception！！{e},{traceback.format_exc()}")
+            gv.lg.logger.fatal(f"run testSuite {self.SuiteName} Exception！！{e},{traceback.format_exc()}")
             self.suiteResult = False
             return self.suiteResult
         finally:
@@ -126,9 +126,9 @@ class TestSuite:
         self.elapsedTime = datetime.strptime(self.finish_time, '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(
             self.start_time, '%Y-%m-%d %H:%M:%S.%f')
         if self.suiteResult:
-            lg.logger.info(f"{self.SuiteName} Test Pass!,ElapsedTime:{self.elapsedTime.seconds}")
+            gv.lg.logger.info(f"{self.SuiteName} Test Pass!,ElapsedTime:{self.elapsedTime.seconds}")
         else:
-            lg.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
+            gv.lg.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
 
     def process_for(self, test_case, step_item: model.step.Step):
         """FOR 循环开始判断"""
@@ -137,7 +137,7 @@ class TestSuite:
             test_case.ForStartSuiteNo = self.index
             gv.ForStartStepNo = step_item.index
             test_case.ForFlag = False
-            lg.logger.debug(f"====================Start Cycle-{gv.ForCycleCounter}===========================")
+            gv.lg.logger.debug(f"====================Start Cycle-{gv.ForCycleCounter}===========================")
 
     def process_EndFor(self, test_case, step_item: model.step.Step):
         """FOR 循环结束判断"""
@@ -149,7 +149,7 @@ class TestSuite:
                 return True
 
             test_case.ForFlag = False
-            lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForCycleCounter}) Cycle test." + '=' * 10)
+            gv.lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForCycleCounter}) Cycle test." + '=' * 10)
             gv.ForCycleCounter = 1
             return False
         else:

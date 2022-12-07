@@ -12,8 +12,8 @@ import traceback
 import pyvisa
 from sockets.communication import CommAbstract, IsNullOrEmpty
 from inspect import currentframe
-import conf.logprint as lg
-
+# import conf.logprint as lg
+import conf.globalvar as gv
 
 def ReplaceCommonEscapeSequences(date):
     return date.replace('\\n', '\n').replace('\\r', '\r')
@@ -28,7 +28,7 @@ class VisaComm(CommAbstract):
         self.prompt = prompt
         self._mbSession = None
         self.rm = pyvisa.ResourceManager()
-        # lg.logger.debug(self.rm.list_resources())
+        # gv.lg.logger.debug(self.rm.list_resources())
 
     def open(self, resourceName=None):
         try:
@@ -36,29 +36,29 @@ class VisaComm(CommAbstract):
                 self._mbSession = self.rm.open_resource(resourceName)
                 # self._mbSession.write("*RST")
                 # IDN = self._mbSession.query("*IDN?")
-                # lg.logger.debug(IDN)
+                # gv.lg.logger.debug(IDN)
                 return True
             else:
                 raise f"resourceName:{resourceName} is not found in ResourceManager!"
         except Exception as e:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
 
     def write(self, date: str):
         try:
             textToWrite = ReplaceCommonEscapeSequences(date)
-            lg.logger.debug("VisaWrite-->" + textToWrite)
+            gv.lg.logger.debug("VisaWrite-->" + textToWrite)
             self._mbSession.write(textToWrite)
         except Exception as e:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
 
     def read(self):
         responseContext = ''
         try:
             responseContext = InsertCommonEscapeSequences(self._mbSession.read())
         except Exception as e:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
         finally:
-            lg.logger.debug("VISARead:->" + responseContext)
+            gv.lg.logger.debug("VISARead:->" + responseContext)
         return responseContext
 
     def query(self, cmdStr):
@@ -66,9 +66,9 @@ class VisaComm(CommAbstract):
         try:
             responseContext = self._mbSession.query(cmdStr)
         except Exception as e:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
         finally:
-            lg.logger.debug(f"VisaQuery: {cmdStr}->" + responseContext)
+            gv.lg.logger.debug(f"VisaQuery: {cmdStr}->" + responseContext)
         return responseContext
 
     def close(self):
@@ -87,16 +87,16 @@ class VisaComm(CommAbstract):
             if IsNullOrEmpty(exceptStr):
                 return True, strRecAll
             if re.search(exceptStr, strRecAll):
-                lg.logger.info(
+                gv.lg.logger.info(
                     f'send: {command} wait: {exceptStr} success in {round(time.time() - start_time, 3)}s')
                 result = True
             else:
-                lg.logger.error(
+                gv.lg.logger.error(
                     f'send: {command} wait: {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
                 result = False
             return result, strRecAll
         except Exception as e:
-            lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
+            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
             return False, strRecAll
 
 

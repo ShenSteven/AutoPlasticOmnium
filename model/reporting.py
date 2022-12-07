@@ -13,7 +13,7 @@ import csv
 import requests
 from threading import Thread
 import ui.mainform as mf
-import conf.logprint as lg
+# import conf.logprint as lg
 import conf.globalvar as gv
 from model.basicfunc import write_csv_file, create_csv_file
 
@@ -23,17 +23,17 @@ def check_connection(url):
     # will return "Connected" if the server is running
     try:
         url = url + "ping"
-        lg.logger.debug(url)
+        gv.lg.logger.debug(url)
         response = requests.get(url)
-        lg.logger.debug(response.status_code)
-        lg.logger.debug(response.text)
+        gv.lg.logger.debug(response.status_code)
+        gv.lg.logger.debug(response.text)
         if "Connected" in response.text:
             return True
         else:
-            lg.logger.debug("Cannot connect to server")
+            gv.lg.logger.debug("Cannot connect to server")
             return False
     except Exception as a:
-        lg.logger.debug(a)
+        gv.lg.logger.debug(a)
         return False
 
 
@@ -45,15 +45,15 @@ def upload_Json_to_client(url, log_path):
     jsonStr = json.dumps(gv.stationObj, default=lambda o: o.__dict__, sort_keys=True, indent=4)
     with open(json_upload_path, 'w') as fw:
         fw.write(jsonStr)
-    lg.logger.debug(jsonStr)
+    gv.lg.logger.debug(jsonStr)
 
     if not check_connection(url):
         return False
     # read_json = open(json_upload_path, "r").read()
     read_json = jsonStr
     read_log = open(log_path, "rb").read()
-    lg.logger.debug("%s post:" % json_upload_path)
-    lg.logger.debug("%s post:" % log_path)
+    gv.lg.logger.debug("%s post:" % json_upload_path)
+    gv.lg.logger.debug("%s post:" % log_path)
     if args.station[0] == "MBFT":
         litepoint = open("./Data/litepoint.zip", "rb").read()
         response = requests.post(url, data=read_json,
@@ -66,8 +66,8 @@ def upload_Json_to_client(url, log_path):
         response = requests.post(url, data=read_json)
     else:
         response = requests.post(read_json, files={"serial_log.txt": read_log})
-    lg.logger.debug("Result:%s" % response.status_code)
-    lg.logger.debug(response.text)
+    gv.lg.logger.debug("Result:%s" % response.status_code)
+    gv.lg.logger.debug(response.text)
     if response.status_code == 200:
         return True
     else:
@@ -97,7 +97,7 @@ def collect_data_to_csv():
                             gv.mesPhases.first_fail, gv.error_details_first_fail, "UTC", gv.cf.dut.test_mode,
                             gv.mesPhases.JSON_UPLOAD, gv.mesPhases.MES_UPLOAD]
         fix_header_value.extend(gv.csv_list_data)
-        lg.logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
+        gv.lg.logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
         write_csv_file(gv.CSVFilePath, fix_header_value)
 
     thread = Thread(target=thread_update, daemon=True)
@@ -122,7 +122,7 @@ def saveTestResult():
             with open(reportPath, 'a', newline='') as stream:
                 writer = csv.writer(stream)
                 writer.writerows(all_rows)
-        lg.logger.debug(f'saveTestResult to:{reportPath}')
+        gv.lg.logger.debug(f'saveTestResult to:{reportPath}')
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()

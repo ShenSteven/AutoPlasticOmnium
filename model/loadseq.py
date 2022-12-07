@@ -24,11 +24,11 @@ import ui.mainform
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations):
-    import conf.logprint as lg
-    lg.logger.debug("Start convert excel testcase to json script,please wait a moment...")
+    # import conf.logprint as lg
+    gv.lg.logger.debug("Start convert excel testcase to json script,please wait a moment...")
     for station in all_stations:
         load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json")
-    lg.logger.debug("convert finish!")
+    gv.lg.logger.debug("convert finish!")
 
 
 def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> list:
@@ -174,14 +174,14 @@ def serialize_to_json(obj, json_path):
     :param json_path: the path of json
     """
     try:
-        import conf.logprint as lg
-        lg.logger.debug(f"delete old json in scripts.")
+        # import conf.logprint as lg
+        gv.lg.logger.debug(f"delete old json in scripts.")
         if os.path.exists(json_path):
             os.chmod(json_path, stat.S_IWRITE)
             os.remove(json_path)
         with open(json_path, 'w') as wf:
             json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-        lg.logger.debug(f"serializeToJson success! {json_path}.")
+        gv.lg.logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
         ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
                                                                                      f'{currentframe().f_code.co_name}:{e} ',
