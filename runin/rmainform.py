@@ -9,7 +9,7 @@
 import os
 import re
 import sys
-from datetime import datetime
+import time
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from os.path import dirname, abspath, join
 from PyQt5.uic import loadUi
@@ -116,12 +116,12 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
 
             if not self.CellList[localNo - 1].StartFlag:
                 self.clear_input()
-                gv.logPath = gv.logFolderPath + rf"\{datetime.now().strftime('%Y%m%d')}"
+                gv.logPath = gv.logFolderPath + rf"\{time.strftime('%Y%m%d')}"
                 os.makedirs(gv.OutPutPath, exist_ok=True)
                 os.makedirs(gv.DataPath, exist_ok=True)
                 os.makedirs(gv.logPath + r"\Json", exist_ok=True)
                 os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
-                gv.debugPath = fr"{gv.logPath}\debug_{datetime.now().strftime('%Y%m%d')}.txt"
+                gv.debugPath = fr"{gv.logPath}\debug_{time.strftime('%Y%m%d')}.txt"
                 self.init_cell_param(localNo, scanSN)
                 self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 255);")
                 self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 255);")
@@ -139,7 +139,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.lineEdit.setFocus()
 
     def init_cell_param(self, localNo, sn):
-        self.CellList[localNo - 1].CellLogTxt = rf"{gv.logPath}\{localNo}_{sn}_{datetime.now().strftime('%H%M%S')}.txt"
+        self.CellList[localNo - 1].CellLogTxt = rf"{gv.logPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
         self.CellList[localNo - 1].lb_sn.setText(sn)
         self.CellList[localNo - 1].lb_cellNum.setVisible(False)
         self.CellList[localNo - 1].lb_testName.setText('')

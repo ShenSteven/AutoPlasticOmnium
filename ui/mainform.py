@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
 # import conf.logprint as lg
-from conf.logprint import QTextEditHandler
+from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, save_config, run_cmd
 import sockets.serialport
 from model.sqlite import Sqlite
@@ -167,6 +167,7 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.fileHandle = None
         self.SaveScriptDisableFlag = False
         self.SingleStepTest = False
         self.StepNo = -1
@@ -234,17 +235,19 @@ class MainForm(QWidget):
 
     def init_textEditHandler(self):
         """create log handler for textEdit"""
+        textEdit_handler = QTextEditHandler(stream=self.ui.textEdit)
+        textEdit_handler.name = 'textEdit_handler'
         log_console = logging.getLogger('testlog').handlers[0]
-        # file_handler = logging.getLogger('testlog').handlers[1]
         if getattr(sys, 'frozen', False):
             logging.getLogger('testlog').removeHandler(log_console)
-            # logging.getLogger('testlog').removeHandler(file_handler)
+            textEdit_handler.formatter = gv.lg.logger.handlers[0].formatter
+            textEdit_handler.level = gv.lg.logger.handlers[0].level
+            self.fileHandle = gv.lg.logger.handlers[0]
         else:
             gv.cf.station.privileges = 'lab'
-        textEdit_handler = QTextEditHandler(stream=self.ui.textEdit)
-        textEdit_handler.formatter = gv.lg.logger.handlers[0].formatter
-        textEdit_handler.level = gv.lg.logger.handlers[0].level
-        textEdit_handler.name = 'textEdit_handler'
+            textEdit_handler.formatter = gv.lg.logger.handlers[1].formatter
+            textEdit_handler.level = gv.lg.logger.handlers[1].level
+            self.fileHandle = gv.lg.logger.handlers[1]
         logging.getLogger('testlog').addHandler(textEdit_handler)
 
     def init_lineEdit(self):
@@ -660,12 +663,18 @@ class MainForm(QWidget):
 
     def on_actionSaveLog(self, info):
         def thread_update():
-            gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_' \
-                            rf'{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
-            content = self.ui.textEdit.toPlainText()
-            with open(gv.txtLogPath, 'wb') as f:
-                f.write(content.encode('utf8'))
-            gv.lg.logger.debug(f"Save test log OK.{gv.txtLogPath}")
+            if info == 'rename':
+                rename_log = gv.txtLogPath.replace('logging', str(gv.finalTestResult).upper()).replace('details',gv.error_details_first_fail)
+                gv.lg.logger.debug(f"rename test log to: {gv.txtLogPath}")
+                self.fileHandle.close()
+                os.rename(gv.txtLogPath, rename_log)
+            else:
+                gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_' \
+                                rf'{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
+                content = self.ui.textEdit.toPlainText()
+                with open(gv.txtLogPath, 'wb') as f:
+                    f.write(content.encode('utf8'))
+                gv.lg.logger.debug(f"Save test log OK.{gv.txtLogPath}")
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
@@ -986,22 +995,22 @@ class MainForm(QWidget):
             self.testcase.clone_suites = self.testSequences
             self.ShowTreeView(self.testSequences)
         gv.SN = self.ui.lineEdit.text()
-        self.variable_init()
+        self.variable_init(gv.SN)
 
-    def variable_init(self):
+    def variable_init(self, SN):
         """测试变量初始化"""
         if self.SingleStepTest and self.testcase.Finished:
             pass
         else:
             gv.TestVariables = model.variables.Variables(gv.cf.station.station_name,
-                                                         gv.cf.station.station_no, gv.SN,
+                                                         gv.cf.station.station_no, SN,
                                                          gv.cf.dut.dut_ip, gv.cf.station.log_folder)
-        gv.stationObj = model.product.JsonObject(gv.SN, gv.cf.station.station_no,
+        gv.stationObj = model.product.JsonObject(SN, gv.cf.station.station_no,
                                                  gv.cf.dut.test_mode,
                                                  gv.cf.dut.qsdk_ver, gv.version)
-        gv.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{gv.SN}/station/{gv.cf.station.station_no}/info'
-        gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{gv.SN}/station/{gv.cf.station.station_name}'
-        gv.mesPhases = model.product.MesInfo(gv.SN, gv.cf.station.station_no, gv.version)
+        gv.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
+        gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
+        gv.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
         init_create_dirs()
         gv.csv_list_header = []
         gv.csv_list_data = []
@@ -1022,6 +1031,10 @@ class MainForm(QWidget):
         self.ui.lb_failInfo.setHidden(True)
         self.ui.lb_testTime.setHidden(True)
         self.sec = 1
+        gv.txtLogPath = rf'{gv.logFolderPath}\logging_{SN}_details_{time.strftime("%H-%M-%S")}.txt'
+        # gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{SN}_{time.strftime("%H-%M-%S")}.txt'
+        gv.lg = LogPrint(gv.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
+        self.init_textEditHandler()
         self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.START)
         self.ui.tabWidget.setCurrentWidget(self.ui.result)
 
@@ -1048,8 +1061,8 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
             myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, True)
             gv.startFlag = True
             gv.lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
-                            f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
-                            f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
+                               f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
+                               f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
             myWind.my_signals.update_tableWidget[str].emit('clear')
             gv.pause_event.set()
         elif status == TestStatus.FAIL:
@@ -1099,7 +1112,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                 gv.startFlag = False
                 myWind.my_signals.lineEditEnableSignal[bool].emit(True)
                 myWind.my_signals.updateStatusBarSignal[str].emit('')
-                myWind.my_signals.saveTextEditSignal[str].emit('')
+                myWind.my_signals.saveTextEditSignal[str].emit('rename')
                 if not gv.finalTestResult:
                     myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
                                                                                  gv.error_details_first_fail, 20,
