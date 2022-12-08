@@ -15,14 +15,13 @@ import model.loadseq
 import model.product
 import model.sqlite
 import conf.globalvar as gv
-# import conf.logprint as lg
 from inspect import currentframe
 
 
 class TestCase:
     """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
-    def __init__(self, testcase_path, sheet_name):
+    def __init__(self, testcase_path, sheet_name, logger):
         self.suite_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = ''
@@ -33,15 +32,17 @@ class TestCase:
         self.ForStartSuiteNo = 0
         self.ForFlag = False
         self.Finished = False
-        model.sqlite.init_database(gv.database_setting)
+        self.logger = logger
+        model.sqlite.init_database(self.logger, gv.database_setting)
         if not getattr(sys, 'frozen', False):
-            model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all)
+            model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger)
         if os.path.exists(self.test_script_json):
             self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json)
         else:
             self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path,
                                                                           self.sheetName,
-                                                                          self.test_script_json)
+                                                                          self.test_script_json,
+                                                                          self.logger)
         self.clone_suites = copy.deepcopy(self.original_suites)
 
     def run(self, global_fail_continue=False):
@@ -65,7 +66,7 @@ class TestCase:
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return self.tResult
         except Exception as e:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
             self.tResult = False
             return self.tResult
         finally:
@@ -93,7 +94,8 @@ class TestCase:
         self.tResult = True
         self.suite_result_list = []
 
-    def teardown(self):
+    @staticmethod
+    def teardown():
         if gv.dut_comm is not None:
             gv.dut_comm.close()
         if gv.PLin is not None:

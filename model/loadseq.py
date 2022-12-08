@@ -23,17 +23,17 @@ import conf.globalvar as gv
 import ui.mainform
 
 
-def excel_convert_to_json(testcase_path_excel, all_stations):
-    # import conf.logprint as lg
-    gv.lg.logger.debug("Start convert excel testcase to json script,please wait a moment...")
+def excel_convert_to_json(testcase_path_excel, all_stations, logger):
+    logger.debug("Start convert excel testcase to json script,please wait a moment...")
     for station in all_stations:
-        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json")
-    gv.lg.logger.debug("convert finish!")
+        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)
+    logger.debug("convert finish!")
 
 
-def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> list:
+def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger) -> list:
     """load test sequence form a sheet in Excel and return the suites sequences list,
     if success,serialize the suites list to json.
+    :param logger: logger handle
     :param testcase_path: the path of Excel
     :param sheet_name: the sheet test_name of Excel
     :param test_script_path:  serialize and save to json path
@@ -84,7 +84,7 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path) -> lis
                                                                                      5)
         sys.exit(e)
     else:
-        serialize_to_json(suites_list, test_script_path)
+        serialize_to_json(suites_list, test_script_path, logger)
         return suites_list
     finally:
         workbook.close()
@@ -168,20 +168,20 @@ def wrapper_save_sha256(fun):
 
 
 @wrapper_save_sha256
-def serialize_to_json(obj, json_path):
+def serialize_to_json(obj, json_path, logger):
     """serialize obj to json and encrypt.
+    :param logger:log handle
     :param obj: the object you want to serialize
     :param json_path: the path of json
     """
     try:
-        # import conf.logprint as lg
-        gv.lg.logger.debug(f"delete old json in scripts.")
+        logger.debug(f"delete old json in scripts.")
         if os.path.exists(json_path):
             os.chmod(json_path, stat.S_IWRITE)
             os.remove(json_path)
         with open(json_path, 'w') as wf:
             json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-        gv.lg.logger.debug(f"serializeToJson success! {json_path}.")
+        logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
         ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
                                                                                      f'{currentframe().f_code.co_name}:{e} ',

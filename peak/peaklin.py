@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QDialog  # QMessageBox
 from future.moves import collections
 import ui.mainform
 from peak.ui_lin import Ui_PeakLin
-# import conf.logprint as lg
 import conf.globalvar as gv
 import binascii
 import os
@@ -42,9 +41,10 @@ class PeakLin(QDialog, Ui_PeakLin):
     bootloader download, uds.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, logger, parent=None):
         QDialog.__init__(self, parent)
         Ui_PeakLin.__init__(self)
+        self.logger = logger
         self.setupUi(self)
         self.init_signals_connect()
         self.initialize()
@@ -65,7 +65,7 @@ class PeakLin(QDialog, Ui_PeakLin):
 
     def initialize(self):
         # API configuration
-        gv.lg.logger.debug("init...")
+        self.logger.debug("init...")
         self.m_objPLinApi = PLinApi.PLinApi()
         if not self.m_objPLinApi.isLoaded():
             raise Exception("PLin-API could not be loaded ! Exiting...")
@@ -224,7 +224,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                 # Reset the last LIN error code to default.
                 linResult = PLinApi.TLIN_ERROR_OK
                 result = True
-                gv.lg.logger.debug(
+                self.logger.debug(
                     f'connect success, dev- {self.m_hHw.value}, client- {self.m_hClient.value}, mode- {hwMode}')
             else:
                 # An error occurred while initializing hardware.
@@ -290,7 +290,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                 # Disconnect if the application was connected to a LIN
                 # hardware.
                 self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
-                gv.lg.logger.debug("SuspendSchedule....")
+                self.logger.debug("SuspendSchedule....")
                 linResult = self.m_objPLinApi.DisconnectClient(self.m_hClient, self.m_hHw)
                 if linResult == PLinApi.TLIN_ERROR_OK:
                     self.m_hHw = PLinApi.HLINHW(0)
@@ -327,8 +327,8 @@ class PeakLin(QDialog, Ui_PeakLin):
 
     def hardwareCbx_IndexChanged(self):
         # gv.lg.logger.debug(lwHw)
-        gv.lg.logger.debug(self.hardwareCbx.currentIndex())
-        gv.lg.logger.debug(self.hardwareCbx.currentText())
+        self.logger.debug(self.hardwareCbx.currentIndex())
+        self.logger.debug(self.hardwareCbx.currentText())
         lwHw = self.m_dataHws[self.hardwareCbx.currentText()]
         if lwHw != 0:
             self.connectBt.setEnabled(True)
@@ -338,7 +338,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_MODE, lnMode, 0)
             self.m_objPLinApi.GetHardwareParam(lwHw, PLinApi.TLIN_HARDWAREPARAM_BAUDRATE, lnCurrBaud, 0)
             # Update hardware mode comboBox
-            gv.lg.logger.debug(f'get lnMode = {lnMode.value}')
+            self.logger.debug(f'get lnMode = {lnMode.value}')
             # if lnMode.value == PLinApi.TLIN_HARDWAREMODE_MASTER.value:
             self.modeCbx.setCurrentIndex(0)
             # else:
@@ -375,7 +375,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             if error_code == PLinApi.TLIN_ERROR_OK:
                 error_code = self.m_objPLinApi.StartSchedule(self.m_hClient, self.m_hHw, iScheduleNumber)
                 if error_code == PLinApi.TLIN_ERROR_OK:
-                    gv.lg.logger.info("start schedule success...")
+                    self.logger.info("start schedule success...")
                     time.sleep(0.001)
                     return True
                 else:
@@ -387,7 +387,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                 self.displayError(error_code)
                 return False
         except Exception as ex:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False
 
     def runSchedule(self):
@@ -413,7 +413,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             if error_code == PLinApi.TLIN_ERROR_OK:
                 error_code = self.m_objPLinApi.StartSchedule(self.m_hClient, self.m_hHw, iScheduleNumber)
                 if error_code == PLinApi.TLIN_ERROR_OK:
-                    gv.lg.logger.info("start schedule success...")
+                    self.logger.info("start schedule success...")
                     time.sleep(0.001)
                     return True
                 else:
@@ -425,62 +425,20 @@ class PeakLin(QDialog, Ui_PeakLin):
                 self.displayError(error_code)
                 return False
         except Exception as ex:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False
 
     def SuspendDiagSchedule(self):
         error_code = self.m_objPLinApi.SuspendSchedule(self.m_hClient, self.m_hHw)
         self.m_objPLinApi.DeleteSchedule(self.m_hClient, self.m_hHw, 0)
         if error_code != PLinApi.TLIN_ERROR_OK:
-            gv.lg.logger.debug('SuspendSchedule fail...')
+            self.logger.debug('SuspendSchedule fail...')
             self.displayError(error_code)
             if error_code == PLinApi.TLIN_ERROR_ILLEGAL_CLIENT:
                 self.on_DoLinConnect()
             return False
         else:
             return True
-
-    # def SetFrameEntry(self, _id, nad, pci, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
-    #                   ChecksumType=PLinApi.TLIN_CHECKSUMTYPE_CLASSIC):
-    #     try:
-    #         time.sleep(gv.cf.BLF.ReqDelay / 1000)
-    #         frameData = nad + " " + pci + " " + data
-    #         tempData = frameData.split()
-    #         lFrameEntry = PLinApi.TLINFrameEntry()
-    #         lFrameEntry.Length = c_ubyte(8)
-    #         lFrameEntry.FrameId = c_ubyte(int(_id, 16))
-    #         lFrameEntry.ChecksumType = ChecksumType
-    #         lFrameEntry.Direction = direction
-    #         lFrameEntry.Flags = PLinApi.FRAME_FLAG_RESPONSE_ENABLE
-    #         lFrameEntry.InitialData = (c_ubyte * 8)()
-    #         for i in range(8):
-    #             try:
-    #                 lFrameEntry.InitialData[i] = c_ubyte(int(tempData[i].strip(), 16))
-    #             except IndexError:
-    #                 lFrameEntry.InitialData[i] = c_ubyte(int('FF', 16))
-    #             except Exception as ex:
-    #                 lg.logger.debug(ex)
-    #         linResult = self.m_objPLinApi.SetFrameEntry(self.m_hClient, self.m_hHw, lFrameEntry)
-    #         if linResult == PLinApi.TLIN_ERROR_OK:
-    #             linResult = self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
-    #                                                           c_ubyte(0),
-    #                                                           lFrameEntry.Length, lFrameEntry.InitialData)
-    #             if linResult == PLinApi.TLIN_ERROR_OK:
-    #                 if log:
-    #                     lg.logger.debug(
-    #                         f"TX  {_id},{bytes_to_string(lFrameEntry.InitialData)},{lFrameEntry.Direction},{lFrameEntry.ChecksumType}")
-    #                 return True
-    #             else:
-    #                 self.displayError(linResult)
-    #                 lg.logger.error(f"Failed to UpdateByteArray message:id:{_id},{lFrameEntry.InitialData}")
-    #                 return False
-    #         else:
-    #             self.displayError(linResult)
-    #             lg.logger.error(f"Failed to SetFrameEntry message:id:{_id},{lFrameEntry.InitialData}")
-    #             return False
-    #     except Exception as ex:
-    #         lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
-    #         return False
 
     def SingleFrame(self, _id, nad, pci, data, timeout=2.0):
         try:
@@ -490,7 +448,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             else:
                 return False, ""
         except Exception as ex:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False, ""
 
     def MultiFrame(self, _id, nad, pci, data, timeout=2):
@@ -519,7 +477,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             else:
                 return False, ""
         except Exception as ex:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False, ""
 
     def TransferData(self, _id, nad, file_data, bytesNumOfBlock, timeout=2.0):
@@ -531,7 +489,7 @@ class PeakLin(QDialog, Ui_PeakLin):
         lastBlockNum = _len % payloadOfBlock
         j = 1
         try:
-            gv.lg.logger.debug(f'Start TransferBlock,Total blockNum: {blockNum}')
+            self.logger.debug(f'Start TransferBlock,Total blockNum: {blockNum}')
             for i in range(blockNum + 1):
                 if j == 256:
                     j = 0
@@ -547,13 +505,13 @@ class PeakLin(QDialog, Ui_PeakLin):
                     pci = '1' + bytesNumOfBlock.replace(' ', '') + '36' + '{:02X}'.format(j)
                     pci = " ".join(re.findall(".{2}", pci))
                     blockData = ' '.join(tempData[i * payloadOfBlock:i * payloadOfBlock + payloadOfBlock])
-                gv.lg.logger.debug(f'TransferDataBlock:{i}')
+                self.logger.debug(f'TransferDataBlock:{i}')
                 if not self.TransferDataBlock(_id, nad, pci, blockData, timeout):
                     return False
                 j = j + 1
             return True
         except Exception as ex:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False
 
     def SFResp(self, _id, rsid, timeout):
@@ -565,19 +523,19 @@ class PeakLin(QDialog, Ui_PeakLin):
         while pRcvMsg.Data[2] != (int(rsid, 16)) or pRcvMsg.Data[1] > 15:
             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             if time.time() - start_time > timeout:
-                gv.lg.logger.error(f"timeout {timeout}s for respond,id")
+                self.logger.error(f"timeout {timeout}s for respond,id")
                 return False, ''
             if pRcvMsg.Type != PLinApi.TLIN_MSGTYPE_STANDARD.value:
                 continue
             if pRcvMsg.Data[2] == (int('7F', 16)) and pRcvMsg.Data[1] < 16:
-                gv.lg.logger.debug(
+                self.logger.debug(
                     f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
                 if pRcvMsg.Data[4] == (int("78", 16)):
                     continue
-                gv.lg.logger.error(f"Negative response!NRC={hex(pRcvMsg.Data[4])}")
+                self.logger.error(f"Negative response!NRC={hex(pRcvMsg.Data[4])}")
                 respData = bytes_to_string(pRcvMsg.Data)
                 return False, respData
-        gv.lg.logger.debug(
+        self.logger.debug(
             f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
         return True, bytes_to_string(pRcvMsg.Data)
 
@@ -589,7 +547,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             else:
                 return False, ""
         except Exception as ex:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False, ""
 
     def SFRespCF(self, _id, rsid, timeout):
@@ -602,18 +560,18 @@ class PeakLin(QDialog, Ui_PeakLin):
         while pRcvMsg.Data[1] < 16 or pRcvMsg.Data[1] > 31:
             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             if time.time() - start_time > timeout:
-                gv.lg.logger.error(f"timeout {timeout}s for respond,id")
+                self.logger.error(f"timeout {timeout}s for respond,id")
                 return False, ''
             if pRcvMsg.Type != PLinApi.TLIN_MSGTYPE_STANDARD.value:
                 continue
-        gv.lg.logger.debug(
+        self.logger.debug(
             f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
         # parse FirstFrame
         if pRcvMsg.Data[3] == (int(rsid, 16)):
             data_len = pRcvMsg.Data[2]
             datas = [pRcvMsg.Data[3], pRcvMsg.Data[4], pRcvMsg.Data[5], pRcvMsg.Data[6], pRcvMsg.Data[7]]
         else:
-            gv.lg.logger.error(
+            self.logger.error(
                 f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
             return False, ''
         # get Consecutive frames
@@ -621,7 +579,7 @@ class PeakLin(QDialog, Ui_PeakLin):
         for i in range(0, int(CFCounter)):
             time.sleep(self._interval / 1000)
             self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-            gv.lg.logger.debug(
+            self.logger.debug(
                 f"RX  {_id},{bytes_to_string(pRcvMsg.Data)},{pRcvMsg.Direction},{pRcvMsg.ChecksumType},{'{:02X}'.format(pRcvMsg.Checksum)}")
             for j in range(2, 8):
                 datas.append(pRcvMsg.Data[j])
@@ -640,7 +598,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             key4 = ((cal[0] & 0x0F) << 4) | ((cal[3] & 0x78) >> 3)
             key = '{:02X}'.format(key1) + " " + '{:02X}'.format(key2) + " " + '{:02X}'.format(
                 key3) + " " + '{:02X}'.format(key4)
-            gv.lg.logger.debug(f'get key: {key}')
+            self.logger.debug(f'get key: {key}')
             return key
         except Exception as ex:
             sys.exit(f'{currentframe().f_code.co_name}:{ex}')
@@ -670,12 +628,12 @@ class PeakLin(QDialog, Ui_PeakLin):
                 if self.SFResp(_id, '76', timeout)[0]:
                     return True
                 else:
-                    gv.lg.logger.error('Rx lost!!!')
+                    self.logger.error('Rx lost!!!')
                     return False
             else:
                 return False
         except Exception as ex:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False
 
     def plin_write(self, _id, data, timeout=None):
@@ -692,16 +650,16 @@ class PeakLin(QDialog, Ui_PeakLin):
             try:
                 pMsg.Data[i] = c_ubyte(int(data_bytes[i].strip(), 16))
             except Exception as ex:
-                gv.lg.logger.exception(ex)
+                self.logger.exception(ex)
         self.m_objPLinApi.CalculateChecksum(pMsg)
         # write LIN message
         linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
         if linResult == PLinApi.TLIN_ERROR_OK:
-            gv.lg.logger.debug(f"TX  {_id},{bytes_to_string(pMsg.Data)},{'{:02X}'.format(pMsg.Checksum)}")
+            self.logger.debug(f"TX  {_id},{bytes_to_string(pMsg.Data)},{'{:02X}'.format(pMsg.Checksum)}")
             return True, ''
         else:
             self.displayError(linResult)
-            gv.lg.logger.error("Failed to write message")
+            self.logger.error("Failed to write message")
             return False, ''
 
     def plin_Get_pMsg(self, _id, data):
@@ -717,7 +675,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             try:
                 pMsg.Data[i] = c_ubyte(int(data_bytes[i].strip(), 16))
             except Exception as ex:
-                gv.lg.logger.exception(ex)
+                self.logger.exception(ex)
         self.m_objPLinApi.CalculateChecksum(pMsg)
         return pMsg
 
@@ -728,11 +686,11 @@ class PeakLin(QDialog, Ui_PeakLin):
                 return
             # pRcvMsg = PLinApi.TLINRcvMsg()
             self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg32)
-            gv.lg.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
+            self.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
             # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             time.sleep(gv.cf.BLF.ReqDelay / 1000)
             self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg33)
-            gv.lg.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
+            self.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
             # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             time.sleep(120 / 1000)
             if once:
@@ -750,29 +708,29 @@ class PeakLin(QDialog, Ui_PeakLin):
                         msg = line[10:(le - 4)]  # Address and checksum are not part of message and they won't be send
                         s19data += msg.decode("utf-8")
         except FileNotFoundError:
-            gv.lg.logger.debug("File not found")
+            self.logger.debug("File not found")
             raise
         datas = " ".join(re.findall(".{2}", s19data))
-        gv.lg.logger.debug(datas)
+        self.logger.debug(datas)
         return datas
 
     @staticmethod
-    def get_crc_apps19(file_dir_path):
+    def get_crc_apps19(logger, file_dir_path):
         s19crc = ''
         try:
             for file in os.listdir(file_dir_path):
                 if 'crc' in file:
                     with open(os.path.join(file_dir_path, file), 'rb') as f:
-                        gv.lg.logger.debug(os.path.join(file_dir_path, file))
+                        logger.debug(os.path.join(file_dir_path, file))
                         for line in f:
                             le = len(line)
                             if le > 13:
                                 s19crc = line[10:18].decode("utf-8")
                                 s19crc = ' '.join(re.findall(".{2}", s19crc))
-                                gv.lg.logger.debug(f'get app s19 crc = {s19crc}')
+                                logger.debug(f'get app s19 crc = {s19crc}')
                                 break
         except FileNotFoundError:
-            gv.lg.logger.fatal("File not found")
+            logger.fatal("File not found")
             raise
         return s19crc
 
@@ -798,7 +756,7 @@ class PeakLin(QDialog, Ui_PeakLin):
             sys.exit()
 
     def displayNotification(self, text="** Invalid choice **", waitSeconds=0.0):
-        gv.lg.logger.warning(text)
+        self.logger.warning(text)
         time.sleep(waitSeconds)
 
     def ConsecutiveFrame(self, _id, nad, sn, data, log=True, direction=PLinApi.TLIN_DIRECTION_PUBLISHER,
@@ -825,7 +783,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                 except IndexError:
                     lFrameEntry.InitialData[i] = c_ubyte(int('FF', 16))
                 except Exception as ex:
-                    gv.lg.logger.debug(ex)
+                    self.logger.debug(ex)
             linResult = self.m_objPLinApi.SetFrameEntry(self.m_hClient, self.m_hHw, lFrameEntry)
             if linResult == PLinApi.TLIN_ERROR_OK:
                 # for i in range(11):
@@ -842,16 +800,16 @@ class PeakLin(QDialog, Ui_PeakLin):
                             and pRcvMsg.Data[2] == lFrameEntry.InitialData[2] \
                             and pRcvMsg.Data[3] == lFrameEntry.InitialData[3]:
                         if log:
-                            gv.lg.logger.debug(f"Tx  {_id},{bytes_to_string(pRcvMsg.Data)}")
+                            self.logger.debug(f"Tx  {_id},{bytes_to_string(pRcvMsg.Data)}")
                         return True
                     if readTxCount == gv.cf.BLF.readTxCount:
-                        gv.lg.logger.warning(f'readTxCount:{gv.cf.BLF.readTxCount}')
+                        self.logger.warning(f'readTxCount:{gv.cf.BLF.readTxCount}')
                         break
 
                     # lg.logger.warning(f"rTx  {_id},{bytes_to_string(lFrameEntry.InitialData)}")
                     # time.sleep(1 / 1000)
-            gv.lg.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(lFrameEntry.InitialData)}")
+            self.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(lFrameEntry.InitialData)}")
             return False
         except Exception as ex:
-            gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False

@@ -15,7 +15,6 @@ import model.product
 import model.step
 from .basicfunc import IsNullOrEmpty, create_csv_file, write_csv_file
 import conf.globalvar as gv
-# import conf.logprint as lg
 import ui.mainform
 
 
@@ -28,18 +27,10 @@ def fail_continue(test_step: model.step.Step, failContinue):
         return failContinue
 
 
-def daq_collect():
-    gv.lg.logger.debug(f"collect DAQ data to {gv.daq_data_path}")
-    create_csv_file(gv.daq_data_path, gv.ArrayListDaqHeader)
-    data_list = [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
-    data_list.extend(gv.ArrayListDaq)
-    write_csv_file(gv.daq_data_path, data_list)
-    gv.ArrayListDaq = []
-
-
 class TestSuite:
 
     def __init__(self, suiteName=None, test_serial=None, dict_=None):
+        self.logger = None
         self.SuiteName = suiteName
         self.index = test_serial
         self.isTest = True
@@ -64,11 +55,13 @@ class TestSuite:
         :param stepNo:
         :return:test result,pass or fail.
         """
+        if self.logger is None:
+            self.logger = test_case.logger
         if not self.isTest:
             self.setColor(Qt.gray)
             self.suiteResult = True
             return self.suiteResult
-        gv.lg.logger.debug(
+        self.logger.debug(
             '- ' * 8 + f"<a name='testSuite:{self.SuiteName}'>Start testSuite:{self.SuiteName}</a>" + '- ' * 9)
         self.setColor(Qt.yellow)
         suiteItem = model.product.SuiteItem()
@@ -99,7 +92,7 @@ class TestSuite:
             return self.suiteResult
         except Exception as e:
             self.setColor(Qt.darkRed)
-            gv.lg.logger.fatal(f"run testSuite {self.SuiteName} Exception！！{e},{traceback.format_exc()}")
+            self.logger.fatal(f"run testSuite {self.SuiteName} Exception！！{e},{traceback.format_exc()}")
             self.suiteResult = False
             return self.suiteResult
         finally:
@@ -126,9 +119,9 @@ class TestSuite:
         self.elapsedTime = datetime.strptime(self.finish_time, '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(
             self.start_time, '%Y-%m-%d %H:%M:%S.%f')
         if self.suiteResult:
-            gv.lg.logger.info(f"{self.SuiteName} Test Pass!,ElapsedTime:{self.elapsedTime.seconds}")
+            self.logger.info(f"{self.SuiteName} Test Pass!,ElapsedTime:{self.elapsedTime.seconds}")
         else:
-            gv.lg.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
+            self.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
 
     def process_for(self, test_case, step_item: model.step.Step):
         """FOR 循环开始判断"""
@@ -137,23 +130,31 @@ class TestSuite:
             test_case.ForStartSuiteNo = self.index
             gv.ForStartStepNo = step_item.index
             test_case.ForFlag = False
-            gv.lg.logger.debug(f"====================Start Cycle-{gv.ForCycleCounter}===========================")
+            self.logger.debug(f"====================Start Cycle-{gv.ForCycleCounter}===========================")
 
     def process_EndFor(self, test_case, step_item: model.step.Step):
         """FOR 循环结束判断"""
         if not IsNullOrEmpty(step_item.For) and step_item.For.lower().startswith('end'):
-            daq_collect()
+            self.daq_collect()
             if gv.ForCycleCounter < gv.ForTotalCycle:
                 test_case.ForFlag = True
                 gv.ForCycleCounter += 1
                 return True
 
             test_case.ForFlag = False
-            gv.lg.logger.debug('=' * 10 + f"Have Complete all({gv.ForCycleCounter}) Cycle test." + '=' * 10)
+            self.logger.debug('=' * 10 + f"Have Complete all({gv.ForCycleCounter}) Cycle test." + '=' * 10)
             gv.ForCycleCounter = 1
             return False
         else:
             return False
+
+    def daq_collect(self):
+        self.logger.debug(f"collect DAQ data to {gv.daq_data_path}")
+        create_csv_file(self.logger, gv.daq_data_path, gv.ArrayListDaqHeader)
+        data_list = [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+        data_list.extend(gv.ArrayListDaq)
+        write_csv_file(self.logger, gv.daq_data_path, data_list)
+        gv.ArrayListDaq = []
 
     def copy_to_json_obj(self, obj: model.product.SuiteItem):
         obj.phase_name = self.SuiteName

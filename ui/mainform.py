@@ -17,7 +17,6 @@ from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
-# import conf.logprint as lg
 from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, save_config, run_cmd
 import sockets.serialport
@@ -62,18 +61,6 @@ class MySignals(QObject):
     showMessageBox = pyqtSignal([str, str, int])
 
 
-def init_create_dirs():
-    try:
-        if not IsNullOrEmpty(gv.cf.station.setTimeZone):
-            os.system(f"tzutil /s \"{gv.cf.station.setTimeZone}\"")
-        os.makedirs(gv.logFolderPath + r"\Json", exist_ok=True)
-        os.makedirs(gv.OutPutPath, exist_ok=True)
-        os.makedirs(gv.DataPath, exist_ok=True)
-        os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
-    except Exception as e:
-        gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
-
-
 def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
     def thread_update():
         label.setText(str_)
@@ -113,32 +100,10 @@ def on_actionLogFolder():
     thread.start()
 
 
-def on_actionOpenLog():
-    def thread_update():
-        if os.path.exists(gv.txtLogPath):
-            os.startfile(gv.txtLogPath)
-        else:
-            gv.lg.logger.warning(f"no find test log")
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
-def on_actionCSVLog():
-    def thread_update():
-        if os.path.exists(gv.CSVFilePath):
-            os.startfile(gv.CSVFilePath)
-        else:
-            gv.lg.logger.warning(f"no find test log")
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
 def on_actionException():
     def thread_update():
-        if os.path.exists(gv.lg.critical_log):
-            os.startfile(gv.lg.critical_log)
+        if os.path.exists(gv.critical_log):
+            os.startfile(gv.critical_log)
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()
@@ -167,6 +132,7 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.logger = gv.lg.logger
         self.fileHandle = None
         self.SaveScriptDisableFlag = False
         self.SingleStepTest = False
@@ -182,11 +148,11 @@ class MainForm(QWidget):
         self.timer = None
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
-        init_create_dirs()
+        self.init_create_dirs()
         # MainForm.main_form = self  # 单例模式
         self.sec = 1
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
-                                                                         f'{gv.cf.station.station_name}')
+                                                                         f'{gv.cf.station.station_name}', self.logger)
         self.testSequences = self.testcase.clone_suites
         self.init_select_station()
         self.init_textEditHandler()
@@ -200,6 +166,17 @@ class MainForm(QWidget):
         self.ShowTreeView(self.testSequences)
         self.testThread = TestThread(self)
         self.testThread.start()
+
+    def init_create_dirs(self):
+        try:
+            if not IsNullOrEmpty(gv.cf.station.setTimeZone):
+                os.system(f"tzutil /s \"{gv.cf.station.setTimeZone}\"")
+            os.makedirs(gv.logFolderPath + r"\Json", exist_ok=True)
+            os.makedirs(gv.OutPutPath, exist_ok=True)
+            os.makedirs(gv.DataPath, exist_ok=True)
+            os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
+        except Exception as e:
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
 
     def init_select_station(self):
         for item in gv.cf.station.station_all:
@@ -381,11 +358,11 @@ class MainForm(QWidget):
         self.ui.actionPrivileges.triggered.connect(self.on_actionPrivileges)
         self.ui.actionStart.triggered.connect(self.on_actionStart)
         self.ui.actionStop.triggered.connect(self.on_actionStop)
-        self.ui.actionOpenLog.triggered.connect(on_actionOpenLog)
+        self.ui.actionOpenLog.triggered.connect(self.on_actionOpenLog)
         self.ui.actionClearLog.triggered.connect(self.on_actionClearLog)
         self.ui.actionLogFolder.triggered.connect(on_actionLogFolder)
         self.ui.actionSaveLog.triggered.connect(self.on_actionSaveLog)
-        self.ui.actionCSVLog.triggered.connect(on_actionCSVLog)
+        self.ui.actionCSVLog.triggered.connect(self.on_actionCSVLog)
         self.ui.actionException.triggered.connect(on_actionException)
         self.ui.actionEnable_lab.triggered.connect(self.on_actionEnable_lab)
         self.ui.actionDisable_factory.triggered.connect(self.on_actionDisable_factory)
@@ -466,14 +443,14 @@ class MainForm(QWidget):
         if gv.startFlag:
             QMessageBox.information(self, 'Infor', 'Test is running, can not reload!', QMessageBox.Yes)
             return
-        gv.lg.logger.debug('start reload script,please wait a moment...')
+        self.logger.debug('start reload script,please wait a moment...')
         QApplication.processEvents()
 
         def thread_convert_and_load_script():
             if os.path.exists(gv.test_script_json):
                 os.chmod(gv.test_script_json, stat.S_IWRITE)
                 os.remove(gv.test_script_json)
-            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name)
+            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger)
             self.testSequences = self.testcase.clone_suites
 
         thread = Thread(target=thread_convert_and_load_script, daemon=True)
@@ -481,7 +458,7 @@ class MainForm(QWidget):
         thread.join()
         if self.testSequences is not None:
             self.ShowTreeView(self.testSequences)
-        gv.lg.logger.debug('reload finish!')
+        self.logger.debug('reload finish!')
         self.SaveScriptDisableFlag = False
 
     def on_itemChanged(self, item, column=0):
@@ -565,7 +542,7 @@ class MainForm(QWidget):
             return
         thread = Thread(
             target=model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
-                                                              gv.cf.station.station_all), daemon=True)
+                                                              gv.cf.station.station_all, self.logger), daemon=True)
         thread.start()
 
     def on_actionOpenScript(self):
@@ -591,7 +568,7 @@ class MainForm(QWidget):
                 self.testcase.original_suites = model.loadseq.load_testcase_from_json(gv.test_script_json)
                 self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
                 self.testSequences = self.testcase.clone_suites
-                gv.lg.logger.debug(f'select {gv.test_script_json} finish!')
+                self.logger.debug(f'select {gv.test_script_json} finish!')
 
         thread = Thread(target=select_station, daemon=True)
         thread.start()
@@ -604,7 +581,7 @@ class MainForm(QWidget):
             QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
         else:
             thread = Thread(target=model.loadseq.serialize_to_json,
-                            args=(self.testcase.clone_suites, gv.test_script_json), daemon=True)
+                            args=(self.testcase.clone_suites, gv.test_script_json, self.logger), daemon=True)
             thread.start()
 
     def on_actionConfig(self):
@@ -615,12 +592,12 @@ class MainForm(QWidget):
                                        "The configuration has been changed.Do you want to save it permanently?",
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if ask == QMessageBox.Yes:
-                save_config(gv.config_yaml_path, gv.cf)
+                save_config(self.logger, gv.config_yaml_path, gv.cf)
         settings_wind.destroy()
 
     def on_peak_lin(self):
         if gv.PLin is None:
-            gv.PLin = PeakLin(self)
+            gv.PLin = PeakLin(self.logger, self)
             gv.PLin.exec_()
         else:
             gv.PLin.show()
@@ -653,7 +630,7 @@ class MainForm(QWidget):
                 else:
                     self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.FAIL)
                 gv.IsCycle = False
-                saveTestResult()
+                saveTestResult(self.logger)
         else:
             self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.ABORT)
 
@@ -661,11 +638,33 @@ class MainForm(QWidget):
         if not gv.startFlag:
             self.ui.textEdit.clear()
 
+    def on_actionOpenLog(self):
+        def thread_update():
+            if os.path.exists(gv.txtLogPath):
+                os.startfile(gv.txtLogPath)
+            else:
+                self.logger.warning(f"no find test log")
+
+        thread = Thread(target=thread_update, daemon=True)
+        thread.start()
+
+    def on_actionCSVLog(self):
+        def thread_update():
+            if os.path.exists(gv.CSVFilePath):
+                os.startfile(gv.CSVFilePath)
+            else:
+                self.logger.warning(f"no find test log")
+
+        thread = Thread(target=thread_update, daemon=True)
+        thread.start()
+
     def on_actionSaveLog(self, info):
         def thread_update():
             if info == 'rename':
-                rename_log = gv.txtLogPath.replace('logging', str(gv.finalTestResult).upper()).replace('details',gv.error_details_first_fail)
-                gv.lg.logger.debug(f"rename test log to: {gv.txtLogPath}")
+                rename_log = gv.txtLogPath.replace('logging',
+                                                   str(gv.finalTestResult).upper()).replace('details',
+                                                                                            gv.error_details_first_fail)
+                self.logger.debug(f"rename test log to: {rename_log}")
                 self.fileHandle.close()
                 os.rename(gv.txtLogPath, rename_log)
             else:
@@ -674,7 +673,7 @@ class MainForm(QWidget):
                 content = self.ui.textEdit.toPlainText()
                 with open(gv.txtLogPath, 'wb') as f:
                     f.write(content.encode('utf8'))
-                gv.lg.logger.debug(f"Save test log OK.{gv.txtLogPath}")
+                self.logger.debug(f"Save test log OK.{gv.txtLogPath}")
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
@@ -694,7 +693,8 @@ class MainForm(QWidget):
 
     def on_actionRestart(self):
         def thread_update():
-            run_cmd(rf'{gv.current_dir}\tool\restart.exe -n AutoPlasticOmnium.exe -p AutoPlasticOmnium.exe')
+            run_cmd(self.logger,
+                    rf'{gv.current_dir}\tool\restart.exe -n AutoPlasticOmnium.exe -p AutoPlasticOmnium.exe')
 
         thread = Thread(target=thread_update)
         ask = QMessageBox.question(self, "Restart Application?",
@@ -850,12 +850,12 @@ class MainForm(QWidget):
         thread.start()
 
     def on_textEditClear(self, info):
-        gv.lg.logger.debug(f'{currentframe().f_code.co_name}:{info}')
+        self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
         self.ui.textEdit.clear()
 
     def updateStatusBar(self, info):
         def update_status_bar():
-            gv.lg.logger.debug(f'{currentframe().f_code.co_name}:{info}')
+            self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
             with model.sqlite.Sqlite(gv.database_setting) as db:
                 db.execute(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
                 db.execute(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
@@ -882,10 +882,10 @@ class MainForm(QWidget):
 
     def timing(self, flag):
         if flag:
-            gv.lg.logger.debug('start timing...')
+            self.logger.debug('start timing...')
             self.timer = self.startTimer(1000)
         else:
-            gv.lg.logger.debug('stop timing...')
+            self.logger.debug('stop timing...')
             self.killTimer(self.timer)
 
     def get_stationNo(self):
@@ -899,7 +899,7 @@ class MainForm(QWidget):
             if rReturn:
                 gv.cf.station.station_no = revStr.replace('\r\n', '').strip()
                 gv.cf.station.station_name = gv.cf.station.station_no[0, gv.cf.station.station_no.index('-')]
-                gv.lg.logger.debug(f"Read fix number success,stationName:{gv.cf.station.station_name}")
+                self.logger.debug(f"Read fix number success,stationName:{gv.cf.station.station_name}")
                 break
         else:
             QMessageBox.Critical(self, 'Read StationNO', "Read FixNum error,Please check it!")
@@ -933,7 +933,7 @@ class MainForm(QWidget):
         with model.sqlite.Sqlite(gv.database_setting) as db:
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
-            gv.lg.logger.debug(str(self.continue_fail_count))
+            self.logger.debug(str(self.continue_fail_count))
         if self.continue_fail_count >= gv.cf.station.continue_fail_limit:
             self.ui.lb_continuous_fail.setStyleSheet(f"background-color:red;")
             if gv.IsDebug:
@@ -1011,7 +1011,7 @@ class MainForm(QWidget):
         gv.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
         gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
         gv.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
-        init_create_dirs()
+        self.init_create_dirs()
         gv.csv_list_header = []
         gv.csv_list_data = []
         gv.daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
@@ -1032,8 +1032,9 @@ class MainForm(QWidget):
         self.ui.lb_testTime.setHidden(True)
         self.sec = 1
         gv.txtLogPath = rf'{gv.logFolderPath}\logging_{SN}_details_{time.strftime("%H-%M-%S")}.txt'
-        # gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{SN}_{time.strftime("%H-%M-%S")}.txt'
         gv.lg = LogPrint(gv.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
+        self.logger = gv.lg.logger
+        self.testcase.logger = self.logger
         self.init_textEditHandler()
         self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.START)
         self.ui.tabWidget.setCurrentWidget(self.ui.result)
@@ -1060,9 +1061,9 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                                                                  QIcon(':/images/Pause-icon.png'))
             myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, True)
             gv.startFlag = True
-            gv.lg.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
-                               f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
-                               f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
+            myWind.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
+                                f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
+                                f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
             myWind.my_signals.update_tableWidget[str].emit('clear')
             gv.pause_event.set()
         elif status == TestStatus.FAIL:
@@ -1076,7 +1077,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                                                                          gv.error_details_first_fail, 20, Qt.red)
             myWind.UpdateContinueFail(False)
             if gv.setIpFlag:
-                gv.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
+                gv.dut_comm.send_command(f"ip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
         elif status == TestStatus.PASS:
             myWind.total_pass_count += 1
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'PASS', 36,
@@ -1097,9 +1098,9 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
                                                                          gv.error_details_first_fail, 20,
                                                                          Qt.gray)
-            saveTestResult()
+            saveTestResult(myWind.logger, )
     except Exception as e:
-        gv.lg.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
+        myWind.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
     finally:
         try:
             myWind.SaveScriptDisableFlag = True
@@ -1108,7 +1109,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                                                                      QIcon(':/images/Start-icon.png'))
                 myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, False)
                 myWind.my_signals.timingSignal[bool].emit(False)
-                gv.lg.logger.debug(f"Test end,ElapsedTime:{myWind.sec}s.")
+                myWind.logger.debug(f"Test end,ElapsedTime:{myWind.sec}s.")
                 gv.startFlag = False
                 myWind.my_signals.lineEditEnableSignal[bool].emit(True)
                 myWind.my_signals.updateStatusBarSignal[str].emit('')
@@ -1119,7 +1120,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
                                                                                  Qt.red)
                 myWind.main_form.ui.treeWidget.blockSignals(False)
         except Exception as e:
-            gv.lg.logger.fatal(f"SetTestStatus Exception！！{e}")
+            myWind.logger.fatal(f"SetTestStatus Exception！！{e}")
         # finally:
         #     try:
         #         if status != TestStatus.START:
@@ -1153,13 +1154,14 @@ class TestThread(QThread):
                             else:
                                 self.myWind.FailNumOfCycleTest += 1
                             if self.myWind.PassNumOfCycleTest + self.myWind.FailNumOfCycleTest == gv.cf.station.loop_count:
-                                gv.lg.logger.debug(f"***** All loop({gv.cf.station.loop_count}) have completed! *****")
+                                self.myWind.logger.debug(
+                                    f"***** All loop({gv.cf.station.loop_count}) have completed! *****")
                                 self.myWind.my_signals.threadStopSignal[str].emit('stop test.')
                                 time.sleep(0.5)
                             else:
                                 time.sleep(gv.cf.station.loop_interval)
                     elif self.myWind.SingleStepTest:
-                        gv.lg.logger.debug(f'Suite:{self.myWind.SuiteNo},Step:{self.myWind.StepNo}')
+                        self.myWind.logger.debug(f'Suite:{self.myWind.SuiteNo},Step:{self.myWind.StepNo}')
                         result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[
                             self.myWind.StepNo].run(
                             self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
@@ -1169,18 +1171,18 @@ class TestThread(QThread):
                         time.sleep(0.5)
                     else:
                         result = self.myWind.testcase.run(gv.cf.station.fail_continue)
-                        result1 = upload_Json_to_client(gv.cf.station.rs_url, gv.txtLogPath)
-                        result2 = upload_result_to_mes(gv.mes_result)
+                        result1 = upload_Json_to_client(self.myWind.logger, gv.cf.station.rs_url, gv.txtLogPath)
+                        result2 = upload_result_to_mes(self.myWind.logger, gv.mes_result)
                         gv.finalTestResult = result & result1 & result2
-                        collect_data_to_csv()
-                        saveTestResult()
+                        collect_data_to_csv(self.myWind.logger)
+                        saveTestResult(self.myWind.logger)
                         self.signal[MainForm, TestStatus].emit(self.myWind,
                                                                TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
                 else:
                     continue
         except Exception as e:
-            gv.lg.logger.fatal(f"TestThread() Exception:{e},{traceback.format_exc()}")
+            self.myWind.logger.fatal(f"TestThread() Exception:{e},{traceback.format_exc()}")
             self.signal[MainForm, TestStatus].emit(self.myWind, TestStatus.ABORT)
         finally:
             pass

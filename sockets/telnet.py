@@ -11,23 +11,23 @@ import time
 import traceback
 from telnetlib import Telnet
 from sockets.communication import CommAbstract, IsNullOrEmpty
-# import conf.logprint as lg
-import conf.globalvar as gv
+
 
 class TelnetComm(CommAbstract):
-    def __init__(self, host, prompt, port=23):
+    def __init__(self, logger, host, prompt, port=23):
+        self.logger = logger
         self.prompt = prompt
         self.tel = Telnet(host, port, timeout=2, )
         self.tel.debuglevel = 1000
         login_prompt = self.tel.read_until(prompt.encode('utf8'), 2).decode('utf8')
-        gv.lg.logger.debug(login_prompt)
+        self.logger.debug(login_prompt)
 
     def open(self, *args):
         self.tel.open(self.tel.host, self.tel.port)
 
     def close(self):
         self.tel.close()
-        gv.lg.logger.debug(f"{self.tel.port} serialPort close success!!")
+        self.logger.debug(f"{self.tel.port} serialPort close success!!")
 
     def read(self):
         self.tel.read_all()
@@ -47,31 +47,32 @@ class TelnetComm(CommAbstract):
                 command += "\n"
             else:
                 pass
-            gv.lg.logger.debug(f"telnet_SendComd-->{command}")
+            self.logger.debug(f"telnet_SendComd-->{command}")
             self.write(command)
             strRecAll = self.tel.read_until(exceptStr.encode('utf-8'), timeout).decode('utf-8')
-            gv.lg.logger.debug(strRecAll)
+            self.logger.debug(strRecAll)
             if re.search(exceptStr, strRecAll):
-                gv.lg.logger.info(f'send: {command} wait: {exceptStr} success in {round(time.time() - start_time, 3)}s')
+                self.logger.info(f'send: {command} wait: {exceptStr} success in {round(time.time() - start_time, 3)}s')
                 result = True
             else:
-                gv.lg.logger.error(f'send: {command} wait: {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
+                self.logger.error(
+                    f'send: {command} wait: {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
                 result = False
             return result, strRecAll
         except Exception as e:
-            gv.lg.logger.fatal(f'{e}, {traceback.format_exc()}')
+            self.logger.fatal(f'{e}, {traceback.format_exc()}')
             return False, strRecAll
         finally:
             if not self.prompt == exceptStr:
                 strRec = self.tel.read_until(self.prompt.encode('utf-8'), timeout).decode('utf-8')
-                gv.lg.logger.debug(strRec)
+                self.logger.debug(strRec)
 
 
 if __name__ == "__main__":
-    tl = TelnetComm('192.168.1.101', "root@OpenWrt:/#")
-    if tl.SendCommand("dmesg | grep 'mmcblk0' | head -1 | awk '{print $5}'", 10):
+    tl = TelnetComm(None, '192.168.1.101', "root@OpenWrt:/#")
+    if tl.SendCommand("dmesg | grep 'mmcblk0' | head -1 | awk '{print $5}'", None, 10):
         if tl.SendCommand('\n'):
-            if tl.SendCommand('luxxxx_tool --get-serial-env', 10, '1N'):
+            if tl.SendCommand('luxxxx_tool --get-serial-env', None, 10, '1N'):
                 if tl.SendCommand('luxxxxx_tool --get-mac-env'):
                     if tl.SendCommand("dmesg | grep 'mmcblk0' | head -1 | awk '{print $5}'"):
                         pass

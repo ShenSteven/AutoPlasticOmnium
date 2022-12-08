@@ -9,11 +9,10 @@
 import os
 import sqlite3
 import conf.globalvar as gv
-# import conf.logprint as lg
 from inspect import currentframe
 
 
-def init_database(database_name):
+def init_database(logger, database_name):
     """init conf/setting.db, OutPut/result.db"""
     try:
         if not os.path.exists(database_name):
@@ -54,7 +53,7 @@ def init_database(database_name):
                                              );''')
                 print(f"Table created successfully")
     except Exception as e:
-        gv.lg.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+        logger.fatal(f'{currentframe().f_code.co_name}:{e}')
 
 
 class Sqlite(object):

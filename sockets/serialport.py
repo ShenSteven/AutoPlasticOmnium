@@ -13,12 +13,11 @@ import traceback
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 from model.basicfunc import IsNullOrEmpty
 from sockets.communication import CommAbstract
-# import conf.logprint as lg
-import conf.globalvar as gv
+
 
 class SerialPort(CommAbstract):
-
-    def __init__(self, port, baudRate=115200, write_timeout=1, timeout=0.5):
+    def __init__(self, logger, port, baudRate=115200, write_timeout=1, timeout=0.5):
+        self.logger = logger
         self.ser = Serial(port, baudrate=baudRate, write_timeout=write_timeout, timeout=timeout, bytesize=EIGHTBITS,
                           stopbits=STOPBITS_ONE, parity=PARITY_NONE)
 
@@ -27,15 +26,15 @@ class SerialPort(CommAbstract):
             if self.ser.isOpen():
                 self.close()
             self.ser.open()
-            gv.lg.logger.info(f'{self.ser.port} serialPort.Open()!!')
+            self.logger.info(f'{self.ser.port} serialPort.Open()!!')
             return True
         except Exception as e:
-            gv.lg.logger.fatal(f'{e}, {traceback.format_exc()}')
+            self.logger.fatal(f'{e}, {traceback.format_exc()}')
             return False
 
     def close(self):
         self.ser.close()
-        gv.lg.logger.debug(f"{self.ser.port} serialPort close {'success' if not self.ser.is_open else 'fail'} !!")
+        self.logger.debug(f"{self.ser.port} serialPort close {'success' if not self.ser.is_open else 'fail'} !!")
 
     def read(self):
         self.ser.read()
@@ -53,7 +52,7 @@ class SerialPort(CommAbstract):
             else:
                 pass
             time.sleep(0.01)
-            gv.lg.logger.debug(f"{self.ser.port}_SendComd-->{command}")
+            self.logger.debug(f"{self.ser.port}_SendComd-->{command}")
             self.ser.reset_output_buffer()
             self.ser.reset_input_buffer()
             if command is not None:
@@ -63,18 +62,18 @@ class SerialPort(CommAbstract):
                 exceptStr = ''
                 time.sleep(timeout * 0.8)
             strRecAll = self.ser.read_until(exceptStr.encode('utf-8')).decode('utf-8')
-            gv.lg.logger.debug(strRecAll)
+            self.logger.debug(strRecAll)
             if IsNullOrEmpty(exceptStr):
                 return True, strRecAll
             if re.search(exceptStr, strRecAll):
-                gv.lg.logger.info(f'wait until {exceptStr} success in {round(time.time() - start_time, 3)}s')
+                self.logger.info(f'wait until {exceptStr} success in {round(time.time() - start_time, 3)}s')
                 result = True
             else:
-                gv.lg.logger.error(f'wait until {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
+                self.logger.error(f'wait until {exceptStr} timeout in {round(time.time() - start_time, 3)}s')
                 result = False
             return result, strRecAll
         except Exception as e:
-            gv.lg.logger.fatal(f'{e}, {traceback.format_exc()}')
+            self.logger.fatal(f'{e}, {traceback.format_exc()}')
             return False, strRecAll
 
 

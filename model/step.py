@@ -17,7 +17,6 @@ import model.sqlite
 import model.keyword
 from .basicfunc import IsNullOrEmpty
 import conf.globalvar as gv
-# import conf.logprint as lg
 import ui.mainform
 
 
@@ -67,6 +66,7 @@ class Step:
     """
 
     def __init__(self, dict_=None):
+        self.logger = None
         self.breakpoint: bool = False
         self.suiteIndex: int = 0
         self.index: int = 0
@@ -132,13 +132,6 @@ class Step:
     def isTest(self, value):
         self._isTest = value
 
-    # @property
-    # def retry(self):
-    #     # if IsNullOrEmpty(self.Retry):
-    #     #     return 0
-    #     # else:
-    #     return int(self.Retry)
-
     @property
     def command(self):
         return Step.parse_var(self.CmdOrParam)
@@ -191,6 +184,8 @@ class Step:
 
     def run(self, testSuite, suiteItem: model.product.SuiteItem = None):
         """run test step"""
+        if self.logger is None:
+            self.logger = testSuite.logger
         self.SuiteName = testSuite.SuiteName
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
@@ -204,9 +199,9 @@ class Step:
         try:
             if self.isTest:
                 self.setColor(Qt.yellow)
-                gv.lg.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
-                                f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
-                                f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
+                self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
+                                  f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
+                                  f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
                 self.init_online_limit()
             else:
                 if not gv.IsCycle:
@@ -238,7 +233,7 @@ class Step:
             self.generate_report(test_result, suiteItem)
             self.process_mesVer()
         except Exception as e:
-            gv.lg.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
+            self.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
             self.setColor(Qt.darkRed)
             self.status = False
             return False
@@ -248,9 +243,9 @@ class Step:
             if not IsNullOrEmpty(self.SetGlobalVar):
                 if bool(self.status):
                     setattr(gv.TestVariables, self.SetGlobalVar, self.testValue)
-                    gv.lg.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
+                    self.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
                 else:
-                    gv.lg.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
+                    self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_result)
             self.clear()
 
@@ -258,7 +253,7 @@ class Step:
         """ record test date to DB."""
         if self.isTest and self.Json.lower() == 'y':
             with model.sqlite.Sqlite(gv.database_result) as db:
-                gv.lg.logger.debug('INSERT test result to result.db table RESULT.')
+                self.logger.debug('INSERT test result to result.db table RESULT.')
                 db.execute(
                     f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
                     f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
@@ -305,7 +300,7 @@ class Step:
             gv.IfCond = test_result
             if not test_result:
                 self.setColor('#FF99CC')
-                gv.lg.logger.warning(f"if statement fail needs to continue, setting the test result to true")
+                self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
                 test_result = True
         elif self.IfElse.lower() == 'else':
             pass
@@ -326,11 +321,11 @@ class Step:
     def _process_ByPF(self, step_result: bool):
         if (self.ByPF.upper() == 'P') and not step_result:
             self.setColor(Qt.darkGreen)
-            gv.lg.logger.warning(f"Let this step:{self.StepName} bypass.")
+            self.logger.warning(f"Let this step:{self.StepName} bypass.")
             return True
         elif (self.ByPF.upper() == 'F') and step_result:
             self.setColor(Qt.darkRed)
-            gv.lg.logger.warning(f"Let this step:{self.StepName} by fail.")
+            self.logger.warning(f"Let this step:{self.StepName} by fail.")
             return False
         else:
             return step_result
@@ -358,9 +353,9 @@ class Step:
                       f"Symptom:{self.error_code}:{self.error_details}," \
                       f"spec:{self.spec},Min:{self.LSL},Value:{self.testValue},Max:{self.USL}"
         if tResult:
-            gv.lg.logger.info(result_info)
+            self.logger.info(result_info)
         else:
-            gv.lg.logger.error(result_info)
+            self.logger.error(result_info)
         if self.Json.lower() == 'y':
             ts = datetime.now() - self.start_time
             self.elapsedTime = ts.seconds + ts.microseconds / 1000000
@@ -407,7 +402,7 @@ class Step:
             for item in gv.stationObj.tests:
                 if item.test_name == obj.test_name:
                     gv.stationObj.tests.remove(item)
-                    gv.lg.logger.debug(f"update testName:{obj.test_name} in json report.")
+                    self.logger.debug(f"update testName:{obj.test_name} in json report.")
                     break
             gv.stationObj.tests.append(obj)
         # update suiteItem.phase_items json item
@@ -415,7 +410,7 @@ class Step:
             for item in suiteItem.phase_items:
                 if item.test_name == obj.test_name:
                     suiteItem.phase_items.remove(item)
-                    gv.lg.logger.debug(f"update testName:{obj.test_name} in json report.")
+                    self.logger.debug(f"update testName:{obj.test_name} in json report.")
                     break
             suiteItem.phase_items.append(obj)
 
@@ -433,14 +428,14 @@ class Step:
     def process_teardown(self, test_result):
         if IsNullOrEmpty(self.TearDown) or test_result:
             return
-        gv.lg.logger.debug(f'run teardown command...')
+        self.logger.debug(f'run teardown command...')
         try:
             if self.TearDown == 'ECUReset':
                 gv.PLin.SingleFrame(self.ID, self._NAD, '02', '11 01', self.Timeout)
             else:
-                gv.lg.logger.warning(f'this teardown({self.TearDown}) no cation.')
+                self.logger.warning(f'this teardown({self.TearDown}) no cation.')
         except Exception as e:
-            gv.lg.logger.fatal(f"process_teardown:{e}")
+            self.logger.fatal(f"process_teardown:{e}")
 
     def init_online_limit(self):
         pass
