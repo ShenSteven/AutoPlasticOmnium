@@ -147,6 +147,6 @@ def create_sub_log_folder():
 
 create_sub_log_folder()
 # logger_path = os.path.join(logFolderPath, f"logging_{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
-lg = LogPrint(None, critical_log, errors_log)
+lg = LogPrint('debug', critical_log, errors_log)
 if __name__ == '__main__':
     pass
