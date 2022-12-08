@@ -624,13 +624,13 @@ class MainForm(QWidget):
     def on_actionStop(self):
         if gv.IsCycle:
             if gv.startFlag:
+                saveTestResult(self.logger)
                 if self.FailNumOfCycleTest == 0:
                     gv.finalTestResult = True
                     self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.PASS)
                 else:
                     self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.FAIL)
                 gv.IsCycle = False
-                saveTestResult(self.logger)
         else:
             self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.ABORT)
 
@@ -1098,7 +1098,7 @@ def SetTestStatus(myWind: MainForm, status: TestStatus):
             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
                                                                          gv.error_details_first_fail, 20,
                                                                          Qt.gray)
-            saveTestResult(myWind.logger, )
+            saveTestResult(myWind.logger)
     except Exception as e:
         myWind.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
     finally:

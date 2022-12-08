@@ -103,7 +103,7 @@ def collect_data_to_csv(logger):
     thread.join()
 
 
-def saveTestResult(logger):
+def saveTestResult(logger=None):
     def thread_update():
         reportPath = fr'{gv.OutPutPath}\result.csv'
         create_csv_file(logger, reportPath, gv.tableWidgetHeader)
@@ -120,7 +120,8 @@ def saveTestResult(logger):
             with open(reportPath, 'a', newline='') as stream:
                 writer = csv.writer(stream)
                 writer.writerows(all_rows)
-        logger.debug(f'saveTestResult to:{reportPath}')
+        if logger is not None:
+            logger.debug(f'saveTestResult to:{reportPath}')
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()
