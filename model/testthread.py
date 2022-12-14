@@ -1,28 +1,27 @@
-#!/usr/bin/env python
-# coding: utf-8
-"""
-@File   : testthread.py
-@Author : Steven.Shen
-@Date   : 12/8/2022
-@Desc   : 
-"""
+# #!/usr/bin/env python
+# # coding: utf-8
+# """
+# @File   : testthread.py
+# @Author : Steven.Shen
+# @Date   : 12/8/2022
+# @Desc   :
+# """
 import time
 import traceback
-
-from PyQt5.QtCore import QThread, pyqtSignal
 import conf.globalvar as gv
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import QThread, pyqtSignal
+from model.teststatus import TestStatus, SetTestStatus
 from model.reporting import upload_Json_to_client, upload_result_to_mes, collect_data_to_csv, saveTestResult
-from model.teststatus import SetTestStatus, TestStatus
-from ui.mainform import MainForm
 
 
 class TestThread(QThread):
-    signal = pyqtSignal(MainForm, TestStatus)
+    signal = pyqtSignal(QWidget, TestStatus)
 
-    def __init__(self, myWind: MainForm):
+    def __init__(self, myWind: QWidget):
         super(TestThread, self).__init__()
         self.myWind = myWind
-        self.signal[MainForm, TestStatus].connect(SetTestStatus)
+        self.signal[QWidget, TestStatus].connect(SetTestStatus)
 
     def __del__(self):
         self.wait()
@@ -53,24 +52,24 @@ class TestThread(QThread):
                             self.myWind.StepNo].run(
                             self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
                         gv.finalTestResult = result
-                        self.signal[MainForm, TestStatus].emit(self.myWind,
-                                                               TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
+                        self.signal[QWidget, TestStatus].emit(self.myWind,
+                                                              TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
                     else:
                         result = self.myWind.testcase.run(gv.cf.station.fail_continue)
-                        result1 = upload_Json_to_client(self.myWind.logger, gv.cf.station.rs_url, gv.txtLogPath)
-                        result2 = upload_result_to_mes(self.myWind.logger, gv.mes_result)
+                        result1 = upload_Json_to_client(self.myWind.logger, self.myWind.rs_url, self.myWind.txtLogPath)
+                        result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mes_result)
                         gv.finalTestResult = result & result1 & result2
                         collect_data_to_csv(self.myWind.logger)
                         saveTestResult(self.myWind.logger)
-                        self.signal[MainForm, TestStatus].emit(self.myWind,
-                                                               TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
+                        self.signal[QWidget, TestStatus].emit(self.myWind,
+                                                              TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
                 else:
                     continue
         except Exception as e:
             self.myWind.logger.fatal(f"TestThread() Exception:{e},{traceback.format_exc()}")
-            self.signal[MainForm, TestStatus].emit(self.myWind, TestStatus.ABORT)
+            self.signal[QWidget, TestStatus].emit(self.myWind, TestStatus.ABORT)
         finally:
             pass
             # gv.testThread.join(3)

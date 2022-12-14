@@ -9,15 +9,15 @@
 import traceback
 from datetime import datetime
 from enum import Enum
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
-from PyQt5.QtWidgets import QLabel, QAction
-
+from PyQt5.QtWidgets import QLabel, QAction, QWidget
 from model.reporting import saveTestResult
-from model.testthread import TestThread
+# from model.testthread import TestThread
 import conf.globalvar as gv
-from ui.mainform import MainForm
+
+
+# from ui.mainform import MainForm
 
 
 class TestStatus(Enum):
@@ -28,13 +28,13 @@ class TestStatus(Enum):
     ABORT = 4
 
 
-def SetTestStatus(myWind: MainForm, status: TestStatus):
+def SetTestStatus(myWind: QWidget, status: TestStatus):
     """设置并处理不同的测试状态"""
     try:
         if status == TestStatus.START:
-            if not myWind.testThread.isRunning():
-                myWind.testThread = TestThread(myWind)
-                myWind.testThread.start()
+            # if not myWind.testThread.isRunning():
+            #     myWind.testThread = TestThread(myWind)
+            #     myWind.testThread.start()
             myWind.ui.treeWidget.blockSignals(True)
             if not myWind.SingleStepTest:
                 myWind.my_signals.textEditClearSignal[str].emit('')

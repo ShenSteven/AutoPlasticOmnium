@@ -13,14 +13,17 @@ from runin.ui_cell import Ui_cell
 
 class Cell(QFrame, Ui_cell):
 
-    def __init__(self, parent=None, row=-1, col=-1):
+    def __init__(self, parent=None, row=-1, col=-1, testcase=None):
         QFrame.__init__(self, parent)
         Ui_cell.__init__(self)
         self.setupUi(self)
         self.row_index = row
         self.col_index = col
-        self.CellLogTxt = ''
+        self.testcase = testcase
         self.sequences = []
+        self.CellLogTxt = ''
+        self.rs_url = ''
+        self.mes_result = ''
         self.logger = None
         self.StartFlag = False
         self.init_cell()

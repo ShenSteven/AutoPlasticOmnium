@@ -73,18 +73,18 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         Ui_RuninMain.__init__(self)
         super().__init__(parent)
         self.setupUi(self)
-        self.initUI()
+        self.initCellUI()
         self.lineEdit.returnPressed.connect(self.locationInput)
         self.lineEdit_2.returnPressed.connect(self.start_cell_test)
 
-    def initUI(self):
+    def initCellUI(self):
         for i in range(self.RowCount):
             for j in range(self.ColCount):
                 self.create_cell(i, j)
         self.lineEdit.setFocus()
 
     def create_cell(self, i, j):
-        widget_cell = Cell(self.body, i + 1, j + 1)
+        widget_cell = Cell(self.body, i + 1, j + 1, self.testcase)
         widget_cell.setObjectName(f"widget_{i + 1}{j + 1}")
         self.gridLayout.addWidget(widget_cell, i, j, 1, 1)
         self.CellList.append(widget_cell)

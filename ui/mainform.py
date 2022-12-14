@@ -5,9 +5,7 @@ import sys
 import stat
 import threading
 import time
-import traceback
 from datetime import datetime
-from enum import Enum
 from os.path import dirname, abspath, join
 from threading import Thread
 from PyQt5 import QtCore
@@ -22,8 +20,10 @@ from model.basicfunc import IsNullOrEmpty, save_config, run_cmd
 import sockets.serialport
 from model.sqlite import Sqlite
 import model.testcase
+from model.teststatus import TestStatus
+from model.testthread import TestThread
 from peak.peaklin import PeakLin
-from model.reporting import upload_Json_to_client, upload_result_to_mes, collect_data_to_csv, saveTestResult
+from model.reporting import saveTestResult
 from inspect import currentframe
 import model.loadseq
 import model.variables
@@ -34,12 +34,12 @@ import model.product
 from ui.settings import SettingsDialog
 
 
-class TestStatus(Enum):
-    """测试状态枚举类"""
-    PASS = 1
-    FAIL = 2
-    START = 3
-    ABORT = 4
+# class TestStatus(Enum):
+#     """测试状态枚举类"""
+#     PASS = 1
+#     FAIL = 2
+#     START = 3
+#     ABORT = 4
 
 
 class MySignals(QObject):
@@ -132,6 +132,8 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.rs_url = ''
+        self.mes_result = ''
         self.logger = gv.lg.logger
         self.fileHandle = None
         self.SaveScriptDisableFlag = False
@@ -661,19 +663,19 @@ class MainForm(QWidget):
     def on_actionSaveLog(self, info):
         def thread_update():
             if info == 'rename':
-                rename_log = gv.txtLogPath.replace('logging',
+                rename_log = self.txtLogPath.replace('logging',
                                                    str(gv.finalTestResult).upper()).replace('details',
                                                                                             gv.error_details_first_fail)
                 self.logger.debug(f"rename test log to: {rename_log}")
                 self.fileHandle.close()
-                os.rename(gv.txtLogPath, rename_log)
+                os.rename(self.txtLogPath, rename_log)
             else:
                 gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_' \
                                 rf'{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
                 content = self.ui.textEdit.toPlainText()
-                with open(gv.txtLogPath, 'wb') as f:
+                with open(self.txtLogPath, 'wb') as f:
                     f.write(content.encode('utf8'))
-                self.logger.debug(f"Save test log OK.{gv.txtLogPath}")
+                self.logger.debug(f"Save test log OK.{self.txtLogPath}")
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
@@ -1008,7 +1010,8 @@ class MainForm(QWidget):
         gv.stationObj = model.product.JsonObject(SN, gv.cf.station.station_no,
                                                  gv.cf.dut.test_mode,
                                                  gv.cf.dut.qsdk_ver, gv.version)
-        gv.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
+        self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
+        self.rs_url = gv.cf.station.rs_url
         gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
         gv.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
         self.init_create_dirs()
@@ -1036,158 +1039,161 @@ class MainForm(QWidget):
         self.logger = gv.lg.logger
         self.testcase.logger = self.logger
         self.init_textEditHandler()
+        if not self.testThread.isRunning():
+            self.testThread = TestThread(self)
+            self.testThread.start()
         self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.START)
         self.ui.tabWidget.setCurrentWidget(self.ui.result)
 
 
-def SetTestStatus(myWind: MainForm, status: TestStatus):
-    """设置并处理不同的测试状态"""
-    try:
-        if status == TestStatus.START:
-            if not myWind.testThread.isRunning():
-                myWind.testThread = TestThread(myWind)
-                myWind.testThread.start()
-            myWind.ui.treeWidget.blockSignals(True)
-            if not myWind.SingleStepTest:
-                myWind.my_signals.textEditClearSignal[str].emit('')
-            myWind.my_signals.lineEditEnableSignal[bool].emit(False)
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Testing', 36,
-                                                                         Qt.yellow)
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode, '', 20,
-                                                                         Qt.yellow)
-            myWind.my_signals.timingSignal[bool].emit(True)
-            gv.startTime = datetime.now()
-            myWind.my_signals.setIconSignal[QAction, QIcon].emit(myWind.ui.actionStart,
-                                                                 QIcon(':/images/Pause-icon.png'))
-            myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, True)
-            gv.startFlag = True
-            myWind.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
-                                f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
-                                f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
-            myWind.my_signals.update_tableWidget[str].emit('clear')
-            gv.pause_event.set()
-        elif status == TestStatus.FAIL:
-            myWind.total_fail_count += 1
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'FAIL', 36,
-                                                                         Qt.red)
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_testTime,
-                                                                         str(myWind.sec), 11,
-                                                                         Qt.gray)
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
-                                                                         gv.error_details_first_fail, 20, Qt.red)
-            myWind.UpdateContinueFail(False)
-            if gv.setIpFlag:
-                gv.dut_comm.send_command(f"ip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
-        elif status == TestStatus.PASS:
-            myWind.total_pass_count += 1
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'PASS', 36,
-                                                                         Qt.green)
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
-                                                                         str(myWind.sec), 20,
-                                                                         Qt.green)
-            myWind.UpdateContinueFail(True)
-        elif status == TestStatus.ABORT:
-            myWind.total_abort_count += 1
-            myWind.testThread.terminate()
-            myWind.testThread.wait(1)
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Abort', 36,
-                                                                         Qt.gray)
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_testTime,
-                                                                         str(myWind.sec), 11,
-                                                                         Qt.gray)
-            myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
-                                                                         gv.error_details_first_fail, 20,
-                                                                         Qt.gray)
-            saveTestResult(myWind.logger)
-    except Exception as e:
-        myWind.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
-    finally:
-        try:
-            myWind.SaveScriptDisableFlag = True
-            if status != TestStatus.START:
-                myWind.my_signals.setIconSignal[QAction, QIcon].emit(myWind.ui.actionStart,
-                                                                     QIcon(':/images/Start-icon.png'))
-                myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, False)
-                myWind.my_signals.timingSignal[bool].emit(False)
-                myWind.logger.debug(f"Test end,ElapsedTime:{myWind.sec}s.")
-                gv.startFlag = False
-                myWind.my_signals.lineEditEnableSignal[bool].emit(True)
-                myWind.my_signals.updateStatusBarSignal[str].emit('')
-                myWind.my_signals.saveTextEditSignal[str].emit('rename')
-                if not gv.finalTestResult:
-                    myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
-                                                                                 gv.error_details_first_fail, 20,
-                                                                                 Qt.red)
-                myWind.main_form.ui.treeWidget.blockSignals(False)
-        except Exception as e:
-            myWind.logger.fatal(f"SetTestStatus Exception！！{e}")
-        # finally:
-        #     try:
-        #         if status != TestStatus.START:
-        #             pass
-        #     except Exception as e:
-        #         lg.logger.fatal(f"SetTestStatus Exception！！{e}")
+# def SetTestStatus(myWind: MainForm, status: TestStatus):
+#     """设置并处理不同的测试状态"""
+#     try:
+#         if status == TestStatus.START:
+#             if not myWind.testThread.isRunning():
+#                 myWind.testThread = TestThread(myWind)
+#                 myWind.testThread.start()
+#             myWind.ui.treeWidget.blockSignals(True)
+#             if not myWind.SingleStepTest:
+#                 myWind.my_signals.textEditClearSignal[str].emit('')
+#             myWind.my_signals.lineEditEnableSignal[bool].emit(False)
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Testing', 36,
+#                                                                          Qt.yellow)
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode, '', 20,
+#                                                                          Qt.yellow)
+#             myWind.my_signals.timingSignal[bool].emit(True)
+#             gv.startTime = datetime.now()
+#             myWind.my_signals.setIconSignal[QAction, QIcon].emit(myWind.ui.actionStart,
+#                                                                  QIcon(':/images/Pause-icon.png'))
+#             myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, True)
+#             gv.startFlag = True
+#             myWind.logger.debug(f"Start test,SN:{gv.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
+#                                 f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
+#                                 f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
+#             myWind.my_signals.update_tableWidget[str].emit('clear')
+#             gv.pause_event.set()
+#         elif status == TestStatus.FAIL:
+#             myWind.total_fail_count += 1
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'FAIL', 36,
+#                                                                          Qt.red)
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_testTime,
+#                                                                          str(myWind.sec), 11,
+#                                                                          Qt.gray)
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
+#                                                                          gv.error_details_first_fail, 20, Qt.red)
+#             myWind.UpdateContinueFail(False)
+#             if gv.setIpFlag:
+#                 gv.dut_comm.send_command(f"ip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
+#         elif status == TestStatus.PASS:
+#             myWind.total_pass_count += 1
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'PASS', 36,
+#                                                                          Qt.green)
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
+#                                                                          str(myWind.sec), 20,
+#                                                                          Qt.green)
+#             myWind.UpdateContinueFail(True)
+#         elif status == TestStatus.ABORT:
+#             myWind.total_abort_count += 1
+#             myWind.testThread.terminate()
+#             myWind.testThread.wait(1)
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Abort', 36,
+#                                                                          Qt.gray)
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_testTime,
+#                                                                          str(myWind.sec), 11,
+#                                                                          Qt.gray)
+#             myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
+#                                                                          gv.error_details_first_fail, 20,
+#                                                                          Qt.gray)
+#             saveTestResult(myWind.logger)
+#     except Exception as e:
+#         myWind.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
+#     finally:
+#         try:
+#             myWind.SaveScriptDisableFlag = True
+#             if status != TestStatus.START:
+#                 myWind.my_signals.setIconSignal[QAction, QIcon].emit(myWind.ui.actionStart,
+#                                                                      QIcon(':/images/Start-icon.png'))
+#                 myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, False)
+#                 myWind.my_signals.timingSignal[bool].emit(False)
+#                 myWind.logger.debug(f"Test end,ElapsedTime:{myWind.sec}s.")
+#                 gv.startFlag = False
+#                 myWind.my_signals.lineEditEnableSignal[bool].emit(True)
+#                 myWind.my_signals.updateStatusBarSignal[str].emit('')
+#                 myWind.my_signals.saveTextEditSignal[str].emit('rename')
+#                 if not gv.finalTestResult:
+#                     myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
+#                                                                                  gv.error_details_first_fail, 20,
+#                                                                                  Qt.red)
+#                 myWind.main_form.ui.treeWidget.blockSignals(False)
+#         except Exception as e:
+#             myWind.logger.fatal(f"SetTestStatus Exception！！{e}")
+#         # finally:
+#         #     try:
+#         #         if status != TestStatus.START:
+#         #             pass
+#         #     except Exception as e:
+#         #         lg.logger.fatal(f"SetTestStatus Exception！！{e}")
 
-
-class TestThread(QThread):
-    signal = pyqtSignal(MainForm, TestStatus)
-
-    def __init__(self, myWind: MainForm):
-        super(TestThread, self).__init__()
-        self.myWind = myWind
-        self.signal[MainForm, TestStatus].connect(SetTestStatus)
-
-    def __del__(self):
-        self.wait()
-
-    def run(self):
-        """
-        进行任务操作，主要的逻辑操作,返回结果
-        """
-        try:
-            while True:
-                if gv.startFlag:
-                    if gv.IsCycle:
-                        while gv.IsCycle:
-                            if self.myWind.testcase.run(gv.cf.station.fail_continue):
-                                self.myWind.PassNumOfCycleTest += 1
-                            else:
-                                self.myWind.FailNumOfCycleTest += 1
-                            if self.myWind.PassNumOfCycleTest + self.myWind.FailNumOfCycleTest == gv.cf.station.loop_count:
-                                self.myWind.logger.debug(
-                                    f"***** All loop({gv.cf.station.loop_count}) have completed! *****")
-                                self.myWind.my_signals.threadStopSignal[str].emit('stop test.')
-                                time.sleep(0.5)
-                            else:
-                                time.sleep(gv.cf.station.loop_interval)
-                    elif self.myWind.SingleStepTest:
-                        self.myWind.logger.debug(f'Suite:{self.myWind.SuiteNo},Step:{self.myWind.StepNo}')
-                        result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[
-                            self.myWind.StepNo].run(
-                            self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
-                        gv.finalTestResult = result
-                        self.signal[MainForm, TestStatus].emit(self.myWind,
-                                                               TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
-                        time.sleep(0.5)
-                    else:
-                        result = self.myWind.testcase.run(gv.cf.station.fail_continue)
-                        result1 = upload_Json_to_client(self.myWind.logger, gv.cf.station.rs_url, gv.txtLogPath)
-                        result2 = upload_result_to_mes(self.myWind.logger, gv.mes_result)
-                        gv.finalTestResult = result & result1 & result2
-                        collect_data_to_csv(self.myWind.logger)
-                        saveTestResult(self.myWind.logger)
-                        self.signal[MainForm, TestStatus].emit(self.myWind,
-                                                               TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
-                        time.sleep(0.5)
-                else:
-                    continue
-        except Exception as e:
-            self.myWind.logger.fatal(f"TestThread() Exception:{e},{traceback.format_exc()}")
-            self.signal[MainForm, TestStatus].emit(self.myWind, TestStatus.ABORT)
-        finally:
-            pass
-            # gv.testThread.join(3)
-            # lg.logger.debug('finally')
+#
+# class TestThread(QThread):
+#     signal = pyqtSignal(MainForm, TestStatus)
+#
+#     def __init__(self, myWind: MainForm):
+#         super(TestThread, self).__init__()
+#         self.myWind = myWind
+#         self.signal[MainForm, TestStatus].connect(SetTestStatus)
+#
+#     def __del__(self):
+#         self.wait()
+#
+#     def run(self):
+#         """
+#         进行任务操作，主要的逻辑操作,返回结果
+#         """
+#         try:
+#             while True:
+#                 if gv.startFlag:
+#                     if gv.IsCycle:
+#                         while gv.IsCycle:
+#                             if self.myWind.testcase.run(gv.cf.station.fail_continue):
+#                                 self.myWind.PassNumOfCycleTest += 1
+#                             else:
+#                                 self.myWind.FailNumOfCycleTest += 1
+#                             if self.myWind.PassNumOfCycleTest + self.myWind.FailNumOfCycleTest == gv.cf.station.loop_count:
+#                                 self.myWind.logger.debug(
+#                                     f"***** All loop({gv.cf.station.loop_count}) have completed! *****")
+#                                 self.myWind.my_signals.threadStopSignal[str].emit('stop test.')
+#                                 time.sleep(0.5)
+#                             else:
+#                                 time.sleep(gv.cf.station.loop_interval)
+#                     elif self.myWind.SingleStepTest:
+#                         self.myWind.logger.debug(f'Suite:{self.myWind.SuiteNo},Step:{self.myWind.StepNo}')
+#                         result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[
+#                             self.myWind.StepNo].run(
+#                             self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
+#                         gv.finalTestResult = result
+#                         self.signal[MainForm, TestStatus].emit(self.myWind,
+#                                                                TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
+#                         time.sleep(0.5)
+#                     else:
+#                         result = self.myWind.testcase.run(gv.cf.station.fail_continue)
+#                         result1 = upload_Json_to_client(self.myWind.logger, gv.cf.station.rs_url, gv.txtLogPath)
+#                         result2 = upload_result_to_mes(self.myWind.logger, gv.mes_result)
+#                         gv.finalTestResult = result & result1 & result2
+#                         collect_data_to_csv(self.myWind.logger)
+#                         saveTestResult(self.myWind.logger)
+#                         self.signal[MainForm, TestStatus].emit(self.myWind,
+#                                                                TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
+#                         time.sleep(0.5)
+#                 else:
+#                     continue
+#         except Exception as e:
+#             self.myWind.logger.fatal(f"TestThread() Exception:{e},{traceback.format_exc()}")
+#             self.signal[MainForm, TestStatus].emit(self.myWind, TestStatus.ABORT)
+#         finally:
+#             pass
+#             # gv.testThread.join(3)
+#             # lg.logger.debug('finally')
 
 
 if __name__ == "__main__":
