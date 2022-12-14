@@ -20,6 +20,9 @@ class Cell(QFrame, Ui_cell):
         self.row_index = row
         self.col_index = col
         self.CellLogTxt = ''
+        self.sequences = []
+        self.logger = None
+        self.StartFlag = False
         self.init_cell()
 
     def init_cell(self):
@@ -29,6 +32,9 @@ class Cell(QFrame, Ui_cell):
         self.lb_testTime.setText('')
         self.lbl_failCount.setText('')
         self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
+
+    def startTest(self):
+        pass
 
 
 if __name__ == "__main__":

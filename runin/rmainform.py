@@ -10,6 +10,7 @@ import os
 import re
 import sys
 import time
+from inspect import currentframe
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from os.path import dirname, abspath, join
 from PyQt5.uic import loadUi
@@ -30,13 +31,10 @@ class LoginWind:
         self.ui.lineEdit.returnPressed.connect(self.onSignIn)
 
     def onSignIn(self):
-        # import conf.globalvar as gv
         try:
             self.ScanFixName = self.ui.lineEdit.text()
-            runin_pattern = re.compile('RUNIN-[0-9]{4}(A|B)')
-            ort_pattern = re.compile('ORT-[0-9]{4}(A|B)')
-            runin_mr = re.match(runin_pattern, self.ScanFixName, flags=0)
-            ort_mr = re.match(ort_pattern, self.ScanFixName, flags=0)
+            runin_mr = re.match(re.compile('RUNIN-[0-9]{4}(A|B)'), self.ScanFixName, flags=0)
+            ort_mr = re.match(re.compile('ORT-[0-9]{4}(A|B)'), self.ScanFixName, flags=0)
             if runin_mr is not None:
                 self.FixtureNumber = self.ScanFixName[0:10]
                 self.AbFace = self.ScanFixName[10:11]
@@ -64,20 +62,19 @@ class LoginWind:
 
 class RuninMainForm(QMainWindow, Ui_RuninMain):
     def __init__(self, parent=None):
+        self.logger = gv.lg.logger
         self.CellList = []
         self.CheckSnList = []
         self.RowCount = gv.cf.RUNIN.row
         self.ColCount = gv.cf.RUNIN.col
-        self.testcase = model.testcase.TestCase(rf'{gv.excel_file_path}', f'{gv.cf.station.station_name}')
+        self.testcase = model.testcase.TestCase(rf'{gv.excel_file_path}', f'{gv.cf.station.station_name}', self.logger)
         self.testSequences = self.testcase.clone_suites
         QMainWindow.__init__(self, parent)
         Ui_RuninMain.__init__(self)
         super().__init__(parent)
-        # self.timer = None
         self.setupUi(self)
-        # self.refresh()
         self.initUI()
-
+        self.lineEdit.returnPressed.connect(self.locationInput)
         self.lineEdit_2.returnPressed.connect(self.start_cell_test)
 
     def initUI(self):
@@ -85,7 +82,6 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
             for j in range(self.ColCount):
                 self.create_cell(i, j)
         self.lineEdit.setFocus()
-        # self.timer.stop()
 
     def create_cell(self, i, j):
         widget_cell = Cell(self.body, i + 1, j + 1)
@@ -99,10 +95,18 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         # self.gridLayout.addWidget(widget_cell, i, j)
         # print(self.gridLayout.rowCount(), self.gridLayout.columnCount())
 
-    # def refresh(self):
-    #     self.timer = QTimer()
-    #     self.timer.timeout.connect(self.initUI)
-    #     self.timer.start(10)  # 10 times per sec
+    def locationInput(self):
+        try:
+            if len(self.lineEdit.text().strip()) == 3:
+                self.lineEdit_2.setFocus()
+            else:
+                QMessageBox.critical(None, "Exception", "Location length error")
+                self.clear_input()
+        except Exception as e:
+            QMessageBox.critical(None, "Exception", str(e))
+            self.logger.critical(f'{currentframe().f_code.co_name}: str(e)')
+            self.clear_input()
+
     def start_cell_test(self):
         try:
             scanSN = self.lineEdit_2.text().strip()
@@ -114,29 +118,30 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
                     self.clear_input()
                     return
 
-            if not self.CellList[localNo - 1].StartFlag:
-                self.clear_input()
-                gv.logPath = gv.logFolderPath + rf"\{time.strftime('%Y%m%d')}"
-                os.makedirs(gv.OutPutPath, exist_ok=True)
-                os.makedirs(gv.DataPath, exist_ok=True)
-                os.makedirs(gv.logPath + r"\Json", exist_ok=True)
-                os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
-                gv.debugPath = fr"{gv.logPath}\debug_{time.strftime('%Y%m%d')}.txt"
-                self.init_cell_param(localNo, scanSN)
-                self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 255);")
-                self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 255);")
-                self.lb_info.setText('')
-
+                if not self.CellList[localNo - 1].StartFlag:
+                    self.clear_input()
+                    gv.logPath = gv.logFolderPath + rf"\{time.strftime('%Y%m%d')}"
+                    os.makedirs(gv.OutPutPath, exist_ok=True)
+                    os.makedirs(gv.DataPath, exist_ok=True)
+                    os.makedirs(gv.logPath + r"\Json", exist_ok=True)
+                    os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
+                    gv.debugPath = fr"{gv.logPath}\debug_{time.strftime('%Y%m%d')}.txt"
+                    self.init_cell_param(localNo, scanSN)
+                    self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 255);")
+                    self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 255);")
+                    self.lb_info.setText('')
+                else:
+                    self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 0);")
+                    self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 0);")
+                    self.lb_info.setText('Location is testing!')
+                    self.clear_input()
             else:
-                pass
+                self.lineEdit_2.setStyleSheet("background-color: rgb(255, 0, 0);")
+                self.lb_info.setText('SN length error!')
+                self.clear_input()
         except Exception as e:
             QMessageBox.critical(None, "Exception", str(e))
             self.clear_input()
-
-    def clear_input(self):
-        self.lineEdit.setText('')
-        self.lineEdit_2.setText('')
-        self.lineEdit.setFocus()
 
     def init_cell_param(self, localNo, sn):
         self.CellList[localNo - 1].CellLogTxt = rf"{gv.logPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
@@ -145,64 +150,20 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.CellList[localNo - 1].lb_testName.setText('')
         self.CellList[localNo - 1].lbl_failCount.setText('')
         self.CellList[localNo - 1].sequences = self.testSequences
+        self.CellList[localNo - 1].logger = rf"{gv.logPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
         if self.CellList[localNo - 1].startTest():
             self.CheckSnList.append(sn)
 
+    def clear_input(self):
+        self.lineEdit.setText('')
+        self.lineEdit_2.setText('')
+        self.lineEdit.setFocus()
 
-# class RuninMainForm2(QWidget):
-#     main_form = None
-#     _lock = threading.RLock()
-#
-#     # def __new__(cls, *args, **kwargs):
-#     #
-#     #     if cls.main_form:  # 如果已经有单例了就不再去抢锁，避免IO等待
-#     #         return cls.main_form
-#     #     with cls._lock:  # 使用with语法，方便抢锁释放锁
-#     #         if not cls.main_form:
-#     #             cls.main_form = super().__new__(cls, *args, **kwargs)
-#     #         return cls.main_form
-#
-#     def __init__(self):
-#         super().__init__()
-#         self.gridLayout = None
-#         self.timer = None
-#         self.RowCount = 10
-#         self.ColCount = 8
-#         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_runin.ui'))
-#         self.initUI()
-#
-#     def initUI(self):
-#         self.gridLayout = QtWidgets.QGridLayout(self.ui.body)
-#         self.gridLayout.setObjectName("gridLayout")
-#         for i in range(self.RowCount):
-#             for j in range(self.ColCount):
-#                 self.create_cell(i, j)
-#         # self.timer.stop()
-#
-#     def create_cell(self, i, j):
-#         # widget_cell = Cell(self.ui.body, i + 1, j + 1)
-#         # widget_cell.setObjectName(f"widget_{i + 1}{j + 1}")
-#         # self.gridLayout.addWidget(widget_cell, i, j)
-#         # print(self.gridLayout.rowCount(), self.gridLayout.columnCount())
-#
-#         objName = f"widget_{i + 1}{j + 1}"
-#         setattr(self, objName, Cell(self.ui.body, i + 1, j + 1))
-#         widget_cell = getattr(self, objName)
-#         widget_cell.setObjectName(objName)
-#         self.gridLayout.addWidget(widget_cell, i, j)
-#         print(self.gridLayout.rowCount(), self.gridLayout.columnCount())
-#         # print(widget_cell.getObjectName())
-#
-#     def refresh(self):
-#         self.timer = QTimer()
-#         self.timer.timeout.connect(self.initUI)
-#         self.timer.start(10)  # 10 times per sec
-#
 
 if __name__ == "__main__":
     app = QApplication([])
     # LoginWin = LoginWind()
     # LoginWin.ui.show()
-    runinMainWin = RuninMainForm2()
-    runinMainWin.ui.show()
+    runinMainWin = RuninMainForm()
+    runinMainWin.show()
     sys.exit(app.exec_())
