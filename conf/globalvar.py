@@ -15,7 +15,6 @@ import platform
 import model.product
 import model.variables
 from conf.logprint import LogPrint
-# from main import bundle_dir
 import main
 
 
@@ -34,7 +33,7 @@ linux = platform.system() == 'Linux'
 tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
 
 current_dir = main.bundle_dir
-print("current_dir:", current_dir)
+# print("current_dir:", current_dir)
 config_yaml_path = abspath(join(dirname(__file__), 'config.yaml'))
 cf = conf.config.read_config(config_yaml_path, conf.config.Configs)
 

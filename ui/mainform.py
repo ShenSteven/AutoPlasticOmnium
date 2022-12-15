@@ -132,6 +132,7 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.txtLogPath = ''
         self.rs_url = ''
         self.mes_result = ''
         self.logger = gv.lg.logger
@@ -642,10 +643,10 @@ class MainForm(QWidget):
 
     def on_actionOpenLog(self):
         def thread_update():
-            if os.path.exists(gv.txtLogPath):
-                os.startfile(gv.txtLogPath)
+            if os.path.exists(self.txtLogPath):
+                os.startfile(self.txtLogPath)
             else:
-                self.logger.warning(f"no find test log")
+                self.logger.warning(f"no find txt log,path:{self.txtLogPath}")
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
@@ -655,7 +656,7 @@ class MainForm(QWidget):
             if os.path.exists(gv.CSVFilePath):
                 os.startfile(gv.CSVFilePath)
             else:
-                self.logger.warning(f"no find test log")
+                self.logger.warning(f"no find CSV log,path:{gv.CSVFilePath}")
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
@@ -664,18 +665,21 @@ class MainForm(QWidget):
         def thread_update():
             if info == 'rename':
                 rename_log = self.txtLogPath.replace('logging',
-                                                   str(gv.finalTestResult).upper()).replace('details',
-                                                                                            gv.error_details_first_fail)
+                                                     str(gv.finalTestResult).upper()).replace('details',
+                                                                                              gv.error_details_first_fail)
                 self.logger.debug(f"rename test log to: {rename_log}")
                 self.fileHandle.close()
                 os.rename(self.txtLogPath, rename_log)
+                self.txtLogPath = rename_log
             else:
-                gv.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_' \
-                                rf'{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
+                self.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_' \
+                                  rf'{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
                 content = self.ui.textEdit.toPlainText()
+
                 with open(self.txtLogPath, 'wb') as f:
                     f.write(content.encode('utf8'))
-                self.logger.debug(f"Save test log OK.{self.txtLogPath}")
+                self.logger = LogPrint('debug', gv.critical_log, gv.errors_log).logger
+                self.logger.debug(f"Save test log path.{self.txtLogPath}")
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
@@ -1034,8 +1038,8 @@ class MainForm(QWidget):
         self.ui.lb_failInfo.setHidden(True)
         self.ui.lb_testTime.setHidden(True)
         self.sec = 1
-        gv.txtLogPath = rf'{gv.logFolderPath}\logging_{SN}_details_{time.strftime("%H-%M-%S")}.txt'
-        gv.lg = LogPrint(gv.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
+        self.txtLogPath = rf'{gv.logFolderPath}\logging_{SN}_details_{time.strftime("%H-%M-%S")}.txt'
+        gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
         self.logger = gv.lg.logger
         self.testcase.logger = self.logger
         self.init_textEditHandler()
