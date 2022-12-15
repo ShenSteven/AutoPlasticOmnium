@@ -6,12 +6,25 @@
 @Date   : 9/2/2022
 @Desc   : 
 """
+import threading
+
 from PyQt5.QtWidgets import QApplication, QFrame
 
 from runin.ui_cell import Ui_cell
 
 
 class Cell(QFrame, Ui_cell):
+    # main_form = None
+    # _lock = threading.RLock()
+    #
+    # def __new__(cls, *args, **kwargs):
+    #
+    #     if cls.main_form:  # 如果已经有单例了就不再去抢锁，避免IO等待
+    #         return cls.main_form
+    #     with cls._lock:  # 使用with语法，方便抢锁释放锁
+    #         if not cls.main_form:
+    #             cls.main_form = super().__new__(cls, *args, **kwargs)
+    #         return cls.main_form
 
     def __init__(self, parent=None, row=-1, col=-1, testcase=None):
         QFrame.__init__(self, parent)

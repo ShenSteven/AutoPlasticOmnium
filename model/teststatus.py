@@ -13,11 +13,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QLabel, QAction, QWidget
 from model.reporting import saveTestResult
-# from model.testthread import TestThread
 import conf.globalvar as gv
-
-
-# from ui.mainform import MainForm
 
 
 class TestStatus(Enum):
