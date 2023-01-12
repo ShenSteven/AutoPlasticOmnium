@@ -29,18 +29,11 @@ from inspect import currentframe
 import model.loadseq
 import model.variables
 import model.product
-
-# pyrcc5 images.qrc -o images.py
-# pyuic5 ui_main.ui -o main_ui.py
 from ui.settings import SettingsDialog
 
 
-# class TestStatus(Enum):
-#     """测试状态枚举类"""
-#     PASS = 1
-#     FAIL = 2
-#     START = 3
-#     ABORT = 4
+# pyrcc5 images.qrc -o images.py
+# pyuic5 ui_main.ui -o main_ui.py
 
 
 def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
