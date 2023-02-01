@@ -52,17 +52,14 @@ def main():
     about_abspath = 'conf/__version__.py'
     try:
         if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
-            # loginWin = rmf.LoginWind()
-            # loginWin.ui.show()
-            rmf.LoginWind().ui.show()
+            gv.loginWin = rmf.LoginWind()
+            gv.loginWin.ui.show()
         else:
-            # mainWin = mf.MainForm()
-            # mainWin.ui.show()
-            mf.MainForm().ui.show()
+            gv.mainWin = mf.MainForm()
+            gv.mainWin.ui.show()
 
         sys.exit(app.exec_())
     except KeyboardInterrupt:
-        # import conf.globalvar as gv
         gv.lg.logger.fatal('KeyboardInterrupt')
         pass
 

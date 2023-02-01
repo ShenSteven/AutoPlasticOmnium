@@ -75,25 +75,16 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.setupUi(self)
         self.initCellUi()
         self.lineEdit.returnPressed.connect(self.locationInput)
-        self.lineEdit_2.returnPressed.connect(self.start_cell_test)
+        self.lineEdit_2.returnPressed.connect(self.start_cell)
 
     def initCellUi(self):
-        for i in range(self.RowCount):
-            for j in range(self.ColCount):
-                self.create_cell(i, j)
+        for row in range(self.RowCount):
+            for col in range(self.ColCount):
+                widget_cell = Cell(self.body, row + 1, col + 1, self.testcase)
+                widget_cell.setObjectName(f"widget_{row + 1}{col + 1}")
+                self.gridLayout.addWidget(widget_cell, row, col, 1, 1)
+                self.CellList.append(widget_cell)
         self.lineEdit.setFocus()
-
-    def create_cell(self, i, j):
-        widget_cell = Cell(self.body, i + 1, j + 1, self.testcase)
-        widget_cell.setObjectName(f"widget_{i + 1}{j + 1}")
-        self.gridLayout.addWidget(widget_cell, i, j, 1, 1)
-        self.CellList.append(widget_cell)
-        # objName = f"widget_{i + 1}{j + 1}"
-        # setattr(self, objName, Cell(self.body, i + 1, j + 1))
-        # widget_cell = getattr(self, objName)
-        # widget_cell.setObjectName(objName)
-        # self.gridLayout.addWidget(widget_cell, i, j)
-        # print(self.gridLayout.rowCount(), self.gridLayout.columnCount())
 
     def locationInput(self):
         try:
@@ -107,7 +98,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
             self.logger.critical(f'{currentframe().f_code.co_name}: str(e)')
             self.clear_input()
 
-    def start_cell_test(self):
+    def start_cell(self):
         try:
             scanSN = self.lineEdit_2.text().strip()
             localNo = int(self.lineEdit.text().strip()[1:])

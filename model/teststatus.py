@@ -28,7 +28,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
     """设置并处理不同的测试状态"""
     try:
         if status == TestStatus.START:
-            if 'RUNIN' in gv.cf.station.station_name or 'ORT' in gv.cf.station.station_name:
+            if gv.loginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 255, 0);")
                 myWind.start_time = datetime.now()
                 myWind.StartFlag = True
@@ -53,7 +53,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.my_signals.update_tableWidget[str].emit('clear')
                 gv.pause_event.set()
         elif status == TestStatus.FAIL:
-            if 'RUNIN' in gv.cf.station.station_name or 'ORT' in gv.cf.station.station_name:
+            if gv.loginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 0, 0);")
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testName,
                                                                              myWind.testcase.error_details_first_fail,
@@ -70,7 +70,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 if myWind.setIpFlag:
                     myWind.testcase.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
         elif status == TestStatus.PASS:
-            if 'RUNIN' in gv.cf.station.station_name or 'ORT' in gv.cf.station.station_name:
+            if gv.loginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(0, 255, 0);")
             else:
                 myWind.total_pass_count += 1
@@ -79,7 +79,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                                                                              20, Qt.green)
                 myWind.UpdateContinueFail(True)
         elif status == TestStatus.ABORT:
-            if 'RUNIN' in gv.cf.station.station_name or 'ORT' in gv.cf.station.station_name:
+            if gv.loginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 255, 255);")
                 myWind.total_abort_count += 1
                 myWind.testThread.terminate()
@@ -99,7 +99,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
         myWind.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
     finally:
         try:
-            if 'RUNIN' in gv.cf.station.station_name or 'ORT' in gv.cf.station.station_name:
+            if gv.loginWin is not None:
                 if status != TestStatus.START:
                     myWind.SN = ''
                     myWind.my_signals.timingSignal[bool].emit(False)

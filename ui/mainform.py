@@ -36,62 +36,6 @@ from ui.settings import SettingsDialog
 # pyrcc5 images.qrc -o images.py
 # pyuic5 ui_main.ui -o main_ui.py
 
-#
-# def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
-#     def thread_update():
-#         label.setText(str_)
-#         if color is not None:
-#             label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
-#         QApplication.processEvents()
-#
-#     thread = Thread(target=thread_update, daemon=True)
-#     thread.start()
-#
-#
-# def updateAction(action_, icon: QIcon = None, text: str = None):
-#     def thread_update():
-#         if icon is not None:
-#             action_.setIcon(icon)
-#         if text is not None:
-#             action_.setText(text)
-#
-#     thread = Thread(target=thread_update, daemon=True)
-#     thread.start()
-#
-#
-# def on_setIcon(action_, icon: QIcon):
-#     def thread_update():
-#         action_.setIcon(icon)
-#
-#     thread = Thread(target=thread_update, daemon=True)
-#     thread.start()
-#
-#
-# def on_actionLogFolder():
-#     def thread_update():
-#         if os.path.exists(gv.logFolderPath):
-#             os.startfile(gv.logFolderPath)
-#
-#     thread = Thread(target=thread_update, daemon=True)
-#     thread.start()
-#
-#
-# def on_actionException():
-#     def thread_update():
-#         if os.path.exists(gv.critical_log):
-#             os.startfile(gv.critical_log)
-#
-#     thread = Thread(target=thread_update, daemon=True)
-#     thread.start()
-#
-#
-# def controlEnable(control, isEnable):
-#     def thread_update():
-#         control.setEnabled(isEnable)
-#
-#     thread = Thread(target=thread_update, daemon=True)
-#     thread.start()
-#
 
 class MainForm(QWidget):
     main_form = None
@@ -137,7 +81,6 @@ class MainForm(QWidget):
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         self.init_create_dirs()
-        # MainForm.main_form = self  # 单例模式
         self.sec = 1
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
                                                                          f'{gv.cf.station.station_name}', self.logger,
@@ -995,11 +938,10 @@ class MainForm(QWidget):
             pass
         else:
             self.TestVariables = model.variables.Variables(gv.cf.station.station_name,
-                                                         gv.cf.station.station_no, SN,
-                                                         gv.cf.dut.dut_ip, gv.cf.station.log_folder)
+                                                           gv.cf.station.station_no, SN, gv.cf.dut.dut_ip,
+                                                           gv.cf.station.log_folder)
         self.testcase.jsonObj = model.product.JsonObject(SN, gv.cf.station.station_no,
-                                              gv.cf.dut.test_mode,
-                                              gv.cf.dut.qsdk_ver, gv.version)
+                                                         gv.cf.dut.test_mode, gv.cf.dut.qsdk_ver, gv.version)
         self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
         self.rs_url = gv.cf.station.rs_url
         gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
