@@ -84,10 +84,10 @@ class TestSuite:
 
             self.suiteResult = all(step_result_list)
             self.print_result_info()
-            self.process_mesVer()
-            if gv.stationObj.test_phases is not None:
+            self.process_mesVer(test_case)
+            if test_case.jsonObj.test_phases is not None:
                 self.copy_to_json_obj(suiteItem)
-                gv.stationObj.test_phases.append(suiteItem)
+                test_case.jsonObj.test_phases.append(suiteItem)
             self.setColor(Qt.green if self.suiteResult else Qt.red)
             return self.suiteResult
         except Exception as e:
@@ -98,11 +98,11 @@ class TestSuite:
         finally:
             self.clear()
 
-    def process_mesVer(self):
-        setattr(gv.mesPhases, self.SuiteName + '_Time',
+    def process_mesVer(self, test_case):
+        setattr(test_case.mesPhases, self.SuiteName + '_Time',
                 self.elapsedTime.seconds + self.elapsedTime.microseconds / 1000000)
         if not self.suiteResult:
-            setattr(gv.mesPhases, self.SuiteName, str(self.suiteResult).upper())
+            setattr(test_case.mesPhases, self.SuiteName, str(self.suiteResult).upper())
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""

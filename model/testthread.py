@@ -58,10 +58,11 @@ class TestThread(QThread):
                     else:
                         result = self.myWind.testcase.run(gv.cf.station.fail_continue)
                         result1 = upload_Json_to_client(self.myWind.logger, self.myWind.rs_url, self.myWind.txtLogPath,
-                                                        self.myWind.SN)
-                        result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mes_result)
+                                                        self.myWind.SN, self.myWind.testcase.jsonObj)
+                        result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mes_result,self.myWind.testcase.mesPhases)
                         self.myWind.finalTestResult = result & result1 & result2
-                        collect_data_to_csv(self.myWind.SN, self.myWind.logger)
+                        collect_data_to_csv(self.myWind.testcase.mesPhases, self.myWind.WorkOrder, self.myWind.SN,
+                                            self.myWind.logger)
                         saveTestResult(self.myWind.logger)
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)

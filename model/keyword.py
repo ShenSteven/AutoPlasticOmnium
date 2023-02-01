@@ -98,7 +98,7 @@ def testKeyword(test_case, item, testSuite):
 
         elif item.Keyword == 'TelnetLogin':
             if not isinstance(test_case.dut_comm, TelnetComm):
-                test_case.dut_comm = TelnetComm(item.logger, gv.dut_ip, gv.cf.dut.prompt)
+                test_case.dut_comm = TelnetComm(item.logger, gv.cf.dut.dut_ip, gv.cf.dut.prompt)
             rReturn = test_case.dut_comm.open(gv.cf.dut.prompt)
 
         elif item.Keyword == 'TelnetAndSendCmd':
@@ -214,7 +214,7 @@ def testKeyword(test_case, item, testSuite):
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
         elif item.Keyword == 'NiVisaCmd':
-            rReturn, revStr = gv.InstrComm.SendCommand(item.command, item.ExpectStr, item.Timeout)
+            rReturn, revStr = gv.NiInstrComm.SendCommand(item.command, item.ExpectStr, item.Timeout)
             if rReturn and item.CheckStr1 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr, item)
@@ -227,8 +227,8 @@ def testKeyword(test_case, item, testSuite):
                 rReturn = False
 
         elif item.Keyword == 'NiVisaOpenInstr':
-            gv.InstrComm = VisaComm(item.logger)
-            rReturn = gv.InstrComm.open(item.command)
+            gv.NiInstrComm = VisaComm(item.logger)
+            rReturn = gv.NiInstrComm.open(item.command)
 
         else:
             rReturn, revStr = test_case.dut_comm.SendCommand(item.command, item.ExpectStr, item.Timeout)

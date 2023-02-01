@@ -35,12 +35,12 @@ def check_connection(logger, url):
         return False
 
 
-def upload_Json_to_client(logger, url, log_path, SN):
+def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
     """上传json内容和测试log到客户服务器"""
     return True
     json_upload_path = os.path.join(gv.logFolderPath, 'Json', f'{SN}_{time.strftime("%H%M%S")}.json')
     gv.jsonOfResult = json_upload_path
-    jsonStr = json.dumps(gv.stationObj, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+    jsonStr = json.dumps(jsonObj, default=lambda o: o.__dict__, sort_keys=True, indent=4)
     with open(json_upload_path, 'w') as fw:
         fw.write(jsonStr)
     logger.debug(jsonStr)
@@ -72,7 +72,7 @@ def upload_Json_to_client(logger, url, log_path, SN):
         return False
 
 
-def collect_data_to_csv(SN, logger):
+def collect_data_to_csv(mesPhases, WorkOrder, SN, logger):
     def thread_update():
         gv.CSVFilePath = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
         csvColumnPath = fr'{gv.scriptFolder}\csv_column.txt'
@@ -87,14 +87,14 @@ def collect_data_to_csv(SN, logger):
         with open(csvColumnPath, 'w') as f:
             header = '\t'.join(fix_header)
             f.write(header)
-        fix_header_value = [gv.dut_model, gv.cf.station.station_name, "Luxxxxx", gv.WorkOrder,
+        fix_header_value = [mf.MainForm.main_form.dut_model, gv.cf.station.station_name, "Luxxxxx", WorkOrder,
                             gv.cf.station.station_no,
-                            "1", SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.version,
+                            "1", SN, gv.cf.dut.qsdk_ver, mesPhases.HW_REVISION, gv.version,
                             time.strftime("%Y/%m/%d %H:%M:%S"), str(mf.MainForm.main_form.sec),
                             mf.MainForm.main_form.finalTestResult,
-                            gv.mesPhases.first_fail, mf.MainForm.main_form.testcase.error_details_first_fail, "UTC",
+                            mesPhases.first_fail, mf.MainForm.main_form.testcase.error_details_first_fail, "UTC",
                             gv.cf.dut.test_mode,
-                            gv.mesPhases.JSON_UPLOAD, gv.mesPhases.MES_UPLOAD]
+                            mesPhases.JSON_UPLOAD, mesPhases.MES_UPLOAD]
         fix_header_value.extend(gv.csv_list_data)
         logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
         write_csv_file(logger, gv.CSVFilePath, fix_header_value)
@@ -129,11 +129,11 @@ def saveTestResult(logger=None):
     thread.join()
 
 
-def upload_result_to_mes(logger, url):
+def upload_result_to_mes(logger, url, mesPhases):
     return True
     if gv.IsDebug:
         return True
-    mes_result = json.dumps(gv.mesPhases, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+    mes_result = json.dumps(mesPhases, default=lambda o: o.__dict__, sort_keys=True, indent=4)
     logger.debug(f'mes info:{mes_result}')
     response = requests.post(url, mes_result)
     if response.status_code == 200:

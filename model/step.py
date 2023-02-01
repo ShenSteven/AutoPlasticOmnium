@@ -121,8 +121,8 @@ class Step:
     @property
     def isTest(self):
         if str(self.IfElse).lower() == 'else':
-            self._isTest = not gv.IfCond
-        if not IsNullOrEmpty(self.Model) and gv.dut_model.lower() not in self.Model.lower():
+            self._isTest = not ui.mainform.MainForm.main_form.testcase.IfCond
+        if not IsNullOrEmpty(self.Model) and ui.mainform.MainForm.main_form.dut_model.lower() not in self.Model.lower():
             self._isTest = False
         if ui.mainform.MainForm.main_form.SingleStepTest:
             self._isTest = True
@@ -151,11 +151,11 @@ class Step:
     @staticmethod
     def parse_var(value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
-        if gv.TestVariables is None:
+        if ui.mainform.MainForm.main_form.TestVariables is None:
             return value
         for a in re.findall(r'<(.*?)>', value):
             # varVal = gv.get_global_val(a)
-            varVal = getattr(gv.TestVariables, a)
+            varVal = getattr(ui.mainform.MainForm.main_form.TestVariables, a)
             if varVal is None:
                 raise Exception(f'Variable:{a} not found in globalVal!!')
             else:
@@ -165,18 +165,18 @@ class Step:
             value = chr(0x03).encode('utf8')
         return value
 
-    def set_json_start_time(self):
+    def set_json_start_time(self, test_case):
         if IsNullOrEmpty(self.Json):
-            if not gv.startTimeJsonFlag:
+            if not test_case.startTimeJsonFlag:
                 return
-            gv.startTimeJson = datetime.now()
-            gv.startTimeJsonFlag = False
+            test_case.startTimeJson = datetime.now()
+            test_case.startTimeJsonFlag = False
         else:
-            if gv.startTimeJsonFlag:
+            if test_case.startTimeJsonFlag:
                 self.start_time_json = datetime.now()
             else:
-                self.start_time_json = gv.startTimeJson
-                gv.startTimeJsonFlag = True
+                self.start_time_json = test_case.startTimeJson
+                test_case.startTimeJsonFlag = True
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
@@ -193,7 +193,7 @@ class Step:
             self.EeroName = self.StepName
         info = ''
         test_result = False
-        self.set_json_start_time()
+        self.set_json_start_time(test_case)
         self.start_time = datetime.now()
 
         try:
@@ -227,11 +227,11 @@ class Step:
             self.set_errorCode_details(test_result, info)
             self.print_test_info(test_case, test_result)
             self.process_teardown(test_result)
-            self.status = self.process_if_bypass(test_result)
+            self.status = self.process_if_bypass(test_case, test_result)
             self.set_errorCode_details(True if self.status == 'True' else False, info)
-            self.record_first_fail(True if self.status == 'True' else False)
-            self.generate_report(test_result, suiteItem)
-            self.process_mesVer()
+            self.record_first_fail(test_case, True if self.status == 'True' else False)
+            self.generate_report(test_case, test_result, suiteItem)
+            self.process_mesVer(test_case)
         except Exception as e:
             self.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
             self.setColor(Qt.darkRed)
@@ -242,7 +242,7 @@ class Step:
         finally:
             if not IsNullOrEmpty(self.SetGlobalVar):
                 if bool(self.status):
-                    setattr(gv.TestVariables, self.SetGlobalVar, self.testValue)
+                    setattr(test_case.myWind.TestVariables, self.SetGlobalVar, self.testValue)
                     self.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
                 else:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
@@ -258,7 +258,7 @@ class Step:
                     f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
                     f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
                     f"VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
-                    f"'{gv.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
+                    f"'{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
                     f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}',"
                     f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
                     f"'{test_result}','{self.status}')")
@@ -287,17 +287,17 @@ class Step:
             self.error_code = self.ErrorCode
             self.error_details = self.ErrorCode
 
-    def process_mesVer(self):
+    def process_mesVer(self, test_case):
         """collect data to mes"""
         if self.Json.lower() == 'y' and IsNullOrEmpty(self.MesVar):
             self.MesVar = self.EeroName
         if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(
                 self.testValue).lower() != 'true':
-            setattr(gv.mesPhases, self.MesVar, self.testValue)
+            setattr(test_case.mesPhases, self.MesVar, self.testValue)
 
-    def _if_statement(self, test_result: bool) -> bool:
+    def _if_statement(self, test_case, test_result: bool) -> bool:
         if self.IfElse.lower() == 'if':
-            gv.IfCond = test_result
+            test_case.IfCond = test_result
             if not test_result:
                 self.setColor('#FF99CC')
                 self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
@@ -305,18 +305,18 @@ class Step:
         elif self.IfElse.lower() == 'else':
             pass
         else:
-            gv.IfCond = True
+            test_case.IfCond = True
         return test_result
 
-    def record_first_fail(self, tResult):
+    def record_first_fail(self, test_case, tResult):
         if not tResult:
-            gv.failCount += 1
+            test_case.failCount += 1
         else:
             return
-        if gv.failCount == 1 and IsNullOrEmpty(ui.mainform.MainForm.main_form.testcase.error_code_first_fail):
+        if test_case.failCount == 1 and IsNullOrEmpty(ui.mainform.MainForm.main_form.testcase.error_code_first_fail):
             ui.mainform.MainForm.main_form.testcase.error_code_first_fail = self.error_code
             ui.mainform.MainForm.main_form.testcase.error_details_first_fail = self.error_details
-            gv.mesPhases.first_fail = self.SuiteName
+            test_case.mesPhases.first_fail = self.SuiteName
 
     def _process_ByPF(self, step_result: bool):
         if (self.ByPF.upper() == 'P') and not step_result:
@@ -339,8 +339,8 @@ class Step:
         self.elapsedTime = 0
         self.status = 'exception'
 
-    def process_if_bypass(self, test_result: bool) -> str:
-        result_if = self._if_statement(test_result)
+    def process_if_bypass(self, test_case, test_result: bool) -> str:
+        result_if = self._if_statement(test_case, test_result)
         by_result = self._process_ByPF(result_if)
         return str(by_result)
 
@@ -377,10 +377,10 @@ class Step:
             gv.csv_list_header.append(name)
             gv.csv_list_data.append(self.testValue)
 
-    def report_to_json(self, testResult, suiteItem: model.product.SuiteItem = None):
+    def report_to_json(self, test_case, testResult, suiteItem: model.product.SuiteItem = None):
         """copy test data to json object"""
         if self.status != str(True):
-            self.start_time_json = gv.startTimeJson
+            self.start_time_json = test_case.startTimeJson
         obj = model.product.StepItem()
         if self.EeroName.endswith('_'):
             obj.test_name = self.EeroName + str(ui.mainform.MainForm.main_form.testcase.ForCycleCounter)
@@ -398,13 +398,13 @@ class Step:
         if not IsNullOrEmpty(self.SPEC) and IsNullOrEmpty(self.LSL):
             obj.lower_limit = self.spec
         # update gv.stationObj.tests json item
-        if gv.stationObj.tests is not None:
-            for item in gv.stationObj.tests:
+        if test_case.jsonObj.tests is not None:
+            for item in test_case.jsonObj.tests:
                 if item.test_name == obj.test_name:
-                    gv.stationObj.tests.remove(item)
+                    test_case.jsonObj.tests.remove(item)
                     self.logger.debug(f"update testName:{obj.test_name} in json report.")
                     break
-            gv.stationObj.tests.append(obj)
+            test_case.jsonObj.tests.append(obj)
         # update suiteItem.phase_items json item
         if suiteItem is not None:
             for item in suiteItem.phase_items:
@@ -416,13 +416,13 @@ class Step:
 
         return obj
 
-    def generate_report(self, test_result, suiteItem: model.product.SuiteItem):
+    def generate_report(self, test_case, test_result, suiteItem: model.product.SuiteItem):
         """ according to self.json, if record test result and data into json file"""
         if self.Json is not None and self.Json.lower() == 'y':
-            obj = self.report_to_json(test_result, suiteItem)
+            obj = self.report_to_json(test_case, test_result, suiteItem)
             self.report_to_csv(obj.test_name)
         elif not test_result or self.ByPF.lower() == 'f':
-            obj = self.report_to_json(test_result, suiteItem)
+            obj = self.report_to_json(test_case, test_result, suiteItem)
             self.report_to_csv(obj.test_name)
 
     def process_teardown(self, test_result):

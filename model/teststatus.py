@@ -47,7 +47,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                                                                      QIcon(':/images/Pause-icon.png'))
                 myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, True)
                 myWind.startFlag = True
-                myWind.logger.debug(f"Start test,SN:{myWind.SN},Station:{gv.cf.station.station_no},DUTMode:{gv.dut_model},"
+                myWind.logger.debug(f"Start test,SN:{myWind.SN},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
                                     f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
                                     f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
                 myWind.my_signals.update_tableWidget[str].emit('clear')
@@ -67,7 +67,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                                                                              myWind.testcase.error_details_first_fail,
                                                                              20, Qt.red)
                 myWind.UpdateContinueFail(False)
-                if gv.setIpFlag:
+                if myWind.setIpFlag:
                     myWind.testcase.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
         elif status == TestStatus.PASS:
             if 'RUNIN' in gv.cf.station.station_name or 'ORT' in gv.cf.station.station_name:

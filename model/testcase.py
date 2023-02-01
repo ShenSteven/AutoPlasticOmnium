@@ -14,6 +14,7 @@ from datetime import datetime
 import model.loadseq
 import model.product
 import model.sqlite
+import model.variables
 import conf.globalvar as gv
 from inspect import currentframe
 
@@ -42,7 +43,14 @@ class TestCase:
         self.ForStartStepNo = 0
         self.ForTotalCycle = 0
         self.ForCycleCounter = 1
+        self.IfCond = True
         self.Finished = False
+        self.failCount = 0
+        self.startTimeJsonFlag = True
+        self.startTimeJson = datetime.now()
+        # self.TestVariables: model.variables.Variables = None
+        self.mesPhases: model.product.MesInfo
+        self.jsonObj: model.product.JsonObject
         model.sqlite.init_database(self.logger, gv.database_setting)
         self.load_testcase(testcase_path, sheet_name, logger)
 
@@ -84,8 +92,8 @@ class TestCase:
             self.tResult = False
             return self.tResult
         finally:
-            self.copy_to_json(gv.stationObj)
-            self.copy_to_mes(gv.mesPhases)
+            self.copy_to_json(self.jsonObj)
+            self.copy_to_mes(self.mesPhases)
             self.clear()
             self.teardown()
             self.Finished = True

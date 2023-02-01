@@ -108,6 +108,12 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.TestVariables: model.variables.Variables = None
+        self.WorkOrder = '1'
+        self.DUTMesMac = ''
+        self.DUTMesIP = ''
+        self.setIpFlag = False  # 是否设置dut IP为默认ip
+        self.dut_model = 'unknown'
         self.SN = ''
         self.finalTestResult = False
         self.startFlag = False
@@ -937,8 +943,8 @@ class MainForm(QWidget):
         def JudgeProdMode():
             """通过SN判断机种"""
             if IsNullOrEmpty(sn):
-                gv.dut_model = 'unknown'
-                return gv.dut_model
+                self.dut_model = 'unknown'
+                return self.dut_model
             if sn[0] == 'J' or sn[0] == '6':
                 gv.dut_mode = gv.cf.dut.dut_models[0]
             elif sn[0] == 'N' or sn[0] == '7':
@@ -948,12 +954,12 @@ class MainForm(QWidget):
             elif sn[0] == 'S' or sn[0] == 'G':
                 gv.dut_mode = gv.cf.dut.dut_models[3]
             else:
-                gv.dut_model = 'unknown'
-            self.ui.actionunknow.setText(gv.dut_model)
-            return gv.dut_model
+                self.dut_model = 'unknown'
+            self.ui.actionunknow.setText(self.dut_model)
+            return self.dut_model
 
         if JudgeProdMode() != 'unknown' and not gv.IsDebug:
-            reg = QRegExp(gv.cf.dut.dut_regex[gv.dut_model])
+            reg = QRegExp(gv.cf.dut.dut_regex[self.dut_model])
             pValidator = QRegExpValidator(reg, self)
             self.ui.lineEdit.setValidator(pValidator)
 
@@ -962,7 +968,7 @@ class MainForm(QWidget):
             self.SingleStepTest = True
         else:
             self.SingleStepTest = False
-        if not gv.dut_model == 'unknown' and not gv.IsDebug:
+        if not self.dut_model == 'unknown' and not gv.IsDebug:
             str_info = f'无法根据SN判断机种或者SN长度不对! 扫描:{len(self.ui.lineEdit.text())},规定:{gv.cf.dut.sn_len}.'
             QMetaObject.invokeMethod(self, 'showMessageBox', Qt.AutoConnection,
                                      QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
@@ -988,16 +994,16 @@ class MainForm(QWidget):
         if self.SingleStepTest and self.testcase.Finished:
             pass
         else:
-            gv.TestVariables = model.variables.Variables(gv.cf.station.station_name,
+            self.TestVariables = model.variables.Variables(gv.cf.station.station_name,
                                                          gv.cf.station.station_no, SN,
                                                          gv.cf.dut.dut_ip, gv.cf.station.log_folder)
-        gv.stationObj = model.product.JsonObject(SN, gv.cf.station.station_no,
-                                                 gv.cf.dut.test_mode,
-                                                 gv.cf.dut.qsdk_ver, gv.version)
+        self.testcase.jsonObj = model.product.JsonObject(SN, gv.cf.station.station_no,
+                                              gv.cf.dut.test_mode,
+                                              gv.cf.dut.qsdk_ver, gv.version)
         self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
         self.rs_url = gv.cf.station.rs_url
         gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
-        gv.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
+        self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
         self.init_create_dirs()
         gv.csv_list_header = []
         gv.csv_list_data = []
@@ -1005,16 +1011,16 @@ class MainForm(QWidget):
         # gv.error_code_first_fail = ''
         # gv.error_details_first_fail = ''
         self.finalTestResult = False
-        gv.setIpFlag = False
-        gv.DUTMesIP = ''
-        gv.MesMac = ''
+        self.setIpFlag = False
+        self.DUTMesIP = ''
+        self.DUTMesMac = ''
         gv.sec = 0
         if not self.SingleStepTest:
             self.SuiteNo = -1
             self.StepNo = -1
-        gv.WorkOrder = '1'
-        gv.startTimeJsonFlag = True
-        gv.startTimeJson = datetime.now()
+        self.WorkOrder = '1'
+        # gv.startTimeJsonFlag = True
+        self.testcase.startTimeJson = datetime.now()
         self.ui.lb_failInfo.setHidden(True)
         self.ui.lb_testTime.setHidden(True)
         self.sec = 1

@@ -38,18 +38,18 @@ config_yaml_path = abspath(join(dirname(__file__), 'config.yaml'))
 cf = conf.config.read_config(config_yaml_path, conf.config.Configs)
 
 # SN = ''
-dut_ip = ''
-DUTMesIP = ''
-MesMac = 'FF:FF:FF:FF:FF'
-WorkOrder = '1'
-dut_model = 'unknown'
+# dut_ip = ''
+# DUTMesIP = ''
+# MesMac = 'FF:FF:FF:FF:FF'
+# WorkOrder = '1'
+# dut_model = 'unknown'
 
 # error_code_first_fail = ''
 # error_details_first_fail = ''
 
 
 logFolderPath = ''
-logPath = ''
+rTxtLogPath = ''
 critical_log = ''
 errors_log = ''
 # txtLogPath = ''
@@ -63,7 +63,7 @@ daq_data_path = ''
 # dut_comm = None
 # FixSerialPort = None
 PLin = None
-InstrComm = None
+NiInstrComm = None
 
 IsDebug = False
 # startFlag = False
@@ -71,10 +71,10 @@ pauseFlag = False
 pause_event = Event()
 IsCycle = False
 # finalTestResult = False
-setIpFlag = False
+# setIpFlag = False
 # SingleStepTest = False
-IfCond = True
-failCount = 0
+# IfCond = True
+# failCount = 0
 
 # ForTotalCycle = 0
 # ForCycleCounter = 1
@@ -99,17 +99,17 @@ database_result = rf'{current_dir}\OutPut\result.db'
 # total_fail_count = 0
 # total_abort_count = 0
 
-TestVariables: model.variables.Variables = None
-mesPhases: model.product.MesInfo
-stationObj: model.product.JsonObject
+# TestVariables: model.variables.Variables = None
+# mesPhases: model.product.MesInfo
+# jsonObj: model.product.JsonObject
 # testThread = None
 
 # PassNumOfCycleTest = 0
 # FailNumOfCycleTest = 0
 # SuiteNo = -1
 # StepNo = -1
-startTimeJsonFlag = True
-startTimeJson = datetime.now()
+# startTimeJsonFlag = True
+# startTimeJson = datetime.now()
 
 pMsg32 = None
 pMsg33 = None
