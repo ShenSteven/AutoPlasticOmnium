@@ -35,10 +35,10 @@ def check_connection(logger, url):
         return False
 
 
-def upload_Json_to_client(logger, url, log_path):
+def upload_Json_to_client(logger, url, log_path, SN):
     """上传json内容和测试log到客户服务器"""
     return True
-    json_upload_path = os.path.join(gv.logFolderPath, 'Json', f'{gv.SN}_{time.strftime("%H%M%S")}.json')
+    json_upload_path = os.path.join(gv.logFolderPath, 'Json', f'{SN}_{time.strftime("%H%M%S")}.json')
     gv.jsonOfResult = json_upload_path
     jsonStr = json.dumps(gv.stationObj, default=lambda o: o.__dict__, sort_keys=True, indent=4)
     with open(json_upload_path, 'w') as fw:
@@ -72,7 +72,7 @@ def upload_Json_to_client(logger, url, log_path):
         return False
 
 
-def collect_data_to_csv(logger):
+def collect_data_to_csv(SN, logger):
     def thread_update():
         gv.CSVFilePath = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
         csvColumnPath = fr'{gv.scriptFolder}\csv_column.txt'
@@ -80,7 +80,7 @@ def collect_data_to_csv(logger):
                       "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
                       "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
         fix_header.extend(gv.csv_list_header)
-        updateColumn = gv.finalTestResult and not gv.IsDebug
+        updateColumn = mf.MainForm.main_form.finalTestResult and not gv.IsDebug
         create_csv_file(logger, gv.CSVFilePath, fix_header, updateColumn)
         if os.path.exists(csvColumnPath):
             os.remove(csvColumnPath)
@@ -89,10 +89,11 @@ def collect_data_to_csv(logger):
             f.write(header)
         fix_header_value = [gv.dut_model, gv.cf.station.station_name, "Luxxxxx", gv.WorkOrder,
                             gv.cf.station.station_no,
-                            "1", gv.SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.version,
+                            "1", SN, gv.cf.dut.qsdk_ver, gv.mesPhases.HW_REVISION, gv.version,
                             time.strftime("%Y/%m/%d %H:%M:%S"), str(mf.MainForm.main_form.sec),
-                            gv.finalTestResult,
-                            gv.mesPhases.first_fail, gv.error_details_first_fail, "UTC", gv.cf.dut.test_mode,
+                            mf.MainForm.main_form.finalTestResult,
+                            gv.mesPhases.first_fail, mf.MainForm.main_form.testcase.error_details_first_fail, "UTC",
+                            gv.cf.dut.test_mode,
                             gv.mesPhases.JSON_UPLOAD, gv.mesPhases.MES_UPLOAD]
         fix_header_value.extend(gv.csv_list_data)
         logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')

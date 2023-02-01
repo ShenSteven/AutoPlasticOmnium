@@ -24,7 +24,7 @@ from .basicfunc import IsNullOrEmpty, kill_process, start_process, restart_proce
 from inspect import currentframe
 
 
-def testKeyword(item, testSuite):
+def testKeyword(test_case, item, testSuite):
     # gv.lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
     # time.sleep(0.02)
     # return True, ''
@@ -97,9 +97,9 @@ def testKeyword(item, testSuite):
             rReturn = ping(item.logger, item.command)
 
         elif item.Keyword == 'TelnetLogin':
-            if not isinstance(gv.dut_comm, TelnetComm):
-                gv.dut_comm = TelnetComm(item.logger, gv.dut_ip, gv.cf.dut.prompt)
-            rReturn = gv.dut_comm.open(gv.cf.dut.prompt)
+            if not isinstance(test_case.dut_comm, TelnetComm):
+                test_case.dut_comm = TelnetComm(item.logger, gv.dut_ip, gv.cf.dut.prompt)
+            rReturn = test_case.dut_comm.open(gv.cf.dut.prompt)
 
         elif item.Keyword == 'TelnetAndSendCmd':
             temp = TelnetComm(item.logger, item.param1, gv.cf.dut.prompt)
@@ -108,14 +108,14 @@ def testKeyword(item, testSuite):
                 return True, ''
 
         elif item.Keyword == 'SerialPortOpen':
-            if not isinstance(gv.dut_comm, SerialPort):
+            if not isinstance(test_case.dut_comm, SerialPort):
                 if not IsNullOrEmpty(item.command):
-                    gv.dut_comm = SerialPort(item.command, int(item.ExpectStr))
-            rReturn = gv.dut_comm.open()
+                    test_case.dut_comm = SerialPort(item.command, int(item.ExpectStr))
+            rReturn = test_case.dut_comm.open()
 
         elif item.Keyword == 'CloseDUTCOMM':
-            if gv.dut_comm is not None:
-                gv.dut_comm.close()
+            if test_case.dut_comm is not None:
+                test_case.dut_comm.close()
                 rReturn = True
 
         elif item.Keyword == 'PLINInitConnect':
@@ -231,7 +231,7 @@ def testKeyword(item, testSuite):
             rReturn = gv.InstrComm.open(item.command)
 
         else:
-            rReturn, revStr = gv.dut_comm.SendCommand(item.command, item.ExpectStr, item.Timeout)
+            rReturn, revStr = test_case.dut_comm.SendCommand(item.command, item.ExpectStr, item.Timeout)
             if rReturn and item.CheckStr1 in revStr and item.CheckStr2 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr, item)

@@ -32,7 +32,7 @@ class TestThread(QThread):
         """
         try:
             while True:
-                if gv.startFlag:
+                if self.myWind.startFlag:
                     if gv.IsCycle:
                         while gv.IsCycle:
                             if self.myWind.testcase.run(gv.cf.station.fail_continue):
@@ -51,19 +51,20 @@ class TestThread(QThread):
                         result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[
                             self.myWind.StepNo].run(
                             self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
-                        gv.finalTestResult = result
+                        self.myWind.finalTestResult = result
                         self.signal[QWidget, TestStatus].emit(self.myWind,
-                                                              TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
+                                                              TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
                     else:
                         result = self.myWind.testcase.run(gv.cf.station.fail_continue)
-                        result1 = upload_Json_to_client(self.myWind.logger, self.myWind.rs_url, self.myWind.txtLogPath)
+                        result1 = upload_Json_to_client(self.myWind.logger, self.myWind.rs_url, self.myWind.txtLogPath,
+                                                        self.myWind.SN)
                         result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mes_result)
-                        gv.finalTestResult = result & result1 & result2
-                        collect_data_to_csv(self.myWind.logger)
+                        self.myWind.finalTestResult = result & result1 & result2
+                        collect_data_to_csv(self.myWind.SN, self.myWind.logger)
                         saveTestResult(self.myWind.logger)
                         self.signal[QWidget, TestStatus].emit(self.myWind,
-                                                              TestStatus.PASS if gv.finalTestResult else TestStatus.FAIL)
+                                                              TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
                 else:
                     continue

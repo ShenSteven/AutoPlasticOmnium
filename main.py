@@ -41,7 +41,6 @@ get_app_dir_path()
 
 
 def excepthook(cls, exception, traceback):
-    # import conf.globalvar as gv
     gv.lg.logger.fatal("".join(format_exception(cls, exception, traceback)))
     QMessageBox.critical(None, "Error", "".join(format_exception(cls, exception, traceback)))
 
@@ -53,11 +52,13 @@ def main():
     about_abspath = 'conf/__version__.py'
     try:
         if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
-            loginWin = rmf.LoginWind()
-            loginWin.ui.show()
+            # loginWin = rmf.LoginWind()
+            # loginWin.ui.show()
+            rmf.LoginWind().ui.show()
         else:
-            mainWin = mf.MainForm()
-            mainWin.ui.show()
+            # mainWin = mf.MainForm()
+            # mainWin.ui.show()
+            mf.MainForm().ui.show()
 
         sys.exit(app.exec_())
     except KeyboardInterrupt:

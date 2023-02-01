@@ -73,11 +73,11 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         Ui_RuninMain.__init__(self)
         super().__init__(parent)
         self.setupUi(self)
-        self.initCellUI()
+        self.initCellUi()
         self.lineEdit.returnPressed.connect(self.locationInput)
         self.lineEdit_2.returnPressed.connect(self.start_cell_test)
 
-    def initCellUI(self):
+    def initCellUi(self):
         for i in range(self.RowCount):
             for j in range(self.ColCount):
                 self.create_cell(i, j)

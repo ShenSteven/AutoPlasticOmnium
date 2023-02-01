@@ -18,7 +18,8 @@ import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, save_config, run_cmd
 import sockets.serialport
-from model.mysignals import MySignals
+from model.mysignals import MySignals, update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
+    on_actionException
 from model.sqlite import Sqlite
 import model.testcase
 from model.teststatus import TestStatus
@@ -35,62 +36,62 @@ from ui.settings import SettingsDialog
 # pyrcc5 images.qrc -o images.py
 # pyuic5 ui_main.ui -o main_ui.py
 
-
-def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
-    def thread_update():
-        label.setText(str_)
-        if color is not None:
-            label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
-        QApplication.processEvents()
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
-def updateAction(action_, icon: QIcon = None, text: str = None):
-    def thread_update():
-        if icon is not None:
-            action_.setIcon(icon)
-        if text is not None:
-            action_.setText(text)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
-def on_setIcon(action_, icon: QIcon):
-    def thread_update():
-        action_.setIcon(icon)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
-def on_actionLogFolder():
-    def thread_update():
-        if os.path.exists(gv.logFolderPath):
-            os.startfile(gv.logFolderPath)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
-def on_actionException():
-    def thread_update():
-        if os.path.exists(gv.critical_log):
-            os.startfile(gv.critical_log)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
-def controlEnable(control, isEnable):
-    def thread_update():
-        control.setEnabled(isEnable)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
+#
+# def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
+#     def thread_update():
+#         label.setText(str_)
+#         if color is not None:
+#             label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
+#         QApplication.processEvents()
+#
+#     thread = Thread(target=thread_update, daemon=True)
+#     thread.start()
+#
+#
+# def updateAction(action_, icon: QIcon = None, text: str = None):
+#     def thread_update():
+#         if icon is not None:
+#             action_.setIcon(icon)
+#         if text is not None:
+#             action_.setText(text)
+#
+#     thread = Thread(target=thread_update, daemon=True)
+#     thread.start()
+#
+#
+# def on_setIcon(action_, icon: QIcon):
+#     def thread_update():
+#         action_.setIcon(icon)
+#
+#     thread = Thread(target=thread_update, daemon=True)
+#     thread.start()
+#
+#
+# def on_actionLogFolder():
+#     def thread_update():
+#         if os.path.exists(gv.logFolderPath):
+#             os.startfile(gv.logFolderPath)
+#
+#     thread = Thread(target=thread_update, daemon=True)
+#     thread.start()
+#
+#
+# def on_actionException():
+#     def thread_update():
+#         if os.path.exists(gv.critical_log):
+#             os.startfile(gv.critical_log)
+#
+#     thread = Thread(target=thread_update, daemon=True)
+#     thread.start()
+#
+#
+# def controlEnable(control, isEnable):
+#     def thread_update():
+#         control.setEnabled(isEnable)
+#
+#     thread = Thread(target=thread_update, daemon=True)
+#     thread.start()
+#
 
 class MainForm(QWidget):
     main_form = None
@@ -107,6 +108,9 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.SN = ''
+        self.finalTestResult = False
+        self.startFlag = False
         self.txtLogPath = ''
         self.rs_url = ''
         self.mes_result = ''
@@ -130,7 +134,8 @@ class MainForm(QWidget):
         # MainForm.main_form = self  # 单例模式
         self.sec = 1
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
-                                                                         f'{gv.cf.station.station_name}', self.logger)
+                                                                         f'{gv.cf.station.station_name}', self.logger,
+                                                                         self)
         self.testSequences = self.testcase.clone_suites
         self.init_select_station()
         self.init_textEditHandler()
@@ -418,7 +423,7 @@ class MainForm(QWidget):
         thread.start()
 
     def on_reloadSeqs(self):
-        if gv.startFlag:
+        if self.startFlag:
             QMessageBox.information(self, 'Infor', 'Test is running, can not reload!', QMessageBox.Yes)
             return
         self.logger.debug('start reload script,please wait a moment...')
@@ -428,7 +433,7 @@ class MainForm(QWidget):
             if os.path.exists(gv.test_script_json):
                 os.chmod(gv.test_script_json, stat.S_IWRITE)
                 os.remove(gv.test_script_json)
-            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger)
+            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger, self)
             self.testSequences = self.testcase.clone_suites
 
         thread = Thread(target=thread_convert_and_load_script, daemon=True)
@@ -440,7 +445,7 @@ class MainForm(QWidget):
         self.SaveScriptDisableFlag = False
 
     def on_itemChanged(self, item, column=0):
-        if gv.startFlag:
+        if self.startFlag:
             return
         if item.parent() is None:
             pNo = self.ui.treeWidget.indexOfTopLevelItem(item)
@@ -515,7 +520,7 @@ class MainForm(QWidget):
         thread.start()
 
     def on_actionConvertExcelToJson(self):
-        if gv.startFlag:
+        if self.startFlag:
             QMessageBox.information(self, 'Infor', 'Test is running, can not do it!', QMessageBox.Yes)
             return
         thread = Thread(
@@ -587,7 +592,7 @@ class MainForm(QWidget):
             QMessageBox.information(self, 'Authority', 'This is factory test privileges.', QMessageBox.Yes)
 
     def on_actionStart(self):
-        if gv.startFlag:
+        if self.startFlag:
             if not gv.pauseFlag:
                 gv.pauseFlag = True
                 self.ui.actionStart.setIcon(QIcon(':/images/Start-icon.png'))
@@ -601,10 +606,10 @@ class MainForm(QWidget):
 
     def on_actionStop(self):
         if gv.IsCycle:
-            if gv.startFlag:
+            if self.startFlag:
                 saveTestResult(self.logger)
                 if self.FailNumOfCycleTest == 0:
-                    gv.finalTestResult = True
+                    self.finalTestResult = True
                     self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.PASS)
                 else:
                     self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.FAIL)
@@ -613,7 +618,7 @@ class MainForm(QWidget):
             self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.ABORT)
 
     def on_actionClearLog(self):
-        if not gv.startFlag:
+        if not self.startFlag:
             self.ui.textEdit.clear()
 
     def on_actionOpenLog(self):
@@ -640,15 +645,15 @@ class MainForm(QWidget):
         def thread_update():
             if info == 'rename':
                 rename_log = self.txtLogPath.replace('logging',
-                                                     str(gv.finalTestResult).upper()).replace('details',
-                                                                                              gv.error_details_first_fail)
+                                                     str(self.finalTestResult).upper()).replace('details',
+                                                                                                self.testcase.error_details_first_fail)
                 self.logger.debug(f"rename test log to: {rename_log}")
                 self.fileHandle.close()
                 os.rename(self.txtLogPath, rename_log)
                 self.txtLogPath = rename_log
             else:
-                self.txtLogPath = rf'{gv.logFolderPath}\{str(gv.finalTestResult).upper()}_{gv.SN}_' \
-                                  rf'{gv.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
+                self.txtLogPath = rf'{gv.logFolderPath}\{str(self.finalTestResult).upper()}_{self.SN}_' \
+                                  rf'{self.testcase.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
                 content = self.ui.textEdit.toPlainText()
 
                 with open(self.txtLogPath, 'wb') as f:
@@ -789,7 +794,7 @@ class MainForm(QWidget):
     # @QtCore.pyqtSlot(QBrush, int, int, bool)
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
         if stepNo_ == -1:
-            if gv.IsCycle or not gv.startFlag:
+            if gv.IsCycle or not self.startFlag:
                 return
             self.ui.treeWidget.topLevelItem(suiteNO_).setExpanded(True)
             self.ui.treeWidget.topLevelItem(suiteNO_).setBackground(0, color)
@@ -869,22 +874,22 @@ class MainForm(QWidget):
             self.logger.debug('stop timing...')
             self.killTimer(self.timer)
 
-    def get_stationNo(self):
-        """通过串口读取治具中设置的测试工站名字"""
-        if not gv.cf.station.fix_flag:
-            return
-        gv.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
-                                                         gv.cf.station.fix_com_baudRate)
-        for i in range(0, 3):
-            rReturn, revStr = gv.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
-            if rReturn:
-                gv.cf.station.station_no = revStr.replace('\r\n', '').strip()
-                gv.cf.station.station_name = gv.cf.station.station_no[0, gv.cf.station.station_no.index('-')]
-                self.logger.debug(f"Read fix number success,stationName:{gv.cf.station.station_name}")
-                break
-        else:
-            QMessageBox.Critical(self, 'Read StationNO', "Read FixNum error,Please check it!")
-            sys.exit(0)
+    # def get_stationNo(self):
+    #     """通过串口读取治具中设置的测试工站名字"""
+    #     if not gv.cf.station.fix_flag:
+    #         return
+    #     gv.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
+    #                                                      gv.cf.station.fix_com_baudRate)
+    #     for i in range(0, 3):
+    #         rReturn, revStr = gv.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
+    #         if rReturn:
+    #             gv.cf.station.station_no = revStr.replace('\r\n', '').strip()
+    #             gv.cf.station.station_name = gv.cf.station.station_no[0, gv.cf.station.station_no.index('-')]
+    #             self.logger.debug(f"Read fix number success,stationName:{gv.cf.station.station_name}")
+    #             break
+    #     else:
+    #         QMessageBox.Critical(self, 'Read StationNO', "Read FixNum error,Please check it!")
+    #         sys.exit(0)
 
     def UpdateContinueFail(self, testResult: bool):
         if gv.IsDebug or gv.cf.dut.test_mode.lower() == 'debug':
@@ -975,8 +980,8 @@ class MainForm(QWidget):
             self.testSequences = copy.deepcopy(self.testcase.original_suites)
             self.testcase.clone_suites = self.testSequences
             self.ShowTreeView(self.testSequences)
-        gv.SN = self.ui.lineEdit.text()
-        self.variable_init(gv.SN)
+        self.SN = self.ui.lineEdit.text()
+        self.variable_init(self.SN)
 
     def variable_init(self, SN):
         """测试变量初始化"""
@@ -997,9 +1002,9 @@ class MainForm(QWidget):
         gv.csv_list_header = []
         gv.csv_list_data = []
         gv.daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
-        gv.error_code_first_fail = ''
-        gv.error_details_first_fail = ''
-        gv.finalTestResult = False
+        # gv.error_code_first_fail = ''
+        # gv.error_details_first_fail = ''
+        self.finalTestResult = False
         gv.setIpFlag = False
         gv.DUTMesIP = ''
         gv.MesMac = ''

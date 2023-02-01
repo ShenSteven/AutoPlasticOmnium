@@ -21,28 +21,42 @@ from inspect import currentframe
 class TestCase:
     """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
-    def __init__(self, testcase_path, sheet_name, logger):
+    def __init__(self, testcase_path, sheet_name, logger, wind=None):
+        self.myWind = wind
+        self.FixSerialPort = None  # 治具串口通信
+        self.dut_comm = None  # DUT通信
+        self.clone_suites = None
+        self.original_suites = None
+        self.logger = None
+        self.testcase_path = None
+        self.sheetName = None
+        self.error_details_first_fail = ''
+        self.error_code_first_fail = ''
         self.suite_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = ''
         self.tResult = True
-        self.sheetName = sheet_name
-        self.testcase_path = testcase_path
         self.test_script_json = gv.test_script_json
         self.ForStartSuiteNo = 0
         self.ForFlag = False
+        self.ForStartStepNo = 0
+        self.ForTotalCycle = 0
+        self.ForCycleCounter = 1
         self.Finished = False
-        self.logger = logger
         model.sqlite.init_database(self.logger, gv.database_setting)
+        self.load_testcase(testcase_path, sheet_name, logger)
+
+    def load_testcase(self, testcase_path, sheet_name, logger):
+        self.sheetName = sheet_name
+        self.testcase_path = testcase_path
+        self.logger = logger
         if not getattr(sys, 'frozen', False):
             model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger)
         if os.path.exists(self.test_script_json):
             self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json)
         else:
-            self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path,
-                                                                          self.sheetName,
-                                                                          self.test_script_json,
-                                                                          self.logger)
+            self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path, self.sheetName,
+                                                                          self.test_script_json, self.logger)
         self.clone_suites = copy.deepcopy(self.original_suites)
 
     def run(self, global_fail_continue=False):
@@ -52,7 +66,7 @@ class TestCase:
                     if i < self.ForStartSuiteNo:
                         continue
                     else:
-                        stepNo = gv.ForStartStepNo
+                        stepNo = self.ForStartStepNo
                 else:
                     stepNo = -1
                 suite_result = self.clone_suites[i].run(self, global_fail_continue, stepNo)
@@ -80,29 +94,47 @@ class TestCase:
         obj.status = 'passed' if self.tResult else 'failed'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
-        obj.error_code = gv.error_code_first_fail
-        obj.error_details = gv.error_details_first_fail
+        obj.error_code = self.error_code_first_fail
+        obj.error_details = self.error_details_first_fail
 
     def copy_to_mes(self, obj: model.product.MesInfo):
         obj.status = 'PASS' if self.tResult else 'FAIL'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
-        obj.error_code = gv.error_code_first_fail
-        obj.error_details = gv.error_details_first_fail
+        obj.error_code = self.error_code_first_fail
+        obj.error_details = self.error_details_first_fail
 
     def clear(self):
         self.tResult = True
         self.suite_result_list = []
 
-    @staticmethod
-    def teardown():
-        if gv.dut_comm is not None:
-            gv.dut_comm.close()
+    def teardown(self):
+        if self.dut_comm is not None:
+            self.dut_comm.close()
         if gv.PLin is not None:
             gv.PLin.close()
-        if gv.cf.station.fix_flag and gv.cf.station.pop_fix and gv.FixSerialPort is not None:
-            gv.FixSerialPort.open()
-            gv.FixSerialPort.sendCommand('AT+TESTEND%', )
+        if gv.cf.station.fix_flag and gv.cf.station.pop_fix and self.FixSerialPort is not None:
+            self.FixSerialPort.open()
+            self.FixSerialPort.sendCommand('AT+TESTEND%', )
+
+    def get_stationNo(self):
+        """通过串口读取治具中设置的测试工站名字"""
+        import sockets.serialport
+        from PyQt5.QtWidgets import QMessageBox
+        if not gv.cf.station.fix_flag:
+            return
+        self.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
+                                                           gv.cf.station.fix_com_baudRate)
+        for i in range(0, 3):
+            rReturn, revStr = self.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
+            if rReturn:
+                gv.cf.station.station_no = revStr.replace('\r\n', '').strip()
+                gv.cf.station.station_name = gv.cf.station.station_no[0, gv.cf.station.station_no.index('-')]
+                self.logger.debug(f"Read fix number success,stationName:{gv.cf.station.station_name}")
+                break
+        else:
+            QMessageBox.Critical(self, 'Read StationNO', "Read FixNum error,Please check it!")
+            sys.exit(0)
 
     if __name__ == "__main__":
         pass

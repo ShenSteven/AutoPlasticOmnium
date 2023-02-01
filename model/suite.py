@@ -73,7 +73,7 @@ class TestSuite:
                     continue
                 self.process_for(test_case, self.steps[i])
                 step_item.suiteVar = self.suiteVar
-                step_result = self.steps[i].run(self, suiteItem)
+                step_result = self.steps[i].run(test_case, self, suiteItem)
                 step_result_list.append(step_result)
 
                 if not step_result and not fail_continue(self.steps[i], global_fail_continue):
@@ -124,34 +124,34 @@ class TestSuite:
             self.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
 
     def process_for(self, test_case, step_item: model.step.Step):
-        """FOR 循环开始判断"""
+        """FOR 循环开始判断 FOR(3)"""
         if not IsNullOrEmpty(step_item.For) and '(' in step_item.For and ')' in step_item.For:
-            gv.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
+            test_case.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
             test_case.ForStartSuiteNo = self.index
-            gv.ForStartStepNo = step_item.index
+            test_case.ForStartStepNo = step_item.index
             test_case.ForFlag = False
-            self.logger.debug(f"====================Start Cycle-{gv.ForCycleCounter}===========================")
+            self.logger.debug(f"====================Start Cycle-{test_case.ForCycleCounter}===========================")
 
     def process_EndFor(self, test_case, step_item: model.step.Step):
-        """FOR 循环结束判断"""
+        """FOR 循环结束判断 ENDFOR"""
         if not IsNullOrEmpty(step_item.For) and step_item.For.lower().startswith('end'):
-            self.daq_collect()
-            if gv.ForCycleCounter < gv.ForTotalCycle:
+            self.daq_collect(test_case)
+            if test_case.ForCycleCounter < test_case.ForTotalCycle:
                 test_case.ForFlag = True
-                gv.ForCycleCounter += 1
+                test_case.ForCycleCounter += 1
                 return True
 
             test_case.ForFlag = False
-            self.logger.debug('=' * 10 + f"Have Complete all({gv.ForCycleCounter}) Cycle test." + '=' * 10)
-            gv.ForCycleCounter = 1
+            self.logger.debug('=' * 10 + f"Have Complete all({test_case.ForCycleCounter}) Cycle test." + '=' * 10)
+            test_case.ForCycleCounter = 1
             return False
         else:
             return False
 
-    def daq_collect(self):
+    def daq_collect(self, test_case):
         self.logger.debug(f"collect DAQ data to {gv.daq_data_path}")
         create_csv_file(self.logger, gv.daq_data_path, gv.ArrayListDaqHeader)
-        data_list = [str(gv.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+        data_list = [str(test_case.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
         data_list.extend(gv.ArrayListDaq)
         write_csv_file(self.logger, gv.daq_data_path, data_list)
         gv.ArrayListDaq = []

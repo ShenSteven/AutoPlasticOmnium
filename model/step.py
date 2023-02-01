@@ -182,7 +182,7 @@ class Step:
         """set treeWidget item color"""
         ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
 
-    def run(self, testSuite, suiteItem: model.product.SuiteItem = None):
+    def run(self, test_case, testSuite, suiteItem: model.product.SuiteItem = None):
         """run test step"""
         if self.logger is None:
             self.logger = testSuite.logger
@@ -220,12 +220,12 @@ class Step:
 
             for retry in range(self.Retry, -1, -1):
                 if gv.pause_event.wait():
-                    test_result, info = model.keyword.testKeyword(self, testSuite)
+                    test_result, info = model.keyword.testKeyword(test_case, self, testSuite)
                 if test_result:
                     break
             self.setColor(Qt.green if test_result else Qt.red)
             self.set_errorCode_details(test_result, info)
-            self.print_test_info(test_result)
+            self.print_test_info(test_case, test_result)
             self.process_teardown(test_result)
             self.status = self.process_if_bypass(test_result)
             self.set_errorCode_details(True if self.status == 'True' else False, info)
@@ -246,10 +246,10 @@ class Step:
                     self.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
                 else:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
-            self.record_date_to_db(test_result)
+            self.record_date_to_db(test_case, test_result)
             self.clear()
 
-    def record_date_to_db(self, test_result):
+    def record_date_to_db(self, test_case, test_result):
         """ record test date to DB."""
         if self.isTest and self.Json.lower() == 'y':
             with model.sqlite.Sqlite(gv.database_result) as db:
@@ -257,7 +257,7 @@ class Step:
                 db.execute(
                     f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
                     f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
-                    f"VALUES (NULL,'{gv.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
+                    f"VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
                     f"'{gv.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
                     f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}',"
                     f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
@@ -313,9 +313,9 @@ class Step:
             gv.failCount += 1
         else:
             return
-        if gv.failCount == 1 and IsNullOrEmpty(gv.error_code_first_fail):
-            gv.error_code_first_fail = self.error_code
-            gv.error_details_first_fail = self.error_details
+        if gv.failCount == 1 and IsNullOrEmpty(ui.mainform.MainForm.main_form.testcase.error_code_first_fail):
+            ui.mainform.MainForm.main_form.testcase.error_code_first_fail = self.error_code
+            ui.mainform.MainForm.main_form.testcase.error_details_first_fail = self.error_details
             gv.mesPhases.first_fail = self.SuiteName
 
     def _process_ByPF(self, step_result: bool):
@@ -344,7 +344,7 @@ class Step:
         by_result = self._process_ByPF(result_if)
         return str(by_result)
 
-    def print_test_info(self, tResult):
+    def print_test_info(self, test_case, tResult):
         ts = datetime.now() - self.start_time
         self.elapsedTime = ts.seconds + ts.microseconds / 1000000
         if self.Keyword == 'Waiting':
@@ -360,7 +360,7 @@ class Step:
             ts = datetime.now() - self.start_time
             self.elapsedTime = ts.seconds + ts.microseconds / 1000000
             ui.mainform.MainForm.main_form.my_signals.update_tableWidget[list].emit(
-                [gv.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
+                [test_case.myWind.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
                  self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
     def report_to_csv(self, name):
@@ -383,7 +383,7 @@ class Step:
             self.start_time_json = gv.startTimeJson
         obj = model.product.StepItem()
         if self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(gv.ForCycleCounter)
+            obj.test_name = self.EeroName + str(ui.mainform.MainForm.main_form.testcase.ForCycleCounter)
         else:
             obj.test_name = self.EeroName
         obj.status = 'passed' if testResult else 'failed'

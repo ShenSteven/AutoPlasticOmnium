@@ -27,7 +27,7 @@ def get_about():
 
 
 about = get_about()
-
+version = about['__version__']
 win = platform.system() == 'Windows'
 linux = platform.system() == 'Linux'
 tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
@@ -37,16 +37,16 @@ current_dir = main.bundle_dir
 config_yaml_path = abspath(join(dirname(__file__), 'config.yaml'))
 cf = conf.config.read_config(config_yaml_path, conf.config.Configs)
 
-SN = ''
+# SN = ''
 dut_ip = ''
 DUTMesIP = ''
 MesMac = 'FF:FF:FF:FF:FF'
 WorkOrder = '1'
 dut_model = 'unknown'
 
-error_code_first_fail = ''
-error_details_first_fail = ''
-version = about['__version__']
+# error_code_first_fail = ''
+# error_details_first_fail = ''
+
 
 logFolderPath = ''
 logPath = ''
@@ -60,26 +60,26 @@ ArrayListDaq = []
 ArrayListDaqHeader = ['SN', 'DateTime']
 daq_data_path = ''
 
-dut_comm = None
-FixSerialPort = None
+# dut_comm = None
+# FixSerialPort = None
 PLin = None
 InstrComm = None
 
 IsDebug = False
-startFlag = False
+# startFlag = False
 pauseFlag = False
 pause_event = Event()
 IsCycle = False
-finalTestResult = False
+# finalTestResult = False
 setIpFlag = False
 # SingleStepTest = False
 IfCond = True
 failCount = 0
 
-ForTotalCycle = 0
-ForCycleCounter = 1
+# ForTotalCycle = 0
+# ForCycleCounter = 1
 # ForStartSuiteNo = 0
-ForStartStepNo = 0
+# ForStartStepNo = 0
 # ForFlag = False
 
 OutPutPath = rf'{current_dir}\OutPut'
@@ -114,8 +114,9 @@ startTimeJson = datetime.now()
 pMsg32 = None
 pMsg33 = None
 
-RuninMainWin = None
-LoginWin = None
+
+# RuninMainWin = None
+# LoginWin = None
 
 
 def set_global_val(name, value):
@@ -147,5 +148,6 @@ def create_sub_log_folder():
 create_sub_log_folder()
 # logger_path = os.path.join(logFolderPath, f"logging_{datetime.now().strftime('%H-%M-%S')}.txt").replace('\\', '/')
 lg = LogPrint('debug', critical_log, errors_log)
+
 if __name__ == '__main__':
     pass
