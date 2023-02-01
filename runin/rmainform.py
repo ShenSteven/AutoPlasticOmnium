@@ -84,6 +84,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
                 widget_cell.setObjectName(f"widget_{row + 1}{col + 1}")
                 self.gridLayout.addWidget(widget_cell, row, col, 1, 1)
                 self.CellList.append(widget_cell)
+                # print(widget_cell)
         self.lineEdit.setFocus()
 
     def locationInput(self):

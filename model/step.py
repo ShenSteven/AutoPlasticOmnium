@@ -18,7 +18,6 @@ import model.keyword
 from .basicfunc import IsNullOrEmpty
 import conf.globalvar as gv
 import ui.mainform as mf
-import runin.cell as rmf
 
 
 class Step:
@@ -67,6 +66,7 @@ class Step:
     """
 
     def __init__(self, dict_=None):
+        self.wind = None
         self.logger = None
         self.breakpoint: bool = False
         self.suiteIndex: int = 0
@@ -131,10 +131,10 @@ class Step:
             return self._isTest
         else:
             if str(self.IfElse).lower() == 'else':
-                self._isTest = not rmf.Cell.main_form.testcase.IfCond
-            if not IsNullOrEmpty(self.Model) and rmf.Cell.main_form.dut_model.lower() not in self.Model.lower():
+                self._isTest = not self.wind.testcase.IfCond
+            if not IsNullOrEmpty(self.Model) and self.wind.dut_model.lower() not in self.Model.lower():
                 self._isTest = False
-            if rmf.Cell.main_form.SingleStepTest:
+            if self.wind.SingleStepTest:
                 self._isTest = True
             return self._isTest
 
@@ -144,30 +144,30 @@ class Step:
 
     @property
     def command(self):
-        return Step.parse_var(self.CmdOrParam)
+        return self.parse_var(self.CmdOrParam)
 
     @property
     def spec(self):
-        return Step.parse_var(self.SPEC)
+        return self.parse_var(self.SPEC)
 
     @property
     def _NAD(self):
-        return Step.parse_var(self.NAD)
+        return self.parse_var(self.NAD)
 
     @property
     def _PCI_LEN(self):
-        return Step.parse_var(self.PCI_LEN)
+        return self.parse_var(self.PCI_LEN)
 
-    @staticmethod
-    def parse_var(value):
+    # @staticmethod
+    def parse_var(self, value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
-        if mf.MainForm.main_form.TestVariables is None and rmf.Cell.main_form.TestVariables:
+        if mf.MainForm.main_form.TestVariables is None and self.wind.TestVariables:
             return value
         for a in re.findall(r'<(.*?)>', value):
             if mf.MainForm.main_form.TestVariables is not None:
                 varVal = getattr(mf.MainForm.main_form.TestVariables, a)
             else:
-                varVal = getattr(rmf.Cell.main_form.TestVariables, a)
+                varVal = getattr(self.wind.TestVariables, a)
             if varVal is None:
                 raise Exception(f'Variable:{a} not found in globalVal!!')
             else:
@@ -197,6 +197,7 @@ class Step:
 
     def run(self, test_case, testSuite, suiteItem: model.product.SuiteItem = None):
         """run test step"""
+        self.wind = test_case.myWind
         if self.logger is None:
             self.logger = testSuite.logger
         self.SuiteName = testSuite.SuiteName

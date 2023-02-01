@@ -64,12 +64,13 @@ class TestCase:
         self.testcase_path = testcase_path
         self.logger = logger
         if not getattr(sys, 'frozen', False):
-            model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger)
+            model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger, self.myWind)
         if os.path.exists(self.test_script_json):
             self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json)
         else:
             self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path, self.sheetName,
-                                                                          self.test_script_json, self.logger)
+                                                                          self.test_script_json, self.logger,
+                                                                          self.myWind)
         self.clone_suites = copy.deepcopy(self.original_suites)
 
     def run(self, global_fail_continue=False):

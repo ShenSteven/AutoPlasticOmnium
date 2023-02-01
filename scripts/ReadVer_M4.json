@@ -57,7 +57,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -105,7 +106,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "p",
@@ -153,7 +155,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -201,7 +204,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "p",
@@ -249,7 +253,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -297,7 +302,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "p",
@@ -345,7 +351,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -393,7 +400,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "p",
@@ -441,7 +449,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -489,7 +498,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "p",
@@ -537,7 +547,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -585,7 +596,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "p",
@@ -633,7 +645,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             }
         ],
         "suiteResult": true,

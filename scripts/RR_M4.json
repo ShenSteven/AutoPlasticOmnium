@@ -57,7 +57,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -105,7 +106,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -153,7 +155,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -201,7 +204,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -249,7 +253,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -297,7 +302,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -345,7 +351,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -393,7 +400,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -441,7 +449,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -489,7 +498,8 @@
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             }
         ],
         "suiteResult": true,
@@ -554,7 +564,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -602,7 +613,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "p",
@@ -650,7 +662,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -698,7 +711,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -746,7 +760,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -794,7 +809,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -842,7 +858,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -890,7 +907,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -938,7 +956,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -986,7 +1005,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1034,7 +1054,8 @@
                 "status": "exception",
                 "suiteIndex": 1,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             }
         ],
         "suiteResult": true,
@@ -1099,7 +1120,8 @@
                 "status": "exception",
                 "suiteIndex": 2,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1147,7 +1169,8 @@
                 "status": "exception",
                 "suiteIndex": 2,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1195,7 +1218,8 @@
                 "status": "exception",
                 "suiteIndex": 2,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1243,7 +1267,8 @@
                 "status": "exception",
                 "suiteIndex": 2,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1291,7 +1316,8 @@
                 "status": "exception",
                 "suiteIndex": 2,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             }
         ],
         "suiteResult": true,
@@ -1356,7 +1382,8 @@
                 "status": "exception",
                 "suiteIndex": 3,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1404,7 +1431,8 @@
                 "status": "exception",
                 "suiteIndex": 3,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1452,7 +1480,8 @@
                 "status": "exception",
                 "suiteIndex": 3,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1500,7 +1529,8 @@
                 "status": "exception",
                 "suiteIndex": 3,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1548,7 +1578,8 @@
                 "status": "exception",
                 "suiteIndex": 3,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             }
         ],
         "suiteResult": true,
@@ -1613,7 +1644,8 @@
                 "status": "exception",
                 "suiteIndex": 4,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1661,7 +1693,8 @@
                 "status": "exception",
                 "suiteIndex": 4,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1709,7 +1742,8 @@
                 "status": "exception",
                 "suiteIndex": 4,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1757,7 +1791,8 @@
                 "status": "exception",
                 "suiteIndex": 4,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             },
             {
                 "ByPF": "",
@@ -1805,7 +1840,8 @@
                 "status": "exception",
                 "suiteIndex": 4,
                 "suiteVar": "",
-                "testValue": null
+                "testValue": null,
+                "wind": null
             }
         ],
         "suiteResult": true,

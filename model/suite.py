@@ -14,7 +14,6 @@ from PyQt5.QtGui import QBrush
 import model.product
 import model.step
 from .basicfunc import IsNullOrEmpty, create_csv_file, write_csv_file
-# import conf.globalvar as gv
 import ui.mainform
 
 
