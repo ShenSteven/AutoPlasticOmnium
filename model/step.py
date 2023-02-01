@@ -363,19 +363,19 @@ class Step:
                 [test_case.myWind.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
                  self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
-    def report_to_csv(self, name):
+    def report_to_csv(self, test_case, name):
         """collect test result and data into csv file"""
-        if name in gv.csv_list_header:
+        if name in test_case.csv_list_header:
             return
         if not IsNullOrEmpty(self.USL) or not IsNullOrEmpty(self.LSL):
-            gv.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
-            gv.csv_list_data.extend([self.testValue, self.LSL, self.USL])
+            test_case.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
+            test_case.csv_list_data.extend([self.testValue, self.LSL, self.USL])
         elif not IsNullOrEmpty(self.spec):
-            gv.csv_list_header.extend([name, f"{name}_SPEC"])
-            gv.csv_list_data.extend([self.testValue, self.spec])
+            test_case.csv_list_header.extend([name, f"{name}_SPEC"])
+            test_case.csv_list_data.extend([self.testValue, self.spec])
         else:
-            gv.csv_list_header.append(name)
-            gv.csv_list_data.append(self.testValue)
+            test_case.csv_list_header.append(name)
+            test_case.csv_list_data.append(self.testValue)
 
     def report_to_json(self, test_case, testResult, suiteItem: model.product.SuiteItem = None):
         """copy test data to json object"""
@@ -420,10 +420,10 @@ class Step:
         """ according to self.json, if record test result and data into json file"""
         if self.Json is not None and self.Json.lower() == 'y':
             obj = self.report_to_json(test_case, test_result, suiteItem)
-            self.report_to_csv(obj.test_name)
+            self.report_to_csv(test_case, obj.test_name)
         elif not test_result or self.ByPF.lower() == 'f':
             obj = self.report_to_json(test_case, test_result, suiteItem)
-            self.report_to_csv(obj.test_name)
+            self.report_to_csv(test_case, obj.test_name)
 
     def process_teardown(self, test_result):
         if IsNullOrEmpty(self.TearDown) or test_result:

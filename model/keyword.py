@@ -251,8 +251,8 @@ def testKeyword(test_case, item, testSuite):
                 item.StepName.startswith("GetDAQTemp") or
                 item.Keyword == "NiDAQmxVolt" or
                 item.Keyword == "NiDAQmxCur"):
-            gv.ArrayListDaq.append("N/A" if IsNullOrEmpty(item.testValue) else item.testValue)
-            gv.ArrayListDaqHeader.append(item.StepName)
+            test_case.ArrayListDaq.append("N/A" if IsNullOrEmpty(item.testValue) else item.testValue)
+            test_case.ArrayListDaqHeader.append(item.StepName)
             item.logger.debug(f"DQA add {item.testValue}")
 
 

@@ -12,8 +12,6 @@ from os.path import join, abspath, dirname, exists
 from threading import Event
 import conf.config
 import platform
-import model.product
-import model.variables
 from conf.logprint import LogPrint
 import main
 
@@ -53,12 +51,13 @@ rTxtLogPath = ''
 critical_log = ''
 errors_log = ''
 # txtLogPath = ''
-jsonOfResult = ''
-csv_list_header = []
-csv_list_data = []
-ArrayListDaq = []
-ArrayListDaqHeader = ['SN', 'DateTime']
-daq_data_path = ''
+# jsonOfResult = ''
+# csv_list_header = []
+# csv_list_data = []
+
+# ArrayListDaq = []
+# ArrayListDaqHeader = ['SN', 'DateTime']
+# daq_data_path = ''
 
 # dut_comm = None
 # FixSerialPort = None

@@ -51,6 +51,11 @@ class TestCase:
         # self.TestVariables: model.variables.Variables = None
         self.mesPhases: model.product.MesInfo
         self.jsonObj: model.product.JsonObject
+        self.ArrayListDaq = []
+        self.ArrayListDaqHeader = ['SN', 'DateTime']
+        self.daq_data_path = ''
+        self.csv_list_header = []
+        self.csv_list_data = []
         model.sqlite.init_database(self.logger, gv.database_setting)
         self.load_testcase(testcase_path, sheet_name, logger)
 

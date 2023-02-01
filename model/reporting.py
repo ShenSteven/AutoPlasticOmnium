@@ -39,7 +39,7 @@ def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
     """上传json内容和测试log到客户服务器"""
     return True
     json_upload_path = os.path.join(gv.logFolderPath, 'Json', f'{SN}_{time.strftime("%H%M%S")}.json')
-    gv.jsonOfResult = json_upload_path
+    # gv.jsonOfResult = json_upload_path
     jsonStr = json.dumps(jsonObj, default=lambda o: o.__dict__, sort_keys=True, indent=4)
     with open(json_upload_path, 'w') as fw:
         fw.write(jsonStr)
@@ -72,14 +72,14 @@ def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
         return False
 
 
-def collect_data_to_csv(mesPhases, WorkOrder, SN, logger):
+def collect_data_to_csv(mesPhases, WorkOrder, SN, logger, csv_list_header, csv_list_data):
     def thread_update():
         gv.CSVFilePath = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
         csvColumnPath = fr'{gv.scriptFolder}\csv_column.txt'
         fix_header = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
                       "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
                       "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
-        fix_header.extend(gv.csv_list_header)
+        fix_header.extend(csv_list_header)
         updateColumn = mf.MainForm.main_form.finalTestResult and not gv.IsDebug
         create_csv_file(logger, gv.CSVFilePath, fix_header, updateColumn)
         if os.path.exists(csvColumnPath):
@@ -95,7 +95,7 @@ def collect_data_to_csv(mesPhases, WorkOrder, SN, logger):
                             mesPhases.first_fail, mf.MainForm.main_form.testcase.error_details_first_fail, "UTC",
                             gv.cf.dut.test_mode,
                             mesPhases.JSON_UPLOAD, mesPhases.MES_UPLOAD]
-        fix_header_value.extend(gv.csv_list_data)
+        fix_header_value.extend(csv_list_data)
         logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
         write_csv_file(logger, gv.CSVFilePath, fix_header_value)
 

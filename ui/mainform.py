@@ -1005,9 +1005,9 @@ class MainForm(QWidget):
         gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
         self.init_create_dirs()
-        gv.csv_list_header = []
-        gv.csv_list_data = []
-        gv.daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
+        # gv.csv_list_header = []
+        # gv.csv_list_data = []
+        self.testcase.daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         # gv.error_code_first_fail = ''
         # gv.error_details_first_fail = ''
         self.finalTestResult = False
