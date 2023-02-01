@@ -62,9 +62,8 @@ class TestThread(QThread):
                         result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mes_result,
                                                        self.myWind.testcase.mesPhases)
                         self.myWind.finalTestResult = result & result1 & result2
-                        collect_data_to_csv(self.myWind.testcase.mesPhases, self.myWind.WorkOrder, self.myWind.SN,
-                                            self.myWind.logger, self.myWind.testcase.csv_list_header,
-                                            self.myWind.testcase.csv_list_data)
+                        collect_data_to_csv(self.myWind.testcase.mesPhases, self.myWind.testcase.csv_list_header,
+                                            self.myWind.testcase.csv_list_data, self.myWind)
                         saveTestResult(self.myWind.logger)
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)

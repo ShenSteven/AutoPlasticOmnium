@@ -72,7 +72,7 @@ def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
         return False
 
 
-def collect_data_to_csv(mesPhases, WorkOrder, SN, logger, csv_list_header, csv_list_data):
+def collect_data_to_csv(mesPhases, csv_list_header, csv_list_data, myWind):
     def thread_update():
         gv.CSVFilePath = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
         csvColumnPath = fr'{gv.scriptFolder}\csv_column.txt'
@@ -80,24 +80,24 @@ def collect_data_to_csv(mesPhases, WorkOrder, SN, logger, csv_list_header, csv_l
                       "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
                       "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
         fix_header.extend(csv_list_header)
-        updateColumn = mf.MainForm.main_form.finalTestResult and not gv.IsDebug
-        create_csv_file(logger, gv.CSVFilePath, fix_header, updateColumn)
+        updateColumn = myWind.finalTestResult and not gv.IsDebug
+        create_csv_file(myWind.logger, gv.CSVFilePath, fix_header, updateColumn)
         if os.path.exists(csvColumnPath):
             os.remove(csvColumnPath)
         with open(csvColumnPath, 'w') as f:
             header = '\t'.join(fix_header)
             f.write(header)
-        fix_header_value = [mf.MainForm.main_form.dut_model, gv.cf.station.station_name, "Luxxxxx", WorkOrder,
+        fix_header_value = [myWind.dut_model, gv.cf.station.station_name, "Luxxxxx", myWind.WorkOrder,
                             gv.cf.station.station_no,
-                            "1", SN, gv.cf.dut.qsdk_ver, mesPhases.HW_REVISION, gv.version,
-                            time.strftime("%Y/%m/%d %H:%M:%S"), str(mf.MainForm.main_form.sec),
-                            mf.MainForm.main_form.finalTestResult,
-                            mesPhases.first_fail, mf.MainForm.main_form.testcase.error_details_first_fail, "UTC",
+                            "1", myWind.SN, gv.cf.dut.qsdk_ver, mesPhases.HW_REVISION, gv.version,
+                            time.strftime("%Y/%m/%d %H:%M:%S"), str(myWind.sec),
+                            myWind.finalTestResult,
+                            mesPhases.first_fail, myWind.testcase.error_details_first_fail, "UTC",
                             gv.cf.dut.test_mode,
                             mesPhases.JSON_UPLOAD, mesPhases.MES_UPLOAD]
         fix_header_value.extend(csv_list_data)
-        logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
-        write_csv_file(logger, gv.CSVFilePath, fix_header_value)
+        myWind.logger.debug(f'CollectResultToCsv {gv.CSVFilePath}')
+        write_csv_file(myWind.logger, gv.CSVFilePath, fix_header_value)
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()
@@ -105,6 +105,9 @@ def collect_data_to_csv(mesPhases, WorkOrder, SN, logger, csv_list_header, csv_l
 
 
 def saveTestResult(logger=None):
+    if mf.MainForm.main_form is None:
+        return
+
     def thread_update():
         reportPath = fr'{gv.OutPutPath}\result.csv'
         create_csv_file(logger, reportPath, gv.tableWidgetHeader)

@@ -8,8 +8,9 @@
 """
 import threading
 import traceback
+from PyQt5 import QtCore
 from PyQt5.QtGui import QBrush
-from PyQt5.QtWidgets import QApplication, QFrame, QLabel
+from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox
 from model.mysignals import MySignals, update_label
 from model.testthread import TestThread
 from runin.ui_cell import Ui_cell
@@ -64,6 +65,21 @@ class Cell(QFrame, Ui_cell):
         self.my_signals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
         self.my_signals.updateLabel[QLabel, str, int].connect(update_label)
         self.my_signals.updateLabel[QLabel, str].connect(update_label)
+        self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
+
+    @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
+    def showMessageBox(self, title, text, level=2):
+        if level == 0:
+            return QMessageBox.information(self, title, text, QMessageBox.Yes)
+        elif level == 1:
+            return QMessageBox.warning(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        elif level == 2:
+            aa = QMessageBox.question(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            return aa
+        elif level == 3:
+            return QMessageBox.about(self, title, text)
+        else:
+            return QMessageBox.critical(self, title, text, QMessageBox.Yes)
 
     def startTest(self):
         try:

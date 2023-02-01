@@ -17,7 +17,8 @@ import model.sqlite
 import model.keyword
 from .basicfunc import IsNullOrEmpty
 import conf.globalvar as gv
-import ui.mainform
+import ui.mainform as mf
+import runin.cell as rmf
 
 
 class Step:
@@ -120,13 +121,22 @@ class Step:
 
     @property
     def isTest(self):
-        if str(self.IfElse).lower() == 'else':
-            self._isTest = not ui.mainform.MainForm.main_form.testcase.IfCond
-        if not IsNullOrEmpty(self.Model) and ui.mainform.MainForm.main_form.dut_model.lower() not in self.Model.lower():
-            self._isTest = False
-        if ui.mainform.MainForm.main_form.SingleStepTest:
-            self._isTest = True
-        return self._isTest
+        if mf.MainForm.main_form is not None:
+            if str(self.IfElse).lower() == 'else':
+                self._isTest = not mf.MainForm.main_form.testcase.IfCond
+            if not IsNullOrEmpty(self.Model) and mf.MainForm.main_form.dut_model.lower() not in self.Model.lower():
+                self._isTest = False
+            if mf.MainForm.main_form.SingleStepTest:
+                self._isTest = True
+            return self._isTest
+        else:
+            if str(self.IfElse).lower() == 'else':
+                self._isTest = not rmf.Cell.main_form.testcase.IfCond
+            if not IsNullOrEmpty(self.Model) and rmf.Cell.main_form.dut_model.lower() not in self.Model.lower():
+                self._isTest = False
+            if rmf.Cell.main_form.SingleStepTest:
+                self._isTest = True
+            return self._isTest
 
     @isTest.setter
     def isTest(self, value):
@@ -151,11 +161,13 @@ class Step:
     @staticmethod
     def parse_var(value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
-        if ui.mainform.MainForm.main_form.TestVariables is None:
+        if mf.MainForm.main_form.TestVariables is None and rmf.Cell.main_form.TestVariables:
             return value
         for a in re.findall(r'<(.*?)>', value):
-            # varVal = gv.get_global_val(a)
-            varVal = getattr(ui.mainform.MainForm.main_form.TestVariables, a)
+            if mf.MainForm.main_form.TestVariables is not None:
+                varVal = getattr(mf.MainForm.main_form.TestVariables, a)
+            else:
+                varVal = getattr(rmf.Cell.main_form.TestVariables, a)
             if varVal is None:
                 raise Exception(f'Variable:{a} not found in globalVal!!')
             else:
@@ -180,7 +192,8 @@ class Step:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
+        if mf.MainForm.main_form is not None:
+            mf.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
 
     def run(self, test_case, testSuite, suiteItem: model.product.SuiteItem = None):
         """run test step"""
@@ -212,8 +225,9 @@ class Step:
 
             if self.breakpoint or gv.pauseFlag:
                 gv.pauseFlag = True
-                ui.mainform.MainForm.main_form.my_signals.setIconSignal[QAction, QIcon].emit(
-                    ui.mainform.MainForm.main_form.ui.actionStart, QIcon(':/images/Start-icon.png'))
+                if mf.MainForm.main_form is not None:
+                    mf.MainForm.main_form.my_signals.setIconSignal[QAction, QIcon].emit(
+                        mf.MainForm.main_form.ui.actionStart, QIcon(':/images/Start-icon.png'))
                 gv.pause_event.clear()
             else:
                 gv.pause_event.set()
@@ -313,9 +327,9 @@ class Step:
             test_case.failCount += 1
         else:
             return
-        if test_case.failCount == 1 and IsNullOrEmpty(ui.mainform.MainForm.main_form.testcase.error_code_first_fail):
-            ui.mainform.MainForm.main_form.testcase.error_code_first_fail = self.error_code
-            ui.mainform.MainForm.main_form.testcase.error_details_first_fail = self.error_details
+        if test_case.failCount == 1 and IsNullOrEmpty(test_case.error_code_first_fail):
+            test_case.error_code_first_fail = self.error_code
+            test_case.error_details_first_fail = self.error_details
             test_case.mesPhases.first_fail = self.SuiteName
 
     def _process_ByPF(self, step_result: bool):
@@ -359,9 +373,10 @@ class Step:
         if self.Json.lower() == 'y':
             ts = datetime.now() - self.start_time
             self.elapsedTime = ts.seconds + ts.microseconds / 1000000
-            ui.mainform.MainForm.main_form.my_signals.update_tableWidget[list].emit(
-                [test_case.myWind.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL, self.elapsedTime,
-                 self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
+            if mf.MainForm.main_form is not None:
+                mf.MainForm.main_form.my_signals.update_tableWidget[list].emit(
+                    [test_case.myWind.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL,
+                     self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
     def report_to_csv(self, test_case, name):
         """collect test result and data into csv file"""
@@ -383,7 +398,7 @@ class Step:
             self.start_time_json = test_case.startTimeJson
         obj = model.product.StepItem()
         if self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(ui.mainform.MainForm.main_form.testcase.ForCycleCounter)
+            obj.test_name = self.EeroName + str(test_case.ForCycleCounter)
         else:
             obj.test_name = self.EeroName
         obj.status = 'passed' if testResult else 'failed'

@@ -20,7 +20,8 @@ import model.step
 import model.sqlite
 from .basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
-import ui.mainform
+import ui.mainform as mf
+import runin.cell as rmf
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations, logger):
@@ -79,9 +80,14 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
-        ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
-                                                                                     f'{currentframe().f_code.co_name}:{e} ',
-                                                                                     5)
+        if mf.MainForm.main_form is not None:
+            mf.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
+                                                                                         f'{currentframe().f_code.co_name}:{e} ',
+                                                                                         5)
+        else:
+            rmf.Cell.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
+                                                                                    f'{currentframe().f_code.co_name}:{e} ',
+                                                                                    5)
         sys.exit(e)
     else:
         serialize_to_json(suites_list, test_script_path, logger)
@@ -108,9 +114,14 @@ def param_wrapper_verify_sha256(flag):
                 if sha256 == JsonSHA:
                     result = fun(*bound_args.args, **bound_args.kwargs)
                 else:
-                    ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
-                                                                                                 f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!',
-                                                                                                 5)
+                    if mf.MainForm.main_form is not None:
+                        mf.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
+                                                                                                     f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!',
+                                                                                                     5)
+                    else:
+                        rmf.Cell.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
+                                                                                                f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!',
+                                                                                                5)
                     sys.exit(f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!')
             else:
                 result = fun(*bound_args.args, **bound_args.kwargs)
@@ -141,9 +152,14 @@ def load_testcase_from_json(json_path, isverify=False):
             sequences_obj_list.append(suit_obj)
         return sequences_obj_list
     except Exception as e:
-        ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
-                                                                                     f'{currentframe().f_code.co_name}:{e} ',
-                                                                                     5)
+        if mf.MainForm.main_form is not None:
+            mf.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+                                                                                f'{currentframe().f_code.co_name}:{e} ',
+                                                                                5)
+        else:
+            rmf.Cell.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+                                                                                 f'{currentframe().f_code.co_name}:{e} ',
+                                                                                 5)
         sys.exit(e)
 
 
@@ -183,7 +199,12 @@ def serialize_to_json(obj, json_path, logger):
             json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=True, indent=4)
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
-        ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
-                                                                                     f'{currentframe().f_code.co_name}:{e} ',
-                                                                                     5)
+        if mf.MainForm.main_form is not None:
+            mf.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+                                                                                f'{currentframe().f_code.co_name}:{e} ',
+                                                                                5)
+        else:
+            rmf.Cell.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+                                                                                 f'{currentframe().f_code.co_name}:{e} ',
+                                                                                 5)
         sys.exit(e)

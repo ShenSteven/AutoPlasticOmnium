@@ -106,7 +106,8 @@ class TestSuite:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.index, -1, False)
+        if ui.mainform.MainForm.main_form is not None:
+            ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.index, -1, False)
         # QMetaObject.invokeMethod(ui.mainform.MainForm.main_form, 'update_treeWidget_color',
         #                          Qt.BlockingQueuedConnection,
         #                          Q_ARG(QBrush, color),
