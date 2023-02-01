@@ -10,14 +10,14 @@ from os.path import dirname, abspath, join
 from threading import Thread
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRegExp, QMetaObject, QThread
+from PyQt5.QtCore import Qt, QRegExp, QMetaObject
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, save_config, run_cmd
-import sockets.serialport
+# import sockets.serialport
 from model.mysignals import MySignals, update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from model.sqlite import Sqlite
@@ -956,7 +956,6 @@ class MainForm(QWidget):
         self.setIpFlag = False
         self.DUTMesIP = ''
         self.DUTMesMac = ''
-        gv.sec = 0
         if not self.SingleStepTest:
             self.SuiteNo = -1
             self.StepNo = -1

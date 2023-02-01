@@ -103,14 +103,14 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         try:
             scanSN = self.lineEdit_2.text().strip()
             localNo = int(self.lineEdit.text().strip()[1:])
-            if len(scanSN) == gv.cf.dut.sn_len:
+            if getattr(sys, 'frozen', True):
                 if scanSN in self.CheckSnList:
                     self.lineEdit_2.setStyleSheet("background-color: rgb(255, 85, 255);")
                     self.lb_info.setText('SN is repetitive!')
                     self.clear_input()
                     return
 
-                if not self.CellList[localNo - 1].StartFlag:
+                if not self.CellList[localNo - 1].startFlag:
                     self.clear_input()
                     gv.rTxtLogPath = gv.logFolderPath + rf"\{time.strftime('%Y%m%d')}"
                     os.makedirs(gv.OutPutPath, exist_ok=True)
@@ -128,9 +128,10 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
                     self.lb_info.setText('Location is testing!')
                     self.clear_input()
             else:
-                self.lineEdit_2.setStyleSheet("background-color: rgb(255, 0, 0);")
-                self.lb_info.setText('SN length error!')
-                self.clear_input()
+                if len(scanSN) != gv.cf.dut.sn_len:
+                    self.lineEdit_2.setStyleSheet("background-color: rgb(255, 0, 0);")
+                    self.lb_info.setText('SN length error!')
+                    self.clear_input()
         except Exception as e:
             QMessageBox.critical(None, "Exception", str(e))
             self.clear_input()

@@ -33,6 +33,10 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.start_time = datetime.now()
                 myWind.StartFlag = True
                 myWind.my_signals.timingSignal[bool].emit(True)
+                print(
+                    f"Start test,SN:{myWind.SN},CellNO={myWind.LocalNo},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
+                    f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug}, FTC:{gv.cf.station.fail_continue},"
+                    f"SoftVersion:{gv.version},WebPS={myWind.WebPsIp}")
             else:
                 myWind.ui.treeWidget.blockSignals(True)
                 if not myWind.SingleStepTest:
@@ -47,9 +51,10 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                                                                      QIcon(':/images/Pause-icon.png'))
                 myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.ui.actionStop, True)
                 myWind.startFlag = True
-                myWind.logger.debug(f"Start test,SN:{myWind.SN},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
-                                    f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
-                                    f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
+                myWind.logger.debug(
+                    f"Start test,SN:{myWind.SN},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
+                    f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
+                    f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
                 myWind.my_signals.update_tableWidget[str].emit('clear')
                 gv.pause_event.set()
         elif status == TestStatus.FAIL:
@@ -68,7 +73,8 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                                                                              20, Qt.red)
                 myWind.UpdateContinueFail(False)
                 if myWind.setIpFlag:
-                    myWind.testcase.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0", gv.cf.dut.prompt, 1)
+                    myWind.testcase.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0",
+                                                          gv.cf.dut.prompt, 1)
         elif status == TestStatus.PASS:
             if gv.loginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(0, 255, 0);")
