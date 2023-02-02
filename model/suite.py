@@ -29,6 +29,7 @@ def fail_continue(test_step: model.step.Step, failContinue):
 class TestSuite:
 
     def __init__(self, suiteName=None, test_serial=None, dict_=None):
+        self.myWind = None
         self.logger = None
         self.SuiteName = suiteName
         self.index = test_serial
@@ -54,6 +55,7 @@ class TestSuite:
         :param stepNo:
         :return:test result,pass or fail.
         """
+        self.myWind = test_case.myWind
         if self.logger is None:
             self.logger = test_case.logger
         if not self.isTest:
@@ -105,14 +107,8 @@ class TestSuite:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        if ui.mainform.MainForm.main_form is not None:
-            ui.mainform.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.index, -1, False)
-        # QMetaObject.invokeMethod(ui.mainform.MainForm.main_form, 'update_treeWidget_color',
-        #                          Qt.BlockingQueuedConnection,
-        #                          Q_ARG(QBrush, color),
-        #                          Q_ARG(int, self.index),
-        #                          Q_ARG(int, -1),
-        #                          Q_ARG(bool, False))
+        if isinstance(self.myWind, ui.mainform.MainForm):
+            self.myWind.my_signals.treeWidgetColor.emit(color, self.index, -1, False)
 
     def print_result_info(self):
         self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -130,19 +126,18 @@ class TestSuite:
             test_case.ForStartSuiteNo = self.index
             test_case.ForStartStepNo = step_item.index
             test_case.ForFlag = False
-            self.logger.debug(f"====================Start Cycle-{test_case.ForCycleCounter}===========================")
+            self.logger.debug('=' * 10 + f"Start Cycle-{test_case.ForCycleCounter}." + '=' * 10)
 
     def process_EndFor(self, test_case, step_item: model.step.Step):
-        """FOR 循环结束判断 ENDFOR"""
+        """FOR 循环结束判断 END FOR"""
         if not IsNullOrEmpty(step_item.For) and step_item.For.lower().startswith('end'):
             self.daq_collect(test_case)
             if test_case.ForCycleCounter < test_case.ForTotalCycle:
                 test_case.ForFlag = True
                 test_case.ForCycleCounter += 1
                 return True
-
             test_case.ForFlag = False
-            self.logger.debug('=' * 10 + f"Have Complete all({test_case.ForCycleCounter}) Cycle test." + '=' * 10)
+            self.logger.debug('=' * 10 + f"Have Complete all ({test_case.ForCycleCounter}) Cycle test." + '=' * 10)
             test_case.ForCycleCounter = 1
             return False
         else:

@@ -10,13 +10,15 @@ import copy
 import os
 import sys
 import traceback
-from datetime import datetime
 import model.loadseq
 import model.product
 import model.sqlite
 import model.variables
 import conf.globalvar as gv
+import sockets.serialport
 from inspect import currentframe
+from datetime import datetime
+from PyQt5.QtWidgets import QMessageBox
 
 
 class TestCase:
@@ -133,8 +135,6 @@ class TestCase:
 
     def get_stationNo(self):
         """通过串口读取治具中设置的测试工站名字"""
-        import sockets.serialport
-        from PyQt5.QtWidgets import QMessageBox
         if not gv.cf.station.fix_flag:
             return
         self.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
