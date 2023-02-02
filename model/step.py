@@ -17,7 +17,7 @@ import model.sqlite
 import model.keyword
 from .basicfunc import IsNullOrEmpty
 import conf.globalvar as gv
-import ui.mainform as mf
+import ui.mainform
 
 
 class Step:
@@ -66,7 +66,7 @@ class Step:
     """
 
     def __init__(self, dict_=None):
-        self.wind = None
+        self.myWind = None
         self.logger = None
         self.breakpoint: bool = False
         self.suiteIndex: int = 0
@@ -81,7 +81,7 @@ class Step:
         self.elapsedTime = 0
         self._isTest = True
         self.suiteVar = ''
-        # Excel Column
+        # ============= Excel Column ===============
         self.SuiteName: str = ''
         self.StepName: str = ''
         self.EeroName: str = ''
@@ -121,21 +121,19 @@ class Step:
 
     @property
     def isTest(self):
-        if mf.MainForm.main_form is not None:
+        if isinstance(self.myWind, ui.mainform.MainForm):
             if str(self.IfElse).lower() == 'else':
-                self._isTest = not mf.MainForm.main_form.testcase.IfCond
-            if not IsNullOrEmpty(self.Model) and mf.MainForm.main_form.dut_model.lower() not in self.Model.lower():
+                self._isTest = not self.myWind.testcase.IfCond
+            if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower():
                 self._isTest = False
-            if mf.MainForm.main_form.SingleStepTest:
+            if self.myWind.SingleStepTest:
                 self._isTest = True
             return self._isTest
         else:
             if str(self.IfElse).lower() == 'else':
-                self._isTest = not self.wind.testcase.IfCond
-            if not IsNullOrEmpty(self.Model) and self.wind.dut_model.lower() not in self.Model.lower():
+                self._isTest = not self.myWind.testcase.IfCond
+            if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower():
                 self._isTest = False
-            if self.wind.SingleStepTest:
-                self._isTest = True
             return self._isTest
 
     @isTest.setter
@@ -161,13 +159,10 @@ class Step:
     # @staticmethod
     def parse_var(self, value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
-        if mf.MainForm.main_form.TestVariables is None and self.wind.TestVariables:
+        if self.myWind.TestVariables is None:
             return value
         for a in re.findall(r'<(.*?)>', value):
-            if mf.MainForm.main_form.TestVariables is not None:
-                varVal = getattr(mf.MainForm.main_form.TestVariables, a)
-            else:
-                varVal = getattr(self.wind.TestVariables, a)
+            varVal = getattr(self.myWind.TestVariables, a)
             if varVal is None:
                 raise Exception(f'Variable:{a} not found in globalVal!!')
             else:
@@ -192,12 +187,12 @@ class Step:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        if mf.MainForm.main_form is not None:
-            mf.MainForm.main_form.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
+        if isinstance(self.myWind, ui.mainform.MainForm):
+            self.myWind.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
 
     def run(self, test_case, testSuite, suiteItem: model.product.SuiteItem = None):
         """run test step"""
-        self.wind = test_case.myWind
+        self.myWind = test_case.myWind
         if self.logger is None:
             self.logger = testSuite.logger
         self.SuiteName = testSuite.SuiteName
@@ -226,9 +221,9 @@ class Step:
 
             if self.breakpoint or gv.pauseFlag:
                 gv.pauseFlag = True
-                if mf.MainForm.main_form is not None:
-                    mf.MainForm.main_form.my_signals.setIconSignal[QAction, QIcon].emit(
-                        mf.MainForm.main_form.ui.actionStart, QIcon(':/images/Start-icon.png'))
+                if isinstance(self.myWind, ui.mainform.MainForm):
+                    self.myWind.my_signals.setIconSignal[QAction, QIcon].emit(
+                        self.myWind.ui.actionStart, QIcon(':/images/Start-icon.png'))
                 gv.pause_event.clear()
             else:
                 gv.pause_event.set()
@@ -374,8 +369,8 @@ class Step:
         if self.Json.lower() == 'y':
             ts = datetime.now() - self.start_time
             self.elapsedTime = ts.seconds + ts.microseconds / 1000000
-            if mf.MainForm.main_form is not None:
-                mf.MainForm.main_form.my_signals.update_tableWidget[list].emit(
+            if isinstance(self.myWind, ui.mainform.MainForm):
+                self.myWind.my_signals.update_tableWidget[list].emit(
                     [test_case.myWind.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL,
                      self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 

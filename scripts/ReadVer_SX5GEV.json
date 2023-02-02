@@ -8,6 +8,7 @@
         "isTest": true,
         "isTestFinished": false,
         "logger": null,
+        "myWind": null,
         "phase_details": null,
         "start_time": "",
         "steps": [
@@ -51,14 +52,14 @@
                 "finish_time": null,
                 "index": 0,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "",
@@ -100,14 +101,14 @@
                 "finish_time": null,
                 "index": 1,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "p",
@@ -149,14 +150,14 @@
                 "finish_time": null,
                 "index": 2,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "",
@@ -198,14 +199,14 @@
                 "finish_time": null,
                 "index": 3,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "p",
@@ -247,14 +248,14 @@
                 "finish_time": null,
                 "index": 4,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "",
@@ -296,14 +297,14 @@
                 "finish_time": null,
                 "index": 5,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "p",
@@ -345,14 +346,14 @@
                 "finish_time": null,
                 "index": 6,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "",
@@ -394,14 +395,14 @@
                 "finish_time": null,
                 "index": 7,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "p",
@@ -443,14 +444,14 @@
                 "finish_time": null,
                 "index": 8,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "",
@@ -492,14 +493,14 @@
                 "finish_time": null,
                 "index": 9,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "p",
@@ -541,14 +542,14 @@
                 "finish_time": null,
                 "index": 10,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "",
@@ -590,14 +591,14 @@
                 "finish_time": null,
                 "index": 11,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "p",
@@ -639,14 +640,14 @@
                 "finish_time": null,
                 "index": 12,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "",
@@ -688,14 +689,14 @@
                 "finish_time": null,
                 "index": 13,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             },
             {
                 "ByPF": "p",
@@ -737,14 +738,14 @@
                 "finish_time": null,
                 "index": 14,
                 "logger": null,
+                "myWind": null,
                 "param1": "",
                 "start_time": null,
                 "start_time_json": null,
                 "status": "exception",
                 "suiteIndex": 0,
                 "suiteVar": "",
-                "testValue": null,
-                "wind": null
+                "testValue": null
             }
         ],
         "suiteResult": true,
