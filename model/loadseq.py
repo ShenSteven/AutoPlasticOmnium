@@ -20,10 +20,10 @@ import model.step
 import model.sqlite
 from .basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
-import ui.mainform as mf
+import ui.mainform
 
 
-def excel_convert_to_json(testcase_path_excel, all_stations, logger, myWind):
+def excel_convert_to_json(testcase_path_excel, all_stations, logger, myWind=None):
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
     for station in all_stations:
         load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger, myWind)
@@ -80,13 +80,10 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
-        if myWind is not None:
-            mf.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
-                                                                                f'{currentframe().f_code.co_name}:{e} ',
-                                                                                5)
+        myWind.my_signals.showMessageBox[str, str, int].emit('ERROR!', f'{currentframe().f_code.co_name}:{e} ', 5)
         sys.exit(e)
     else:
-        serialize_to_json(suites_list, test_script_path, logger)
+        serialize_to_json(suites_list, test_script_path, logger, myWind)
         return suites_list
     finally:
         workbook.close()
@@ -110,10 +107,10 @@ def param_wrapper_verify_sha256(flag):
                 if sha256 == JsonSHA:
                     result = fun(*bound_args.args, **bound_args.kwargs)
                 else:
-                    if mf.MainForm.main_form is not None:
-                        mf.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
-                                                                                            f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!',
-                                                                                            5)
+                    if ui.mainform.MainForm.main_form is not None:
+                        ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
+                                                                                                     f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!',
+                                                                                                     5)
                     sys.exit(f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!')
             else:
                 result = fun(*bound_args.args, **bound_args.kwargs)
@@ -125,7 +122,7 @@ def param_wrapper_verify_sha256(flag):
 
 
 @param_wrapper_verify_sha256(False)
-def load_testcase_from_json(json_path, isverify=False):
+def load_testcase_from_json(json_path, isverify=False, Wind=None):
     try:
         """Deserialize form json.
         :param json_path: json file path.
@@ -144,10 +141,8 @@ def load_testcase_from_json(json_path, isverify=False):
             sequences_obj_list.append(suit_obj)
         return sequences_obj_list
     except Exception as e:
-        if mf.MainForm.main_form is not None:
-            mf.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
-                                                                                f'{currentframe().f_code.co_name}:{e} ',
-                                                                                5)
+        if Wind is not None:
+            Wind.my_signals.showMessageBox[str, str, int].emit('Exception!', f'{currentframe().f_code.co_name}:{e}', 5)
         sys.exit(e)
 
 
@@ -172,8 +167,9 @@ def wrapper_save_sha256(fun):
 
 
 @wrapper_save_sha256
-def serialize_to_json(obj, json_path, logger):
+def serialize_to_json(obj, json_path, logger, Wind=None):
     """serialize obj to json and encrypt.
+    :param myWind:
     :param logger:log handle
     :param obj: the object you want to serialize
     :param json_path: the path of json
@@ -187,8 +183,6 @@ def serialize_to_json(obj, json_path, logger):
             json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=True, indent=4)
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
-        if mf.MainForm.main_form is not None:
-            mf.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
-                                                                                f'{currentframe().f_code.co_name}:{e} ',
-                                                                                5)
+        if Wind is not None:
+            Wind.my_signals.showMessageBox[str, str, int].emit('Exception!', f'{currentframe().f_code.co_name}:{e}', 5)
         sys.exit(e)
