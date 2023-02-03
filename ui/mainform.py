@@ -51,6 +51,7 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
         self.pause_event = threading.Event()
         self.IsCycle = False
         self.pauseFlag = False
@@ -184,7 +185,7 @@ class MainForm(QWidget):
 
     def init_tableWidget(self):
         self.ui.tableWidget_2.setHorizontalHeaderLabels(['property', 'value'])
-        self.ui.tableWidget.setHorizontalHeaderLabels(gv.tableWidgetHeader)
+        self.ui.tableWidget.setHorizontalHeaderLabels(self.tableWidgetHeader)
         self.ui.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.tableWidget.resizeColumnsToContents()
@@ -982,7 +983,7 @@ class MainForm(QWidget):
     def saveTestResult(self):
         def thread_update():
             reportPath = fr'{gv.OutPutPath}\result.csv'
-            create_csv_file(self.logger, reportPath, gv.tableWidgetHeader)
+            create_csv_file(self.logger, reportPath, self.tableWidgetHeader)
             if os.path.exists(reportPath):
                 all_rows = []
                 for row in range(self.ui.tableWidget.rowCount()):
