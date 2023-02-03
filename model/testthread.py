@@ -72,7 +72,7 @@ class TestThread(QThread):
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
                 else:
-                    continue
+                    time.sleep(0.001)
         except Exception as e:
             self.myWind.logger.fatal(f"TestThread() Exception:{e},{traceback.format_exc()}")
             self.signal[QWidget, TestStatus].emit(self.myWind, TestStatus.ABORT)
