@@ -446,8 +446,8 @@ class MainForm(QWidget):
         self.on_returnPressed('stepping')
 
     def on_actionLooping(self):
-        gv.FailNumOfCycleTest = 0
-        gv.PassNumOfCycleTest = 0
+        self.FailNumOfCycleTest = 0
+        self.PassNumOfCycleTest = 0
         gv.IsCycle = True
         self.on_returnPressed()
 
