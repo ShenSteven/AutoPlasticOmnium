@@ -35,8 +35,8 @@ class TestThread(QThread):
         try:
             while True:
                 if self.myWind.startFlag:
-                    if gv.IsCycle:
-                        while gv.IsCycle:
+                    if self.myWind.IsCycle:
+                        while self.myWind.IsCycle:
                             if self.myWind.testcase.run(gv.cf.station.fail_continue):
                                 self.myWind.PassNumOfCycleTest += 1
                             else:

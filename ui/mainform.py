@@ -51,6 +51,9 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.pause_event = threading.Event()
+        self.IsCycle = False
+        self.pauseFlag = False
         self.shop_floor_url = ''
         self.TestVariables: model.variables.Variables = None
         self.WorkOrder = '1'
@@ -448,7 +451,7 @@ class MainForm(QWidget):
     def on_actionLooping(self):
         self.FailNumOfCycleTest = 0
         self.PassNumOfCycleTest = 0
-        gv.IsCycle = True
+        self.IsCycle = True
         self.on_returnPressed()
 
     def on_actionBreakpoint(self):
@@ -542,19 +545,19 @@ class MainForm(QWidget):
 
     def on_actionStart(self):
         if self.startFlag:
-            if not gv.pauseFlag:
-                gv.pauseFlag = True
+            if not self.pauseFlag:
+                self.pauseFlag = True
                 self.ui.actionStart.setIcon(QIcon(':/images/Start-icon.png'))
-                gv.pause_event.clear()
+                self.pause_event.clear()
             else:
-                gv.pauseFlag = False
+                self.pauseFlag = False
                 self.ui.actionStart.setIcon(QIcon(':/images/Pause-icon.png'))
-                gv.pause_event.set()
+                self.pause_event.set()
         else:
             self.on_returnPressed()
 
     def on_actionStop(self):
-        if gv.IsCycle:
+        if self.IsCycle:
             if self.startFlag:
                 self.saveTestResult()
                 if self.FailNumOfCycleTest == 0:
@@ -562,7 +565,7 @@ class MainForm(QWidget):
                     self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.PASS)
                 else:
                     self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.FAIL)
-                gv.IsCycle = False
+                self.IsCycle = False
         else:
             self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.ABORT)
 
@@ -743,7 +746,7 @@ class MainForm(QWidget):
     # @QtCore.pyqtSlot(QBrush, int, int, bool)
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
         if stepNo_ == -1:
-            if gv.IsCycle or not self.startFlag:
+            if self.IsCycle or not self.startFlag:
                 return
             self.ui.treeWidget.topLevelItem(suiteNO_).setExpanded(True)
             self.ui.treeWidget.topLevelItem(suiteNO_).setBackground(0, color)

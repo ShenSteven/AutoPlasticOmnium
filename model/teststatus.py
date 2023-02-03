@@ -55,7 +55,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                     f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
                     f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
                 myWind.my_signals.update_tableWidget[str].emit('clear')
-                gv.pause_event.set()
+                myWind.pause_event.set()
         elif status == TestStatus.FAIL:
             if gv.loginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 0, 0);")

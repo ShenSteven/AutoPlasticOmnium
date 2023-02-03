@@ -213,23 +213,23 @@ class Step:
                                   f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
                 self.init_online_limit()
             else:
-                if not gv.IsCycle:
+                if not self.myWind.IsCycle:
                     self.setColor(Qt.gray)
                 test_result = True
                 self.status = str(test_result)
                 return True
 
-            if self.breakpoint or gv.pauseFlag:
-                gv.pauseFlag = True
+            if self.breakpoint or self.myWind.pauseFlag:
+                self.myWind.pauseFlag = True
                 if isinstance(self.myWind, ui.mainform.MainForm):
                     self.myWind.my_signals.setIconSignal[QAction, QIcon].emit(
                         self.myWind.ui.actionStart, QIcon(':/images/Start-icon.png'))
-                gv.pause_event.clear()
+                self.myWind.pause_event.clear()
             else:
-                gv.pause_event.set()
+                self.myWind.pause_event.set()
 
             for retry in range(self.Retry, -1, -1):
-                if gv.pause_event.wait():
+                if self.myWind.pause_event.wait():
                     test_result, info = model.keyword.testKeyword(test_case, self, testSuite)
                 if test_result:
                     break

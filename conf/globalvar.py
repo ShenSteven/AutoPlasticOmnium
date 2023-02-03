@@ -66,9 +66,9 @@ PLin = None
 
 IsDebug = False
 # startFlag = False
-pauseFlag = False
-pause_event = Event()
-IsCycle = False
+# pauseFlag = False
+# pause_event = Event()
+# IsCycle = False
 # finalTestResult = False
 # setIpFlag = False
 # SingleStepTest = False
