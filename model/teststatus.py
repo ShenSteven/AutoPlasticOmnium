@@ -12,7 +12,6 @@ from enum import Enum
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QLabel, QAction, QWidget
-from model.reporting import saveTestResult
 import conf.globalvar as gv
 
 
@@ -100,7 +99,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
                                                                              myWind.testcase.error_details_first_fail,
                                                                              20, Qt.gray)
-                saveTestResult(myWind.logger)
+                myWind.saveTestResult()
     except Exception as e:
         myWind.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
     finally:

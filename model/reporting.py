@@ -9,10 +9,8 @@
 import os
 import time
 import json
-import csv
 import requests
 from threading import Thread
-import ui.mainform as mf
 import conf.globalvar as gv
 from model.basicfunc import write_csv_file, create_csv_file
 
@@ -98,34 +96,6 @@ def collect_data_to_csv(mesPhases, csv_list_header, csv_list_data, myWind):
         fix_header_value.extend(csv_list_data)
         myWind.logger.debug(f'CollectResultToCsv {myWind.testcase.csv_file_path}')
         write_csv_file(myWind.logger, myWind.testcase.csv_file_path, fix_header_value)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-    thread.join()
-
-
-def saveTestResult(logger=None):
-    if mf.MainForm.main_form is None:
-        return
-
-    def thread_update():
-        reportPath = fr'{gv.OutPutPath}\result.csv'
-        create_csv_file(logger, reportPath, gv.tableWidgetHeader)
-        if os.path.exists(reportPath):
-            all_rows = []
-            for row in range(mf.MainForm.main_form.ui.tableWidget.rowCount()):
-                row_data = []
-                for column in range(mf.MainForm.main_form.ui.tableWidget.columnCount()):
-                    item = mf.MainForm.main_form.ui.tableWidget.item(row, column)
-                    if item is not None:
-                        row_data.append(item.text())
-                all_rows.append(row_data)
-
-            with open(reportPath, 'a', newline='') as stream:
-                writer = csv.writer(stream)
-                writer.writerows(all_rows)
-        if logger is not None:
-            logger.debug(f'saveTestResult to:{reportPath}')
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()

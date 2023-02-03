@@ -1,4 +1,5 @@
 import copy
+import csv
 import logging
 import os
 import sys
@@ -16,8 +17,7 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
-from model.basicfunc import IsNullOrEmpty, save_config, run_cmd
-# import sockets.serialport
+from model.basicfunc import IsNullOrEmpty, save_config, run_cmd, create_csv_file
 from model.mysignals import MySignals, update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from model.sqlite import Sqlite
@@ -25,7 +25,6 @@ import model.testcase
 from model.teststatus import TestStatus
 from model.testthread import TestThread
 from peak.peaklin import PeakLin
-from model.reporting import saveTestResult
 from inspect import currentframe
 import model.loadseq
 import model.variables
@@ -557,7 +556,7 @@ class MainForm(QWidget):
     def on_actionStop(self):
         if gv.IsCycle:
             if self.startFlag:
-                saveTestResult(self.logger)
+                self.saveTestResult()
                 if self.FailNumOfCycleTest == 0:
                     self.finalTestResult = True
                     self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.PASS)
@@ -976,6 +975,30 @@ class MainForm(QWidget):
             self.testThread.start()
         self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.START)
         self.ui.tabWidget.setCurrentWidget(self.ui.result)
+
+    def saveTestResult(self):
+        def thread_update():
+            reportPath = fr'{gv.OutPutPath}\result.csv'
+            create_csv_file(self.logger, reportPath, gv.tableWidgetHeader)
+            if os.path.exists(reportPath):
+                all_rows = []
+                for row in range(self.ui.tableWidget.rowCount()):
+                    row_data = []
+                    for column in range(self.ui.tableWidget.columnCount()):
+                        item = self.ui.tableWidget.item(row, column)
+                        if item is not None:
+                            row_data.append(item.text())
+                    all_rows.append(row_data)
+
+                with open(reportPath, 'a', newline='') as stream:
+                    writer = csv.writer(stream)
+                    writer.writerows(all_rows)
+            if self.logger is not None:
+                self.logger.debug(f'saveTestResult to:{reportPath}')
+
+        thread = Thread(target=thread_update, daemon=True)
+        thread.start()
+        thread.join()
 
 
 if __name__ == "__main__":

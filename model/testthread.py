@@ -12,7 +12,7 @@ import conf.globalvar as gv
 from PyQt5.QtWidgets import QWidget, QFrame
 from PyQt5.QtCore import QThread, pyqtSignal
 from model.teststatus import TestStatus, SetTestStatus
-from model.reporting import upload_Json_to_client, upload_result_to_mes, collect_data_to_csv, saveTestResult
+from model.reporting import upload_Json_to_client, upload_result_to_mes, collect_data_to_csv
 
 
 class TestThread(QThread):
@@ -66,7 +66,8 @@ class TestThread(QThread):
                         self.myWind.finalTestResult = result & result1 & result2
                         collect_data_to_csv(self.myWind.testcase.mesPhases, self.myWind.testcase.csv_list_header,
                                             self.myWind.testcase.csv_list_data, self.myWind)
-                        saveTestResult(self.myWind.logger)
+                        if gv.mainWin is not None:
+                            self.myWind.saveTestResult()
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
