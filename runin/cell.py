@@ -6,9 +6,14 @@
 @Date   : 9/2/2022
 @Desc   : 
 """
+import logging
+import os
+import sys
+import threading
 import time
 import traceback
 from datetime import datetime
+from threading import Thread
 import conf.globalvar as gv
 from PyQt5 import QtCore
 from PyQt5.QtGui import QBrush
@@ -26,6 +31,11 @@ class Cell(QFrame, Ui_cell):
     def __init__(self, parent=None, row=-1, col=-1, testcase=None):
         QFrame.__init__(self, parent)
         Ui_cell.__init__(self)
+        self.logger = gv.lg.logger
+        self.fileHandle = None
+        self.pause_event = threading.Event()
+        self.IsCycle = False
+        self.pauseFlag = False
         self.shop_floor_url = ''
         self.TestVariables: model.variables.Variables = None
         self.WorkOrder = '1'
@@ -57,10 +67,12 @@ class Cell(QFrame, Ui_cell):
         self.LocalNo = -100
         self.row_index = row
         self.col_index = col
-        self.testcase = testcase
+        # self.testcase = testcase
+        self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
+                                                                         f'{gv.cf.station.station_name}', self.logger,
+                                                                         self)
         self.sequences = []
-        self.CellLogTxt = ''
-        self.logger = None
+
         self.setupUi(self)
         self.init_cell_ui()
         self.init_signals_connect()
@@ -82,6 +94,7 @@ class Cell(QFrame, Ui_cell):
         self.my_signals.updateLabel[QLabel, str, int].connect(update_label)
         self.my_signals.updateLabel[QLabel, str].connect(update_label)
         self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
+        self.my_signals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
     def showMessageBox(self, title, text, level=2):
@@ -96,6 +109,20 @@ class Cell(QFrame, Ui_cell):
             return QMessageBox.about(self, title, text)
         else:
             return QMessageBox.critical(self, title, text, QMessageBox.Yes)
+
+    def on_actionSaveLog(self, info):
+        def thread_update():
+            if info == 'rename':
+                rename_log = self.txtLogPath.replace('logging',
+                                                     str(self.finalTestResult).upper()).replace('details',
+                                                                                                self.testcase.error_details_first_fail)
+                self.logger.debug(f"rename test log to: {rename_log}")
+                self.fileHandle.close()
+                os.rename(self.txtLogPath, rename_log)
+                self.txtLogPath = rename_log
+
+        thread = Thread(target=thread_update, daemon=True)
+        thread.start()
 
     def startTest(self):
         try:
@@ -122,7 +149,7 @@ class Cell(QFrame, Ui_cell):
         self.rs_url = gv.cf.station.rs_url
         self.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
-        self.init_create_dirs()
+        # self.init_create_dirs()
         self.finalTestResult = False
         self.setIpFlag = False
         self.DUTMesIP = ''
@@ -137,10 +164,21 @@ class Cell(QFrame, Ui_cell):
         gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
         self.logger = gv.lg.logger
         self.testcase.logger = self.logger
+        self.init_textEditHandler()
         if not self.testThread.isRunning():
             self.testThread = TestThread(self)
             self.testThread.start()
         self.testThread.signal2[Cell, TestStatus].emit(self, TestStatus.START)
+
+    def init_textEditHandler(self):
+        """create log handler for textEdit"""
+        log_console = logging.getLogger('testlog').handlers[0]
+        if getattr(sys, 'frozen', False):
+            logging.getLogger('testlog').removeHandler(log_console)
+            self.fileHandle = gv.lg.logger.handlers[0]
+        else:
+            gv.cf.station.privileges = 'lab'
+            self.fileHandle = gv.lg.logger.handlers[1]
 
     def timing(self, flag):
         if flag:
@@ -154,9 +192,6 @@ class Cell(QFrame, Ui_cell):
         self.my_signals.updateLabel[QLabel, str, int].emit(self.lb_testTime, str(self.sec), 20)
         # QApplication.processEvents()
         self.sec += 1
-
-    def init_create_dirs(self):
-        pass
 
 
 if __name__ == "__main__":

@@ -84,7 +84,7 @@ class MainForm(QWidget):
         self.timer = None
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
-        self.init_create_dirs()
+        gv.init_create_dirs(self.logger)
         self.sec = 1
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
                                                                          f'{gv.cf.station.station_name}', self.logger,
@@ -102,17 +102,6 @@ class MainForm(QWidget):
         self.ShowTreeView(self.testSequences)
         self.testThread = TestThread(self)
         self.testThread.start()
-
-    def init_create_dirs(self):
-        try:
-            if not IsNullOrEmpty(gv.cf.station.setTimeZone):
-                os.system(f"tzutil /s \"{gv.cf.station.setTimeZone}\"")
-            os.makedirs(gv.logFolderPath + r"\Json", exist_ok=True)
-            os.makedirs(gv.OutPutPath, exist_ok=True)
-            os.makedirs(gv.DataPath, exist_ok=True)
-            os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
-        except Exception as e:
-            self.logger.fatal(f'{currentframe().f_code.co_name}:{e}')
 
     def init_select_station(self):
         for item in gv.cf.station.station_all:
@@ -950,7 +939,7 @@ class MainForm(QWidget):
         self.rs_url = gv.cf.station.rs_url
         self.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
-        self.init_create_dirs()
+        gv.init_create_dirs(self.logger)
         # gv.csv_list_header = []
         # gv.csv_list_data = []
         self.testcase.daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'

@@ -6,7 +6,6 @@
 @Date   : 9/2/2022
 @Desc   : 
 """
-import os
 import re
 import sys
 import time
@@ -112,12 +111,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
 
                 if not self.CellList[localNo - 1].startFlag:
                     self.clear_input()
-                    gv.rTxtLogPath = gv.logFolderPath + rf"\{time.strftime('%Y%m%d')}"
-                    os.makedirs(gv.OutPutPath, exist_ok=True)
-                    os.makedirs(gv.DataPath, exist_ok=True)
-                    os.makedirs(gv.rTxtLogPath + r"\Json", exist_ok=True)
-                    os.makedirs(gv.cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
-                    gv.debugPath = fr"{gv.rTxtLogPath}\debug_{time.strftime('%Y%m%d')}.txt"
+                    gv.init_create_dirs(self.logger)
                     self.init_cell_param(localNo, scanSN)
                     self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 255);")
                     self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 255);")
@@ -137,13 +131,13 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
             self.clear_input()
 
     def init_cell_param(self, localNo, sn):
-        self.CellList[localNo - 1].CellLogTxt = rf"{gv.rTxtLogPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
+        self.CellList[localNo - 1].CellLogTxt = rf"{gv.logFolderPath}\logging_{localNo}_{sn}_details_{time.strftime('%H-%M-%S')}.txt"
         self.CellList[localNo - 1].lb_sn.setText(sn)
         self.CellList[localNo - 1].lb_cellNum.setVisible(False)
         self.CellList[localNo - 1].lb_testName.setText('')
         self.CellList[localNo - 1].lbl_failCount.setText('')
         self.CellList[localNo - 1].sequences = self.testSequences
-        self.CellList[localNo - 1].logger = rf"{gv.rTxtLogPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
+        self.CellList[localNo - 1].logger = rf"{gv.logFolderPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
         if self.CellList[localNo - 1].startTest():
             self.CheckSnList.append(sn)
 

@@ -8,11 +8,13 @@
 """
 import os
 from datetime import datetime
+from inspect import currentframe
 from os.path import join, abspath, dirname, exists
 import conf.config
 import platform
 from conf.logprint import LogPrint
 import main
+from model.basicfunc import IsNullOrEmpty
 
 
 def get_about():
@@ -42,7 +44,6 @@ database_result = rf'{current_dir}\OutPut\result.db'
 logFolderPath = ''
 critical_log = ''
 errors_log = ''
-rTxtLogPath = ''
 
 IsDebug = False
 mainWin = None
@@ -81,6 +82,19 @@ def create_sub_log_folder():
 
 create_sub_log_folder()
 lg = LogPrint('debug', critical_log, errors_log)
+
+
+def init_create_dirs(logger):
+    try:
+        if not IsNullOrEmpty(cf.station.setTimeZone):
+            os.system(f"tzutil /s \"{cf.station.setTimeZone}\"")
+        os.makedirs(logFolderPath + r"\Json", exist_ok=True)
+        os.makedirs(OutPutPath, exist_ok=True)
+        os.makedirs(DataPath, exist_ok=True)
+        os.makedirs(cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
+    except Exception as e:
+        logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+
 
 if __name__ == '__main__':
     pass

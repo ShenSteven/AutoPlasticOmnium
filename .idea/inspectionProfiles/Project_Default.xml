@@ -16,6 +16,7 @@
           <option value="peak.PeakLin" />
           <option value="images_rc" />
           <option value="model.product" />
+          <option value="model.testcase" />
         </list>
       </option>
     </inspection_tool>

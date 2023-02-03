@@ -30,11 +30,11 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
             if gv.loginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 255, 0);")
                 myWind.start_time = datetime.now()
-                myWind.StartFlag = True
+                myWind.startFlag = True
                 myWind.my_signals.timingSignal[bool].emit(True)
                 print(
                     f"Start test,SN:{myWind.SN},CellNO={myWind.LocalNo},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
-                    f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug}, FTC:{gv.cf.station.fail_continue},"
+                    f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},FTC:{gv.cf.station.fail_continue},"
                     f"SoftVersion:{gv.version},WebPS={myWind.WebPsIp}")
             else:
                 myWind.ui.treeWidget.blockSignals(True)
@@ -108,8 +108,9 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 if status != TestStatus.START:
                     myWind.SN = ''
                     myWind.my_signals.timingSignal[bool].emit(False)
-                    myWind.StartFlag = False
+                    myWind.startFlag = False
                     myWind.logger.debug(f"Test end,ElapsedTime:{myWind.sec}s.")
+                    myWind.my_signals.saveTextEditSignal[str].emit('rename')
                     if not myWind.finalTestResult:
                         myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testName,
                                                                                      myWind.testcase.error_details_first_fail,
