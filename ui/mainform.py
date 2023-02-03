@@ -52,6 +52,7 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.shop_floor_url = ''
         self.TestVariables: model.variables.Variables = None
         self.WorkOrder = '1'
         self.DUTMesMac = ''
@@ -582,10 +583,10 @@ class MainForm(QWidget):
 
     def on_actionCSVLog(self):
         def thread_update():
-            if os.path.exists(gv.CSVFilePath):
-                os.startfile(gv.CSVFilePath)
+            if os.path.exists(self.testcase.csv_file_path):
+                os.startfile(self.testcase.csv_file_path)
             else:
-                self.logger.warning(f"no find CSV log,path:{gv.CSVFilePath}")
+                self.logger.warning(f"no find CSV log,path:{self.testcase.csv_file_path}")
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
@@ -944,7 +945,7 @@ class MainForm(QWidget):
                                                          gv.cf.dut.test_mode, gv.cf.dut.qsdk_ver, gv.version)
         self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
         self.rs_url = gv.cf.station.rs_url
-        gv.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
+        self.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
         self.init_create_dirs()
         # gv.csv_list_header = []

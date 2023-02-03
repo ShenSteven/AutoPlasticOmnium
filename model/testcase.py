@@ -28,6 +28,7 @@ class TestCase:
         self.myWind = wind
         self.FixSerialPort = None  # 治具串口通信
         self.dut_comm = None  # DUT通信
+        self.NiInstrComm = None
         self.clone_suites = None
         self.original_suites = None
         self.logger = None
@@ -58,6 +59,7 @@ class TestCase:
         self.daq_data_path = ''
         self.csv_list_header = []
         self.csv_list_data = []
+        self.csv_file_path = ''
         model.sqlite.init_database(self.logger, gv.database_setting)
         self.load_testcase(testcase_path, sheet_name, logger)
 

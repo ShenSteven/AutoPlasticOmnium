@@ -62,7 +62,7 @@ errors_log = ''
 # dut_comm = None
 # FixSerialPort = None
 PLin = None
-NiInstrComm = None
+# NiInstrComm = None
 
 IsDebug = False
 # startFlag = False
@@ -86,10 +86,10 @@ DataPath = rf'{current_dir}\Data'
 scriptFolder = rf'{current_dir}\scripts'
 excel_file_path = rf'{scriptFolder}\{cf.station.testcase}'
 test_script_json = rf'{scriptFolder}\{cf.station.station_name}.json'
-CSVFilePath = ''
-mes_shop_floor = ''
+# csvFilePath = ''
+# mes_shop_floor = ''
 # mes_result = ''
-shop_floor_url = ''
+# shop_floor_url = ''
 database_setting = rf'{current_dir}\conf\setting.db'
 database_result = rf'{current_dir}\OutPut\result.db'
 

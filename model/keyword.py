@@ -214,7 +214,7 @@ def testKeyword(test_case, item, testSuite):
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
         elif item.Keyword == 'NiVisaCmd':
-            rReturn, revStr = gv.NiInstrComm.SendCommand(item.command, item.ExpectStr, item.Timeout)
+            rReturn, revStr = test_case.NiInstrComm.SendCommand(item.command, item.ExpectStr, item.Timeout)
             if rReturn and item.CheckStr1 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr, item)
@@ -227,8 +227,8 @@ def testKeyword(test_case, item, testSuite):
                 rReturn = False
 
         elif item.Keyword == 'NiVisaOpenInstr':
-            gv.NiInstrComm = VisaComm(item.logger)
-            rReturn = gv.NiInstrComm.open(item.command)
+            test_case.NiInstrComm = VisaComm(item.logger)
+            rReturn = test_case.NiInstrComm.open(item.command)
 
         else:
             rReturn, revStr = test_case.dut_comm.SendCommand(item.command, item.ExpectStr, item.Timeout)
