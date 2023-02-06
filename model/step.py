@@ -121,20 +121,15 @@ class Step:
 
     @property
     def isTest(self):
-        if isinstance(self.myWind, ui.mainform.MainForm):
-            if str(self.IfElse).lower() == 'else':
-                self._isTest = not self.myWind.testcase.IfCond
-            if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower():
-                self._isTest = False
-            if self.myWind.SingleStepTest:
-                self._isTest = True
+        if self.myWind is None:
             return self._isTest
-        else:
-            if str(self.IfElse).lower() == 'else':
-                self._isTest = not self.myWind.testcase.IfCond
-            if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower():
-                self._isTest = False
-            return self._isTest
+        if str(self.IfElse).lower() == 'else':
+            self._isTest = not self.myWind.testcase.IfCond
+        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower():
+            self._isTest = False
+        if self.myWind.SingleStepTest:
+            self._isTest = True
+        return self._isTest
 
     @isTest.setter
     def isTest(self, value):
@@ -159,6 +154,8 @@ class Step:
     # @staticmethod
     def parse_var(self, value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
+        if self.myWind is None:
+            return value
         if self.myWind.TestVariables is None:
             return value
         for a in re.findall(r'<(.*?)>', value):
