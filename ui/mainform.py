@@ -22,6 +22,7 @@ from model.mysignals import MySignals, update_label, on_setIcon, updateAction, c
     on_actionException
 from model.sqlite import Sqlite
 import model.testcase
+from model.testform import TestForm
 from model.teststatus import TestStatus
 from model.testthread import TestThread
 from peak.peaklin import PeakLin
@@ -36,7 +37,7 @@ from ui.settings import SettingsDialog
 # pyuic5 ui_main.ui -o main_ui.py
 
 
-class MainForm(QWidget):
+class MainForm(QWidget, TestForm):
     main_form = None
     _lock = threading.RLock()
 
@@ -51,41 +52,11 @@ class MainForm(QWidget):
 
     def __init__(self):
         super().__init__()
+        TestForm.__init__(self)
         self.tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
-        self.pause_event = threading.Event()
-        self.IsCycle = False
-        self.pauseFlag = False
-        self.shop_floor_url = ''
-        self.TestVariables: model.variables.Variables = None
-        self.WorkOrder = '1'
-        self.DUTMesMac = ''
-        self.DUTMesIP = ''
-        self.setIpFlag = False  # 是否设置dut IP为默认ip
-        self.dut_model = 'unknown'
-        self.SN = ''
-        self.finalTestResult = False
-        self.startFlag = False
-        self.txtLogPath = ''
-        self.rs_url = ''
-        self.mes_result = ''
-        self.logger = gv.lg.logger
-        self.fileHandle = None
-        self.SaveScriptDisableFlag = False
-        self.SingleStepTest = False
-        self.StepNo = -1
-        self.SuiteNo = -1
-        self.FailNumOfCycleTest = 0
-        self.PassNumOfCycleTest = 0
-        self.total_abort_count = 0
-        self.total_fail_count = 0
-        self.total_pass_count = 0
-        self.continue_fail_count = 0
-        self.my_signals = MySignals()
-        self.timer = None
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         gv.init_create_dirs(self.logger)
-        self.sec = 1
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
                                                                          f'{gv.cf.station.station_name}', self.logger,
                                                                          self)

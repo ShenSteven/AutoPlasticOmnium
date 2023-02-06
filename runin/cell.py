@@ -21,48 +21,18 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox
 import model.variables
 from conf.logprint import LogPrint
 from model.mysignals import MySignals, update_label
+from model.testform import TestForm
 from model.teststatus import TestStatus
 from model.testthread import TestThread
 from runin.ui_cell import Ui_cell
 
 
-class Cell(QFrame, Ui_cell):
+class Cell(QFrame, Ui_cell, TestForm):
 
     def __init__(self, parent=None, row=-1, col=-1, testcase=None):
         QFrame.__init__(self, parent)
         Ui_cell.__init__(self)
-        self.logger = gv.lg.logger
-        self.fileHandle = None
-        self.pause_event = threading.Event()
-        self.IsCycle = False
-        self.pauseFlag = False
-        self.shop_floor_url = ''
-        self.TestVariables: model.variables.Variables = None
-        self.WorkOrder = '1'
-        self.DUTMesMac = ''
-        self.DUTMesIP = ''
-        self.setIpFlag = False  # 是否设置dut IP为默认ip
-        self.dut_model = 'unknown'
-        self.SN = ''
-        self.finalTestResult = False
-        self.startFlag = False
-        self.txtLogPath = ''
-        self.rs_url = ''
-        self.mes_result = ''
-        self.fileHandle = None
-        self.SaveScriptDisableFlag = False
-        self.SingleStepTest = False
-        self.StepNo = -1
-        self.SuiteNo = -1
-        self.FailNumOfCycleTest = 0
-        self.PassNumOfCycleTest = 0
-        self.total_abort_count = 0
-        self.total_fail_count = 0
-        self.total_pass_count = 0
-        self.continue_fail_count = 0
-        self.my_signals = MySignals()
-        self.timer = None
-        self.sec = 1
+        TestForm.__init__(self)
         self.WebPsIp = 'null'
         self.LocalNo = -100
         self.row_index = row
