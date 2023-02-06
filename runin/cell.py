@@ -9,7 +9,6 @@
 import logging
 import os
 import sys
-import threading
 import time
 import traceback
 from datetime import datetime
@@ -20,7 +19,7 @@ from PyQt5.QtGui import QBrush
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox
 import model.variables
 from conf.logprint import LogPrint
-from model.mysignals import MySignals, update_label
+from model.mysignals import update_label
 from model.testform import TestForm
 from model.teststatus import TestStatus
 from model.testthread import TestThread

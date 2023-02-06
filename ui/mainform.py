@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, save_config, run_cmd, create_csv_file
-from model.mysignals import MySignals, update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
+from model.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from model.sqlite import Sqlite
 import model.testcase
