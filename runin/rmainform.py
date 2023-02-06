@@ -10,11 +10,15 @@ import re
 import sys
 import time
 from inspect import currentframe
+
+from PyQt5.QtCore import QRegExp
+from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from os.path import dirname, abspath, join
 from PyQt5.uic import loadUi
 import model.testcase
 import model.loadseq
+from model.basicfunc import IsNullOrEmpty
 from runin.cell import Cell
 from runin.ui_runin import Ui_RuninMain
 import conf.globalvar as gv
@@ -62,6 +66,7 @@ class LoginWind:
 
 class RuninMainForm(QMainWindow, Ui_RuninMain):
     def __init__(self, parent=None):
+        self.dut_model = None
         self.logger = gv.lg.logger
         self.CellList = []
         self.CheckSnList = []
@@ -73,6 +78,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.setupUi(self)
         self.initCellUi()
         self.lineEdit.returnPressed.connect(self.locationInput)
+        self.lineEdit_2.textEdited.connect(self.on_textEdited)
         self.lineEdit_2.returnPressed.connect(self.start_cell)
 
     def initCellUi(self):
@@ -84,7 +90,6 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
                 widget_cell.setObjectName(f"widget_{row + 1}{col + 1}")
                 self.gridLayout.addWidget(widget_cell, row, col, 1, 1)
                 self.CellList.append(widget_cell)
-                # print(widget_cell)
         self.lineEdit.setFocus()
 
     def locationInput(self):
@@ -131,13 +136,37 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
             QMessageBox.critical(None, "Exception", str(e))
             self.clear_input()
 
+    def on_textEdited(self):
+        def JudgeProdMode():
+            """通过SN判断机种"""
+            sn = self.lineEdit_2.text()
+            if sn[0] == 'J' or sn[0] == '6':
+                self.dut_model = gv.cf.dut.dut_models[0]
+            elif sn[0] == 'N' or sn[0] == '7':
+                self.dut_model = gv.cf.dut.dut_models[1]
+            elif sn[0] == 'Q' or sn[0] == '8':
+                self.dut_model = gv.cf.dut.dut_models[2]
+            elif sn[0] == 'S' or sn[0] == 'G':
+                self.dut_model = gv.cf.dut.dut_models[3]
+            else:
+                self.dut_model = 'unknown'
+
+        """验证dut sn的正则规则"""
+        if JudgeProdMode() != 'unknown' and not gv.IsDebug:
+            reg = QRegExp(gv.cf.dut.dut_regex[self.dut_model])
+            pValidator = QRegExpValidator(reg, self)
+            self.lineEdit_2.setValidator(pValidator)
+
     def init_cell_param(self, localNo, sn):
-        self.CellList[localNo - 1].CellLogTxt = rf"{gv.logFolderPath}\logging_{localNo}_{sn}_details_{time.strftime('%H-%M-%S')}.txt"
+        self.CellList[
+            localNo - 1].CellLogTxt = rf"{gv.logFolderPath}\logging_{localNo}_{sn}_details_{time.strftime('%H-%M-%S')}.txt"
         self.CellList[localNo - 1].lb_sn.setText(sn)
         self.CellList[localNo - 1].lb_cellNum.setVisible(False)
         self.CellList[localNo - 1].lb_testName.setText('')
         self.CellList[localNo - 1].lbl_failCount.setText('')
         self.CellList[localNo - 1].logger = rf"{gv.logFolderPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
+        self.CellList[localNo - 1].dut_model = self.dut_model
+        self.CellList[localNo - 1].lb_model.setText(self.dut_model)
         if self.CellList[localNo - 1].startTest():
             self.CheckSnList.append(sn)
 

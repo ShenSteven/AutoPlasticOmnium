@@ -845,26 +845,23 @@ class MainForm(QWidget, TestForm):
             return True
 
     def on_textEdited(self):
-        sn = self.ui.lineEdit.text()
 
         def JudgeProdMode():
             """通过SN判断机种"""
-            if IsNullOrEmpty(sn):
-                self.dut_model = 'unknown'
-                return self.dut_model
+            sn = self.ui.lineEdit.text()
             if sn[0] == 'J' or sn[0] == '6':
-                gv.dut_mode = gv.cf.dut.dut_models[0]
+                self.dut_model = gv.cf.dut.dut_models[0]
             elif sn[0] == 'N' or sn[0] == '7':
-                gv.dut_mode = gv.cf.dut.dut_models[1]
+                self.dut_model = gv.cf.dut.dut_models[1]
             elif sn[0] == 'Q' or sn[0] == '8':
-                gv.dut_mode = gv.cf.dut.dut_models[2]
+                self.dut_model = gv.cf.dut.dut_models[2]
             elif sn[0] == 'S' or sn[0] == 'G':
-                gv.dut_mode = gv.cf.dut.dut_models[3]
+                self.dut_model = gv.cf.dut.dut_models[3]
             else:
                 self.dut_model = 'unknown'
             self.ui.actionunknow.setText(self.dut_model)
-            return self.dut_model
 
+        """验证dut sn的正则规则"""
         if JudgeProdMode() != 'unknown' and not gv.IsDebug:
             reg = QRegExp(gv.cf.dut.dut_regex[self.dut_model])
             pValidator = QRegExpValidator(reg, self)

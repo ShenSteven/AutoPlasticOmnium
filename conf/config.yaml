@@ -58,7 +58,7 @@ dut:
     ssh_username: root
     ssh_password: root
     dut_models:
-    - xxx1
+    - cento212
     dut_regex:
         cento212: '[A-Z0-9]+$'
     data_api:

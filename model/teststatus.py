@@ -59,9 +59,8 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
         elif status == TestStatus.FAIL:
             if gv.loginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 0, 0);")
-                myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testName,
-                                                                             myWind.testcase.error_details_first_fail,
-                                                                             20, Qt.red)
+                myWind.my_signals.updateLabel[QLabel, str].emit(myWind.lb_testName,
+                                                                myWind.testcase.error_details_first_fail)
             else:
                 myWind.total_fail_count += 1
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'FAIL', 36, Qt.red)
@@ -112,10 +111,8 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                     myWind.logger.debug(f"Test end,ElapsedTime:{myWind.sec}s.")
                     myWind.my_signals.saveTextEditSignal[str].emit('rename')
                     if not myWind.finalTestResult:
-                        myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testName,
-                                                                                     myWind.testcase.error_details_first_fail,
-                                                                                     20,
-                                                                                     Qt.red)
+                        myWind.my_signals.updateLabel[QLabel, str].emit(myWind.lb_testName,
+                                                                        myWind.testcase.error_details_first_fail)
                     else:
                         pass
             else:

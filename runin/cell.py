@@ -155,8 +155,8 @@ class Cell(QFrame, Ui_cell, TestForm):
             self.killTimer(self.timer)
 
     def timerEvent(self, a):
-        self.my_signals.updateLabel[QLabel, str, int].emit(self.lb_testTime, str(self.sec), 20)
-        # QApplication.processEvents()
+        self.my_signals.updateLabel[QLabel, str].emit(self.lb_testTime, str(self.sec))
+        QApplication.processEvents()
         self.sec += 1
 
 
