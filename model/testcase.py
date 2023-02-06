@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import QMessageBox
 class TestCase:
     """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
-    def __init__(self, testcase_path, sheet_name, logger, wind=None):
+    def __init__(self, testcase_path, sheet_name, logger, wind=None, cflag=True):
         self.myWind = wind
         self.FixSerialPort = None  # 治具串口通信
         self.dut_comm = None  # DUT通信
@@ -61,16 +61,16 @@ class TestCase:
         self.csv_list_data = []
         self.csv_file_path = ''
         model.sqlite.init_database(self.logger, gv.database_setting)
-        self.load_testcase(testcase_path, sheet_name, logger)
+        self.load_testcase(testcase_path, sheet_name, logger, cflag)
 
-    def load_testcase(self, testcase_path, sheet_name, logger):
+    def load_testcase(self, testcase_path, sheet_name, logger, cflag):
         self.sheetName = sheet_name
         self.testcase_path = testcase_path
         self.logger = logger
-        if not getattr(sys, 'frozen', False):
+        if not getattr(sys, 'frozen', False) and cflag:
             model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger, self.myWind)
         if os.path.exists(self.test_script_json):
-            self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json)
+            self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json, self.myWind)
         else:
             self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path, self.sheetName,
                                                                           self.test_script_json, self.logger,

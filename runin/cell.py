@@ -29,7 +29,7 @@ from runin.ui_cell import Ui_cell
 
 class Cell(QFrame, Ui_cell, TestForm):
 
-    def __init__(self, parent=None, row=-1, col=-1, testcase=None):
+    def __init__(self, parent=None, row=-1, col=-1):
         QFrame.__init__(self, parent)
         Ui_cell.__init__(self)
         TestForm.__init__(self)
@@ -37,11 +37,9 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.LocalNo = -100
         self.row_index = row
         self.col_index = col
-        # self.testcase = testcase
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
                                                                          f'{gv.cf.station.station_name}', self.logger,
-                                                                         self)
-        self.sequences = []
+                                                                         self, False)
 
         self.setupUi(self)
         self.init_cell_ui()
@@ -119,7 +117,6 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.rs_url = gv.cf.station.rs_url
         self.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
-        # self.init_create_dirs()
         self.finalTestResult = False
         self.setIpFlag = False
         self.DUTMesIP = ''

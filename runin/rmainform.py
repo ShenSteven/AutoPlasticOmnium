@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from os.path import dirname, abspath, join
 from PyQt5.uic import loadUi
 import model.testcase
+import model.loadseq
 from runin.cell import Cell
 from runin.ui_runin import Ui_RuninMain
 import conf.globalvar as gv
@@ -66,8 +67,6 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.CheckSnList = []
         self.RowCount = gv.cf.RUNIN.row
         self.ColCount = gv.cf.RUNIN.col
-        self.testcase = model.testcase.TestCase(rf'{gv.excel_file_path}', f'{gv.cf.station.station_name}', self.logger)
-        self.testSequences = self.testcase.clone_suites
         QMainWindow.__init__(self, parent)
         Ui_RuninMain.__init__(self)
         super().__init__(parent)
@@ -77,9 +76,11 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.lineEdit_2.returnPressed.connect(self.start_cell)
 
     def initCellUi(self):
+        if not getattr(sys, 'frozen', False):
+            model.loadseq.excel_convert_to_json(f'{gv.excel_file_path}', gv.cf.station.station_all, self.logger)
         for row in range(self.RowCount):
             for col in range(self.ColCount):
-                widget_cell = Cell(self.body, row + 1, col + 1, self.testcase)
+                widget_cell = Cell(self.body, row + 1, col + 1)
                 widget_cell.setObjectName(f"widget_{row + 1}{col + 1}")
                 self.gridLayout.addWidget(widget_cell, row, col, 1, 1)
                 self.CellList.append(widget_cell)
@@ -136,7 +137,6 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.CellList[localNo - 1].lb_cellNum.setVisible(False)
         self.CellList[localNo - 1].lb_testName.setText('')
         self.CellList[localNo - 1].lbl_failCount.setText('')
-        self.CellList[localNo - 1].sequences = self.testSequences
         self.CellList[localNo - 1].logger = rf"{gv.logFolderPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
         if self.CellList[localNo - 1].startTest():
             self.CheckSnList.append(sn)
