@@ -24,6 +24,8 @@ from model.testform import TestForm
 from model.teststatus import TestStatus
 from model.testthread import TestThread
 from runin.ui_cell import Ui_cell
+from time import strftime
+from time import gmtime
 
 
 class Cell(QFrame, Ui_cell, TestForm):
@@ -155,7 +157,7 @@ class Cell(QFrame, Ui_cell, TestForm):
             self.killTimer(self.timer)
 
     def timerEvent(self, a):
-        self.my_signals.updateLabel[QLabel, str].emit(self.lb_testTime, str(self.sec))
+        self.my_signals.updateLabel[QLabel, str].emit(self.lb_testTime, strftime("%H:%M:%S", gmtime(self.sec)))
         QApplication.processEvents()
         self.sec += 1
 
