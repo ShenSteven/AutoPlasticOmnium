@@ -34,14 +34,14 @@ class Cell(QFrame, Ui_cell, TestForm):
         QFrame.__init__(self, parent)
         Ui_cell.__init__(self)
         TestForm.__init__(self)
-        self.WebPsIp = 'null'
+        self.WebPsIp = '192.168.10.'
+        self.webSwitchCon = None
         self.LocalNo = -100
         self.row_index = row
         self.col_index = col
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
                                                                          f'{gv.cf.station.station_name}', self.logger,
                                                                          self, False)
-
         self.setupUi(self)
         self.init_cell_ui()
         self.init_signals_connect()
@@ -54,6 +54,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.lb_testTime.setText('')
         self.lbl_failCount.setText('')
         self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
+        self.WebPsIp = '192.168.10.' + str(self.row_index)
         self.testcase.myWind = self
 
     def init_signals_connect(self):

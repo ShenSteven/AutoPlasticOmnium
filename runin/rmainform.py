@@ -18,7 +18,7 @@ from os.path import dirname, abspath, join
 from PyQt5.uic import loadUi
 import model.testcase
 import model.loadseq
-from model.basicfunc import IsNullOrEmpty
+from model.mysignals import on_actionLogFolder
 from runin.cell import Cell
 from runin.ui_runin import Ui_RuninMain
 import conf.globalvar as gv
@@ -80,6 +80,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.lineEdit.returnPressed.connect(self.locationInput)
         self.lineEdit_2.textEdited.connect(self.on_textEdited)
         self.lineEdit_2.returnPressed.connect(self.start_cell)
+        self.bt_openLog.clicked.connect(on_actionLogFolder)
 
     def initCellUi(self):
         if not getattr(sys, 'frozen', False):
