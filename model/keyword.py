@@ -240,7 +240,7 @@ def testKeyword(test_case, item, testSuite):
             else:
                 rReturn = False
     except Exception as e:
-        raise
+        raise e
     else:
         return rReturn, compInfo
     finally:

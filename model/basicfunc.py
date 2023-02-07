@@ -37,10 +37,10 @@ def ping(logger, host, timeout=1):
             return False
     except subprocess.TimeoutExpired:
         logger.debug(f'ping {host} Timeout.')
-        return False
+        raise
     except Exception as e:
         logger.fatal(e)
-        return False
+        raise
 
 
 def run_cmd(logger, command, timeout=3):
@@ -58,7 +58,7 @@ def run_cmd(logger, command, timeout=3):
             return False, ret.stdout
     except Exception as e:
         logger.fatal(e)
-        return False, None
+        raise
 
 
 def kill_process(logger, process_name, killall=True):
@@ -75,7 +75,8 @@ def kill_process(logger, process_name, killall=True):
         return True
     except Exception as e:
         logger.fatal(e)
-        return False
+        raise e
+        # return False
 
 
 def process_exists(process_name):
@@ -99,7 +100,8 @@ def start_process(logger, full_path, process_name):
             return True
     except Exception as e:
         logger.fatal(e)
-        return False
+        raise e
+        # return False
 
 
 def restart_process(logger, full_path, process_name):
@@ -109,7 +111,8 @@ def restart_process(logger, full_path, process_name):
             return start_process(logger, full_path, process_name)
     except Exception as e:
         logger.fatal(e)
-        return False
+        raise e
+        # return False
 
 
 def save_config(logger, yaml_file, obj):
@@ -124,8 +127,8 @@ def save_config(logger, yaml_file, obj):
             logger.fatal(f"save_config! {e}")
             f.seek(0)
             f.write(readall)
+            raise
         else:
-            pass
             logger.info(f"save conf.yaml success!")
 
 
@@ -173,7 +176,8 @@ def create_csv_file(logger, filename, header, updateColumn=False):
                         file.writerows(rows)
                     logger.debug(f'update csvHeader success!')
     except Exception as e:
-        logger.debug(e)
+        logger.fatal(e)
+        raise e
 
 
 def write_csv_file(logger, filename, row):
@@ -183,6 +187,7 @@ def write_csv_file(logger, filename, row):
             file.writerow(row)
     except Exception as e:
         logger.fatal(e)
+        raise e
 
 
 def IsNullOrEmpty(strObj: str):

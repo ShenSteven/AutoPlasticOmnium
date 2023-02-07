@@ -447,7 +447,7 @@ class Step:
             else:
                 self.logger.warning(f'this teardown({self.TearDown}) no cation.')
         except Exception as e:
-            self.logger.fatal(f"process_teardown:{e}")
+            raise e
 
     def init_online_limit(self):
         pass
