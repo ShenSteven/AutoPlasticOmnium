@@ -11,7 +11,7 @@ import traceback
 from datetime import datetime
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QLabel
 import model.product
 import model.sqlite
 import model.keyword
@@ -204,6 +204,8 @@ class Step:
 
         try:
             if self.isTest:
+                if not isinstance(self.myWind, ui.mainform.MainForm):
+                    self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName, self.StepName)
                 self.setColor(Qt.yellow)
                 self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                   f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
@@ -231,18 +233,18 @@ class Step:
                 if test_result:
                     break
             self.setColor(Qt.green if test_result else Qt.red)
-            self.set_errorCode_details(test_result, info)
+            self.set_errorCode_details(str(test_result), info)
             self.print_test_info(test_case, test_result)
             self.process_teardown(test_result)
             self.status = self.process_if_bypass(test_case, test_result)
-            self.set_errorCode_details(True if self.status == 'True' else False, info)
-            self.record_first_fail(test_case, True if self.status == 'True' else False)
+            self.record_first_fail(test_case, str(self.status), info)
             self.generate_report(test_case, test_result, suiteItem)
             self.process_mesVer(test_case)
         except Exception as e:
             self.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
             self.setColor(Qt.darkRed)
-            self.status = False
+            self.status = 'exception'
+            self.record_first_fail(test_case, str(self.status), info)
             return False
         else:
             return True if self.status == 'True' else False
@@ -270,29 +272,30 @@ class Step:
                     f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
                     f"'{test_result}','{self.status}')")
 
-    def set_errorCode_details(self, result=False, info=''):
-        if result:
+    def set_errorCode_details(self, status: str, info=''):
+        if status == str(True):
             self.error_code = ''
             self.error_details = ''
-            return
-
-        if IsNullOrEmpty(self.error_code) and IsNullOrEmpty(self.error_details):
-            return
-
-        if IsNullOrEmpty(self.ErrorCode):
-            self.error_code = self.EeroName
-            self.error_details = self.EeroName
-        elif ':' in self.ErrorCode:
-            error_list = self.ErrorCode.split()
-            if len(error_list) > 1 and info == 'TooHigh':
-                self.error_code = error_list[1].split(':')[0].strip()
-                self.error_details = error_list[1].split(':')[1].strip()
-            else:
-                self.error_code = error_list[0].split(':')[0].strip()
-                self.error_details = error_list[0].split(':')[1].strip()
-        else:
+        elif status == 'exception':
             self.error_code = self.ErrorCode
-            self.error_details = self.ErrorCode
+            self.error_details = 'exception!'
+        else:
+            # if IsNullOrEmpty(self.error_code) and IsNullOrEmpty(self.error_details):
+            #     return
+            if IsNullOrEmpty(self.ErrorCode):
+                self.error_code = self.EeroName
+                self.error_details = self.EeroName
+            elif ':' in self.ErrorCode:
+                error_list = self.ErrorCode.split()
+                if len(error_list) > 1 and info == 'TooHigh':
+                    self.error_code = error_list[1].split(':')[0].strip()
+                    self.error_details = error_list[1].split(':')[1].strip()
+                else:
+                    self.error_code = error_list[0].split(':')[0].strip()
+                    self.error_details = error_list[0].split(':')[1].strip()
+            else:
+                self.error_code = self.ErrorCode
+                self.error_details = self.ErrorCode
 
     def process_mesVer(self, test_case):
         """collect data to mes"""
@@ -315,8 +318,9 @@ class Step:
             test_case.IfCond = True
         return test_result
 
-    def record_first_fail(self, test_case, tResult):
-        if not tResult:
+    def record_first_fail(self, test_case, status: str, info):
+        self.set_errorCode_details(status, info)
+        if status != str(True):
             test_case.failCount += 1
         else:
             return

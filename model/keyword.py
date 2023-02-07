@@ -8,7 +8,6 @@
 """
 import os
 import re
-import traceback
 import nidaqmx
 from PyQt5 import QtCore
 from PyQt5.QtCore import QMetaObject, Qt
@@ -26,7 +25,7 @@ from inspect import currentframe
 
 def testKeyword(test_case, item, testSuite):
     # gv.lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
-    time.sleep(1)
+    # time.sleep(0.5)
     # return True, ''
     rReturn = False
     compInfo = ''
@@ -241,9 +240,7 @@ def testKeyword(test_case, item, testSuite):
             else:
                 rReturn = False
     except Exception as e:
-        item.logger.fatal(f'{currentframe().f_code.co_name}:{e},{traceback.format_exc()}')
-        rReturn = False
-        return rReturn, compInfo
+        raise
     else:
         return rReturn, compInfo
     finally:
