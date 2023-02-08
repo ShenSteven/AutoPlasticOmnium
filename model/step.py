@@ -205,7 +205,8 @@ class Step:
         try:
             if self.isTest:
                 if not isinstance(self.myWind, ui.mainform.MainForm):
-                    self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName, self.StepName)
+                    self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
+                                                                         f"<A href='https://www.qt.io/'>{self.StepName}</A>")
                 self.setColor(Qt.yellow)
                 self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                   f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"

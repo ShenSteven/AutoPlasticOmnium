@@ -65,6 +65,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.my_signals.updateLabel[QLabel, str].connect(update_label)
         self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
         self.my_signals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
+        self.lb_testName.linkActivated.connect(self.link_clicked)
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
     def showMessageBox(self, title, text, level=2):
@@ -161,6 +162,16 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.my_signals.updateLabel[QLabel, str].emit(self.lb_testTime, strftime("%H:%M:%S", gmtime(self.sec)))
         QApplication.processEvents()
         self.sec += 1
+
+    def link_clicked(self):
+        def open_testlog():
+            if os.path.exists(self.txtLogPath):
+                os.startfile(self.txtLogPath)
+            else:
+                self.logger.warning(f"no find txt log,path:{self.txtLogPath}")
+
+        thread = Thread(target=open_testlog, daemon=True)
+        thread.start()
 
 
 if __name__ == "__main__":

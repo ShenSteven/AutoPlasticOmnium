@@ -41,6 +41,7 @@ class Ui_cell(object):
         self.lb_sn.setTextFormat(QtCore.Qt.AutoText)
         self.lb_sn.setScaledContents(False)
         self.lb_sn.setAlignment(QtCore.Qt.AlignCenter)
+        self.lb_sn.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.lb_sn.setObjectName("lb_sn")
         self.horizontalLayout.addWidget(self.lb_sn)
         self.horizontalLayout.setStretch(0, 10)

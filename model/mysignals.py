@@ -34,14 +34,14 @@ class MySignals(QObject):
 
 
 def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
-    def thread_update():
-        label.setText(str_)
-        if color is not None:
-            label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
-        QApplication.processEvents()
+    # def thread_update():
+    label.setText(str_)
+    if color is not None:
+        label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
+    QApplication.processEvents()
 
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
+    # thread = Thread(target=thread_update, daemon=True)
+    # thread.start()
 
 
 def updateAction(action_, icon: QIcon = None, text: str = None):
