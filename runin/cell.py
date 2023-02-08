@@ -202,7 +202,6 @@ class Cell(QFrame, Ui_cell, TestForm):
 
     def On_actionClearCell(self):
         if not self.startFlag:
-            gv.CheckSnList.remove(self.lb_sn.text())
             self.lb_cellNum.setText('')
             self.lb_sn.setText('')
             self.lb_model.setText('')
@@ -221,7 +220,6 @@ class Cell(QFrame, Ui_cell, TestForm):
                 return
             self.testThread.signal2[Cell, TestStatus].emit(self, TestStatus.ABORT)
             time.sleep(1)
-
         if not self.startTest():
             return
         gv.CheckSnList.append(self.SN)

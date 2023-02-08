@@ -71,14 +71,13 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.dut_model = None
         self.logger = gv.lg.logger
         self.CellList = []
-        # self.CheckSnList = []
         self.RowCount = gv.cf.RUNIN.row
         self.ColCount = gv.cf.RUNIN.col
         self.setupUi(self)
         self.lb_ip.setText('IP: ' + socket.gethostbyname(socket.gethostname()))
         self.lb_station.setText(gv.cf.station.station_no)
         self.lb_testMode.setText(gv.cf.dut.test_mode)
-        self.lb_info.setText('Please can sn.')
+        self.lb_info.setText('Please scan sn.')
         self.setWindowTitle('RUNIN/ORT ' + gv.version)
         self.initCellUi()
         self.lineEdit.returnPressed.connect(self.locationInput)
@@ -168,7 +167,6 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.CellList[localNo - 1].lb_model.setText(self.dut_model)
         if self.CellList[localNo - 1].startTest():
             gv.CheckSnList.append(sn)
-        print(gv.CheckSnList)
 
     def clear_input(self):
         self.lineEdit.setText('')
