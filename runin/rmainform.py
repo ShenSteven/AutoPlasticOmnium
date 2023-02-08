@@ -7,6 +7,7 @@
 @Desc   : 
 """
 import re
+import socket
 import sys
 import time
 from inspect import currentframe
@@ -66,21 +67,27 @@ class LoginWind:
 
 class RuninMainForm(QMainWindow, Ui_RuninMain):
     def __init__(self, parent=None):
+        QMainWindow.__init__(self, parent)
+        Ui_RuninMain.__init__(self)
+        super().__init__(parent)
         self.dut_model = None
         self.logger = gv.lg.logger
         self.CellList = []
         self.CheckSnList = []
         self.RowCount = gv.cf.RUNIN.row
         self.ColCount = gv.cf.RUNIN.col
-        QMainWindow.__init__(self, parent)
-        Ui_RuninMain.__init__(self)
-        super().__init__(parent)
         self.setupUi(self)
+        self.lb_ip.setText('IP: ' + socket.gethostbyname(socket.gethostname()))
+        self.lb_station.setText(gv.cf.station.station_no)
+        self.lb_testMode.setText(gv.cf.dut.test_mode)
+        self.lb_info.setText('Please can sn.')
+        self.setWindowTitle('RUNIN/ORT ' + gv.version)
         self.initCellUi()
         self.lineEdit.returnPressed.connect(self.locationInput)
         self.lineEdit_2.textEdited.connect(self.on_textEdited)
         self.lineEdit_2.returnPressed.connect(self.start_cell)
         self.bt_openLog.clicked.connect(on_actionLogFolder)
+
 
     def initCellUi(self):
         if not getattr(sys, 'frozen', False):
