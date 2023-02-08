@@ -88,7 +88,6 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.lineEdit_2.returnPressed.connect(self.start_cell)
         self.bt_openLog.clicked.connect(on_actionLogFolder)
 
-
     def initCellUi(self):
         if not getattr(sys, 'frozen', False):
             model.loadseq.excel_convert_to_json(f'{gv.excel_file_path}', gv.cf.station.station_all, self.logger)
