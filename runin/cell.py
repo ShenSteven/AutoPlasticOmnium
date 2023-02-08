@@ -15,10 +15,11 @@ from datetime import datetime
 from threading import Thread
 import conf.globalvar as gv
 from PyQt5 import QtCore
-from PyQt5.QtGui import QBrush
-from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox
+from PyQt5.QtGui import QBrush, QCursor
+from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox, QMenu
 import model.variables
 from conf.logprint import LogPrint
+from model.basicfunc import IsNullOrEmpty
 from model.mysignals import update_label
 from model.testform import TestForm
 from model.teststatus import TestStatus
@@ -36,7 +37,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         TestForm.__init__(self)
         self.WebPsIp = '192.168.10.'
         self.webSwitchCon = None
-        self.LocalNo = -100
+        self.localNo = -100
         self.row_index = row
         self.col_index = col
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
@@ -56,6 +57,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
         self.WebPsIp = '192.168.10.' + str(self.row_index)
         self.testcase.myWind = self
+        self.localNo = (self.row_index - 1) * 8 + self.col_index
 
     def init_signals_connect(self):
         """connect signals to slots"""
@@ -66,6 +68,12 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
         self.my_signals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
         self.lb_testName.linkActivated.connect(self.link_clicked)
+        self.customContextMenuRequested.connect(self.on_menu)
+        self.actionClearCell.triggered.connect(self.On_actionClearCell)
+        self.actionRetest.triggered.connect(self.On_actionRetest)
+        self.actionResetFailCount.triggered.connect(self.On_actionResetFailCount)
+        self.actionSetDefaultIP.triggered.connect(self.On_actionSetDefaultIP)
+        self.actionTelnetLogin.triggered.connect(self.On_actionTelnetLogin)
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
     def showMessageBox(self, title, text, level=2):
@@ -99,18 +107,20 @@ class Cell(QFrame, Ui_cell, TestForm):
         try:
             # if not self.checkContinueFailNum():
             #     return False
-            self.SN = ''
-            self.SN = self.lb_sn.text().strip()
+            self.SN = self.lb_sn.text()
             self.variable_init(self.SN)
         except Exception as e:
             self.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
             return False
+        else:
+            return True
 
     def checkContinueFailNum(self):
         pass
 
     def variable_init(self, SN):
         """测试变量初始化"""
+        gv.init_create_dirs(self.logger)
         self.TestVariables = model.variables.Variables(gv.cf.station.station_name,
                                                        gv.cf.station.station_no, SN, gv.cf.dut.dut_ip,
                                                        gv.cf.station.log_folder)
@@ -130,7 +140,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.WorkOrder = '1'
         self.testcase.startTimeJson = datetime.now()
         self.sec = 1
-        self.txtLogPath = rf'{gv.logFolderPath}\logging_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
+        self.txtLogPath = rf'{gv.logFolderPath}\logging_{self.localNo}_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
         gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
         self.logger = gv.lg.logger
         self.testcase.logger = self.logger
@@ -149,6 +159,14 @@ class Cell(QFrame, Ui_cell, TestForm):
         else:
             gv.cf.station.privileges = 'lab'
             self.fileHandle = gv.lg.logger.handlers[1]
+
+    def UpdateContinueFail(self, testResult: bool):
+        if gv.IsDebug or gv.cf.dut.test_mode.lower() == 'debug':
+            return
+        if testResult:
+            self.continue_fail_count = 0
+        else:
+            self.continue_fail_count += 1
 
     def timing(self, flag):
         if flag:
@@ -172,6 +190,50 @@ class Cell(QFrame, Ui_cell, TestForm):
 
         thread = Thread(target=open_testlog, daemon=True)
         thread.start()
+
+    def on_menu(self):
+        menu = QMenu(self)
+        menu.addAction(self.actionClearCell)
+        menu.addAction(self.actionRetest)
+        menu.addAction(self.actionResetFailCount)
+        menu.addAction(self.actionSetDefaultIP)
+        menu.addAction(self.actionTelnetLogin)
+        menu.exec_(QCursor.pos())
+
+    def On_actionClearCell(self):
+        if not self.startFlag:
+            gv.CheckSnList.remove(self.lb_sn.text())
+            self.lb_cellNum.setText('')
+            self.lb_sn.setText('')
+            self.lb_model.setText('')
+            self.lb_testTime.setText('')
+            self.lbl_failCount.setText('')
+            self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
+            self.setStyleSheet("background-color: rgb(154, 142, 139);")
+
+    def On_actionRetest(self):
+        if IsNullOrEmpty(self.lb_sn.text()):
+            return
+        if self.startFlag:
+            invoke_return = QMessageBox.warning(self, 'Retest?', 'Under testing,Are you sure retest?',
+                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if invoke_return == QMessageBox.No:
+                return
+            self.testThread.signal2[Cell, TestStatus].emit(self, TestStatus.ABORT)
+            time.sleep(1)
+
+        if not self.startTest():
+            return
+        gv.CheckSnList.append(self.SN)
+
+    def On_actionResetFailCount(self):
+        self.UpdateContinueFail(True)
+
+    def On_actionSetDefaultIP(self):
+        pass
+
+    def On_actionTelnetLogin(self):
+        pass
 
 
 if __name__ == "__main__":

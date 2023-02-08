@@ -9,9 +9,7 @@
 import re
 import socket
 import sys
-import time
 from inspect import currentframe
-
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
@@ -73,7 +71,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.dut_model = None
         self.logger = gv.lg.logger
         self.CellList = []
-        self.CheckSnList = []
+        # self.CheckSnList = []
         self.RowCount = gv.cf.RUNIN.row
         self.ColCount = gv.cf.RUNIN.col
         self.setupUi(self)
@@ -116,7 +114,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
             scanSN = self.lineEdit_2.text().strip()
             localNo = int(self.lineEdit.text().strip()[1:])
             if getattr(sys, 'frozen', True):
-                if scanSN in self.CheckSnList:
+                if scanSN in gv.CheckSnList:
                     self.lineEdit_2.setStyleSheet("background-color: rgb(255, 85, 255);")
                     self.lb_info.setText('SN is repetitive!')
                     self.clear_input()
@@ -124,7 +122,6 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
 
                 if not self.CellList[localNo - 1].startFlag:
                     self.clear_input()
-                    gv.init_create_dirs(self.logger)
                     self.init_cell_param(localNo, scanSN)
                     self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 255);")
                     self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 255);")
@@ -165,17 +162,13 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
             self.lineEdit_2.setValidator(pValidator)
 
     def init_cell_param(self, localNo, sn):
-        self.CellList[
-            localNo - 1].CellLogTxt = rf"{gv.logFolderPath}\logging_{localNo}_{sn}_details_{time.strftime('%H-%M-%S')}.txt"
         self.CellList[localNo - 1].lb_sn.setText(sn)
-        self.CellList[localNo - 1].lb_cellNum.setVisible(False)
-        self.CellList[localNo - 1].lb_testName.setText('')
         self.CellList[localNo - 1].lbl_failCount.setText('')
-        self.CellList[localNo - 1].logger = rf"{gv.logFolderPath}\{localNo}_{sn}_{time.strftime('%H%M%S')}.txt"
         self.CellList[localNo - 1].dut_model = self.dut_model
         self.CellList[localNo - 1].lb_model.setText(self.dut_model)
         if self.CellList[localNo - 1].startTest():
-            self.CheckSnList.append(sn)
+            gv.CheckSnList.append(sn)
+        print(gv.CheckSnList)
 
     def clear_input(self):
         self.lineEdit.setText('')

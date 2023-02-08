@@ -16,6 +16,7 @@ from datetime import datetime
 import psutil
 import yaml
 import hashlib
+from socket import AddressFamily
 
 
 def ping(logger, host, timeout=1):
@@ -213,6 +214,13 @@ def get_sha256(filepath) -> str:
         sha256obj = hashlib.sha256()
         sha256obj.update(f.read())
         return sha256obj.hexdigest()
+
+
+def GetAllIpv4Address(networkSegment):
+    for name, info in psutil.net_if_addrs().items():
+        for addr in info:
+            if AddressFamily.AF_INET == addr.family and str(addr.address).startswith(networkSegment):
+                return str(addr.address)
 
 
 if __name__ == '__main__':

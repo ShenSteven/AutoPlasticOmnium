@@ -33,7 +33,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.startFlag = True
                 myWind.my_signals.timingSignal[bool].emit(True)
                 print(
-                    f"Start test,SN:{myWind.SN},CellNO={myWind.LocalNo},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
+                    f"Start test,SN:{myWind.SN},CellNO={myWind.localNo},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
                     f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},FTC:{gv.cf.station.fail_continue},"
                     f"SoftVersion:{gv.version},WebPS={myWind.WebPsIp}")
             else:
@@ -105,6 +105,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
         try:
             if gv.loginWin is not None:
                 if status != TestStatus.START:
+                    gv.CheckSnList.remove(myWind.SN)
                     myWind.SN = ''
                     myWind.my_signals.timingSignal[bool].emit(False)
                     myWind.startFlag = False

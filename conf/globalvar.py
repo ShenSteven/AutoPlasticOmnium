@@ -44,6 +44,7 @@ database_result = rf'{current_dir}\OutPut\result.db'
 logFolderPath = ''
 critical_log = ''
 errors_log = ''
+CheckSnList = []
 
 IsDebug = False
 mainWin = None

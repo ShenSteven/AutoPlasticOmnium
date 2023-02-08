@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
-from model.basicfunc import IsNullOrEmpty, save_config, run_cmd, create_csv_file
+from model.basicfunc import IsNullOrEmpty, save_config, run_cmd, create_csv_file, GetAllIpv4Address
 from model.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from model.sqlite import Sqlite
@@ -177,14 +177,6 @@ class MainForm(QWidget, TestForm):
                 self.ui.actionDisable_factory.setEnabled(False)
 
     def init_label_info(self):
-        def GetAllIpv4Address(networkSegment):
-            import psutil
-            from socket import AddressFamily
-            for name, info in psutil.net_if_addrs().items():
-                for addr in info:
-                    if AddressFamily.AF_INET == addr.family and str(addr.address).startswith(networkSegment):
-                        return str(addr.address)
-
         self.ui.actionproduction.setText(gv.cf.dut.test_mode)
         self.ui.action192_168_1_101.setText(GetAllIpv4Address('10.90.'))
 
