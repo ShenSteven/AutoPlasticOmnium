@@ -25,7 +25,7 @@ from inspect import currentframe
 
 def testKeyword(test_case, item, testSuite):
     # gv.lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
-    # time.sleep(0.5)
+    time.sleep(1)
     # return True, ''
     rReturn = False
     compInfo = ''
