@@ -6,7 +6,6 @@
 /build/
 /test/
 /.idea
-/flash/
 /conf/setting.db
 /OutPut/result.db
 /venv/
