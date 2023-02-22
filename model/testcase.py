@@ -31,7 +31,7 @@ class TestCase:
         self.NiInstrComm = None
         self.clone_suites = None
         self.original_suites = None
-        self.logger = None
+        self.logger = logger
         self.testcase_path = None
         self.sheetName = None
         self.error_details_first_fail = ''
@@ -70,7 +70,7 @@ class TestCase:
         if not getattr(sys, 'frozen', False) and cflag:
             model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger, self.myWind)
         if os.path.exists(self.test_script_json):
-            self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json, self.myWind)
+            self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json, False, self.myWind)
         else:
             self.original_suites = model.loadseq.load_testcase_from_excel(self.testcase_path, self.sheetName,
                                                                           self.test_script_json, self.logger,

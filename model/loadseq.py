@@ -95,15 +95,18 @@ def param_wrapper_verify_sha256(flag):
         sig = inspect.signature(fun)
 
         def inner(*args, **kwargs):
+            sha256 = ''
             bound_args = sig.bind(*args, **kwargs)
             bound_args.apply_defaults()
             if flag or bound_args.args[1]:
                 with model.sqlite.Sqlite(gv.database_setting) as db:
                     db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{bound_args.args[0]}'")
-                    sha256 = db.cur.fetchone()[0]
-                    # print(f"  dbSHA:{sha256}")
+                    result = db.cur.fetchone()
+                    if result:
+                        sha256 = result[0]
+                        print(f"  dbSHA:{sha256}")
                 JsonSHA = get_sha256(bound_args.args[0])
-                # print(f"jsonSHA:{JsonSHA}")
+                print(f"jsonSHA:{JsonSHA}")
                 if sha256 == JsonSHA:
                     result = fun(*bound_args.args, **bound_args.kwargs)
                 else:

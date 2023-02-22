@@ -1,7 +1,7 @@
 station:
     privileges: labs
     station_all:
-    #- LTT
+    - LTT
     - FL_M4 #(前左):0x1E
     - FR_M4 #(前右):0x50
     - RL_M4 #(后左):0x1F

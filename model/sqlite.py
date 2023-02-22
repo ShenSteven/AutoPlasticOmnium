@@ -29,6 +29,7 @@ def init_database(logger, database_name):
                 db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_pass_count', '0')")
                 db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_fail_count', '0')")
                 db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_abort_count', '0')")
+                logger.debug(f"Table created successfully")
                 print(f"Table created successfully")
         if not os.path.exists(gv.database_result):
             with Sqlite(gv.database_result) as db:
@@ -51,9 +52,10 @@ def init_database(logger, database_name):
                                               TEST_RESULT   TEXT    NOT NULL,
                                               STATUS        TEXT    NOT NULL
                                              );''')
+                logger.debug(f"Table created successfully")
                 print(f"Table created successfully")
     except Exception as e:
-        logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+        logger.fatal(f'{currentframe().f_code.co_name}:{e},{database_name}')
 
 
 class Sqlite(object):

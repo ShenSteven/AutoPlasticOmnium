@@ -87,6 +87,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.bt_openLog.clicked.connect(on_actionLogFolder)
 
     def initCellUi(self):
+        gv.init_create_dirs(self.logger)
         model.sqlite.init_database(self.logger, gv.database_setting)
         if not getattr(sys, 'frozen', False):
             model.loadseq.excel_convert_to_json(f'{gv.excel_file_path}', gv.cf.station.station_all, self.logger)

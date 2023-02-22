@@ -8,6 +8,7 @@ block_cipher = None #pyi_crypto.PyiBlockCipher(key="'steven1986.11'")
 added_files = [
     ('ui/images/*', 'ui/images'),
     ('ui/ui_main.ui', 'ui'),
+    ('runin/ui_login.ui', 'runin'),
     ('conf/*.yaml', 'conf'),
     ('conf/*.db', 'conf'),
     ('conf/__version__.py', 'conf'),
