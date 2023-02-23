@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
-from pathlib import Path
 import os
+from pathlib import Path
 from PyInstaller.utils.hooks import collect_data_files, copy_metadata
 
 block_cipher = None #pyi_crypto.PyiBlockCipher(key="'steven1986.11'")
