@@ -30,3 +30,6 @@ future~=0.18.2
 # $PyInterpreterDirectory$\pyinstaller.exe
 # -y $FileName$      #--clean -y  $FileName$
 # $FileDir$
+#======D:\PythonDev\pyside2\venv\Lib\site-packages\PyInstaller\building\utils.py========
+#             except PermissionError:
+#                 os.system(f'rmdir /S /Q {path}')
