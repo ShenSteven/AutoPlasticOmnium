@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-@File   : loadseq.py
+@File   : load seq.py
 @Author : Steven.Shen
 @Date   : 2021/10/15
 @Desc   : 
@@ -14,26 +14,25 @@ import json
 import sys
 from inspect import currentframe
 from types import NoneType
+from PyQt5.QtWidgets import QMessageBox
 from openpyxl import load_workbook
 import model.suite
 import model.step
 import model.sqlite
 from .basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
-import ui.mainform
 
 
-def excel_convert_to_json(testcase_path_excel, all_stations, logger, myWind=None):
+def excel_convert_to_json(testcase_path_excel, all_stations, logger):
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
     for station in all_stations:
-        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger, myWind)
+        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)
     logger.debug("convert finish!")
 
 
-def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger, myWind=None) -> list:
+def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger) -> list:
     """load test sequence form a sheet in Excel and return the suites sequences list,
     if success,serialize the suites list to json.
-    :param myWind: test windows
     :param logger: logger handle
     :param testcase_path: the path of Excel
     :param sheet_name: the sheet test_name of Excel
@@ -80,10 +79,10 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
-        myWind.my_signals.showMessageBox[str, str, int].emit('ERROR!', f'{currentframe().f_code.co_name}:{e} ', 5)
+        QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
         sys.exit(e)
     else:
-        serialize_to_json(suites_list, test_script_path, logger, myWind)
+        serialize_to_json(suites_list, test_script_path, logger)
         return suites_list
     finally:
         workbook.close()
@@ -100,21 +99,22 @@ def param_wrapper_verify_sha256(flag):
             bound_args.apply_defaults()
             if flag or bound_args.args[1]:
                 with model.sqlite.Sqlite(gv.database_setting) as db:
-                    db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{bound_args.args[0]}'")
+                    file_name = os.path.basename(bound_args.args[0])
+                    db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{file_name}'")
                     result = db.cur.fetchone()
+                    # QMessageBox.information(None, 'dbSHA!', f"{result}", QMessageBox.Yes)
                     if result:
                         sha256 = result[0]
-                        print(f"  dbSHA:{sha256}")
+                        # print(f"  dbSHA:{sha256}")
                 JsonSHA = get_sha256(bound_args.args[0])
-                print(f"jsonSHA:{JsonSHA}")
+                # print(f"jsonSHA:{JsonSHA}")
+                # QMessageBox.information(None, "jsonSHA!", f"{JsonSHA}", QMessageBox.Yes)
                 if sha256 == JsonSHA:
                     result = fun(*bound_args.args, **bound_args.kwargs)
                 else:
-                    if ui.mainform.MainForm.main_form is not None:
-                        ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('ERROR!',
-                                                                                                     f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!',
-                                                                                                     5)
-                    sys.exit(f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!')
+                    error_info = f'{currentframe().f_code.co_name}:script {bound_args.args[0]} has been tampered!'
+                    QMessageBox.critical(None, 'ERROR!', error_info, QMessageBox.Yes)
+                    sys.exit(0)
             else:
                 result = fun(*bound_args.args, **bound_args.kwargs)
             return result
@@ -124,8 +124,8 @@ def param_wrapper_verify_sha256(flag):
     return wrapper_verify_sha2562
 
 
-@param_wrapper_verify_sha256(False)
-def load_testcase_from_json(json_path, isverify=False, Wind=None):
+@param_wrapper_verify_sha256(True)
+def load_testcase_from_json(json_path, isVerify=False):
     try:
         """Deserialize form json.
         :param json_path: json file path.
@@ -144,8 +144,7 @@ def load_testcase_from_json(json_path, isverify=False, Wind=None):
             sequences_obj_list.append(suit_obj)
         return sequences_obj_list
     except Exception as e:
-        if Wind is not None:
-            Wind.my_signals.showMessageBox[str, str, int].emit('Exception!', f'{currentframe().f_code.co_name}:{e}', 5)
+        QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
         sys.exit(e)
 
 
@@ -159,10 +158,11 @@ def wrapper_save_sha256(fun):
         result = fun(*bound_args.args, **bound_args.kwargs)
         sha256 = get_sha256(bound_args.args[1])
         with model.sqlite.Sqlite(gv.database_setting) as db:
+            file_name = os.path.basename(bound_args.args[1])
             try:
-                db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{bound_args.args[1]}', '{sha256}')")
+                db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")
             except sqlite3.IntegrityError:
-                db.execute(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{bound_args.args[1]}'")
+                db.execute(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{file_name}'")
         # os.chmod(args[1], stat.S_IREAD)
         return result
 
@@ -170,9 +170,8 @@ def wrapper_save_sha256(fun):
 
 
 @wrapper_save_sha256
-def serialize_to_json(obj, json_path, logger, Wind=None):
+def serialize_to_json(obj, json_path, logger):
     """serialize obj to json and encrypt.
-    :param myWind:
     :param logger:log handle
     :param obj: the object you want to serialize
     :param json_path: the path of json
@@ -186,6 +185,5 @@ def serialize_to_json(obj, json_path, logger, Wind=None):
             json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=True, indent=4)
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
-        if Wind is not None:
-            Wind.my_signals.showMessageBox[str, str, int].emit('Exception!', f'{currentframe().f_code.co_name}:{e}', 5)
+        QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
         sys.exit(e)
