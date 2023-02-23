@@ -163,7 +163,7 @@ def wrapper_save_sha256(fun):
                 db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")
             except sqlite3.IntegrityError:
                 db.execute(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{file_name}'")
-        # os.chmod(args[1], stat.S_IREAD)
+        os.chmod(args[1], stat.S_IREAD)
         return result
 
     return inner
