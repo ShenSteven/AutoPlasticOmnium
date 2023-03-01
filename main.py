@@ -52,6 +52,7 @@ def main():
     about_abspath = 'conf/__version__.py'
     try:
         if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
+            # if gv.cf.station.station_name == 'RUNIN' or gv.cf.station.station_name == 'ORT':
             gv.loginWin = rmf.LoginWind()
             gv.loginWin.ui.show()
         else:
