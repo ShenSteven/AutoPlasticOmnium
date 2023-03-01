@@ -57,7 +57,8 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
         self.WebPsIp = '192.168.10.' + str(self.row_index)
         self.testcase.myWind = self
-        self.localNo = (self.row_index - 1) * 8 + self.col_index
+        self.localNo = (self.row_index - 1) * gv.cf.RUNIN.col + self.col_index
+        self.lb_cellNum.setText(str(self.localNo))
 
     def init_signals_connect(self):
         """connect signals to slots"""

@@ -1,5 +1,5 @@
 station:
-    privileges: labs
+    privileges: lab
     station_all:
     - LTT
     - FL_M4 #(前左):0x1E
@@ -75,6 +75,6 @@ BLF:
     readTxCount: 1000
     MRtoMRDelay: 0.1
 RUNIN:
-    row: 10
-    col: 8
+    row: 5
+    col: 4
 

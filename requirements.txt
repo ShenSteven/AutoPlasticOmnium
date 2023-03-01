@@ -1,5 +1,5 @@
 PyQt5~=5.15.7
-pyqt5-tools~=5.12
+# pyqt5-tools~=5.12
 PyQt5-stubs~=5.15
 PyQt5Designer~=5.14.1
 pyinstaller~=5.8
