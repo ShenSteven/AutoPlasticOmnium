@@ -49,6 +49,7 @@ station:
     setTimeZone:
     fix_flag: false
     fail_continue: false
+    auto_scan: false
 dut:
     prompt: root@OpenWrt:/#
     dut_ip: 192.168.1.101

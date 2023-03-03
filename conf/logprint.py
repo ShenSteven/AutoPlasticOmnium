@@ -49,6 +49,8 @@ class QTextEditHandler(logging.Handler, QWidget):
             self.mySignal[str].emit(msg)
         except RecursionError:  # See issue 36272
             raise
+        except RuntimeError:
+            print('logprint.emit():RuntimeError')
         except Exception:
             self.handleError(record)
             raise

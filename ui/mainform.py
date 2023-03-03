@@ -9,10 +9,12 @@ import time
 from datetime import datetime
 from os.path import dirname, abspath, join
 from threading import Thread
+import cv2
+import zxing
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
@@ -53,6 +55,8 @@ class MainForm(QWidget, TestForm):
     def __init__(self):
         super().__init__()
         TestForm.__init__(self)
+        self._lastSn = ''
+        self.cap = None
         self.tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
@@ -73,6 +77,7 @@ class MainForm(QWidget, TestForm):
         self.ShowTreeView(self.testSequences)
         self.testThread = TestThread(self)
         self.testThread.start()
+        self.open_camera()
 
     def init_select_station(self):
         for item in gv.cf.station.station_all:
@@ -779,23 +784,6 @@ class MainForm(QWidget, TestForm):
             self.logger.debug('stop timing...')
             self.killTimer(self.timer)
 
-    # def get_stationNo(self):
-    #     """通过串口读取治具中设置的测试工站名字"""
-    #     if not gv.cf.station.fix_flag:
-    #         return
-    #     gv.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
-    #                                                      gv.cf.station.fix_com_baudRate)
-    #     for i in range(0, 3):
-    #         rReturn, revStr = gv.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
-    #         if rReturn:
-    #             gv.cf.station.station_no = revStr.replace('\r\n', '').strip()
-    #             gv.cf.station.station_name = gv.cf.station.station_no[0, gv.cf.station.station_no.index('-')]
-    #             self.logger.debug(f"Read fix number success,stationName:{gv.cf.station.station_name}")
-    #             break
-    #     else:
-    #         QMessageBox.Critical(self, 'Read StationNO', "Read FixNum error,Please check it!")
-    #         sys.exit(0)
-
     def UpdateContinueFail(self, testResult: bool):
         if gv.IsDebug or gv.cf.dut.test_mode.lower() == 'debug':
             return
@@ -900,11 +888,7 @@ class MainForm(QWidget, TestForm):
         self.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
         gv.init_create_dirs(self.logger)
-        # gv.csv_list_header = []
-        # gv.csv_list_data = []
         self.testcase.daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
-        # gv.error_code_first_fail = ''
-        # gv.error_details_first_fail = ''
         self.finalTestResult = False
         self.setIpFlag = False
         self.DUTMesIP = ''
@@ -913,7 +897,6 @@ class MainForm(QWidget, TestForm):
             self.SuiteNo = -1
             self.StepNo = -1
         self.WorkOrder = '1'
-        # gv.startTimeJsonFlag = True
         self.testcase.startTimeJson = datetime.now()
         self.ui.lb_failInfo.setHidden(True)
         self.ui.lb_testTime.setHidden(True)
@@ -952,6 +935,62 @@ class MainForm(QWidget, TestForm):
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
         thread.join()
+
+    def open_camera(self):
+        if not gv.cf.station.auto_scan:
+            return
+        self.cap = cv2.VideoCapture(0)
+        if not self.cap.isOpened():
+            print("Cannot open camera or no video devices!")
+            self.logger.debug("Cannot open camera or no video devices!")
+            return
+        else:
+            self.logger.debug('open camera ok.')
+        video = threading.Thread(target=self.auto_scan,daemon=True)  # 將 OpenCV 的部分放入 threading 裡執行
+        video.start()
+
+    def auto_scan(self):
+        try:
+            if gv.cf.station.station_name == "CCT":
+                return
+            fixComRcv = ""
+            # self.ui.bt_photo.setEnabled(True)
+            while True:
+                if self.startFlag:
+                    continue
+                # fixComRcv += self.testcase.FixSerialPort.read()
+                # self.ui.tabWidget.setCurrentWidget(self.ui.video)
+                ret, frame = self.cap.read()  # 讀取影格
+                if not ret:
+                    print("Cannot receive frame")
+                    break
+                frame = cv2.resize(frame, (self.ui.lb_video.height(), self.ui.lb_video.width()))  # 改變尺寸符合視窗
+                cv2.imwrite('autoScan.jpg', frame)  # 儲存圖片
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # 改為 RGB
+                height, width, channel = frame.shape
+                img = QImage(frame, width, height, channel * width, QImage.Format_RGB888)
+                # self.ui.lb_video.setPixmap(QPixmap.fromImage(img))  # 顯示圖片
+                reader = zxing.BarCodeReader()
+                result = reader.decode("autoScan.jpg").parsed
+                print('autoScan')
+                # self.ui.bt_photo.setEnabled(False)
+                # if 'AT+SCAN' in fixComRcv:
+                #     pass
+                # else:
+                #     if result is None or result == self._lastSn:
+                #         continue
+                self.ui.lineEdit.setText('Jresult')
+                # if not self.ui.lineEdit.Text() == result:
+                #     continue
+                # self.ui.tabWidget.setCurrentWidget(self.ui.result)
+                self.on_returnPressed()
+                self.ui.lineEdit.returnPressed.emit()
+                self._lastSn = result
+                time.sleep(0.1)
+        except RuntimeError:
+            print('RuntimeError')
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":
