@@ -184,8 +184,11 @@ class Step:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        if isinstance(self.myWind, ui.mainform.MainForm):
-            self.myWind.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
+        try:
+            if isinstance(self.myWind, ui.mainform.MainForm):
+                self.myWind.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
+        except RuntimeError:
+            pass
 
     def run(self, test_case, testSuite, suiteItem: model.product.SuiteItem = None):
         """run test step"""

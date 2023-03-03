@@ -107,8 +107,11 @@ class TestSuite:
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
-        if isinstance(self.myWind, ui.mainform.MainForm):
-            self.myWind.my_signals.treeWidgetColor.emit(color, self.index, -1, False)
+        try:
+            if isinstance(self.myWind, ui.mainform.MainForm):
+                self.myWind.my_signals.treeWidgetColor.emit(color, self.index, -1, False)
+        except RuntimeError:
+            pass
 
     def print_result_info(self):
         self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
