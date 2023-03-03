@@ -32,7 +32,6 @@ from time import gmtime
 class Cell(QFrame, Ui_cell, TestForm):
 
     def __init__(self, parent=None, row=-1, col=-1):
-        QFrame.__init__(self, parent)
         Ui_cell.__init__(self)
         TestForm.__init__(self)
         self.WebPsIp = '192.168.10.'
@@ -149,7 +148,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         if not self.testThread.isRunning():
             self.testThread = TestThread(self)
             self.testThread.start()
-        self.testThread.signal2[Cell, TestStatus].emit(self, TestStatus.START)
+        self.testThread.signal[Cell, TestStatus].emit(self, TestStatus.START)
 
     def init_textEditHandler(self):
         """create log handler for textEdit"""
@@ -219,7 +218,7 @@ class Cell(QFrame, Ui_cell, TestForm):
                                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if invoke_return == QMessageBox.No:
                 return
-            self.testThread.signal2[Cell, TestStatus].emit(self, TestStatus.ABORT)
+            self.testThread.signal[Cell, TestStatus].emit(self, TestStatus.ABORT)
             time.sleep(1)
         if not self.startTest():
             return

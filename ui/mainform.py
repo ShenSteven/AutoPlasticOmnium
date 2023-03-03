@@ -14,9 +14,9 @@ import zxing
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QCloseEvent
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
-    QHeaderView, QTableWidgetItem, QLabel, QWidget, QAction, QInputDialog, QLineEdit
+    QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, save_config, run_cmd, create_csv_file, GetAllIpv4Address
@@ -39,7 +39,7 @@ from ui.settings import SettingsDialog
 # pyuic5 ui_main.ui -o main_ui.py
 
 
-class MainForm(QWidget, TestForm):
+class MainForm(TestForm):
     main_form = None
     _lock = threading.RLock()
 
@@ -52,11 +52,8 @@ class MainForm(QWidget, TestForm):
                 cls.main_form = super().__new__(cls, *args, **kwargs)
             return cls.main_form
 
-    def __init__(self):
-        super().__init__()
-        TestForm.__init__(self)
-        self._lastSn = ''
-        self.cap = None
+    def __init__(self, parent=None):
+        super(MainForm, self).__init__(parent)
         self.tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
@@ -939,58 +936,65 @@ class MainForm(QWidget, TestForm):
     def open_camera(self):
         if not gv.cf.station.auto_scan:
             return
+        if gv.cf.station.station_name == "CCT":
+            return
         self.cap = cv2.VideoCapture(0)
         if not self.cap.isOpened():
-            print("Cannot open camera or no video devices!")
             self.logger.debug("Cannot open camera or no video devices!")
             return
         else:
             self.logger.debug('open camera ok.')
-        video = threading.Thread(target=self.auto_scan,daemon=True)  # 將 OpenCV 的部分放入 threading 裡執行
+        video = threading.Thread(target=self.auto_scan, daemon=True)  # 將 OpenCV 的部分放入 threading 裡執行
         video.start()
 
     def auto_scan(self):
         try:
-            if gv.cf.station.station_name == "CCT":
-                return
-            fixComRcv = ""
-            # self.ui.bt_photo.setEnabled(True)
-            while True:
+            fixComRcv = ''
+            # # self.ui.bt_photo.setEnabled(True)
+            while self.autoScanFlag:
                 if self.startFlag:
                     continue
                 # fixComRcv += self.testcase.FixSerialPort.read()
-                # self.ui.tabWidget.setCurrentWidget(self.ui.video)
-                ret, frame = self.cap.read()  # 讀取影格
+                # # self.ui.tabWidget.setCurrentWidget(self.ui.video)
+                ret, frame = self.cap.read()
                 if not ret:
                     print("Cannot receive frame")
                     break
-                frame = cv2.resize(frame, (self.ui.lb_video.height(), self.ui.lb_video.width()))  # 改變尺寸符合視窗
-                cv2.imwrite('autoScan.jpg', frame)  # 儲存圖片
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # 改為 RGB
+                frame = cv2.resize(frame, (self.ui.lb_video.height(), self.ui.lb_video.width()))
+                cv2.imwrite('autoScan.jpg', frame)
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # RGB
                 height, width, channel = frame.shape
                 img = QImage(frame, width, height, channel * width, QImage.Format_RGB888)
-                # self.ui.lb_video.setPixmap(QPixmap.fromImage(img))  # 顯示圖片
+                # # self.ui.lb_video.setPixmap(QPixmap.fromImage(img))
                 reader = zxing.BarCodeReader()
                 result = reader.decode("autoScan.jpg").parsed
-                print('autoScan')
                 # self.ui.bt_photo.setEnabled(False)
                 # if 'AT+SCAN' in fixComRcv:
                 #     pass
                 # else:
                 #     if result is None or result == self._lastSn:
                 #         continue
-                self.ui.lineEdit.setText('Jresult')
+                self.ui.lineEdit.setText(result)
                 # if not self.ui.lineEdit.Text() == result:
                 #     continue
-                # self.ui.tabWidget.setCurrentWidget(self.ui.result)
-                self.on_returnPressed()
+                # # self.ui.tabWidget.setCurrentWidget(self.ui.result)
                 self.ui.lineEdit.returnPressed.emit()
                 self._lastSn = result
+                fixComRcv = ''
                 time.sleep(0.1)
+
         except RuntimeError:
             print('RuntimeError')
         except Exception as e:
             print(e)
+
+    def closeEvent(self, a0: QCloseEvent) -> None:
+        """
+        重写QWidget类的closrEvent方法，在窗口被关闭的时候自动触发
+        """
+        # super().closeEvent(a0)  # 先添加父类的方法，以免导致覆盖父类方法（这是重点！！！）
+        self.autoScanFlag = False
+        print('.....................................closeOpenCV')
 
 
 if __name__ == "__main__":

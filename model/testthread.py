@@ -9,21 +9,21 @@
 import time
 import traceback
 import conf.globalvar as gv
-from PyQt5.QtWidgets import QWidget, QFrame
+from PyQt5.QtWidgets import QWidget, QFrame, QMainWindow
 from PyQt5.QtCore import QThread, pyqtSignal
 from model.teststatus import TestStatus, SetTestStatus
 from model.reporting import upload_Json_to_client, upload_result_to_mes, collect_data_to_csv
 
 
 class TestThread(QThread):
-    signal = pyqtSignal(QWidget, TestStatus)
-    signal2 = pyqtSignal(QFrame, TestStatus)
+    signal = pyqtSignal((QMainWindow, TestStatus), (QWidget, TestStatus), (QFrame, TestStatus))
 
     def __init__(self, myWind: QWidget):
         super(TestThread, self).__init__()
         self.myWind = myWind
+        self.signal[QMainWindow, TestStatus].connect(SetTestStatus)
         self.signal[QWidget, TestStatus].connect(SetTestStatus)
-        self.signal2[QFrame, TestStatus].connect(SetTestStatus)
+        self.signal[QFrame, TestStatus].connect(SetTestStatus)
 
     def __del__(self):
         self.wait()

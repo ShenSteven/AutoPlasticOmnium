@@ -6,16 +6,22 @@
 @Date   : 2/6/2023
 @Desc   : 
 """
+import sys
 import threading
+from PyQt5.QtWidgets import QMainWindow, QMessageBox
 import model.variables
 import conf.globalvar as gv
 from model.mysignals import MySignals
 
 
-class TestForm:
+class TestForm(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, parent=None):
+        super(TestForm, self).__init__(parent)
         self.logger = gv.lg.logger
+        self.autoScanFlag = True
+        self._lastSn = ''
+        self.cap = None
         self.fileHandle = None
         self.timer = None
         self.sec = 1
@@ -46,3 +52,14 @@ class TestForm:
         self.total_pass_count = 0
         self.continue_fail_count = 0
         self.my_signals = MySignals()
+
+    def closeEvent(self, event):
+        # self.autoScanFlag = False
+        # print('................closeEvent.....................closeOpenCV')
+        reply = QMessageBox.question(self, '提示', "是否要关闭所有窗口?", QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            event.accept()
+            sys.exit(0)  # 退出程序
+        else:
+            event.ignore()
