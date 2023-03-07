@@ -10,13 +10,17 @@ from datetime import datetime
 from os.path import dirname, abspath, join
 from threading import Thread
 import cv2
+import matplotlib
+import numpy as np
 import zxing
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import Qt, QRegExp, QMetaObject
+from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QCloseEvent
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, save_config, run_cmd, create_csv_file, GetAllIpv4Address
@@ -33,6 +37,8 @@ import model.loadseq
 import model.variables
 import model.product
 from ui.settings import SettingsDialog
+
+matplotlib.use("Qt5Agg")
 
 
 # pyrcc5 images.qrc -o images.py
@@ -54,6 +60,9 @@ class MainForm(TestForm):
 
     def __init__(self, parent=None):
         super(MainForm, self).__init__(parent)
+        self.graphic_scene = None
+        self.canvas = None
+        self.t = 0
         self.tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
@@ -70,6 +79,7 @@ class MainForm(TestForm):
         self.init_label_info()
         self.init_status_bar()
         self.init_lineEdit()
+        self.init_graphicsView()
         self.init_signals_connect()
         self.ShowTreeView(self.testSequences)
         self.testThread = TestThread(self)
@@ -78,8 +88,8 @@ class MainForm(TestForm):
 
     def init_select_station(self):
         for item in gv.cf.station.station_all:
-            station_qaction = QAction(self)
-            station_qaction.setObjectName(item)
+            station_select = QAction(self)
+            station_select.setObjectName(item)
             if item.startswith("FL_"):
                 item += "(前左)"
             elif item.startswith("FR_"):
@@ -104,9 +114,9 @@ class MainForm(TestForm):
                 item += "(前右格栅)"
             elif item.startswith("ReadVer_"):
                 item += "(读版本)"
-            station_qaction.setText(item)
-            self.ui.menuSelect_Station.addAction(station_qaction)
-            station_qaction.triggered.connect(self.on_select_station)
+            station_select.setText(item)
+            self.ui.menuSelect_Station.addAction(station_select)
+            station_select.triggered.connect(self.on_select_station)
 
     def init_textEditHandler(self):
         """create log handler for textEdit"""
@@ -135,14 +145,23 @@ class MainForm(TestForm):
         # if not gv.IsDebug:
         #     self.ui.lineEdit.setValidator(pValidator)
 
+    def init_graphicsView(self):
+        self.canvas = FigureCanvas(self.sinWave())
+        self.graphic_scene = QtWidgets.QGraphicsScene()
+        print(self.ui.graphicsView.geometry())
+        x = self.ui.graphicsView.x()
+        y = self.ui.graphicsView.y()
+        self.graphic_scene.setSceneRect(x, y, self.ui.graphicsView.width() * 0.98, self.ui.graphicsView.height() * 0.9)
+        print(self.graphic_scene.width(), self.graphic_scene.height(), self.graphic_scene.sceneRect())
+        self.graphic_scene.addWidget(self.canvas)
+        self.ui.graphicsView.setScene(self.graphic_scene)
+
     def init_childLabel(self):
         self.ui.lb_failInfo = QLabel('Next:O-SFT /Current:O', self.ui.lb_status)
-        self.ui.lb_failInfo.setStyleSheet(
-            f"background-color:#f0f0f0;font: 11pt '宋体';")
+        self.ui.lb_failInfo.setStyleSheet(f"background-color:#f0f0f0;font: 11pt '宋体';")
         self.ui.lb_failInfo.setHidden(True)
         self.ui.lb_testTime = QLabel('TestTime:30s', self.ui.lb_errorCode)
-        self.ui.lb_testTime.setStyleSheet(
-            f"background-color:#f0f0f0;font: 11pt '宋体';")
+        self.ui.lb_testTime.setStyleSheet(f"background-color:#f0f0f0;font: 11pt '宋体';")
         self.ui.lb_testTime.setHidden(True)
 
     def init_tableWidget(self):
@@ -266,6 +285,8 @@ class MainForm(TestForm):
         self.ui.treeWidget.itemChanged.connect(self.on_itemChanged)
         self.ui.treeWidget.itemPressed.connect(self.on_itemActivated)
         self.ui.tableWidget_2.itemChanged.connect(self.on_tableWidget2Edit)
+        self.ui.pBt_start.clicked.connect(self.run)
+        self.ui.pBt_stop.clicked.connect(self.stop)
 
     def init_treeWidget_color(self):
         self.ui.treeWidget.blockSignals(True)
@@ -995,6 +1016,31 @@ class MainForm(TestForm):
         # super().closeEvent(a0)  # 先添加父类的方法，以免导致覆盖父类方法（这是重点！！！）
         self.autoScanFlag = False
         print('.....................................closeOpenCV')
+
+    def sinWave(self, i=0):
+        fig = plt.figure(figsize=(9, 4), dpi=100)
+        ax = plt.axes(xlim=(0, 2), ylim=(-2, 2))
+        line, = ax.plot([], [])
+        line.set_data([], [])
+        x = np.linspace(0, 2, 100)
+        y = np.sin(5 * np.pi * (x - 0.01 * i))
+        line.set_data(x, y)
+        plt.close()
+        return fig
+
+    def count(self):
+        self.t = self.t + 5
+        self.canvas = FigureCanvas(self.sinWave(self.t))
+        self.graphic_scene.clear()
+        self.graphic_scene.addWidget(self.canvas)
+
+    def run(self):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.count)
+        self.timer.start(50)
+
+    def stop(self):
+        self.timer.stop()
 
 
 if __name__ == "__main__":
