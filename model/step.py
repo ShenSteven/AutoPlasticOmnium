@@ -62,7 +62,7 @@ class Step:
         Keyword: str = None: 测试步骤对应的关键字，执行对应关键字下的代码段
         Json: str = None: 测试结果是否生成Json数据上传给客户
         EeroName: str = None: 客户定义的测试步骤名字
-        param1: str = None
+        Param1: str = None
     """
 
     def __init__(self, dict_=None):
@@ -70,7 +70,7 @@ class Step:
         self.logger = None
         self.breakpoint: bool = False
         self.suiteIndex: int = 0
-        self.index: int = 0
+        self._index: int = 0
         self.testValue = None
         self.start_time = None
         self.finish_time = None
@@ -109,7 +109,7 @@ class Step:
         self.FTC: str = ''
         self.Json: str = ''
         self.SetGlobalVar: str = ''
-        self.param1: str = ''
+        self.Param1: str = ''
         self.TearDown: str = ''
         # PLIN
         self.ID: str = ''
@@ -118,6 +118,16 @@ class Step:
 
         if dict_ is not None:
             self.__dict__.update(dict_)
+
+    @property
+    def index(self):
+        if self.myWind is not None:
+            self._index = self.myWind.testcase.clone_suites[self.suiteIndex].steps.index(self)
+        return self._index
+
+    @index.setter
+    def index(self, value):
+        self._index = value
 
     @property
     def isTest(self):

@@ -182,7 +182,7 @@ def serialize_to_json(obj, json_path, logger):
             os.chmod(json_path, stat.S_IWRITE)
             os.remove(json_path)
         with open(json_path, 'w') as wf:
-            json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+            json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=False, indent=4)
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)

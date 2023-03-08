@@ -101,7 +101,7 @@ def testKeyword(test_case, item, testSuite):
             rReturn = test_case.dut_comm.open(gv.cf.dut.prompt)
 
         elif item.Keyword == 'TelnetAndSendCmd':
-            temp = TelnetComm(item.logger, item.param1, gv.cf.dut.prompt)
+            temp = TelnetComm(item.logger, item.Param1, gv.cf.dut.prompt)
             if temp.open(gv.cf.dut.prompt) and \
                     temp.SendCommand(item.command, item.ExpectStr, item.Timeout)[0]:
                 return True, ''

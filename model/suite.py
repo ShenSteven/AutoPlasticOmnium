@@ -32,7 +32,7 @@ class TestSuite:
         self.myWind = None
         self.logger = None
         self.SuiteName = suiteName
-        self.index = test_serial
+        self._index = test_serial
         self.isTest = True
         self.suiteResult = True
         self.isTestFinished = False
@@ -46,6 +46,16 @@ class TestSuite:
         self.elapsedTime = None
         if dict_ is not None:
             self.__dict__.update(dict_)
+
+    @property
+    def index(self):
+        if self.myWind is not None:
+            self._index = self.myWind.testcase.clone_suites.index(self)
+        return self._index
+
+    @index.setter
+    def index(self, value):
+        self._index = value
 
     def run(self, test_case, global_fail_continue, stepNo=-1):
         """

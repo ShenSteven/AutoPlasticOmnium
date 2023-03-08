@@ -12,6 +12,7 @@ from threading import Thread
 import cv2
 import matplotlib
 import numpy as np
+import openpyxl
 import zxing
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
@@ -253,7 +254,7 @@ class MainForm(TestForm):
         self.ui.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
         self.ui.actionStepping.triggered.connect(self.on_actionStepping)
         self.ui.actionLooping.triggered.connect(self.on_actionLooping)
-        self.ui.actionEditStep.triggered.connect(self.on_actionEditStep)
+        # self.ui.actionEditStep.triggered.connect(self.on_actionEditStep)
         self.ui.actionExpandAll.triggered.connect(self.on_actionExpandAll)
         self.ui.actionCollapseAll.triggered.connect(self.on_actionCollapseAll)
         self.ui.actionBreakpoint.triggered.connect(self.on_actionBreakpoint)
@@ -494,6 +495,14 @@ class MainForm(TestForm):
             thread = Thread(target=model.loadseq.serialize_to_json,
                             args=(self.testcase.clone_suites, gv.test_script_json, self.logger), daemon=True)
             thread.start()
+        sheet_name = gv.cf.station.station_name
+        workbook = openpyxl.load_workbook(gv.excel_file_path)
+        worksheet = workbook[sheet_name]
+        for suit in self.testcase.clone_suites:
+            for step in suit.steps:
+                _step = list(filter(lambda item: item.isupper(), step))
+                worksheet.append(_step)
+        workbook.save(gv.excel_file_path)
 
     def on_actionConfig(self):
         settings_wind = SettingsDialog(self)
@@ -637,25 +646,29 @@ class MainForm(TestForm):
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         for prop_name in list(dir(step_obj)):
             prop_value = getattr(step_obj, prop_name)
-            if isinstance(prop_value, str) and not prop_name.startswith('_'):
+            # if isinstance(prop_value, str) and prop_name[0:1].isupper():
+            if prop_name[0:1].isupper():
                 column_cnt = self.ui.tableWidget_2.columnCount()
                 row_cnt = self.ui.tableWidget_2.rowCount()
                 self.ui.tableWidget_2.insertRow(row_cnt)
                 key_pairs = [prop_name, prop_value]
+                print(key_pairs)
                 for column in range(column_cnt):
                     self.ui.tableWidget_2.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
-                    item = QTableWidgetItem(key_pairs[column])
+                    item = QTableWidgetItem(str(key_pairs[column]))
                     if column == 0:
                         item.setFlags(Qt.ItemIsEnabled)
                         item.setBackground(Qt.lightGray)
                     self.ui.tableWidget_2.setItem(row_cnt, column, item)
-        self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
+        # self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
         self.ui.tableWidget_2.blockSignals(False)
 
     def on_tableWidget2Edit(self, item):
         prop_name = self.ui.tableWidget_2.item(item.row(), item.column() - 1).text()
         prop_value = item.text()
-        setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], prop_name, prop_value)
+        test_step = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        T = (type(getattr(test_step, prop_name)))
+        setattr(test_step, prop_name, T(prop_value))
 
     def on_actionExpandAll(self):
         self.ui.treeWidget.expandAll()
