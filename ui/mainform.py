@@ -478,7 +478,7 @@ class MainForm(TestForm):
                     gv.IsDebug = True
                 gv.cf.station.station_no = gv.cf.station.station_name
                 gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
-                self.testcase.original_suites = model.loadseq.load_testcase_from_json(gv.test_script_json)
+                self.testcase.original_suites = model.loadseq.load_testcase_from_json(gv.test_script_json)[0]
                 self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
                 self.testSequences = self.testcase.clone_suites
                 self.logger.debug(f'select {gv.test_script_json} finish!')

@@ -141,6 +141,7 @@ def load_testcase_from_json(json_path, isVerify=False):
         :param json_path: json file path.
         :return:object
         """
+        header = []
         with open(json_path, 'r') as rf:
             sequences_dict = json.load(rf)
         sequences_obj_list = []
@@ -148,11 +149,17 @@ def load_testcase_from_json(json_path, isVerify=False):
             step_obj_list = []
             for step_dict in suit_dict['steps']:
                 step_obj = model.step.Step(step_dict)
+                if not header:
+                    for prop_name in list(dir(step_obj)):
+                        if prop_name[0:1].isupper():
+                            prop_value = getattr(step_obj, prop_name)
+                            if prop_value is not None:
+                                header.append(prop_name)
                 step_obj_list.append(step_obj)
             suit_obj = model.suite.TestSuite(dict_=suit_dict)
             suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)
-        return sequences_obj_list
+        return sequences_obj_list, header
     except Exception as e:
         raise
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)

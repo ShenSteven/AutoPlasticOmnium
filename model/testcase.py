@@ -72,7 +72,7 @@ class TestCase:
             self.header = model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all,
                                                               self.logger)
         if os.path.exists(self.test_script_json):
-            self.original_suites = model.loadseq.load_testcase_from_json(self.test_script_json)
+            self.original_suites, self.header = model.loadseq.load_testcase_from_json(self.test_script_json)
         else:
             self.original_suites, self.header = model.loadseq.load_testcase_from_excel(self.testcase_path,
                                                                                        self.sheetName,
