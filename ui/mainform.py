@@ -61,6 +61,7 @@ class MainForm(TestForm):
 
     def __init__(self, parent=None):
         super(MainForm, self).__init__(parent)
+        self.header_new = []
         self.graphic_scene = None
         self.canvas = None
         self.t = 0
@@ -489,20 +490,30 @@ class MainForm(TestForm):
             self.ShowTreeView(self.testSequences)
 
     def on_actionSaveToScript(self):
-        if self.SaveScriptDisableFlag:
-            QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
-        else:
-            thread = Thread(target=model.loadseq.serialize_to_json,
-                            args=(self.testcase.clone_suites, gv.test_script_json, self.logger), daemon=True)
-            thread.start()
-        sheet_name = gv.cf.station.station_name
-        workbook = openpyxl.load_workbook(gv.excel_file_path)
-        worksheet = workbook[sheet_name]
-        for suit in self.testcase.clone_suites:
-            for step in suit.steps:
-                _step = list(filter(lambda item: item.isupper(), step))
-                worksheet.append(_step)
-        workbook.save(gv.excel_file_path)
+        # if self.SaveScriptDisableFlag:
+        #     QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
+        # else:
+        def SaveToScript():
+            model.loadseq.serialize_to_json(self.testcase.clone_suites, gv.test_script_json, self.logger)
+
+            step_value = []
+            sheet_name = gv.cf.station.station_name
+            workbook = openpyxl.load_workbook(gv.excel_file_path)
+            worksheet = workbook[sheet_name]
+            if set(self.testcase.header) == set(self.header_new):
+                worksheet.delete_rows(idx=2, amount=1000)
+                # worksheet.append(self.testcase.header)
+                for suit in self.testcase.clone_suites:
+                    for step in suit.steps:
+                        for header in self.testcase.header:
+                            step_value.append(getattr(step, header))
+                        worksheet.append(step_value)
+                        step_value = []
+                workbook.save(gv.excel_file_path)
+                self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
+
+        thread = Thread(target=SaveToScript, daemon=True)
+        thread.start()
 
     def on_actionConfig(self):
         settings_wind = SettingsDialog(self)
@@ -668,16 +679,27 @@ class MainForm(TestForm):
     def on_tableWidget2Edit(self, item):
         prop_name = self.ui.tableWidget_2.item(item.row(), item.column() - 1).text()
         prop_value = item.text()
-        test_step = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         try:
-            T = (type(getattr(test_step, prop_name)))
+            T = (type(getattr(step_obj, prop_name)))
             if T is int:
-                setattr(test_step, prop_name, T(prop_value))
+                setattr(step_obj, prop_name, T(prop_value))
             else:
-                setattr(test_step, prop_name, prop_value)
+                setattr(step_obj, prop_name, prop_value)
         except ValueError:
-            self.ui.tableWidget_2.setItem(item.row(), item.column(), QTableWidgetItem(''))
+            self.ui.tableWidget_2.blockSignals(True)
+            item.setBackground(Qt.red)
+            self.ui.tableWidget_2.blockSignals(False)
             raise
+        else:
+            self.ui.tableWidget_2.blockSignals(True)
+            item.setBackground(Qt.white)
+            self.ui.tableWidget_2.blockSignals(False)
+        for prop_name in list(dir(step_obj)):
+            if prop_name[0:1].isupper():
+                prop_value = getattr(step_obj, prop_name)
+                if prop_value is not None:
+                    self.header_new.append(prop_name)
 
     def on_actionExpandAll(self):
         self.ui.treeWidget.expandAll()
@@ -703,7 +725,7 @@ class MainForm(TestForm):
         self.ui.treeWidget.setHeaderLabel(f'{gv.cf.station.station_no}')
         for suite in sequences:
             suite_node = QTreeWidgetItem(self.ui.treeWidget)
-            suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. {suite.SuiteName}')
+            suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. {suite.name}')
             suite_node.setIcon(0, QIcon(':/images/folder-icon.png'))
             if checkall:
                 suite_node.setCheckState(0, Qt.Checked)

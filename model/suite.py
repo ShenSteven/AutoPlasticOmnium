@@ -33,7 +33,7 @@ class TestSuite:
     def __init__(self, suiteName=None, test_serial=None, dict_=None):
         self.myWind = None
         self.logger = None
-        self.SuiteName = suiteName
+        self.name = suiteName
         self._index = test_serial
         self.isTest = True
         self.suiteResult = True
@@ -75,7 +75,7 @@ class TestSuite:
             self.suiteResult = True
             return self.suiteResult
         self.logger.debug(
-            '- ' * 8 + f"<a name='testSuite:{self.SuiteName}'>Start testSuite:{self.SuiteName}</a>" + '- ' * 9)
+            '- ' * 8 + f"<a name='testSuite:{self.name}'>Start testSuite:{self.name}</a>" + '- ' * 9)
         self.setColor(Qt.yellow)
         suiteItem = model.product.SuiteItem()
         step_result_list = []
@@ -105,17 +105,17 @@ class TestSuite:
             return self.suiteResult
         except Exception as e:
             self.setColor(Qt.darkRed)
-            self.logger.fatal(f"run testSuite {self.SuiteName} Exception！！{e},{traceback.format_exc()}")
+            self.logger.fatal(f"run testSuite {self.name} Exception！！{e},{traceback.format_exc()}")
             self.suiteResult = False
             return self.suiteResult
         finally:
             self.clear()
 
     def process_mesVer(self, test_case):
-        setattr(test_case.mesPhases, self.SuiteName + '_Time',
+        setattr(test_case.mesPhases, self.name + '_Time',
                 self.elapsedTime.seconds + self.elapsedTime.microseconds / 1000000)
         if not self.suiteResult:
-            setattr(test_case.mesPhases, self.SuiteName, str(self.suiteResult).upper())
+            setattr(test_case.mesPhases, self.name, str(self.suiteResult).upper())
 
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
@@ -130,9 +130,9 @@ class TestSuite:
         self.elapsedTime = datetime.strptime(self.finish_time, '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(
             self.start_time, '%Y-%m-%d %H:%M:%S.%f')
         if self.suiteResult:
-            self.logger.info(f"{self.SuiteName} Test Pass!,ElapsedTime:{self.elapsedTime.seconds}")
+            self.logger.info(f"{self.name} Test Pass!,ElapsedTime:{self.elapsedTime.seconds}")
         else:
-            self.logger.error(f"{self.SuiteName} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
+            self.logger.error(f"{self.name} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
 
     def process_for(self, test_case, step_item: model.step.Step):
         """FOR 循环开始判断 FOR(3)"""
@@ -167,7 +167,7 @@ class TestSuite:
         test_case.ArrayListDaq = []
 
     def copy_to_json_obj(self, obj: model.product.SuiteItem):
-        obj.phase_name = self.SuiteName
+        obj.phase_name = self.name
         obj.status = "passed" if self.suiteResult else "failed"
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time

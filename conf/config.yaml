@@ -16,11 +16,11 @@ station:
 #    - FLB_SX5GEV #(前左保杠):0x52
 #    - FRB_SX5GEV #(前右保杠):0x54
     - FL_M6 #(前左):0x1E
-    - FLG_M6 #(左格栅灯):0x52
-    - FR_M6 #(前右):0x50
-    - FRG_M6 #(右格栅灯):0x54
-    - ReadVer_SX5GEV
-    - ReadVer_M4
+#    - FLG_M6 #(左格栅灯):0x52
+#    - FR_M6 #(前右):0x50
+#    - FRG_M6 #(右格栅灯):0x54
+#    - ReadVer_SX5GEV
+#    - ReadVer_M4
 #    - ALE
 #    - FL_SX5GEV_EOL #(前左):0x1E
 #    - FR_SX5GEV_EOL #(前右):0x50

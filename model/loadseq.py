@@ -14,6 +14,8 @@ import json
 import sys
 from inspect import currentframe
 from types import NoneType
+from typing import Any
+
 from PyQt5.QtWidgets import QMessageBox
 from openpyxl import load_workbook
 import model.suite
@@ -21,16 +23,22 @@ import model.step
 import model.sqlite
 from .basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
+from .suite import TestSuite
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations, logger):
+    header = []
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
     for station in all_stations:
-        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)
+        header_temp = \
+            load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)[1]
+        if gv.cf.station.station_name == station:
+            header = header_temp
     logger.debug("convert finish!")
+    return header
 
 
-def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger) -> list:
+def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger) -> tuple[list[TestSuite], list[Any]]:
     """load test sequence form a sheet in Excel and return the suites sequences list,
     if success,serialize the suites list to json.
     :param logger: logger handle
@@ -62,19 +70,17 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger
             # 给step对象属性赋值
             test_step = model.step.Step()
             for header, cell in dict(zip(item_header, line)).items():
-                test_step.index = temp_suite.totalNumber
-                test_step.suiteIndex = temp_suite.index
-                # setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
+                # test_step.index = temp_suite.totalNumber
+                # test_step.suiteIndex = temp_suite.index
                 T = (type(getattr(test_step, header)))
-                default_value = getattr(test_step, header)
-                if type(cell.value) is NoneType:
-                    if T is int:
-                        cell.value = default_value
-                        setattr(test_step, header, T(cell.value))
-                    # elif T is str:
-                    #     setattr(test_step, header, cell.value)
-                setattr(test_step, header, cell.value)
-                test_step.SuiteName = temp_suite_name
+                if T is int:
+                    if type(cell.value) is NoneType:
+                        cell.value = getattr(test_step, header)
+                    setattr(test_step, header, T(cell.value))
+                else:
+                    setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
+                if temp_suite.totalNumber == 0:
+                    test_step.SuiteName = temp_suite_name
 
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
@@ -84,7 +90,10 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger
         sys.exit(e)
     else:
         serialize_to_json(suites_list, test_script_path, logger)
-        return suites_list
+        if gv.cf.station.station_name == sheet_name:
+            return suites_list, item_header
+        else:
+            return suites_list, []
     finally:
         workbook.close()
 

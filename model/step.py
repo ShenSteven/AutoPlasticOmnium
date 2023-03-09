@@ -81,8 +81,8 @@ class Step:
         self.elapsedTime = 0.0
         self._isTest = True
         self.suiteVar = ''
-        self._SuiteName: str = ''
         # ============= Excel Column ===============
+        self._SuiteName: str = ''
         self.StepName: str = 'Waiting'
         self.EeroName: str = None
         self.Keyword: str = 'Waiting'
@@ -125,16 +125,13 @@ class Step:
 
     @FTC.setter
     def FTC(self, value):
-        if value is None:
-            self._FTC = None
+        if value.upper() == 'Y':
+            self._FTC = value.upper()
+        elif value == 'None' or value == '':
+            self._FTC = ''
         else:
-            if value.upper() == 'Y':
-                self._FTC = value.upper()
-            elif value == 'None' or value == '':
-                self._FTC = None
-            else:
-                self._FTC = ''
-                raise ValueError("fail to continue. Y=继续，None/''=不继续")
+            # self._FTC = ''
+            raise ValueError("fail to continue. Y=继续，None/''=不继续")
 
     @property
     def Json(self):
@@ -142,16 +139,13 @@ class Step:
 
     @Json.setter
     def Json(self, value):
-        if value is None:
-            self._Json = None
+        if value.upper() == 'Y':
+            self._Json = value.upper()
+        elif value == 'None' or value == '':
+            self._Json = ''
         else:
-            if value.upper() == 'Y':
-                self._Json = value.upper()
-            elif value == 'None' or value == '':
-                self._Json = None
-            else:
-                self._Json = ''
-                raise ValueError("数据收集到json文件.Y=收集，None/''=不收集")
+            # self._Json = ''
+            raise ValueError("数据收集到json文件.Y=收集，None/''=不收集")
 
     @property
     def ByPF(self):
@@ -159,23 +153,18 @@ class Step:
 
     @ByPF.setter
     def ByPF(self, value):
-        if value is None:
-            self._ByPF = None
+        if value.upper() == 'P' or value.upper() == 'F':
+            self._ByPF = value.upper()
+        elif value == 'None' or value == '':
+            self._ByPF = ''
         else:
-            if value.upper() == 'P' or value.upper() == 'F':
-                self._ByPF = value.upper()
-            elif value == 'None' or value == '':
-                self._ByPF = None
-            else:
-                self._ByPF = ''
-                raise ValueError("Value: 'P'=bypass，'F'=byFail, None/''=不干涉测试结果")
+            # self._ByPF = ''
+            raise ValueError("Value: 'P'=bypass，'F'=byFail, None/''=不干涉测试结果")
 
     @property
     def SuiteName(self):
         if self.myWind is not None:
-            self._SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].SuiteName
-        else:
-            self._SuiteName = None
+            self._SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].name
         return self._SuiteName
 
     @SuiteName.setter
@@ -268,7 +257,7 @@ class Step:
         self.myWind = test_case.myWind
         if self.logger is None:
             self.logger = testSuite.logger
-        self.SuiteName = testSuite.SuiteName
+        self.SuiteName = testSuite.name
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
         if IsNullOrEmpty(self.EeroName):
