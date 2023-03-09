@@ -652,13 +652,15 @@ class MainForm(TestForm):
                 row_cnt = self.ui.tableWidget_2.rowCount()
                 self.ui.tableWidget_2.insertRow(row_cnt)
                 key_pairs = [prop_name, prop_value]
-                print(key_pairs)
                 for column in range(column_cnt):
                     self.ui.tableWidget_2.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
                     item = QTableWidgetItem(str(key_pairs[column]))
                     if column == 0:
                         item.setFlags(Qt.ItemIsEnabled)
                         item.setBackground(Qt.lightGray)
+                    else:
+                        if (key_pairs[column]) is None:
+                            item.setBackground(Qt.lightGray)
                     self.ui.tableWidget_2.setItem(row_cnt, column, item)
         # self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
         self.ui.tableWidget_2.blockSignals(False)
@@ -667,8 +669,15 @@ class MainForm(TestForm):
         prop_name = self.ui.tableWidget_2.item(item.row(), item.column() - 1).text()
         prop_value = item.text()
         test_step = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
-        T = (type(getattr(test_step, prop_name)))
-        setattr(test_step, prop_name, T(prop_value))
+        try:
+            T = (type(getattr(test_step, prop_name)))
+            if T is int:
+                setattr(test_step, prop_name, T(prop_value))
+            else:
+                setattr(test_step, prop_name, prop_value)
+        except ValueError:
+            self.ui.tableWidget_2.setItem(item.row(), item.column(), QTableWidgetItem(''))
+            raise
 
     def on_actionExpandAll(self):
         self.ui.treeWidget.expandAll()

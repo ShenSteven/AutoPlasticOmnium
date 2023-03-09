@@ -18,6 +18,8 @@ import ui.mainform
 
 
 def fail_continue(test_step: model.step.Step, failContinue):
+    if test_step.FTC is None:
+        return failContinue
     if test_step.FTC.lower() == 'n':
         return False
     elif test_step.FTC.lower() == 'y':

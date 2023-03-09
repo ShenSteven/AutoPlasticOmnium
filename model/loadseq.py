@@ -68,17 +68,18 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger
                 T = (type(getattr(test_step, header)))
                 default_value = getattr(test_step, header)
                 if type(cell.value) is NoneType:
-                    cell.value = default_value
-                    # if T is int:
-                    #     cell.value = default_value
+                    if T is int:
+                        cell.value = default_value
+                        setattr(test_step, header, T(cell.value))
                     # elif T is str:
-                    #     cell.value = default_value
-                setattr(test_step, header, T(cell.value))
+                    #     setattr(test_step, header, cell.value)
+                setattr(test_step, header, cell.value)
                 test_step.SuiteName = temp_suite_name
 
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
+        raise
         QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
         sys.exit(e)
     else:
@@ -144,6 +145,7 @@ def load_testcase_from_json(json_path, isVerify=False):
             sequences_obj_list.append(suit_obj)
         return sequences_obj_list
     except Exception as e:
+        raise
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
         sys.exit(e)
 
@@ -185,5 +187,6 @@ def serialize_to_json(obj, json_path, logger):
             json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=False, indent=4)
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
+        raise
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
         sys.exit(e)

@@ -24,7 +24,7 @@ class Step:
     """测试步骤类
     Attributes:
         suiteIndex: 测试套序列号
-        index: 当前测试step序列号
+        _index: 当前测试step序列号
         # stepResult: 测试项测试结果
         start_time: 测试项的开始时
         finish_time: 测试结束时间
@@ -37,7 +37,7 @@ class Step:
         _isTest：bool 决定步骤是否测试，默认都测试
         _command：test command after parse variant.
         ### excel header variant ###
-        SuiteName: str = ''：测试套名字
+        _SuiteName: str = ''：测试套名字
         StepName: str = None: 当前测试step名字
         ErrorCode: str = None: 测试错误码
         Retry: int = None: 测试失败retry次数
@@ -57,10 +57,10 @@ class Step:
         ErrorDetails: str = None: 测试错误码详细描述
         Unit: str = None: 测试值单位
         MesVar: str = None: 上传MES信息的变量名字
-        ByPF: str = None: 手动人为控制测试结果 1=pass，0||空=fail
-        FTC: str = None: 失败继续 fail to continue。1=继续，0||空=不继续
+        _ByPF: str = None: 手动人为控制测试结果 P=bypass，F=byFail,空=不干涉测试结果
+        _FTC: str = None: 失败继续 fail to continue。y=继续，None|''=不继续
         Keyword: str = None: 测试步骤对应的关键字，执行对应关键字下的代码段
-        Json: str = None: 测试结果是否生成Json数据上传给客户
+        _Json: str = None: 测试结果数据是否收集到json文件中并上传给客户.y=收集，None|''=不收集
         EeroName: str = None: 客户定义的测试步骤名字
         Param1: str = None
     """
@@ -75,49 +75,112 @@ class Step:
         self.start_time = None
         self.finish_time = None
         self.start_time_json = None
-        self.error_code = ''
-        self.error_details = ''
+        self.error_code: str = ''
+        self.error_details: str = ''
         self.status: str = 'exception'  # pass/fail/exception
-        self.elapsedTime = 0
+        self.elapsedTime = 0.0
         self._isTest = True
         self.suiteVar = ''
+        self._SuiteName: str = ''
         # ============= Excel Column ===============
-        self.SuiteName: str = ''
-        self.StepName: str = ''
-        self.EeroName: str = ''
-        self.Keyword: str = ''
-        self.ErrorCode: str = ''
-        self.ErrorDetails: str = ''
+        self.StepName: str = 'Waiting'
+        self.EeroName: str = None
+        self.Keyword: str = 'Waiting'
+        self.ErrorCode: str = None
+        self.ErrorDetails: str = None
         self.Retry: int = 0
-        self.Timeout: int = 0
-        self.IfElse: str = ''
-        self.For: str = ''
-        self.SubStr1: str = ''
-        self.SubStr2: str = ''
-        self.Model: str = ''
-        self.CmdOrParam: str = ''
-        self.ExpectStr: str = ''
-        self.CheckStr1: str = ''
-        self.CheckStr2: str = ''
-        self.NoContain: str = ''
-        self.SPEC: str = ''
-        self.LSL: str = ''
-        self.USL: str = ''
-        self.Unit: str = ''
-        self.MesVar: str = ''
-        self.ByPF: str = ''
-        self.FTC: str = ''
-        self.Json: str = ''
-        self.SetGlobalVar: str = ''
-        self.Param1: str = ''
-        self.TearDown: str = ''
+        self.Timeout: int = 1
+        self.IfElse: str = None
+        self.For: str = None
+        self.SubStr1: str = None
+        self.SubStr2: str = None
+        self.Model: str = None
+        self.CmdOrParam: str = None
+        self.ExpectStr: str = None
+        self.CheckStr1: str = None
+        self.CheckStr2: str = None
+        self.NoContain: str = None
+        self.SPEC: str = None
+        self.LSL: str = None
+        self.USL: str = None
+        self.Unit: str = None
+        self.MesVar: str = None
+        self._ByPF: str = None
+        self._FTC: str = None
+        self._Json: str = None
+        self.SetGlobalVar: str = None
+        self.Param1: str = None
+        self.TearDown: str = None
         # PLIN
-        self.ID: str = ''
-        self.NAD: str = ''
-        self.PCI_LEN: str = ''
+        self.ID: str = None
+        self.NAD: str = None
+        self.PCI_LEN: str = None
 
         if dict_ is not None:
             self.__dict__.update(dict_)
+
+    @property
+    def FTC(self):
+        return self._FTC
+
+    @FTC.setter
+    def FTC(self, value):
+        if value is None:
+            self._FTC = None
+        else:
+            if value.upper() == 'Y':
+                self._FTC = value.upper()
+            elif value == 'None' or value == '':
+                self._FTC = None
+            else:
+                self._FTC = ''
+                raise ValueError("fail to continue. Y=继续，None/''=不继续")
+
+    @property
+    def Json(self):
+        return self._Json
+
+    @Json.setter
+    def Json(self, value):
+        if value is None:
+            self._Json = None
+        else:
+            if value.upper() == 'Y':
+                self._Json = value.upper()
+            elif value == 'None' or value == '':
+                self._Json = None
+            else:
+                self._Json = ''
+                raise ValueError("数据收集到json文件.Y=收集，None/''=不收集")
+
+    @property
+    def ByPF(self):
+        return self._ByPF
+
+    @ByPF.setter
+    def ByPF(self, value):
+        if value is None:
+            self._ByPF = None
+        else:
+            if value.upper() == 'P' or value.upper() == 'F':
+                self._ByPF = value.upper()
+            elif value == 'None' or value == '':
+                self._ByPF = None
+            else:
+                self._ByPF = ''
+                raise ValueError("Value: 'P'=bypass，'F'=byFail, None/''=不干涉测试结果")
+
+    @property
+    def SuiteName(self):
+        if self.myWind is not None:
+            self._SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].SuiteName
+        else:
+            self._SuiteName = None
+        return self._SuiteName
+
+    @SuiteName.setter
+    def SuiteName(self, value):
+        self._SuiteName = value
 
     @property
     def index(self):
@@ -133,7 +196,7 @@ class Step:
     def isTest(self):
         if self.myWind is None:
             return self._isTest
-        if str(self.IfElse).lower() == 'else':
+        if not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'else':
             self._isTest = not self.myWind.testcase.IfCond
         if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower():
             self._isTest = False
@@ -164,7 +227,7 @@ class Step:
     # @staticmethod
     def parse_var(self, value):
         """当CmdOrParam中有变量时，把命令中的<>字符替换成对应的变量值"""
-        if self.myWind is None:
+        if self.myWind is None or value is None:
             return value
         if self.myWind.TestVariables is None:
             return value
@@ -274,7 +337,7 @@ class Step:
 
     def record_date_to_db(self, test_case, test_result):
         """ record test date to DB."""
-        if self.isTest and self.Json.lower() == 'y':
+        if self.isTest and self.Json is not None and self.Json.upper() == 'Y':
             with model.sqlite.Sqlite(gv.database_result) as db:
                 self.logger.debug('INSERT test result to result.db table RESULT.')
                 db.execute(
@@ -313,20 +376,20 @@ class Step:
 
     def process_mesVer(self, test_case):
         """collect data to mes"""
-        if self.Json.lower() == 'y' and IsNullOrEmpty(self.MesVar):
+        if self.Json is not None and self.Json.upper() == 'Y' and IsNullOrEmpty(self.MesVar):
             self.MesVar = self.EeroName
         if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(
                 self.testValue).lower() != 'true':
             setattr(test_case.mesPhases, self.MesVar, self.testValue)
 
     def _if_statement(self, test_case, test_result: bool) -> bool:
-        if self.IfElse.lower() == 'if':
+        if not IsNullOrEmpty(self.IfElse) and self.IfElse.lower() == 'if':
             test_case.IfCond = test_result
             if not test_result:
                 self.setColor('#FF99CC')
                 self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
                 test_result = True
-        elif self.IfElse.lower() == 'else':
+        elif not IsNullOrEmpty(self.IfElse) and self.IfElse.lower() == 'else':
             pass
         else:
             test_case.IfCond = True
@@ -344,11 +407,11 @@ class Step:
             test_case.mesPhases.first_fail = self.SuiteName
 
     def _process_ByPF(self, step_result: bool):
-        if (self.ByPF.upper() == 'P') and not step_result:
+        if (not IsNullOrEmpty(self.ByPF) and self.ByPF.upper() == 'P') and not step_result:
             self.setColor(Qt.darkGreen)
             self.logger.warning(f"Let this step:{self.StepName} bypass.")
             return True
-        elif (self.ByPF.upper() == 'F') and step_result:
+        elif (not IsNullOrEmpty(self.ByPF) and self.ByPF.upper() == 'F') and step_result:
             self.setColor(Qt.darkRed)
             self.logger.warning(f"Let this step:{self.StepName} by fail.")
             return False
@@ -381,7 +444,7 @@ class Step:
             self.logger.info(result_info)
         else:
             self.logger.error(result_info)
-        if self.Json.lower() == 'y':
+        if self.Json is not None and self.Json.upper() == 'Y':
             ts = datetime.now() - self.start_time
             self.elapsedTime = ts.seconds + ts.microseconds / 1000000
             if isinstance(self.myWind, ui.mainform.MainForm):
@@ -444,10 +507,10 @@ class Step:
 
     def generate_report(self, test_case, test_result, suiteItem: model.product.SuiteItem):
         """ according to self.json, if record test result and data into json file"""
-        if self.Json is not None and self.Json.lower() == 'y':
+        if self.Json is not None and self.Json.upper() == 'Y':
             obj = self.report_to_json(test_case, test_result, suiteItem)
             self.report_to_csv(test_case, obj.test_name)
-        elif not test_result or self.ByPF.lower() == 'f':
+        elif not test_result or (not IsNullOrEmpty(self.ByPF) and self.ByPF.upper() == 'F'):
             obj = self.report_to_json(test_case, test_result, suiteItem)
             self.report_to_csv(test_case, obj.test_name)
 
