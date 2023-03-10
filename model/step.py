@@ -116,8 +116,26 @@ class Step:
         self.NAD: str = None
         self.PCI_LEN: str = None
 
+        # self.index = -1
+        self.items = list(filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), self.__dict__))
         if dict_ is not None:
             self.__dict__.update(dict_)
+
+    # def __iter__(self):
+    #     self.index = -1
+    #     return self
+    #
+    # def __next__(self):
+    #     self.index += 1
+    #     if self.index >= len(self.items):
+    #         raise StopIteration
+    #     return self.items[self.index]
+
+    # def __getitem__(self, i):
+    #     if i >= len(self.items):
+    #         raise IndexError("out of index")
+    #     item = self.items[i]
+    #     return item
 
     @property
     def FTC(self):

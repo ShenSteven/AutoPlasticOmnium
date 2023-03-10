@@ -495,14 +495,13 @@ class MainForm(TestForm):
         # else:
         def SaveToScript():
             model.loadseq.serialize_to_json(self.testcase.clone_suites, gv.test_script_json, self.logger)
-
             step_value = []
             sheet_name = gv.cf.station.station_name
             workbook = openpyxl.load_workbook(gv.excel_file_path)
             worksheet = workbook[sheet_name]
-            if set(self.testcase.header) == set(self.header_new):
-                worksheet.delete_rows(idx=2, amount=1000)
-                # worksheet.append(self.testcase.header)
+            if self.testcase.header == self.header_new:
+                worksheet.delete_rows(idx=1, amount=gv.max_step_count * 3)
+                worksheet.append(self.testcase.header)
                 for suit in self.testcase.clone_suites:
                     for step in suit.steps:
                         for header in self.testcase.header:
@@ -511,6 +510,17 @@ class MainForm(TestForm):
                         step_value = []
                 workbook.save(gv.excel_file_path)
                 self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
+            else:
+                pass
+                # worksheet.delete_rows(idx=2, amount=gv.max_step_count * 3)
+                # for suit in self.testcase.clone_suites:
+                #     for step in suit.steps:
+                #         for header in self.testcase.header:
+                #             step_value.append(getattr(step, header))
+                #         worksheet.append(step_value)
+                #         step_value = []
+                # workbook.save(gv.excel_file_path)
+                # self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
 
         thread = Thread(target=SaveToScript, daemon=True)
         thread.start()

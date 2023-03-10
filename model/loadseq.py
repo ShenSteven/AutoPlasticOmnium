@@ -30,34 +30,36 @@ def excel_convert_to_json(testcase_path_excel, all_stations, logger):
     header = []
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
     for station in all_stations:
-        header_temp = \
-            load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)[1]
+        suit, header_temp, count = \
+            load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)
         if gv.cf.station.station_name == station:
             header = header_temp
+            gv.max_step_count = count
     logger.debug("convert finish!")
     return header
 
 
-def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger) -> tuple[list[TestSuite], list[Any]]:
+def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger) -> tuple[list[TestSuite], list[Any], int]:
     """load test sequence form a sheet in Excel and return the suites sequences list,
     if success,serialize the suites list to json.
     :param logger: logger handle
     :param testcase_path: the path of Excel
     :param sheet_name: the sheet test_name of Excel
-    :param test_script_path:  serialize and save to json path
+    :param json_path:  serialize and save to json path
     :return : temp_suite[] list
     """
     workbook = None
     temp_suite = None
     suites_list = []
-    item_header = []
+    headers = []
     temp_suite_name = ""
+    step_count = 0
     try:
         print(f'start load_testcase_from_excel sheet:{sheet_name}...')
         workbook = load_workbook(testcase_path, read_only=True)
         worksheet = workbook[sheet_name]
         for i in list(worksheet.rows)[0]:  # 获取表头，第一行
-            item_header.append(i.value)
+            headers.append(i.value)
 
         for i in range(1, worksheet.max_row):  # 一行行的读取excel
             line = list(worksheet.rows)[i]
@@ -69,8 +71,11 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger
                 suites_list.append(temp_suite)
             # 给step对象属性赋值
             test_step = model.step.Step()
-            for header, cell in dict(zip(item_header, line)).items():
-                # test_step.index = temp_suite.totalNumber
+            step_count += 1
+            param = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), test_step.__dict__)
+            gv.items = list(map(lambda x: x[1:] if x.startswith('_') else x, param))
+            for header, cell in dict(zip(headers, line)).items():
+                test_step.index = temp_suite.totalNumber
                 # test_step.suiteIndex = temp_suite.index
                 T = (type(getattr(test_step, header)))
                 if T is int:
@@ -89,11 +94,11 @@ def load_testcase_from_excel(testcase_path, sheet_name, test_script_path, logger
         QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
         sys.exit(e)
     else:
-        serialize_to_json(suites_list, test_script_path, logger)
+        serialize_to_json(suites_list, json_path, logger)
         if gv.cf.station.station_name == sheet_name:
-            return suites_list, item_header
+            return suites_list, headers, step_count
         else:
-            return suites_list, []
+            return suites_list, [], step_count
     finally:
         workbook.close()
 
@@ -141,7 +146,8 @@ def load_testcase_from_json(json_path, isVerify=False):
         :param json_path: json file path.
         :return:object
         """
-        header = []
+        step_count = 0
+        headers = []
         with open(json_path, 'r') as rf:
             sequences_dict = json.load(rf)
         sequences_obj_list = []
@@ -149,17 +155,20 @@ def load_testcase_from_json(json_path, isVerify=False):
             step_obj_list = []
             for step_dict in suit_dict['steps']:
                 step_obj = model.step.Step(step_dict)
-                if not header:
-                    for prop_name in list(dir(step_obj)):
-                        if prop_name[0:1].isupper():
-                            prop_value = getattr(step_obj, prop_name)
-                            if prop_value is not None:
-                                header.append(prop_name)
+                step_count += 1
                 step_obj_list.append(step_obj)
+                if not headers:
+                    param = dict(filter(lambda x: x[0][0:1].isupper() or x[0][1:2].isupper(), step_dict.items()))
+                    param2 = list(filter(lambda x: param[x] is not None, param))
+                    headers = list(map(lambda x: x[1:] if x.startswith('_') else x, param2))
+
+                    items = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), step_obj.__dict__)
+                    gv.items = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
             suit_obj = model.suite.TestSuite(dict_=suit_dict)
             suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)
-        return sequences_obj_list, header
+        gv.max_step_count = step_count
+        return sequences_obj_list, headers
     except Exception as e:
         raise
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)

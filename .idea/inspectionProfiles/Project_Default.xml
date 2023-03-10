@@ -26,6 +26,7 @@
           <option value="images_rc" />
           <option value="model.product" />
           <option value="model.testcase" />
+          <option value="test_script_path" />
         </list>
       </option>
     </inspection_tool>
