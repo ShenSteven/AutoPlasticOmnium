@@ -498,29 +498,23 @@ class MainForm(TestForm):
             step_value = []
             sheet_name = gv.cf.station.station_name
             workbook = openpyxl.load_workbook(gv.excel_file_path)
-            worksheet = workbook[sheet_name]
-            if self.testcase.header == self.header_new:
-                worksheet.delete_rows(idx=1, amount=gv.max_step_count * 3)
-                worksheet.append(self.testcase.header)
-                for suit in self.testcase.clone_suites:
-                    for step in suit.steps:
-                        for header in self.testcase.header:
-                            step_value.append(getattr(step, header))
-                        worksheet.append(step_value)
-                        step_value = []
-                workbook.save(gv.excel_file_path)
-                self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
-            else:
-                pass
-                # worksheet.delete_rows(idx=2, amount=gv.max_step_count * 3)
-                # for suit in self.testcase.clone_suites:
-                #     for step in suit.steps:
-                #         for header in self.testcase.header:
-                #             step_value.append(getattr(step, header))
-                #         worksheet.append(step_value)
-                #         step_value = []
-                # workbook.save(gv.excel_file_path)
-                # self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
+            try:
+                worksheet = workbook[sheet_name]
+            except KeyError:
+                workbook.create_sheet(sheet_name)
+                worksheet = workbook[sheet_name]
+            workbook.active = workbook.sheetnames.index(sheet_name)
+            worksheet.delete_rows(idx=1, amount=gv.max_step_count * 3)
+            worksheet.append(self.header_new)
+            for suit in self.testcase.clone_suites:
+                for step in suit.steps:
+                    for item in self.header_new:
+                        value = getattr(step, item)
+                        step_value.append('' if value is None else value)
+                    worksheet.append(step_value)
+                    step_value = []
+            workbook.save(gv.excel_file_path)
+            self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
 
         thread = Thread(target=SaveToScript, daemon=True)
         thread.start()
@@ -602,6 +596,7 @@ class MainForm(TestForm):
     def on_actionSaveLog(self, info):
         def thread_update():
             if info == 'rename':
+                print(self.testcase.error_details_first_fail)
                 rename_log = self.txtLogPath.replace('logging',
                                                      str(self.finalTestResult).upper()).replace('details',
                                                                                                 self.testcase.error_details_first_fail)
@@ -665,24 +660,24 @@ class MainForm(TestForm):
         for i in range(0, self.ui.tableWidget_2.rowCount()):
             self.ui.tableWidget_2.removeRow(0)
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
-        for prop_name in list(dir(step_obj)):
+        # for prop_name in list(dir(step_obj)):
+        for prop_name in gv.items:
             prop_value = getattr(step_obj, prop_name)
-            # if isinstance(prop_value, str) and prop_name[0:1].isupper():
-            if prop_name[0:1].isupper():
-                column_cnt = self.ui.tableWidget_2.columnCount()
-                row_cnt = self.ui.tableWidget_2.rowCount()
-                self.ui.tableWidget_2.insertRow(row_cnt)
-                key_pairs = [prop_name, prop_value]
-                for column in range(column_cnt):
-                    self.ui.tableWidget_2.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
-                    item = QTableWidgetItem(str(key_pairs[column]))
-                    if column == 0:
-                        item.setFlags(Qt.ItemIsEnabled)
+            # if prop_name[0:1].isupper():
+            column_cnt = self.ui.tableWidget_2.columnCount()
+            row_cnt = self.ui.tableWidget_2.rowCount()
+            self.ui.tableWidget_2.insertRow(row_cnt)
+            key_pairs = [prop_name, prop_value]
+            for column in range(column_cnt):
+                self.ui.tableWidget_2.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
+                item = QTableWidgetItem(str(key_pairs[column]))
+                if column == 0:
+                    item.setFlags(Qt.ItemIsEnabled)
+                    item.setBackground(Qt.lightGray)
+                else:
+                    if (key_pairs[column]) is None:
                         item.setBackground(Qt.lightGray)
-                    else:
-                        if (key_pairs[column]) is None:
-                            item.setBackground(Qt.lightGray)
-                    self.ui.tableWidget_2.setItem(row_cnt, column, item)
+                self.ui.tableWidget_2.setItem(row_cnt, column, item)
         # self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
         self.ui.tableWidget_2.blockSignals(False)
 
@@ -695,6 +690,8 @@ class MainForm(TestForm):
             if T is int:
                 setattr(step_obj, prop_name, T(prop_value))
             else:
+                if prop_value == 'None':
+                    prop_value = None
                 setattr(step_obj, prop_name, prop_value)
         except ValueError:
             self.ui.tableWidget_2.blockSignals(True)
@@ -705,11 +702,12 @@ class MainForm(TestForm):
             self.ui.tableWidget_2.blockSignals(True)
             item.setBackground(Qt.white)
             self.ui.tableWidget_2.blockSignals(False)
-        for prop_name in list(dir(step_obj)):
-            if prop_name[0:1].isupper():
-                prop_value = getattr(step_obj, prop_name)
-                if prop_value is not None:
-                    self.header_new.append(prop_name)
+        # for prop_name in list(dir(step_obj)):
+        for prop_name in gv.items:
+            # if prop_name[0:1].isupper():
+            prop_value = getattr(step_obj, prop_name)
+            if prop_value is not None:
+                self.header_new.append(prop_name)
 
     def on_actionExpandAll(self):
         self.ui.treeWidget.expandAll()
