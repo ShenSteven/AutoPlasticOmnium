@@ -61,7 +61,7 @@ class Step:
         _FTC: str = None: 失败继续 fail to continue。y=继续，None|''=不继续
         Keyword: str = None: 测试步骤对应的关键字，执行对应关键字下的代码段
         _Json: str = None: 测试结果数据是否收集到json文件中并上传给客户.y=收集，None|''=不收集
-        EeroName: str = None: 客户定义的测试步骤名字
+        _EeroName: str = None: 客户定义的测试步骤名字
         Param1: str = None
     """
 
@@ -84,7 +84,7 @@ class Step:
         # ============= Excel Column ===============
         self._SuiteName: str = ''
         self.StepName: str = 'Waiting'
-        self.EeroName: str = None
+        self._EeroName: str = None
         self.Keyword: str = 'Waiting'
         self.ErrorCode: str = None
         self.ErrorDetails: str = None
@@ -136,6 +136,17 @@ class Step:
     #         raise IndexError("out of index")
     #     item = self.items[i]
     #     return item
+    @property
+    def EeroName(self):
+        if self._EeroName is None:
+            return None
+        if self._EeroName == '':
+            self._EeroName = self.StepName
+        return self._EeroName
+
+    @EeroName.setter
+    def EeroName(self, value):
+        self._EeroName = value
 
     @property
     def FTC(self):
@@ -278,8 +289,8 @@ class Step:
         self.SuiteName = testSuite.name
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
-        if IsNullOrEmpty(self.EeroName):
-            self.EeroName = self.StepName
+        # if IsNullOrEmpty(self.EeroName):
+        #     self.EeroName = self.StepName
         info = ''
         test_result = False
         self.set_json_start_time(test_case)
@@ -426,8 +437,8 @@ class Step:
             return step_result
 
     def clear(self):
-        self.error_code = None
-        self.error_details = None
+        self.error_code = ''
+        self.error_details = ''
         if not gv.IsDebug:
             self.isTest = True
         self.testValue = None
@@ -478,7 +489,9 @@ class Step:
         if self.status != str(True):
             self.start_time_json = test_case.startTimeJson
         obj = model.product.StepItem()
-        if self.EeroName.endswith('_'):
+        if self.EeroName is None:
+            obj.test_name = self.StepName
+        elif self.EeroName.endswith('_'):
             obj.test_name = self.EeroName + str(test_case.ForCycleCounter)
         else:
             obj.test_name = self.EeroName

@@ -185,7 +185,7 @@ class MainForm(TestForm):
             gv.IsDebug = False
             self.ui.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
             self.ui.actionConvertExcelToJson.setEnabled(False)
-            self.ui.actionSaveToScript.setEnabled(False)
+            # self.ui.actionSaveToScript.setEnabled(False)
             self.ui.actionReloadScript.setEnabled(False)
             self.ui.actionStart.setEnabled(False)
             self.ui.actionStop.setEnabled(False)
@@ -286,7 +286,7 @@ class MainForm(TestForm):
         self.ui.treeWidget.customContextMenuRequested.connect(self.on_treeWidgetMenu)
         self.ui.treeWidget.itemChanged.connect(self.on_itemChanged)
         self.ui.treeWidget.itemPressed.connect(self.on_itemActivated)
-        self.ui.tableWidget_2.itemChanged.connect(self.on_tableWidget2Edit)
+        self.ui.tableWidget_2.itemChanged.connect(self.on_stepInfoEdit)
         self.ui.pBt_start.clicked.connect(self.run)
         self.ui.pBt_stop.clicked.connect(self.stop)
 
@@ -319,7 +319,7 @@ class MainForm(TestForm):
             cc = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
             anchor = f'testStep:{pp}-{cc}'
             self.ui.textEdit.scrollToAnchor(anchor)
-            self.on_actionEditStep()
+            self.on_actionShowStepInfo()
 
     def on_tableWidget_clear(self):
         for i in range(0, self.ui.tableWidget.rowCount()):
@@ -489,36 +489,6 @@ class MainForm(TestForm):
         if self.testSequences is not None:
             self.ShowTreeView(self.testSequences)
 
-    def on_actionSaveToScript(self):
-        # if self.SaveScriptDisableFlag:
-        #     QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
-        # else:
-        def SaveToScript():
-            model.loadseq.serialize_to_json(self.testcase.clone_suites, gv.test_script_json, self.logger)
-            step_value = []
-            sheet_name = gv.cf.station.station_name
-            workbook = openpyxl.load_workbook(gv.excel_file_path)
-            try:
-                worksheet = workbook[sheet_name]
-            except KeyError:
-                workbook.create_sheet(sheet_name)
-                worksheet = workbook[sheet_name]
-            workbook.active = workbook.sheetnames.index(sheet_name)
-            worksheet.delete_rows(idx=1, amount=gv.max_step_count * 3)
-            worksheet.append(self.header_new)
-            for suit in self.testcase.clone_suites:
-                for step in suit.steps:
-                    for item in self.header_new:
-                        value = getattr(step, item)
-                        step_value.append('' if value is None else value)
-                    worksheet.append(step_value)
-                    step_value = []
-            workbook.save(gv.excel_file_path)
-            self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
-
-        thread = Thread(target=SaveToScript, daemon=True)
-        thread.start()
-
     def on_actionConfig(self):
         settings_wind = SettingsDialog(self)
         settings_wind.exec_()
@@ -596,10 +566,9 @@ class MainForm(TestForm):
     def on_actionSaveLog(self, info):
         def thread_update():
             if info == 'rename':
-                print(self.testcase.error_details_first_fail)
                 rename_log = self.txtLogPath.replace('logging',
                                                      str(self.finalTestResult).upper()).replace('details',
-                                                                                                self.testcase.error_details_first_fail)
+                                                                                                str(self.testcase.error_details_first_fail))
                 self.logger.debug(f"rename test log to: {rename_log}")
                 self.fileHandle.close()
                 os.rename(self.txtLogPath, rename_log)
@@ -653,7 +622,7 @@ class MainForm(TestForm):
         self.ui.actionConfig.setEnabled(isDebug)
         self.ShowTreeView(self.testSequences)
 
-    def on_actionEditStep(self):
+    def on_actionShowStepInfo(self):
         self.ui.tableWidget_2.blockSignals(True)
         if self.ui.tabWidget.currentWidget() != self.ui.stepInfo:
             self.ui.tabWidget.setCurrentWidget(self.ui.stepInfo)
@@ -681,7 +650,7 @@ class MainForm(TestForm):
         # self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
         self.ui.tableWidget_2.blockSignals(False)
 
-    def on_tableWidget2Edit(self, item):
+    def on_stepInfoEdit(self, item):
         prop_name = self.ui.tableWidget_2.item(item.row(), item.column() - 1).text()
         prop_value = item.text()
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
@@ -708,6 +677,40 @@ class MainForm(TestForm):
             prop_value = getattr(step_obj, prop_name)
             if prop_value is not None:
                 self.header_new.append(prop_name)
+        self.ui.actionSaveToScript.setEnabled(True)
+
+    def on_actionSaveToScript(self):
+        if self.SaveScriptDisableFlag:
+            QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
+            self.ui.actionSaveToScript.setEnabled(False)
+            return
+
+        def SaveToScript():
+            self.ui.actionSaveToScript.setEnabled(False)
+            model.loadseq.serialize_to_json(self.testcase.clone_suites, gv.test_script_json, self.logger)
+            step_value = []
+            sheet_name = gv.cf.station.station_name
+            workbook = openpyxl.load_workbook(gv.excel_file_path)
+            try:
+                worksheet = workbook[sheet_name]
+            except KeyError:
+                workbook.create_sheet(sheet_name)
+                worksheet = workbook[sheet_name]
+            workbook.active = workbook.sheetnames.index(sheet_name)
+            worksheet.delete_rows(idx=1, amount=gv.max_step_count * 3)
+            worksheet.append(self.header_new)
+            for suit in self.testcase.clone_suites:
+                for step in suit.steps:
+                    for item in self.header_new:
+                        value = getattr(step, item)
+                        step_value.append('' if value is None else value)
+                    worksheet.append(step_value)
+                    step_value = []
+            workbook.save(gv.excel_file_path)
+            self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
+
+        thread = Thread(target=SaveToScript, daemon=True)
+        thread.start()
 
     def on_actionExpandAll(self):
         self.ui.treeWidget.expandAll()
