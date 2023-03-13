@@ -196,6 +196,7 @@ def testKeyword(test_case, item, testSuite):
         elif item.Keyword == 'NiDAQmxVolt':
             # https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019Pf1SAE&l=zh-CN
             with nidaqmx.Task() as task:
+                item.CmdOrParam = item.CmdOrParam[0:7] + str(int(item.CmdOrParam[-1:]) - 1)
                 task.ai_channels.add_ai_voltage_chan(item.CmdOrParam, min_val=-10, max_val=10)
                 data = task.read(number_of_samples_per_channel=1)
                 item.logger.debug(f"get {item.CmdOrParam} sensor Volt: {data}.")
@@ -205,6 +206,7 @@ def testKeyword(test_case, item, testSuite):
 
         elif item.Keyword == 'NiDAQmxCur':
             with nidaqmx.Task() as task:
+                item.CmdOrParam = item.CmdOrParam[0:7] + str(int(item.CmdOrParam[-1:]) - 1)
                 task.ai_channels.add_ai_voltage_chan(item.CmdOrParam, min_val=-10, max_val=10)
                 data = task.read(number_of_samples_per_channel=1)
                 item.logger.debug(f"get {item.CmdOrParam} sensor Volt: {data}.")
@@ -217,8 +219,8 @@ def testKeyword(test_case, item, testSuite):
             if rReturn and item.CheckStr1 in revStr:
                 if not IsNullOrEmpty(item.SubStr1) or not IsNullOrEmpty(item.SubStr2):
                     item.testValue = subStr(item.SubStr1, item.SubStr2, revStr, item)
-                elif str_to_int(item.CheckStr2)[0]:
-                    item.testValue = "%.2f" % float(revStr.split(',')[str_to_int(item.CheckStr2)[1] - 1])
+                elif str_to_int(item.Param1)[0]:
+                    item.testValue = "%.2f" % float(revStr.split(',')[str_to_int(item.Param1)[1] - 1])
                 else:
                     return True, ''
                 compInfo, rReturn = assert_value(compInfo, item, rReturn)

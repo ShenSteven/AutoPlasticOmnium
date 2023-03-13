@@ -36,7 +36,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         TestForm.__init__(self)
         self.WebPsIp = '192.168.10.'
         self.webSwitchCon = None
-        self.localNo = -100
+        # self.localNo = -100
         self.row_index = row
         self.col_index = col
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
@@ -47,6 +47,13 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.init_signals_connect()
         self.testThread = TestThread(self)
 
+    @property
+    def LocalNo(self):
+        if gv.cf.RUNIN.col > 8:
+            raise ValueError('out of! config.RUNIN.col must is 8 or less.')
+        else:
+            return (self.row_index - 1) * gv.cf.RUNIN.col + self.col_index
+
     def init_cell_ui(self):
         self.lb_cellNum.setText('')
         self.lb_sn.setText('')
@@ -56,8 +63,8 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
         self.WebPsIp = '192.168.10.' + str(self.row_index)
         self.testcase.myWind = self
-        self.localNo = (self.row_index - 1) * gv.cf.RUNIN.col + self.col_index
-        self.lb_cellNum.setText(str(self.localNo))
+        # self.localNo = (self.row_index - 1) * gv.cf.RUNIN.col + self.col_index
+        self.lb_cellNum.setText(str(self.LocalNo))
 
     def init_signals_connect(self):
         """connect signals to slots"""
@@ -123,7 +130,8 @@ class Cell(QFrame, Ui_cell, TestForm):
         gv.init_create_dirs(self.logger)
         self.TestVariables = model.variables.Variables(gv.cf.station.station_name,
                                                        gv.cf.station.station_no, SN, gv.cf.dut.dut_ip,
-                                                       gv.cf.station.log_folder)
+                                                       gv.cf.station.log_folder, str(self.LocalNo),
+                                                       str(gv.cf.RUNIN.row))
         self.testcase.jsonObj = model.product.JsonObject(SN, gv.cf.station.station_no,
                                                          gv.cf.dut.test_mode, gv.cf.dut.qsdk_ver, gv.version)
         self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
@@ -140,7 +148,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.WorkOrder = '1'
         self.testcase.startTimeJson = datetime.now()
         self.sec = 1
-        self.txtLogPath = rf'{gv.logFolderPath}\logging_{self.localNo}_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
+        self.txtLogPath = rf'{gv.logFolderPath}\logging_{self.LocalNo}_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
         gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
         self.logger = gv.lg.logger
         self.testcase.logger = self.logger
