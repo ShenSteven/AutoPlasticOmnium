@@ -78,7 +78,7 @@ class Step:
         self.error_code: str = ''
         self.error_details: str = ''
         self.status: str = 'exception'  # pass/fail/exception
-        self.elapsedTime = 0.0
+        self.elapsedTime = 0
         self._isTest = True
         self.suiteVar = ''
         # ============= Excel Column ===============

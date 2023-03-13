@@ -843,11 +843,9 @@
         ],
         "start_time": null,
         "finish_time": null,
-        "error_code": null,
-        "phase_details": null,
-        "elapsedTime": null,
-        "start_time_json": null,
-        "testValue": null
+        "error_code": "",
+        "phase_details": "",
+        "elapsedTime": null
     },
     {
         "myWind": null,
@@ -1776,12 +1774,9 @@
         ],
         "start_time": null,
         "finish_time": null,
-        "error_code": null,
-        "phase_details": null,
-        "elapsedTime": null,
-        "_SuiteName": "",
-        "start_time_json": null,
-        "testValue": null
+        "error_code": "",
+        "phase_details": "",
+        "elapsedTime": null
     },
     {
         "myWind": null,
@@ -2212,12 +2207,9 @@
         ],
         "start_time": null,
         "finish_time": null,
-        "error_code": null,
-        "phase_details": null,
-        "elapsedTime": null,
-        "_SuiteName": "",
-        "start_time_json": null,
-        "testValue": null
+        "error_code": "",
+        "phase_details": "",
+        "elapsedTime": null
     },
     {
         "myWind": null,
@@ -2648,12 +2640,9 @@
         ],
         "start_time": null,
         "finish_time": null,
-        "error_code": null,
-        "phase_details": null,
-        "elapsedTime": null,
-        "_SuiteName": "",
-        "start_time_json": null,
-        "testValue": null
+        "error_code": "",
+        "phase_details": "",
+        "elapsedTime": null
     },
     {
         "myWind": null,
@@ -3084,11 +3073,8 @@
         ],
         "start_time": null,
         "finish_time": null,
-        "error_code": null,
-        "phase_details": null,
-        "elapsedTime": null,
-        "_SuiteName": "",
-        "start_time_json": null,
-        "testValue": null
+        "error_code": "",
+        "phase_details": "",
+        "elapsedTime": null
     }
 ]

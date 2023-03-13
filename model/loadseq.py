@@ -196,6 +196,23 @@ def wrapper_save_sha256(fun):
     return inner
 
 
+def default_f(o):
+    try:
+        _dict = o.__dict__
+        _dict['myWind'] = None
+        _dict['logger'] = None
+        _dict['start_time'] = None
+        _dict['finish_time'] = None
+        if 'steps' not in _dict:
+            if _dict['_index'] != 0:
+                _dict['_SuiteName'] = ''
+            _dict['start_time_json'] = None
+            _dict['testValue'] = None
+        return _dict
+    except AttributeError:
+        return None
+
+
 @wrapper_save_sha256
 def serialize_to_json(obj, json_path, logger):
     """serialize obj to json and encrypt.
@@ -209,9 +226,10 @@ def serialize_to_json(obj, json_path, logger):
             os.chmod(json_path, stat.S_IWRITE)
             os.remove(json_path)
         with open(json_path, 'w') as wf:
-            json.dump(obj, wf, default=lambda o: o.__dict__, sort_keys=False, indent=4)
+            json.dump(obj, wf, default=default_f, sort_keys=False, indent=4)
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
+        logger.fatal(f'{currentframe().f_code.co_name}:{e}')
         raise
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
         sys.exit(e)

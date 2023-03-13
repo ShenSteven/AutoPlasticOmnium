@@ -43,8 +43,8 @@ class TestSuite:
         self.steps = []
         self.start_time = ""
         self.finish_time = ""
-        self.error_code = None
-        self.phase_details = None
+        self.error_code = ''
+        self.phase_details = ''
         self.elapsedTime = None
         if dict_ is not None:
             self.__dict__.update(dict_)

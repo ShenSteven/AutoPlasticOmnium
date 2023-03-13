@@ -680,10 +680,10 @@ class MainForm(TestForm):
         self.ui.actionSaveToScript.setEnabled(True)
 
     def on_actionSaveToScript(self):
-        if self.SaveScriptDisableFlag:
-            QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
-            self.ui.actionSaveToScript.setEnabled(False)
-            return
+        # if self.SaveScriptDisableFlag:
+        #     QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
+        #     self.ui.actionSaveToScript.setEnabled(False)
+        #     return
 
         def SaveToScript():
             self.ui.actionSaveToScript.setEnabled(False)
