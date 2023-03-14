@@ -14,7 +14,7 @@ class Variables:
         self.SN = sn
         self.Station = station_name
         self.StationNo = station_no
-        self.Channel = channel
+        self.CellNo = channel
         self.Group = group
         self.DutDefaultIP = dut_default_ip
         self.LogPath = log_path

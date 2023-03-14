@@ -34,6 +34,6 @@ matplotlib==3.7.1
 # $PyInterpreterDirectory$\pyinstaller.exe
 # -y $FileName$      #--clean -y  $FileName$
 # $FileDir$
-#======D:\PythonDev\pyside2\venv\Lib\site-packages\PyInstaller\building\utils.py========
+#======D:\PythonDev\pyside2\venv\Lib\site-packages\PyInstaller\building\utils.py  line:435========
 #             except PermissionError:
 #                 os.system(f'rmdir /S /Q {path}')

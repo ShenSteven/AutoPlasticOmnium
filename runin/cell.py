@@ -137,6 +137,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
         self.rs_url = gv.cf.station.rs_url
         self.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
+        self.testcase.daq_data_path = rf'{gv.OutPutPath}\{gv.cf.station.station_no}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
         self.finalTestResult = False
         self.setIpFlag = False
