@@ -10,7 +10,9 @@ from datetime import datetime
 
 
 class Variables:
-    def __init__(self, station_name, station_no, sn, dut_default_ip, log_path, channel='1', group='1'):
+    """Environment variables and system variables"""
+
+    def __init__(self, station_name, station_no, sn, dut_default_ip, log_path, channel, group='1'):
         self.SN = sn
         self.Station = station_name
         self.StationNo = station_no

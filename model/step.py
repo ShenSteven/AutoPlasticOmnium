@@ -37,7 +37,7 @@ class Step:
         _isTest：bool 决定步骤是否测试，默认都测试
         _command：test command after parse variant.
         ### excel header variant ###
-        _SuiteName: str = ''：测试套名字
+        SuiteName: str = ''：测试套名字
         StepName: str = None: 当前测试step名字
         ErrorCode: str = None: 测试错误码
         Retry: int = None: 测试失败retry次数
@@ -61,7 +61,7 @@ class Step:
         _FTC: str = None: 失败继续 fail to continue。y=继续，None|''=不继续
         Keyword: str = None: 测试步骤对应的关键字，执行对应关键字下的代码段
         _Json: str = None: 测试结果数据是否收集到json文件中并上传给客户.y=收集，None|''=不收集
-        _EeroName: str = None: 客户定义的测试步骤名字
+        EeroName: str = None: 客户定义的测试步骤名字
         Param1: str = None
     """
 
@@ -82,9 +82,9 @@ class Step:
         self._isTest = True
         self.suiteVar = ''
         # ============= Excel Column ===============
-        self._SuiteName: str = ''
+        self.SuiteName: str = ''
         self.StepName: str = 'Waiting'
-        self._EeroName: str = None
+        self.EeroName: str = None
         self.Keyword: str = 'Waiting'
         self.ErrorCode: str = None
         self.ErrorDetails: str = None
@@ -95,6 +95,9 @@ class Step:
         self.SubStr1: str = None
         self.SubStr2: str = None
         self.Model: str = None
+        self.ID: str = None  # PLIN
+        self.NAD: str = None  # PLIN
+        self.PCI_LEN: str = None  # PLIN
         self.CmdOrParam: str = None
         self.ExpectStr: str = None
         self.CheckStr1: str = None
@@ -111,12 +114,7 @@ class Step:
         self.SetGlobalVar: str = None
         self.Param1: str = None
         self.TearDown: str = None
-        # PLIN
-        self.ID: str = None
-        self.NAD: str = None
-        self.PCI_LEN: str = None
 
-        # self.index = -1
         self.items = list(filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), self.__dict__))
         if dict_ is not None:
             self.__dict__.update(dict_)
@@ -137,16 +135,38 @@ class Step:
     #     item = self.items[i]
     #     return item
     @property
-    def EeroName(self):
-        if self._EeroName is None:
+    def eeroName(self):
+        if self.EeroName is None:
             return None
-        if self._EeroName == '':
-            self._EeroName = self.StepName
-        return self._EeroName
+        if self.EeroName == '':
+            self.EeroName = self.StepName
+        return self.EeroName
 
-    @EeroName.setter
-    def EeroName(self, value):
-        self._EeroName = value
+    # @EeroName.setter
+    # def EeroName(self, value):
+    #     self._EeroName = value
+
+    @property
+    def subStr1(self):
+        if self.SubStr1 is None:
+            return ''
+        else:
+            return self.SubStr1
+
+    # @SubStr1.setter
+    # def SubStr1(self, value):
+    #     self._SubStr1 = value
+
+    @property
+    def subStr2(self):
+        if self.SubStr2 is None:
+            return ''
+        else:
+            return self.SubStr2
+
+    # @SubStr2.setter
+    # def SubStr2(self, value):
+    #     self._SubStr2 = value
 
     @property
     def FTC(self):
@@ -159,7 +179,6 @@ class Step:
         elif value == 'None' or value == '':
             self._FTC = ''
         else:
-            # self._FTC = ''
             raise ValueError("fail to continue. Y=继续，None/''=不继续")
 
     @property
@@ -173,7 +192,6 @@ class Step:
         elif value == 'None' or value == '':
             self._Json = ''
         else:
-            # self._Json = ''
             raise ValueError("数据收集到json文件.Y=收集，None/''=不收集")
 
     @property
@@ -187,18 +205,17 @@ class Step:
         elif value == 'None' or value == '':
             self._ByPF = ''
         else:
-            # self._ByPF = ''
             raise ValueError("Value: 'P'=bypass，'F'=byFail, None/''=不干涉测试结果")
 
     @property
-    def SuiteName(self):
+    def suiteName(self):
         if self.myWind is not None:
-            self._SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].name
-        return self._SuiteName
+            self.SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].name
+        return self.SuiteName
 
-    @SuiteName.setter
-    def SuiteName(self, value):
-        self._SuiteName = value
+    # @SuiteName.setter
+    # def SuiteName(self, value):
+    #     self._SuiteName = value
 
     @property
     def index(self):
@@ -228,19 +245,67 @@ class Step:
 
     @property
     def command(self):
-        return self.parse_var(self.CmdOrParam)
+        if self.CmdOrParam is None:
+            return ''
+        else:
+            return self.parse_expr(self.parse_var(self.CmdOrParam))
+
+    @property
+    def expectStr(self):
+        if self.ExpectStr is None:
+            return ''
+        else:
+            return self.parse_var(self.ExpectStr)
+
+    # @expectStr.setter
+    # def expectStr(self, value):
+    #     self._ExpectStr = value
+
+    @property
+    def checkStr1(self):
+        if self.CheckStr1 is None:
+            return ''
+        else:
+            return self.parse_var(self.CheckStr1)
+
+    # @checkStr1.setter
+    # def checkStr1(self, value):
+    #     self.CheckStr1 = value
+
+    @property
+    def checkStr2(self):
+        if self.CheckStr2 is None:
+            return ''
+        else:
+            return self.parse_var(self.CheckStr2)
+
+    # @CheckStr2.setter
+    # def CheckStr2(self, value):
+    #     self._CheckStr2 = value
 
     @property
     def spec(self):
         return self.parse_var(self.SPEC)
 
     @property
-    def _NAD(self):
-        return self.parse_var(self.NAD)
+    def param1(self):
+        return self.parse_var(self.Param1)
 
     @property
-    def _PCI_LEN(self):
+    def NAD_(self):
+        return self.parse_var(self.NAD)
+
+    # @NAD_.setter
+    # def NAD_(self, value):
+    #     self._NAD = value
+
+    @property
+    def PCI_LEN_(self):
         return self.parse_var(self.PCI_LEN)
+
+    # @PCI_LEN.setter
+    # def PCI_LEN(self, value):
+    #     self._PCI_LEN = value
 
     # @staticmethod
     def parse_var(self, value):
@@ -258,6 +323,19 @@ class Step:
 
         if value == 'quit' or value == '0x03':
             value = chr(0x03).encode('utf8')
+        return value
+
+    def parse_expr(self, value):
+        """当CmdOrParam中有表达式时，计算表达式"""
+        if value is None:
+            return value
+        for a in re.findall(r'{(.*?)}', value):
+            try:
+                varVal = str(eval(a))
+            except:
+                raise
+            else:
+                value = re.compile('{' + f'{a}' + '}').sub(varVal, value, count=1)
         return value
 
     def set_json_start_time(self, test_case):
@@ -302,7 +380,7 @@ class Step:
                     self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
                                                                          f"<A href='https://www.qt.io/'>{self.StepName}</A>")
                 self.setColor(Qt.yellow)
-                self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
+                self.logger.debug(f"<a name='testStep:{self.suiteName}-{self.StepName}'>Start:{self.StepName},"
                                   f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
                                   f"SubStr:{self.SubStr1}*{self.SubStr2},MesVer:{self.MesVar},FTC:{self.FTC}</a>")
                 self.init_online_limit()
@@ -362,7 +440,7 @@ class Step:
                     f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
                     f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
                     f"VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
-                    f"'{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
+                    f"'{test_case.myWind.dut_model}','{self.suiteName}','{self.StepName}','{self.spec}','{self.LSL}',"
                     f"'{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}',"
                     f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
                     f"'{test_result}','{self.status}')")
@@ -378,8 +456,8 @@ class Step:
             # if IsNullOrEmpty(self.error_code) and IsNullOrEmpty(self.error_details):
             #     return
             if IsNullOrEmpty(self.ErrorCode):
-                self.error_code = self.EeroName
-                self.error_details = self.EeroName
+                self.error_code = self.eeroName
+                self.error_details = self.eeroName
             elif ':' in self.ErrorCode:
                 error_list = self.ErrorCode.split()
                 if len(error_list) > 1 and info == 'TooHigh':
@@ -395,7 +473,7 @@ class Step:
     def process_mesVer(self, test_case):
         """collect data to mes"""
         if self.Json is not None and self.Json.upper() == 'Y' and IsNullOrEmpty(self.MesVar):
-            self.MesVar = self.EeroName
+            self.MesVar = self.eeroName
         if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(
                 self.testValue).lower() != 'true':
             setattr(test_case.mesPhases, self.MesVar, self.testValue)
@@ -422,7 +500,7 @@ class Step:
         if test_case.failCount == 1 and IsNullOrEmpty(test_case.error_code_first_fail):
             test_case.error_code_first_fail = self.error_code
             test_case.error_details_first_fail = self.error_details
-            test_case.mesPhases.first_fail = self.SuiteName
+            test_case.mesPhases.first_fail = self.suiteName
 
     def _process_ByPF(self, step_result: bool):
         if (not IsNullOrEmpty(self.ByPF) and self.ByPF.upper() == 'P') and not step_result:
@@ -489,12 +567,12 @@ class Step:
         if self.status != str(True):
             self.start_time_json = test_case.startTimeJson
         obj = model.product.StepItem()
-        if self.EeroName is None:
+        if self.eeroName is None:
             obj.test_name = self.StepName
-        elif self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(test_case.ForCycleCounter)
+        elif self.eeroName.endswith('_'):
+            obj.test_name = self.eeroName + str(test_case.ForCycleCounter)
         else:
-            obj.test_name = self.EeroName
+            obj.test_name = self.eeroName
         obj.status = 'passed' if testResult else 'failed'
         obj.test_value = str(testResult) if self.testValue is None else self.testValue
         obj.units = self.Unit
@@ -540,7 +618,7 @@ class Step:
         self.logger.debug(f'run teardown command...')
         try:
             if self.TearDown == 'ECUReset':
-                gv.PLin.SingleFrame(self.ID, self._NAD, '02', '11 01', self.Timeout)
+                gv.PLin.SingleFrame(self.ID, self.NAD_, '02', '11 01', self.Timeout)
             else:
                 self.logger.warning(f'this teardown({self.TearDown}) no cation.')
         except Exception as e:
