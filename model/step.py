@@ -20,6 +20,20 @@ import conf.globalvar as gv
 import ui.mainform
 
 
+def parse_expr(value):
+    """当CmdOrParam中有表达式时，计算表达式"""
+    if value is None:
+        return value
+    for a in re.findall(r'{(.*?)}', value):
+        try:
+            varVal = str(eval(a))
+        except:
+            raise
+        else:
+            value = re.compile('{' + f'{a}' + '}').sub(varVal, value, count=1)
+    return value
+
+
 class Step:
     """测试步骤类
     Attributes:
@@ -114,7 +128,6 @@ class Step:
         self.SetGlobalVar: str = None
         self.Param1: str = None
         self.TearDown: str = None
-
         self.items = list(filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), self.__dict__))
         if dict_ is not None:
             self.__dict__.update(dict_)
@@ -248,7 +261,7 @@ class Step:
         if self.CmdOrParam is None:
             return ''
         else:
-            return self.parse_expr(self.parse_var(self.CmdOrParam))
+            return parse_expr(self.parse_var(self.CmdOrParam))
 
     @property
     def expectStr(self):
@@ -323,19 +336,6 @@ class Step:
 
         if value == 'quit' or value == '0x03':
             value = chr(0x03).encode('utf8')
-        return value
-
-    def parse_expr(self, value):
-        """当CmdOrParam中有表达式时，计算表达式"""
-        if value is None:
-            return value
-        for a in re.findall(r'{(.*?)}', value):
-            try:
-                varVal = str(eval(a))
-            except:
-                raise
-            else:
-                value = re.compile('{' + f'{a}' + '}').sub(varVal, value, count=1)
         return value
 
     def set_json_start_time(self, test_case):

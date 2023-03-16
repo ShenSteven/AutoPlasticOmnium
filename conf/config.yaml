@@ -1,6 +1,7 @@
 station:
     privileges: lab
     station_all:
+    - Sample
     - LTT1
 #    - FL_M4 #(前左):0x1E
 #    - FR_M4 #(前右):0x50
@@ -29,8 +30,8 @@ station:
 #    - RR_SX5GEV_EOL #(后右):0x53
 #    - FLB_SX5GEV_EOL #(前左保杠):0x52
 #    - FRB_SX5GEV_EOL #(前右保杠):0x54
-    station_name: FL_M6
-    station_no: FL_M6
+    station_name: Sample
+    station_no: Sample
     log_folder: D:\TestLog
     log_server: 10.90.104.85
     log_server_username: eero

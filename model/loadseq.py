@@ -112,7 +112,7 @@ def param_wrapper_verify_sha256(flag):
             sha256 = ''
             bound_args = sig.bind(*args, **kwargs)
             bound_args.apply_defaults()
-            if flag or bound_args.args[1]:
+            if flag and bound_args.args[1]:
                 with model.sqlite.Sqlite(gv.database_setting) as db:
                     file_name = os.path.basename(bound_args.args[0])
                     db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{file_name}'")
@@ -140,7 +140,7 @@ def param_wrapper_verify_sha256(flag):
 
 
 @param_wrapper_verify_sha256(True)
-def load_testcase_from_json(json_path, isVerify=False):
+def load_testcase_from_json(json_path, isVerify=True):
     try:
         """Deserialize form json.
         :param json_path: json file path.

@@ -68,10 +68,10 @@ def testKeyword(test_case, item, testSuite):
                 QtCore.Q_RETURN_ARG(list),
                 QtCore.Q_ARG(str, item.expectStr),
                 QtCore.Q_ARG(str, item.command))
-            item.logger.debug(f'dialog input:{invoke_return[0]}')
             if not invoke_return[1]:
                 rReturn = False
             else:
+                item.logger.debug(f'dialog input:{invoke_return[0]}')
                 rReturn = True
 
         elif item.Keyword == 'AppS19Info':

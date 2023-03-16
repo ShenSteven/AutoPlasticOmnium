@@ -69,10 +69,6 @@ class MainForm(TestForm):
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         gv.init_create_dirs(self.logger)
-        self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
-                                                                         f'{gv.cf.station.station_name}', self.logger,
-                                                                         self)
-        self.testSequences = self.testcase.clone_suites
         self.init_select_station()
         self.init_textEditHandler()
         self.init_lab_factory(gv.cf.station.privileges)
@@ -83,6 +79,10 @@ class MainForm(TestForm):
         self.init_lineEdit()
         self.init_graphicsView()
         self.init_signals_connect()
+        self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
+                                                                         f'{gv.cf.station.station_name}', self.logger,
+                                                                         self)
+        self.testSequences = self.testcase.clone_suites
         self.ShowTreeView(self.testSequences)
         self.testThread = TestThread(self)
         self.testThread.start()
@@ -255,11 +255,15 @@ class MainForm(TestForm):
         self.ui.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
         self.ui.actionStepping.triggered.connect(self.on_actionStepping)
         self.ui.actionLooping.triggered.connect(self.on_actionLooping)
-        # self.ui.actionEditStep.triggered.connect(self.on_actionEditStep)
+        # self.ui.actionEditStep.triggered.connect(self.actionEditStep())
         self.ui.actionExpandAll.triggered.connect(self.on_actionExpandAll)
         self.ui.actionCollapseAll.triggered.connect(self.on_actionCollapseAll)
         self.ui.actionBreakpoint.triggered.connect(self.on_actionBreakpoint)
+        self.ui.actionDelete.triggered.connect(self.on_actionDelete)
+        self.ui.actionCopy.triggered.connect(self.on_actionCopy)
+        self.ui.actionPaste.triggered.connect(self.on_actionPaste)
 
+        self.ui.actionNew.triggered.connect(self.on_actionNew)
         self.ui.actionOpen_TestCase.triggered.connect(self.on_actionOpen_TestCase)
         self.ui.actionConvertExcelToJson.triggered.connect(self.on_actionConvertExcelToJson)
         self.ui.actionOpenScript.triggered.connect(self.on_actionOpenScript)
@@ -302,7 +306,7 @@ class MainForm(TestForm):
         if item.parent() is None:
             # lg.logger.critical('itemActivate')
             self.SuiteNo = self.ui.treeWidget.indexOfTopLevelItem(item)
-            self.StepNo = 0
+            self.StepNo = -1
             self.ui.treeWidget.expandItem(item)
             self.ui.actionStepping.setEnabled(False)
             self.ui.actionEditStep.setEnabled(False)
@@ -403,10 +407,16 @@ class MainForm(TestForm):
     def on_treeWidgetMenu(self):
         if gv.IsDebug:
             menu = QMenu(self.ui.treeWidget)
+            sub_menu = QMenu(menu)
+            sub_menu.setObjectName("Edit")
+            sub_menu.setTitle("Edit")
+            menu.addMenu(sub_menu)
+            sub_menu.addAction(self.ui.actionDelete)
+            sub_menu.addAction(self.ui.actionCopy)
+            sub_menu.addAction(self.ui.actionPaste)
             menu.addAction(self.ui.actionStepping)
             menu.addAction(self.ui.actionLooping)
             menu.addAction(self.ui.actionBreakpoint)
-            # menu.addAction(self.ui.actionEditStep)
             menu.addAction(self.ui.actionCheckAll)
             menu.addAction(self.ui.actionUncheckAll)
             menu.addAction(self.ui.actionExpandAll)
@@ -478,7 +488,8 @@ class MainForm(TestForm):
                     gv.IsDebug = True
                 gv.cf.station.station_no = gv.cf.station.station_name
                 gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
-                self.testcase.original_suites = model.loadseq.load_testcase_from_json(gv.test_script_json)[0]
+                self.testcase.original_suites, self.testcase.header = model.loadseq.load_testcase_from_json(
+                    gv.test_script_json)
                 self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
                 self.testSequences = self.testcase.clone_suites
                 self.logger.debug(f'select {gv.test_script_json} finish!')
@@ -1073,7 +1084,7 @@ class MainForm(TestForm):
         print('.....................................closeOpenCV')
 
     def sinWave(self, i=0):
-        fig = plt.figure(figsize=(3, 2), dpi=100)
+        fig = plt.figure(figsize=(6, 4), dpi=100)
         ax = plt.axes(xlim=(0, 2), ylim=(-2, 2))
         line, = ax.plot([], [])
         line.set_data([], [])
@@ -1096,6 +1107,41 @@ class MainForm(TestForm):
 
     def stop(self):
         self.timer.stop()
+
+    def on_actionDelete(self):
+        if self.startFlag:
+            return
+        if self.StepNo == -1:
+            del self.testcase.clone_suites[self.SuiteNo]
+        else:
+            del self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        self.ShowTreeView(self.testSequences)
+
+    def on_actionCopy(self):
+        pass
+
+    def on_actionPaste(self):
+        pass
+
+    def on_actionNew(self):
+        station_name, ok = QInputDialog.getText(self, 'New TestSequences', 'test station name:')
+        if ok:
+            test_script_json = rf'{gv.scriptFolder}\{station_name}.json'
+            if os.path.exists(test_script_json):
+                QMessageBox.critical(None, 'ERROR!', '{station_name} have existed!!', QMessageBox.Yes)
+                return
+            else:
+                gv.cf.station.station_name = station_name
+                gv.cf.station.station_no = gv.cf.station.station_name
+                gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
+                os.system(f'copy {gv.scriptFolder}\\sample.json {gv.test_script_json}')
+            self.testcase.original_suites, self.testcase.header = model.loadseq.load_testcase_from_json(
+                gv.test_script_json, False)
+            self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
+            self.testSequences = self.testcase.clone_suites
+            gv.cf.station.station_all.append(station_name)
+            self.ShowTreeView(self.testSequences)
+            self.logger.debug(f'new {station_name} test Sequences finish!')
 
 
 if __name__ == "__main__":

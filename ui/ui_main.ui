@@ -553,6 +553,8 @@ font: 20pt &quot;宋体&quot;;</string>
     <property name="title">
      <string>TestCase</string>
     </property>
+    <addaction name="actionNew"/>
+    <addaction name="separator"/>
     <addaction name="actionOpen_TestCase"/>
     <addaction name="actionConvertExcelToJson"/>
    </widget>
@@ -963,6 +965,32 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionPeakLin">
    <property name="text">
     <string>PeakLin</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="toolTip">
+    <string>Paste</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New...</string>
    </property>
   </action>
  </widget>
