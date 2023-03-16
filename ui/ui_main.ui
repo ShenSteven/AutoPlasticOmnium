@@ -553,7 +553,7 @@ font: 20pt &quot;宋体&quot;;</string>
     <property name="title">
      <string>TestCase</string>
     </property>
-    <addaction name="actionNew"/>
+    <addaction name="actionNewSeq"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_TestCase"/>
     <addaction name="actionConvertExcelToJson"/>
@@ -988,9 +988,25 @@ font: 20pt &quot;宋体&quot;;</string>
     <string>Paste</string>
    </property>
   </action>
-  <action name="actionNew">
+  <action name="actionNewSeq">
    <property name="text">
     <string>New...</string>
+   </property>
+  </action>
+  <action name="actionNewStep">
+   <property name="text">
+    <string>New...</string>
+   </property>
+   <property name="toolTip">
+    <string>New step</string>
+   </property>
+  </action>
+  <action name="actionCutStep">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="toolTip">
+    <string>Cut step</string>
    </property>
   </action>
  </widget>
