@@ -2,7 +2,7 @@ station:
     privileges: lab
     station_all:
     - Sample
-    - LTT1
+#    - LTT1
 #    - FL_M4 #(前左):0x1E
 #    - FR_M4 #(前右):0x50
 #    - RL_M4 #(后左):0x1F
@@ -16,7 +16,7 @@ station:
 #    - RR_SX5GEV #(后右):0x53
 #    - FLB_SX5GEV #(前左保杠):0x52
 #    - FRB_SX5GEV #(前右保杠):0x54
-    - FL_M6 #(前左):0x1E
+#    - FL_M6 #(前左):0x1E
 #    - FLG_M6 #(左格栅灯):0x52
 #    - FR_M6 #(前右):0x50
 #    - FRG_M6 #(右格栅灯):0x54

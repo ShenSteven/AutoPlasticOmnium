@@ -261,13 +261,13 @@ class MainForm(TestForm):
         self.ui.actionExpandAll.triggered.connect(self.on_actionExpandAll)
         self.ui.actionCollapseAll.triggered.connect(self.on_actionCollapseAll)
         self.ui.actionBreakpoint.triggered.connect(self.on_actionBreakpoint)
-        self.ui.actionCutStep.triggered.connect(self.on_actionCutStep)
+        # self.ui.actionCutStep.triggered.connect(self.on_actionCutStep)
         self.ui.actionCopy.triggered.connect(self.on_actionCopy)
         self.ui.actionPaste.triggered.connect(self.on_actionPaste)
         self.ui.actionNewStep.triggered.connect(self.on_actionNewStep)
         self.ui.actionDelete.triggered.connect(self.on_actionDelete)
 
-        self.ui.actionNewSeq.triggered.connect(self.on_actionNewSeq)
+        self.ui.actionNewSeq.triggered.connect(self.on_actionNewSequence)
         self.ui.actionOpen_TestCase.triggered.connect(self.on_actionOpen_TestCase)
         self.ui.actionConvertExcelToJson.triggered.connect(self.on_actionConvertExcelToJson)
         self.ui.actionOpenScript.triggered.connect(self.on_actionOpenScript)
@@ -704,9 +704,12 @@ class MainForm(TestForm):
         #     QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
         #     self.ui.actionSaveToScript.setEnabled(False)
         #     return
+        if not self.header_new:
+            raise ValueError('the list of excel header_new cannot be empty!')
+
         def SaveToScript():
             self.ui.actionSaveToScript.setEnabled(False)
-            model.loadseq.serialize_to_json(self.testcase.clone_suites, gv.test_script_json, self.logger)
+
             step_value = []
             sheet_name = gv.cf.station.station_name
             workbook = openpyxl.load_workbook(gv.excel_file_path)
@@ -715,21 +718,25 @@ class MainForm(TestForm):
             except KeyError:
                 workbook.create_sheet(sheet_name)
                 worksheet = workbook[sheet_name]
-            workbook.active = workbook.sheetnames.index(sheet_name)
-            worksheet.delete_rows(idx=1, amount=gv.max_step_count * 3)
-            worksheet.append(self.header_new)
-            for suit in self.testcase.clone_suites:
-                for step in suit.steps:
-                    for item in self.header_new:
-                        value = getattr(step, item)
-                        step_value.append('' if value is None else value)
-                    worksheet.append(step_value)
-                    step_value = []
             try:
-                workbook.save(gv.excel_file_path)
+                workbook.active = workbook.sheetnames.index(sheet_name)
+                worksheet.delete_rows(idx=1, amount=gv.max_step_count * 3)
+                worksheet.append(self.header_new)
+                for suit in self.testcase.clone_suites:
+                    for step in suit.steps:
+                        for item in self.header_new:
+                            value = getattr(step, item)
+                            step_value.append('' if value is None else value)
+                        worksheet.append(step_value)
+                        step_value = []
+                    workbook.save(gv.excel_file_path)
             except:
                 raise
-            self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
+            else:
+                # model.loadseq.serialize_to_json(self.testcase.clone_suites, gv.test_script_json, self.logger)
+                self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
+                # self.ui.actionReloadScript.triggered.emit()
+                self.on_reloadSeqs()
 
         thread = Thread(target=SaveToScript, daemon=True)
         thread.start()
@@ -1123,35 +1130,50 @@ class MainForm(TestForm):
         if self.StepNo == -1:
             del self.testcase.clone_suites[self.SuiteNo]
         else:
-            del self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+            if len(self.testcase.clone_suites[self.SuiteNo].steps) == 1:
+                del self.testcase.clone_suites[self.SuiteNo]
+                self.SuiteNo = 0
+            else:
+                del_step = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
+                del self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+                if self.StepNo == 0:
+                    self.testcase.clone_suites[self.SuiteNo].steps[0].SuiteName = del_step.SuiteName
+                    self.testcase.clone_suites[self.SuiteNo].steps[0].index = 0
         self.ShowTreeView(self.testSequences)
         self.ui.actionSaveToScript.setEnabled(True)
         self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
+        try:
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(0, 1))
+        except IndexError:
+            self.SuiteNo = 0
+            self.StepNo = 0
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(0, 1))
+        except:
+            raise
 
     def on_actionCopy(self):
         if self.StepNo == -1:
             self.suitClipboard = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo])
-            self.ui.actionPaste.setEnabled(True)
         else:
             self.stepClipboard = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
-            self.ui.actionPaste.setEnabled(True)
+            if self.StepNo == 0:
+                self.stepClipboard.SuiteName = ''
+        self.ui.actionPaste.setEnabled(True)
 
     def on_actionPaste(self):
-        if self.StepNo == -1 and self.suitClipboard is not None:
-            self.testcase.clone_suites.insert(self.SuiteNo, self.suitClipboard)
-            self.suitClipboard = None
-            self.ui.actionPaste.setEnabled(False)
+        if self.StepNo == -1:
+            if self.suitClipboard is not None:
+                self.testcase.clone_suites.insert(self.SuiteNo, self.suitClipboard)
+                self.suitClipboard = None
         else:
             if self.stepClipboard is not None:
-                self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo, self.stepClipboard)
+                self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo + 1, self.stepClipboard)
                 self.stepClipboard = None
-                self.ui.actionPaste.setEnabled(False)
         self.ShowTreeView(self.testSequences)
+        self.ui.actionPaste.setEnabled(False)
         self.ui.actionSaveToScript.setEnabled(True)
         self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-
-    def on_actionCutStep(self):
-        pass
+        self.on_stepInfoEdit(self.ui.tableWidget_2.item(0, 1))
 
     def on_actionNewStep(self):
         if self.StepNo == -1:
@@ -1159,14 +1181,13 @@ class MainForm(TestForm):
             self.testcase.clone_suites.insert(self.SuiteNo, new_suit)
         else:
             new_step = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
-            # if self.StepNo == 0:
-            #     new_step.SuiteName = None
             self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo, new_step)
         self.ShowTreeView(self.testSequences)
         self.ui.actionSaveToScript.setEnabled(True)
         self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
+        self.on_stepInfoEdit(self.ui.tableWidget_2.item(0, 1))
 
-    def on_actionNewSeq(self):
+    def on_actionNewSequence(self):
         station_name, ok = QInputDialog.getText(self, 'New TestSequences', 'test station name:')
         if ok:
             test_script_json = rf'{gv.scriptFolder}\{station_name}.json'
