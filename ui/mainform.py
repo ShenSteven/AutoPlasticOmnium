@@ -664,8 +664,10 @@ class MainForm(TestForm):
                     item.setFlags(Qt.ItemIsEnabled)
                     item.setBackground(Qt.lightGray)
                 else:
-                    if (key_pairs[column]) is None:
+                    if key_pairs[column] is None:
                         item.setBackground(Qt.lightGray)
+                    if key_pairs[column - 1] == 'NeverUsed':
+                        item.setFlags(Qt.ItemIsEnabled)
                 self.ui.tableWidget_2.setItem(row_cnt, column, item)
         # self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
         self.ui.tableWidget_2.blockSignals(False)
@@ -673,6 +675,7 @@ class MainForm(TestForm):
     def on_stepInfoEdit(self, item):
         prop_name = self.ui.tableWidget_2.item(item.row(), item.column() - 1).text()
         prop_value = item.text()
+        # print(prop_value)
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         try:
             T = (type(getattr(step_obj, prop_name)))
@@ -692,11 +695,11 @@ class MainForm(TestForm):
             item.setBackground(Qt.white)
             self.ui.tableWidget_2.blockSignals(False)
         # for prop_name in list(dir(step_obj)):
-        for prop_name in gv.items:
+        for field in gv.items:
             # if prop_name[0:1].isupper():
-            prop_value = getattr(step_obj, prop_name)
+            prop_value = getattr(step_obj, field)
             if prop_value is not None:
-                self.header_new.append(prop_name)
+                self.header_new.append(field)
         self.ui.actionSaveToScript.setEnabled(True)
 
     def on_actionSaveToScript(self):
@@ -709,7 +712,6 @@ class MainForm(TestForm):
 
         def SaveToScript():
             self.ui.actionSaveToScript.setEnabled(False)
-
             step_value = []
             sheet_name = gv.cf.station.station_name
             workbook = openpyxl.load_workbook(gv.excel_file_path)
@@ -1141,13 +1143,15 @@ class MainForm(TestForm):
                     self.testcase.clone_suites[self.SuiteNo].steps[0].index = 0
         self.ShowTreeView(self.testSequences)
         self.ui.actionSaveToScript.setEnabled(True)
-        self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
         try:
-            self.on_stepInfoEdit(self.ui.tableWidget_2.item(0, 1))
+            self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
         except IndexError:
             self.SuiteNo = 0
             self.StepNo = 0
-            self.on_stepInfoEdit(self.ui.tableWidget_2.item(0, 1))
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+        except AttributeError:
+            pass
         except:
             raise
 
@@ -1165,6 +1169,11 @@ class MainForm(TestForm):
             if self.suitClipboard is not None:
                 self.testcase.clone_suites.insert(self.SuiteNo, self.suitClipboard)
                 self.suitClipboard = None
+            # if self.stepClipboard is not None:
+            #     self.testcase.clone_suites[self.SuiteNo].steps.insert(0, self.stepClipboard)
+            #     self.testcase.clone_suites[self.SuiteNo].steps[0].SuiteName = del_step.SuiteName
+            #     self.testcase.clone_suites[self.SuiteNo].steps[0].index = 0
+            #     self.stepClipboard = None
         else:
             if self.stepClipboard is not None:
                 self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo + 1, self.stepClipboard)
@@ -1173,7 +1182,7 @@ class MainForm(TestForm):
         self.ui.actionPaste.setEnabled(False)
         self.ui.actionSaveToScript.setEnabled(True)
         self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-        self.on_stepInfoEdit(self.ui.tableWidget_2.item(0, 1))
+        self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
 
     def on_actionNewStep(self):
         if self.StepNo == -1:
@@ -1185,7 +1194,7 @@ class MainForm(TestForm):
         self.ShowTreeView(self.testSequences)
         self.ui.actionSaveToScript.setEnabled(True)
         self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-        self.on_stepInfoEdit(self.ui.tableWidget_2.item(0, 1))
+        self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
 
     def on_actionNewSequence(self):
         station_name, ok = QInputDialog.getText(self, 'New TestSequences', 'test station name:')
