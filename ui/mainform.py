@@ -1159,6 +1159,8 @@ class MainForm(TestForm):
             self.testcase.clone_suites.insert(self.SuiteNo, new_suit)
         else:
             new_step = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
+            # if self.StepNo == 0:
+            #     new_step.SuiteName = None
             self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo, new_step)
         self.ShowTreeView(self.testSequences)
         self.ui.actionSaveToScript.setEnabled(True)
