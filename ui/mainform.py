@@ -14,7 +14,7 @@ import matplotlib
 import numpy as np
 import openpyxl
 import zxing
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QCloseEvent
@@ -61,6 +61,8 @@ class MainForm(TestForm):
 
     def __init__(self, parent=None):
         super(MainForm, self).__init__(parent)
+        self.stepClipboard = None
+        self.suitClipboard = None
         self.header_new = []
         self.graphic_scene = None
         self.canvas = None
@@ -413,7 +415,10 @@ class MainForm(TestForm):
             sub_menu.setObjectName("Edit")
             sub_menu.setTitle("Edit")
             menu.addMenu(sub_menu)
-            sub_menu.addAction(self.ui.actionCutStep)
+            # sub_menu.addAction(self.ui.actionCutStep)
+            icon7 = QIcon()
+            icon7.addPixmap(QPixmap(":/images/edit.png"), QIcon.Normal, QIcon.Off)
+            sub_menu.setIcon(icon7)
             sub_menu.addAction(self.ui.actionCopy)
             sub_menu.addAction(self.ui.actionPaste)
             sub_menu.addAction(self.ui.actionNewStep)
@@ -699,7 +704,6 @@ class MainForm(TestForm):
         #     QMessageBox.information(self, 'Infor', 'Please save it before start test!', QMessageBox.Yes)
         #     self.ui.actionSaveToScript.setEnabled(False)
         #     return
-
         def SaveToScript():
             self.ui.actionSaveToScript.setEnabled(False)
             model.loadseq.serialize_to_json(self.testcase.clone_suites, gv.test_script_json, self.logger)
@@ -721,7 +725,10 @@ class MainForm(TestForm):
                         step_value.append('' if value is None else value)
                     worksheet.append(step_value)
                     step_value = []
-            workbook.save(gv.excel_file_path)
+            try:
+                workbook.save(gv.excel_file_path)
+            except:
+                raise
             self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
 
         thread = Thread(target=SaveToScript, daemon=True)
@@ -1113,19 +1120,49 @@ class MainForm(TestForm):
         self.timer.stop()
 
     def on_actionDelete(self):
-        if self.startFlag:
-            return
         if self.StepNo == -1:
             del self.testcase.clone_suites[self.SuiteNo]
         else:
             del self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         self.ShowTreeView(self.testSequences)
+        self.ui.actionSaveToScript.setEnabled(True)
+        self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
 
     def on_actionCopy(self):
-        pass
+        if self.StepNo == -1:
+            self.suitClipboard = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo])
+            self.ui.actionPaste.setEnabled(True)
+        else:
+            self.stepClipboard = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
+            self.ui.actionPaste.setEnabled(True)
 
     def on_actionPaste(self):
+        if self.StepNo == -1 and self.suitClipboard is not None:
+            self.testcase.clone_suites.insert(self.SuiteNo, self.suitClipboard)
+            self.suitClipboard = None
+            self.ui.actionPaste.setEnabled(False)
+        else:
+            if self.stepClipboard is not None:
+                self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo, self.stepClipboard)
+                self.stepClipboard = None
+                self.ui.actionPaste.setEnabled(False)
+        self.ShowTreeView(self.testSequences)
+        self.ui.actionSaveToScript.setEnabled(True)
+        self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
+
+    def on_actionCutStep(self):
         pass
+
+    def on_actionNewStep(self):
+        if self.StepNo == -1:
+            new_suit = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo])
+            self.testcase.clone_suites.insert(self.SuiteNo, new_suit)
+        else:
+            new_step = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
+            self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo, new_step)
+        self.ShowTreeView(self.testSequences)
+        self.ui.actionSaveToScript.setEnabled(True)
+        self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
 
     def on_actionNewSeq(self):
         station_name, ok = QInputDialog.getText(self, 'New TestSequences', 'test station name:')
@@ -1146,12 +1183,6 @@ class MainForm(TestForm):
             gv.cf.station.station_all.append(station_name)
             self.ShowTreeView(self.testSequences)
             self.logger.debug(f'new {station_name} test Sequences finish!')
-
-    def on_actionCutStep(self):
-        pass
-
-    def on_actionNewStep(self):
-        pass
 
 
 if __name__ == "__main__":
