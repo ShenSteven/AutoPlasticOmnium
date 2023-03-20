@@ -1149,14 +1149,12 @@ class MainForm(TestForm):
                                             hint=QAbstractItemView.EnsureVisible)
 
             self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
-        except IndexError:
-            self.SuiteNo = 0
-            self.StepNo = 0
-            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
-        except AttributeError:
-            self.SuiteNo = 0
-            self.StepNo = 0
-            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+        except (IndexError, AttributeError):
+            step_obj = self.testcase.clone_suites[0].steps[0]
+            for field in gv.items:
+                prop_value = getattr(step_obj, field)
+                if prop_value is not None:
+                    self.header_new.append(field)
         except:
             raise
 
@@ -1194,14 +1192,12 @@ class MainForm(TestForm):
                                         hint=QAbstractItemView.EnsureVisible)
         try:
             self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
-        except IndexError:
-            self.SuiteNo = 0
-            self.StepNo = 0
-            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
-        except AttributeError:
-            self.SuiteNo = 0
-            self.StepNo = 0
-            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+        except (IndexError, AttributeError):
+            step_obj = self.testcase.clone_suites[0].steps[0]
+            for field in gv.items:
+                prop_value = getattr(step_obj, field)
+                if prop_value is not None:
+                    self.header_new.append(field)
         except:
             raise
 
