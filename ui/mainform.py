@@ -264,7 +264,7 @@ class MainForm(TestForm):
         # self.ui.actionCutStep.triggered.connect(self.on_actionCutStep)
         self.ui.actionCopy.triggered.connect(self.on_actionCopy)
         self.ui.actionPaste.triggered.connect(self.on_actionPaste)
-        self.ui.actionNewStep.triggered.connect(self.on_actionNewStep)
+        # self.ui.actionNewStep.triggered.connect(self.on_actionNewStep)
         self.ui.actionDelete.triggered.connect(self.on_actionDelete)
 
         self.ui.actionNewSeq.triggered.connect(self.on_actionNewSequence)
@@ -421,7 +421,7 @@ class MainForm(TestForm):
             sub_menu.setIcon(icon7)
             sub_menu.addAction(self.ui.actionCopy)
             sub_menu.addAction(self.ui.actionPaste)
-            sub_menu.addAction(self.ui.actionNewStep)
+            # sub_menu.addAction(self.ui.actionNewStep)
             sub_menu.addAction(self.ui.actionDelete)
             menu.addAction(self.ui.actionStepping)
             menu.addAction(self.ui.actionLooping)
@@ -1145,13 +1145,18 @@ class MainForm(TestForm):
         self.ui.actionSaveToScript.setEnabled(True)
         try:
             self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
+            self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(self.SuiteNo),
+                                            hint=QAbstractItemView.EnsureVisible)
+
             self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
         except IndexError:
             self.SuiteNo = 0
             self.StepNo = 0
             self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
         except AttributeError:
-            pass
+            self.SuiteNo = 0
+            self.StepNo = 0
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
         except:
             raise
 
@@ -1169,11 +1174,14 @@ class MainForm(TestForm):
             if self.suitClipboard is not None:
                 self.testcase.clone_suites.insert(self.SuiteNo, self.suitClipboard)
                 self.suitClipboard = None
-            # if self.stepClipboard is not None:
-            #     self.testcase.clone_suites[self.SuiteNo].steps.insert(0, self.stepClipboard)
-            #     self.testcase.clone_suites[self.SuiteNo].steps[0].SuiteName = del_step.SuiteName
-            #     self.testcase.clone_suites[self.SuiteNo].steps[0].index = 0
-            #     self.stepClipboard = None
+            elif self.stepClipboard is not None:
+                self.testcase.clone_suites[self.SuiteNo].steps.insert(0, self.stepClipboard)
+                self.testcase.clone_suites[self.SuiteNo].steps[0].SuiteName = \
+                    self.testcase.clone_suites[self.SuiteNo].steps[1].SuiteName
+                self.testcase.clone_suites[self.SuiteNo].steps[0].index = 0
+                self.testcase.clone_suites[self.SuiteNo].steps[1].index = 1
+                self.testcase.clone_suites[self.SuiteNo].steps[1].SuiteName = ''
+                self.stepClipboard = None
         else:
             if self.stepClipboard is not None:
                 self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo + 1, self.stepClipboard)
@@ -1182,19 +1190,32 @@ class MainForm(TestForm):
         self.ui.actionPaste.setEnabled(False)
         self.ui.actionSaveToScript.setEnabled(True)
         self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-        self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+        self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(self.SuiteNo),
+                                        hint=QAbstractItemView.EnsureVisible)
+        try:
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+        except IndexError:
+            self.SuiteNo = 0
+            self.StepNo = 0
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+        except AttributeError:
+            self.SuiteNo = 0
+            self.StepNo = 0
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+        except:
+            raise
 
-    def on_actionNewStep(self):
-        if self.StepNo == -1:
-            new_suit = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo])
-            self.testcase.clone_suites.insert(self.SuiteNo, new_suit)
-        else:
-            new_step = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
-            self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo, new_step)
-        self.ShowTreeView(self.testSequences)
-        self.ui.actionSaveToScript.setEnabled(True)
-        self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-        self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+    # def on_actionNewStep(self):
+    #     if self.StepNo == -1:
+    #         new_suit = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo])
+    #         self.testcase.clone_suites.insert(self.SuiteNo, new_suit)
+    #     else:
+    #         new_step = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
+    #         self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo, new_step)
+    #     self.ShowTreeView(self.testSequences)
+    #     self.ui.actionSaveToScript.setEnabled(True)
+    #     self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
+    #     self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
 
     def on_actionNewSequence(self):
         station_name, ok = QInputDialog.getText(self, 'New TestSequences', 'test station name:')
