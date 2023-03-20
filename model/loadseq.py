@@ -83,7 +83,7 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger) -> tu
                         cell.value = getattr(test_step, header)
                     setattr(test_step, header, T(cell.value))
                 else:
-                    setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value))
+                    setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value).strip())
                 if temp_suite.totalNumber == 0:
                     test_step.SuiteName = temp_suite_name
 

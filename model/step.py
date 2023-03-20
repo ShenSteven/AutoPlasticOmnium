@@ -531,7 +531,7 @@ class Step:
 
     def print_test_info(self, test_case, tResult):
         ts = datetime.now() - self.start_time
-        self.elapsedTime = ts.seconds + ts.microseconds / 1000000
+        self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
         if self.Keyword == 'Waiting':
             return
         result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
@@ -543,7 +543,7 @@ class Step:
             self.logger.error(result_info)
         if self.Json is not None and self.Json.upper() == 'Y':
             ts = datetime.now() - self.start_time
-            self.elapsedTime = ts.seconds + ts.microseconds / 1000000
+            self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
             if isinstance(self.myWind, ui.mainform.MainForm):
                 self.myWind.my_signals.update_tableWidget[list].emit(
                     [test_case.myWind.SN, self.StepName, self.spec, self.LSL, self.testValue, self.USL,
