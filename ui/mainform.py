@@ -14,7 +14,7 @@ import matplotlib
 import numpy as np
 import openpyxl
 import zxing
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QCloseEvent
@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
     QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from openpyxl.worksheet.table import Table, TableStyleInfo
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, save_config, run_cmd, create_csv_file, GetAllIpv4Address
@@ -716,28 +717,45 @@ class MainForm(TestForm):
             sheet_name = gv.cf.station.station_name
             workbook = openpyxl.load_workbook(gv.excel_file_path)
             try:
-                worksheet = workbook[sheet_name]
+                ws = workbook[sheet_name]
             except KeyError:
                 workbook.create_sheet(sheet_name)
-                worksheet = workbook[sheet_name]
+                ws = workbook[sheet_name]
             try:
                 workbook.active = workbook.sheetnames.index(sheet_name)
-                worksheet.delete_rows(idx=1, amount=gv.max_step_count * 3)
-                worksheet.append(self.header_new)
+                for table in ws.tables.items():
+                    try:
+                        del ws.tables[table[0]]
+                    except KeyError:
+                        pass
+                ws.delete_rows(idx=0, amount=gv.max_step_count * 3)
+                ws.append(self.header_new)
                 for suit in self.testcase.clone_suites:
                     for step in suit.steps:
                         for item in self.header_new:
                             value = getattr(step, item)
                             step_value.append('' if value is None else value)
-                        worksheet.append(step_value)
+                        ws.append(step_value)
                         step_value = []
-                    workbook.save(gv.excel_file_path)
-            except:
+                tab = Table(displayName=sheet_name,
+                            ref=f"A1:{ws.cell(row=ws.max_row, column=ws.max_column).coordinate}")
+                style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=True,
+                                       showLastColumn=False, showRowStripes=True, showColumnStripes=False)
+                tab.tableStyleInfo = style
+                ws.add_table(tab)
+            except Exception as e:
+                QMetaObject.invokeMethod(
+                    self,
+                    'showMessageBox',
+                    Qt.BlockingQueuedConnection,
+                    QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
+                    QtCore.Q_ARG(str, 'ERROR!'),
+                    QtCore.Q_ARG(str, f'{currentframe().f_code.co_name}:{e}'),
+                    QtCore.Q_ARG(int, 4))
                 raise
             else:
-                # model.loadseq.serialize_to_json(self.testcase.clone_suites, gv.test_script_json, self.logger)
+                workbook.save(gv.excel_file_path)
                 self.logger.debug(f'sync save to excel:{gv.excel_file_path}')
-                # self.ui.actionReloadScript.triggered.emit()
                 self.on_reloadSeqs()
 
         thread = Thread(target=SaveToScript, daemon=True)

@@ -15,7 +15,6 @@ import sys
 from inspect import currentframe
 from types import NoneType
 from typing import Any
-
 from PyQt5.QtWidgets import QMessageBox
 from openpyxl import load_workbook
 import model.suite
@@ -90,9 +89,9 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger) -> tu
             temp_suite.totalNumber += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
-        raise
         QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
-        sys.exit(e)
+        raise
+        # sys.exit(e)
     else:
         serialize_to_json(suites_list, json_path, logger)
         if gv.cf.station.station_name == sheet_name:
@@ -170,9 +169,9 @@ def load_testcase_from_json(json_path, isVerify=True):
         gv.max_step_count = step_count
         return sequences_obj_list, headers
     except Exception as e:
-        raise
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
-        sys.exit(e)
+        raise
+        # sys.exit(e)
 
 
 def wrapper_save_sha256(fun):
@@ -230,6 +229,6 @@ def serialize_to_json(obj, json_path, logger):
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
         logger.fatal(f'{currentframe().f_code.co_name}:{e}')
-        raise
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
-        sys.exit(e)
+        raise
+        # sys.exit(e)

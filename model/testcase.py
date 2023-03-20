@@ -10,6 +10,8 @@ import copy
 import os
 import sys
 import traceback
+from PyQt5 import QtCore
+from PyQt5.QtCore import QMetaObject, Qt
 import model.loadseq
 import model.product
 import model.sqlite
@@ -65,20 +67,32 @@ class TestCase:
         self.load_testcase(testcase_path, sheet_name, logger, cflag)
 
     def load_testcase(self, testcase_path, sheet_name, logger, cflag):
-        self.sheetName = sheet_name
-        self.testcase_path = testcase_path
-        self.logger = logger
-        if not getattr(sys, 'frozen', False) and cflag:
-            self.header = model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all,
-                                                              self.logger)
-        if os.path.exists(self.test_script_json):
-            self.original_suites, self.header = model.loadseq.load_testcase_from_json(self.test_script_json)
-        else:
-            self.original_suites, self.header = model.loadseq.load_testcase_from_excel(self.testcase_path,
-                                                                                       self.sheetName,
-                                                                                       self.test_script_json,
-                                                                                       self.logger)
-        self.clone_suites = copy.deepcopy(self.original_suites)
+        try:
+            self.sheetName = sheet_name
+            self.testcase_path = testcase_path
+            self.logger = logger
+            if not getattr(sys, 'frozen', False) and cflag:
+                self.header = model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all,
+                                                                  self.logger)
+            if os.path.exists(self.test_script_json):
+                self.original_suites, self.header = model.loadseq.load_testcase_from_json(self.test_script_json)
+            else:
+                self.original_suites, self.header = model.loadseq.load_testcase_from_excel(self.testcase_path,
+                                                                                           self.sheetName,
+                                                                                           self.test_script_json,
+                                                                                           self.logger)
+            self.clone_suites = copy.deepcopy(self.original_suites)
+        except Exception as e:
+            # QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
+            QMetaObject.invokeMethod(
+                self.myWind,
+                'showMessageBox',
+                Qt.BlockingQueuedConnection,
+                QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
+                QtCore.Q_ARG(str, 'ERROR!'),
+                QtCore.Q_ARG(str, f'{currentframe().f_code.co_name}:{e}'),
+                QtCore.Q_ARG(int, 4))
+            raise
 
     def run(self, global_fail_continue=False):
         try:
