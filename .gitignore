@@ -4,7 +4,7 @@
 /OutPut/
 /dist/
 /build/
-/test/
+/test/*
 /.idea
 /conf/setting.db
 /OutPut/result.db
