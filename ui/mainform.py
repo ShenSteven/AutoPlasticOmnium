@@ -743,6 +743,8 @@ class MainForm(TestForm):
                                        showLastColumn=False, showRowStripes=True, showColumnStripes=False)
                 tab.tableStyleInfo = style
                 ws.add_table(tab)
+                ws.protection.sheet = True
+                ws.protection.password = '....'
             except Exception as e:
                 QMetaObject.invokeMethod(
                     self,
