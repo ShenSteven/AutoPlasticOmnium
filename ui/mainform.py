@@ -23,9 +23,10 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from openpyxl.worksheet.table import Table, TableStyleInfo
+import conf.config
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
-from model.basicfunc import IsNullOrEmpty, save_config, run_cmd, create_csv_file, GetAllIpv4Address
+from model.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address
 from model.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from model.sqlite import Sqlite
@@ -518,7 +519,7 @@ class MainForm(TestForm):
                                        "The configuration has been changed.Do you want to save it permanently?",
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if ask == QMessageBox.Yes:
-                save_config(self.logger, gv.config_yaml_path, gv.cf)
+                conf.config.save_config(gv.cf, gv.config_yaml_path)
         settings_wind.destroy()
 
     def on_peak_lin(self):
@@ -744,7 +745,7 @@ class MainForm(TestForm):
                 tab.tableStyleInfo = style
                 ws.add_table(tab)
                 ws.protection.sheet = True
-                ws.protection.password = '....'
+                ws.protection.password = sheet_name
             except Exception as e:
                 QMetaObject.invokeMethod(
                     self,
@@ -1250,6 +1251,7 @@ class MainForm(TestForm):
             self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
             self.testSequences = self.testcase.clone_suites
             gv.cf.station.station_all.append(station_name)
+            conf.config.save_config(gv.cf, gv.config_yaml_path)
             self.ShowTreeView(self.testSequences)
             self.logger.debug(f'new {station_name} test Sequences finish!')
 

@@ -6,10 +6,12 @@
 @Date   : 2021/10/22
 @Desc   : config.yaml 配置对象数据结构模型
 """
+import json
+
 import yaml
 
 
-class StationConf:
+class Conf:
     privileges: str
     station_all: list
     station_name: str
@@ -31,11 +33,6 @@ class StationConf:
     continue_fail_limit: int
     setTimeZone: str
 
-    def __init__(self, dict_):
-        self.__dict__.update(dict_)
-
-
-class DutConf:
     prompt: str
     dut_ip: str
     dut_com_port: str
@@ -51,24 +48,53 @@ class DutConf:
     test_mode: str
     debug_skip: list
 
-    def __init__(self, dict_):
-        self.__dict__.update(dict_)
+    def __init__(self, dict_=None):
+        if dict_ is not None:
+            self.__dict__.update(dict_)
+
+    def __getitem__(self, i):
+        if i >= len(self.__dict__.items()):
+            raise IndexError("out of index")
+        item = list(self.__dict__.items())[i]
+        return item
 
 
 class Configs:
-    def __init__(self, dict_):
-        self.__dict__ = dict_
-        self.station = StationConf(dict_['station'])
-        self.dut = DutConf(dict_['dut'])
-        self.BLF = DutConf(dict_['BLF'])
-        self.RUNIN = DutConf(dict_['RUNIN'])
+    def __init__(self, dict_=None):
+        if dict_ is not None:
+            self.__dict__.update(dict_)
+        self.station = Conf(dict_['station'])
+        self.dut = Conf(dict_['dut'])
+        self.BLF = Conf(dict_['BLF'])
+        self.RUNIN = Conf(dict_['RUNIN'])
+
+    def __getitem__(self, i):
+        if i >= len(self.__dict__.items()):
+            raise IndexError("out of index")
+        item = list(self.__dict__.items())[i]
+        return item
 
 
 def read_config(yaml_file, objType) -> Configs:
     with open(yaml_file, 'r', encoding='utf-8') as f:
-        yaml_data = yaml.safe_load(f)
+        yaml_data = yaml.unsafe_load(f)
         obj = objType(yaml_data)
         return obj
+
+
+def save_config(obj, path):
+    with open(path, 'r+', encoding='utf-8') as rf:
+        readall = rf.read()
+        try:
+            with open(path, 'w', encoding='utf-8') as wf:
+                yaml.dump(dict(obj), wf, sort_keys=False, indent=4)
+        except Exception as e:
+            print(f"save_config! {e}")
+            rf.seek(0)
+            rf.write(readall)
+            raise
+        else:
+            print(f"save conf.yaml success!")
 
 
 def read_yaml(yaml_file):
@@ -76,13 +102,9 @@ def read_yaml(yaml_file):
         yaml_data = yaml.safe_load(f)
         return yaml_data
 
-def save_yaml(obj, path):
-    with open(path, 'w') as wf:
-        yaml.dump(obj, wf, sort_keys=False, indent=4)
-
 
 if __name__ == '__main__':
     pass
     cf = read_config('config.yaml', Configs)
-    cf.station.station_all.append('LTT5')
-    save_yaml(cf, 'config.yaml')
+    cf.station.station_all.append('LTT9')
+    save_config(cf, 'config.yaml')

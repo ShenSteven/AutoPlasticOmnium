@@ -116,21 +116,21 @@ def restart_process(logger, full_path, process_name):
         # return False
 
 
-def save_config(logger, yaml_file, obj):
-    with open(yaml_file, mode='r+', encoding='utf-8') as f:
-        readall = f.read()
-        try:
-            js = json.dumps(obj, default=lambda o: o.__dict__, sort_keys=False, indent=4)
-            ya = yaml.safe_load(js)
-            f.seek(0)
-            yaml.safe_dump(ya, stream=f, default_flow_style=False, sort_keys=False, indent=4)
-        except Exception as e:
-            logger.fatal(f"save_config! {e}")
-            f.seek(0)
-            f.write(readall)
-            raise
-        else:
-            logger.info(f"save conf.yaml success!")
+# def save_config(logger, yaml_file, obj):
+#     with open(yaml_file, mode='r+', encoding='utf-8') as f:
+#         readall = f.read()
+#         try:
+#             js = json.dumps(obj, default=lambda o: o.__dict__, sort_keys=False, indent=4)
+#             ya = yaml.safe_load(js)
+#             f.seek(0)
+#             yaml.safe_dump(ya, stream=f, default_flow_style=False, sort_keys=False, indent=4)
+#         except Exception as e:
+#             logger.fatal(f"save_config! {e}")
+#             f.seek(0)
+#             f.write(readall)
+#             raise
+#         else:
+#             logger.info(f"save conf.yaml success!")
 
 
 def wrapper(logger, flag):

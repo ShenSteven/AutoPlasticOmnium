@@ -90,8 +90,7 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger) -> tu
             temp_suite.steps.append(test_step)
     except Exception as e:
         QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
-        raise
-        # sys.exit(e)
+        sys.exit(e)
     else:
         serialize_to_json(suites_list, json_path, logger)
         if gv.cf.station.station_name == sheet_name:
