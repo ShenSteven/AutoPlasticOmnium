@@ -2,6 +2,7 @@ import copy
 import csv
 import logging
 import os
+import re
 import sys
 import stat
 import threading
@@ -22,6 +23,7 @@ from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, 
     QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 import conf.config
 import conf.globalvar as gv
@@ -46,6 +48,22 @@ matplotlib.use("Qt5Agg")
 
 # pyrcc5 images.qrc -o images.py
 # pyuic5 ui_main.ui -o main_ui.py
+
+def column_width_autofit(ws):
+    # 设置一个字典用于保存列宽数据
+    dims = {}
+    # 遍历表格数据，获取自适应列宽数据
+    for row in ws.rows:
+        for cell in row:
+            if cell.value:
+                # 遍历整个表格，把该列所有的单元格文本进行长度对比，找出最长的单元格
+                # 在对比单元格文本时需要将中文字符识别为1.7个长度，英文字符识别为1个，这里只需要将文本长度直接加上中文字符数量即可
+                # re.findall('([\u4e00-\u9fa5])', cell.value)能够识别大部分中文字符
+                cell_len = 0.7 * len(re.findall('([\u4e00-\u9fa5])', str(cell.value))) + len(str(cell.value))
+                dims[cell.column] = max((dims.get(cell.column, 0), cell_len))
+    for col, value in dims.items():
+        # 设置列宽，get_column_letter用于获取数字列号对应的字母列号，最后值+2是用来调整最终效果的
+        ws.column_dimensions[get_column_letter(col)].width = value + 2
 
 
 class MainForm(TestForm):
@@ -697,6 +715,7 @@ class MainForm(TestForm):
             item.setBackground(Qt.white)
             self.ui.tableWidget_2.blockSignals(False)
         # for prop_name in list(dir(step_obj)):
+        self.header_new = []
         for field in gv.items:
             # if prop_name[0:1].isupper():
             prop_value = getattr(step_obj, field)
@@ -723,7 +742,8 @@ class MainForm(TestForm):
                 workbook.create_sheet(sheet_name)
                 ws = workbook[sheet_name]
             try:
-                workbook.active = workbook.sheetnames.index(sheet_name)
+                sheet_index = workbook.sheetnames.index(sheet_name)
+                workbook.active = sheet_index
                 for table in ws.tables.items():
                     try:
                         del ws.tables[table[0]]
@@ -744,8 +764,11 @@ class MainForm(TestForm):
                                        showLastColumn=False, showRowStripes=True, showColumnStripes=False)
                 tab.tableStyleInfo = style
                 ws.add_table(tab)
-                ws.protection.sheet = True
-                ws.protection.password = sheet_name
+                ws.views.sheetView[0].zoomScale = 80
+                column_width_autofit(ws)
+                # ws.protection.sheet = True
+                # ws.protection.enable()
+                # ws.protection.password = '....'
             except Exception as e:
                 QMetaObject.invokeMethod(
                     self,
@@ -1172,6 +1195,7 @@ class MainForm(TestForm):
             self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
         except (IndexError, AttributeError):
             step_obj = self.testcase.clone_suites[0].steps[0]
+            self.header_new = []
             for field in gv.items:
                 prop_value = getattr(step_obj, field)
                 if prop_value is not None:
@@ -1215,6 +1239,7 @@ class MainForm(TestForm):
             self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
         except (IndexError, AttributeError):
             step_obj = self.testcase.clone_suites[0].steps[0]
+            self.header_new = []
             for field in gv.items:
                 prop_value = getattr(step_obj, field)
                 if prop_value is not None:

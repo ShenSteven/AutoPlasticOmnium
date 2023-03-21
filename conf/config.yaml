@@ -1,8 +1,8 @@
 station:
     privileges: lab
     station_all:
-    - Sample
-#    - LTT1
+#    - Sample
+    - LTT1
 #    - FL_M4 #(前左):0x1E
 #    - FR_M4 #(前右):0x50
 #    - RL_M4 #(后左):0x1F

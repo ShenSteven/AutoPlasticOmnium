@@ -6,12 +6,15 @@
 @Date   : 3/10/2023
 @Desc   : 
 """
+import re
 
 # font_sizes.py
 import openpyxl
 from openpyxl.cell import Cell
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
+
 
 # def font_demo(path):
 #     workbook = openpyxl.Workbook()
@@ -75,11 +78,28 @@ from openpyxl.styles import Font
 #     workbook.save(path)
 
 
+def column_width_autofit(ws):
+    # 设置一个字典用于保存列宽数据
+    dims = {}
+    # 遍历表格数据，获取自适应列宽数据
+    for row in ws.rows:
+        for cell in row:
+            if cell.value:
+                # 遍历整个表格，把该列所有的单元格文本进行长度对比，找出最长的单元格
+                # 在对比单元格文本时需要将中文字符识别为1.7个长度，英文字符识别为1个，这里只需要将文本长度直接加上中文字符数量即可
+                # re.findall('([\u4e00-\u9fa5])', cell.value)能够识别大部分中文字符
+                cell_len = 0.7 * len(re.findall('([\u4e00-\u9fa5])', str(cell.value))) + len(str(cell.value))
+                dims[cell.column] = max((dims.get(cell.column, 0), cell_len))
+    for col, value in dims.items():
+        # 设置列宽，get_column_letter用于获取数字列号对应的字母列号，最后值+2是用来调整最终效果的
+        ws.column_dimensions[get_column_letter(col)].width = value + 2
+
+
 from openpyxl import Workbook
 from openpyxl.workbook.protection import WorkbookProtection
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
-wb = load_workbook("../model/table.xlsx")
+wb = openpyxl.Workbook()
 ws = wb.active
 for table in ws.tables.items():
     try:
@@ -90,7 +110,7 @@ ws.delete_rows(idx=1, amount=10 * 3)
 data = [
     ['Apples', 10000, 5000, 8000, 8000],
     ['Pears', 2000, 3000, 4000, 5000],
-    ['Bananas', 6000, 6000, 6500, 6000],
+    ['Bananas', 6000, '你好啊拉大手榴弹', 6500, 'fsdfs600000000fsfd'],
     ['Oranges', 500, 300, 200, 700],
 ]
 
@@ -102,7 +122,7 @@ for row in data:
 tab = Table(displayName="Table1", ref="A1:E5")
 
 # Add a default style with striped rows and banded columns
-style =  TableStyleInfo(name="TableStyleMedium9", showFirstColumn=True,
+style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=True,
                        showLastColumn=False, showRowStripes=True, showColumnStripes=False)
 tab.tableStyleInfo = style
 
@@ -114,13 +134,17 @@ Using this method ensures table name is unque through out defined names and all 
 ws.add_table(tab)
 # hashed_password = ...
 # print(wb.security)
-wb.security = WorkbookProtection(workbookPassword='0000', revisionsPassword='0000', lockWindows=True,
-                                 lockStructure=True, lockRevision=True)
+# wb.security = WorkbookProtection(workbookPassword='0000', revisionsPassword='0000', lockWindows=True,
+#                                  lockStructure=True, lockRevision=True)
 # wb.security.set_workbook_password(hashed_password, already_hashed=True)
-ws.protection.sheet = True
-# ws.protection.enable()
-# ws.protection.disable()
-ws.protection.password = '...'
+# ws.protection.sheet = True
+# # ws.protection.enable()
+# # ws.protection.disable()
+# hashed_password = '...'
+# ws.protection.password = hashed_password
+ws.views.sheetView[0].zoomScale = 80
+ssss(ws)
+
 wb.save("table.xlsx")
 
 if __name__ == "__main__":

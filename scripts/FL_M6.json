@@ -542,7 +542,7 @@
                 "Keyword": "SrecGetStartAdd",
                 "ErrorCode": null,
                 "ErrorDetails": null,
-                "Retry": 0,
+                "Retry": 10,
                 "Timeout": 1,
                 "IfElse": null,
                 "For": null,
