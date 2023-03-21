@@ -1,10 +1,9 @@
-/test/test.py
 /log/
 /Data/
 /OutPut/
 /dist/
 /build/
-/test/*
+/test/
 /.idea
 /conf/setting.db
 /OutPut/result.db
@@ -13,3 +12,4 @@
 /OutPut/result.csv
 /ui/main.py
 /venv39/
+!/test/excelstyle.py

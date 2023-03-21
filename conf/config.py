@@ -76,6 +76,13 @@ def read_yaml(yaml_file):
         yaml_data = yaml.safe_load(f)
         return yaml_data
 
+def save_yaml(obj, path):
+    with open(path, 'w') as wf:
+        yaml.dump(obj, wf, sort_keys=False, indent=4)
+
 
 if __name__ == '__main__':
     pass
+    cf = read_config('config.yaml', Configs)
+    cf.station.station_all.append('LTT5')
+    save_yaml(cf, 'config.yaml')

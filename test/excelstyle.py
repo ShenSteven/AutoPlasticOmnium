@@ -102,7 +102,7 @@ for row in data:
 tab = Table(displayName="Table1", ref="A1:E5")
 
 # Add a default style with striped rows and banded columns
-style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=True,
+style =  TableStyleInfo(name="TableStyleMedium9", showFirstColumn=True,
                        showLastColumn=False, showRowStripes=True, showColumnStripes=False)
 tab.tableStyleInfo = style
 
