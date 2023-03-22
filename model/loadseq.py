@@ -22,23 +22,16 @@ import model.step
 import model.sqlite
 from .basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
-from .suite import TestSuite
 
 
 def excel_convert_to_json(testcase_path_excel, all_stations, logger):
-    header = []
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
     for station in all_stations:
-        suit, header_temp, count = \
-            load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)
-        if gv.cf.station.station_name == station:
-            header = header_temp
-            gv.max_step_count = count
+        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)
     logger.debug("convert finish!")
-    return header
 
 
-def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger) -> tuple[list[TestSuite], list[Any], int]:
+def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger):
     """load test sequence form a sheet in Excel and return the suites sequences list,
     if success,serialize the suites list to json.
     :param logger: logger handle
@@ -71,11 +64,11 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger) -> tu
             # 给step对象属性赋值
             test_step = model.step.Step()
             step_count += 1
-            param = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), test_step.__dict__)
-            gv.items = list(map(lambda x: x[1:] if x.startswith('_') else x, param))
             for header, cell in dict(zip(headers, line)).items():
                 test_step.index = temp_suite.totalNumber
                 # test_step.suiteIndex = temp_suite.index
+                if not hasattr(test_step, header):
+                    setattr(test_step, header, '')
                 T = (type(getattr(test_step, header)))
                 if T is int:
                     if type(cell.value) is NoneType:
@@ -93,10 +86,6 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger) -> tu
         sys.exit(e)
     else:
         serialize_to_json(suites_list, json_path, logger)
-        if gv.cf.station.station_name == sheet_name:
-            return suites_list, headers, step_count
-        else:
-            return suites_list, [], step_count
     finally:
         workbook.close()
 
@@ -165,8 +154,7 @@ def load_testcase_from_json(json_path, isVerify=True):
             suit_obj = model.suite.TestSuite(dict_=suit_dict)
             suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)
-        gv.max_step_count = step_count
-        return sequences_obj_list, headers
+        return sequences_obj_list, headers, step_count
     except Exception as e:
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
         raise

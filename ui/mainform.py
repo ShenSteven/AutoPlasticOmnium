@@ -388,9 +388,9 @@ class MainForm(TestForm):
         QApplication.processEvents()
 
         def thread_convert_and_load_script():
-            if os.path.exists(gv.test_script_json):
-                os.chmod(gv.test_script_json, stat.S_IWRITE)
-                os.remove(gv.test_script_json)
+            if os.path.exists(self.testcase.test_script_json):
+                os.chmod(self.testcase.test_script_json, stat.S_IWRITE)
+                os.remove(self.testcase.test_script_json)
             self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger, self)
             self.testSequences = self.testcase.clone_suites
 
@@ -516,12 +516,10 @@ class MainForm(TestForm):
                 if gv.cf.station.station_name.startswith('ReadVer_'):
                     gv.IsDebug = True
                 gv.cf.station.station_no = gv.cf.station.station_name
-                gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
-                self.testcase.original_suites, self.testcase.header = model.loadseq.load_testcase_from_json(
-                    gv.test_script_json)
-                self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
+                self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger,
+                                                        self)
                 self.testSequences = self.testcase.clone_suites
-                self.logger.debug(f'select {gv.test_script_json} finish!')
+                self.logger.debug(f'select {self.testcase.test_script_json} finish!')
 
         thread = Thread(target=select_station, daemon=True)
         thread.start()
@@ -752,7 +750,7 @@ class MainForm(TestForm):
                         del ws.tables[table[0]]
                     except KeyError:
                         pass
-                ws.delete_rows(idx=0, amount=gv.max_step_count * 3)
+                ws.delete_rows(idx=0, amount=self.testcase.step_count * 3)
                 ws.append(self.header_new)
                 for suit in self.testcase.clone_suites:
                     for step in suit.steps:
@@ -1274,11 +1272,9 @@ class MainForm(TestForm):
             else:
                 gv.cf.station.station_name = station_name
                 gv.cf.station.station_no = gv.cf.station.station_name
-                gv.test_script_json = rf'{gv.scriptFolder}\{gv.cf.station.station_name}.json'
-                os.system(f'copy {gv.scriptFolder}\\sample.json {gv.test_script_json}')
-            self.testcase.original_suites, self.testcase.header = model.loadseq.load_testcase_from_json(
-                gv.test_script_json, False)
-            self.testcase.clone_suites = copy.deepcopy(self.testcase.original_suites)
+                os.system(f'copy {gv.scriptFolder}\\sample.json {gv.scriptFolder}\\{gv.cf.station.station_name}.json')
+            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger, self,
+                                                    False, False)
             self.testSequences = self.testcase.clone_suites
             gv.cf.station.station_all.append(station_name)
             conf.config.save_config(gv.cf, gv.config_yaml_path)

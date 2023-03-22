@@ -37,10 +37,8 @@ OutPutPath = rf'{current_dir}\OutPut'
 DataPath = rf'{current_dir}\Data'
 scriptFolder = rf'{current_dir}\scripts'
 excel_file_path = rf'{scriptFolder}\{cf.station.testcase}'
-test_script_json = rf'{scriptFolder}\{cf.station.station_name}.json'
 database_setting = rf'{current_dir}\conf\setting.db'
 database_result = rf'{current_dir}\OutPut\result.db'
-max_step_count = 0
 items = []
 
 logFolderPath = ''

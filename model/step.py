@@ -129,7 +129,7 @@ class Step:
         self.Param1: str = None
         self.TearDown: str = None
         self.NeverUsed: str = None
-        self.items = list(filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), self.__dict__))
+        # self.items = list(filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), self.__dict__))
         if dict_ is not None:
             self.__dict__.update(dict_)
 
