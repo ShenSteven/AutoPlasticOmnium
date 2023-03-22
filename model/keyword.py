@@ -75,7 +75,7 @@ def testKeyword(test_case, item, testSuite):
                 rReturn = True
 
         elif item.Keyword == 'AppS19Info':
-            file_path = f"{gv.current_dir}\\flash\\{item.command}"
+            file_path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}\{item.command}"
             item.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(file_path)))
             rReturn = True
 
@@ -158,7 +158,7 @@ def testKeyword(test_case, item, testSuite):
                 item.testValue = subStr(item.subStr1, item.subStr2, revStr, item)
 
         elif item.Keyword == 'TransferData':
-            file_path = f"{gv.current_dir}\\flash\\{item.command}"
+            file_path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}\{item.command}"
             s19datas = gv.PLin.get_datas(file_path)
             item.logger.debug(file_path)
             rReturn = gv.PLin.TransferData(item.ID, item.NAD_, s19datas, item.PCI_LEN_, item.Timeout)
@@ -173,12 +173,12 @@ def testKeyword(test_case, item, testSuite):
 
         elif item.Keyword == 'GetCRC':
             item.testValue = peak.peaklin.PeakLin.get_crc_apps19(item.logger,
-                                                                 f"{gv.current_dir}\\flash\\{gv.cf.station.station_name}")
+                                                                 rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}")
             rReturn = not IsNullOrEmpty(item.testValue)
 
         elif item.Keyword == 'SrecGetStartAdd':
             rReturn, revStr = run_cmd(item.logger,
-                                      rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{item.command}")
+                                      rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}\{item.command}")
             if rReturn:
                 item.testValue = ' '.join(re.findall(".{2}", revStr.split()[-3].zfill(8)))
             else:
@@ -186,7 +186,7 @@ def testKeyword(test_case, item, testSuite):
 
         elif item.Keyword == 'SrecGetLen':
             rReturn, revStr = run_cmd(item.logger,
-                                      rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{item.command}")
+                                      rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}\{item.command}")
             if rReturn:
                 data_len = int(revStr.split()[-1], 16) - int(revStr.split()[-3], 16) + 1
                 item.testValue = ' '.join(re.findall(".{2}", hex(data_len)[2:].upper().zfill(8)))

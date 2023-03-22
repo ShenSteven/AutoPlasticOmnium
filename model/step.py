@@ -423,7 +423,7 @@ class Step:
         else:
             return True if self.status == 'True' else False
         finally:
-            if not IsNullOrEmpty(self.SetGlobalVar):
+            if not IsNullOrEmpty(self.SetGlobalVar) and self.isTest:
                 if bool(self.status):
                     setattr(test_case.myWind.TestVariables, self.SetGlobalVar, self.testValue)
                     self.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")

@@ -111,36 +111,36 @@ class MainForm(TestForm):
         self.open_camera()
 
     def init_select_station(self):
-        for item in gv.cf.station.station_all:
-            station_select = QAction(self)
-            station_select.setObjectName(item)
-            if item.startswith("FL_"):
-                item += "(前左)"
-            elif item.startswith("FR_"):
-                item += "(前右)"
-            elif item.startswith("RL_"):
-                item += "(后左)"
-            elif item.startswith("RML_"):
-                item += "(后中左)"
-            elif item.startswith("RMR_"):
-                item += "(后中右)"
-            elif item.startswith("RR_"):
-                item += "(后右)"
-            elif item.startswith("RM_"):
-                item += "(后右)"
-            elif item.startswith("FLB_"):
-                item += "(前左保杠)"
-            elif item.startswith("FRB_"):
-                item += "(前右保杠)"
-            elif item.startswith("FLG_"):
-                item += "(前左格栅)"
-            elif item.startswith("FRG_"):
-                item += "(前右格栅)"
-            elif item.startswith("ReadVer_"):
-                item += "(读版本)"
-            station_select.setText(item)
-            self.ui.menuSelect_Station.addAction(station_select)
-            station_select.triggered.connect(self.on_select_station)
+        for stationName in gv.cf.station.station_all:
+            model_all = []
+            station_model = ['M4', 'M6', 'SX5GEV', 'SX5GEV_EOL', 'ReadVer']
+            if stationName not in station_model:
+                station_select = QAction(self)
+                station_select.setObjectName(stationName)
+                station_select.setText(stationName)
+                self.ui.menuSelect_Station.addAction(station_select)
+                station_select.triggered.connect(self.on_select_station)
+            else:
+                if stationName == 'M4':
+                    model_all = ['FL', 'FR', 'RL', 'RML', 'RMR', 'RR']
+                elif stationName == 'M6':
+                    model_all = ['FL', 'FR', 'FLG', 'FRG']
+                elif stationName == 'SX5GEV' or stationName == 'SX5GEV_EOL':
+                    model_all = ['FL', 'FR', 'RL', 'RM', 'RR', 'FLB', 'FRB']
+                elif stationName == 'ReadVer':
+                    model_all = ['SX5GEV', 'M4']
+
+                station_menu = QMenu(self.ui.menuSelect_Station)
+                station_menu.setObjectName(stationName)
+                station_menu.setTitle(stationName)
+                self.ui.menuSelect_Station.addMenu(station_menu)
+                station_menu.triggered.connect(self.on_select_station)
+                for item in model_all:
+                    model_select = QAction(self)
+                    model_select.setObjectName(item)
+                    model_select.setText(item)
+                    station_menu.addAction(model_select)
+                    model_select.triggered.connect(self.on_select_dut_model)
 
     def init_textEditHandler(self):
         """create log handler for textEdit"""
@@ -391,7 +391,8 @@ class MainForm(TestForm):
             if os.path.exists(self.testcase.test_script_json):
                 os.chmod(self.testcase.test_script_json, stat.S_IWRITE)
                 os.remove(self.testcase.test_script_json)
-            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger, self)
+            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger, self,
+                                                    False)
             self.testSequences = self.testcase.clone_suites
 
         thread = Thread(target=thread_convert_and_load_script, daemon=True)
@@ -513,19 +514,30 @@ class MainForm(TestForm):
             if isinstance(action, QAction):
                 gv.cf.station.station_name = action.text() if "(" not in action.text() else action.text()[
                                                                                             :action.text().index('(')]
-                if gv.cf.station.station_name.startswith('ReadVer_'):
-                    gv.IsDebug = True
-                gv.cf.station.station_no = gv.cf.station.station_name
-                self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger,
-                                                        self)
-                self.testSequences = self.testcase.clone_suites
-                self.logger.debug(f'select {self.testcase.test_script_json} finish!')
+            if isinstance(action, QMenu):
+                gv.cf.station.station_name = action.title() if "(" not in action.title() else action.title()[
+                                                                                              :action.title().index(
+                                                                                                  '(')]
+            if gv.cf.station.station_name.startswith('ReadVer'):
+                gv.IsDebug = True
+            gv.cf.station.station_no = gv.cf.station.station_name
+            self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger,
+                                                    self, False)
+            self.testSequences = self.testcase.clone_suites
+            self.logger.debug(f'select {self.testcase.test_script_json} finish!')
 
         thread = Thread(target=select_station, daemon=True)
         thread.start()
         thread.join()
         if self.testSequences is not None:
             self.ShowTreeView(self.testSequences)
+
+    def on_select_dut_model(self):
+        action = self.sender()
+        if isinstance(action, QAction):
+            self.dut_model = action.text() if "(" not in action.text() else action.text()[
+                                                                            :action.text().index('(')]
+        self.ui.treeWidget.setHeaderLabel(f'{gv.cf.station.station_no}_{self.dut_model}')
 
     def on_actionConfig(self):
         settings_wind = SettingsDialog(self)
