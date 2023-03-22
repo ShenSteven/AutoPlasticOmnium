@@ -39,7 +39,7 @@ scriptFolder = rf'{current_dir}\scripts'
 excel_file_path = rf'{scriptFolder}\{cf.station.testcase}'
 database_setting = rf'{current_dir}\conf\setting.db'
 database_result = rf'{current_dir}\OutPut\result.db'
-items = []
+step_attr = []
 
 logFolderPath = ''
 critical_log = ''

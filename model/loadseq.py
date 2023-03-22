@@ -150,7 +150,7 @@ def load_testcase_from_json(json_path, isVerify=True):
                     headers = list(map(lambda x: x[1:] if x.startswith('_') else x, param2))
 
                     items = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), step_obj.__dict__)
-                    gv.items = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
+                    gv.step_attr = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
             suit_obj = model.suite.TestSuite(dict_=suit_dict)
             suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)

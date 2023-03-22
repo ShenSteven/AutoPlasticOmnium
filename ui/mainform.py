@@ -668,7 +668,7 @@ class MainForm(TestForm):
             self.ui.tableWidget_2.removeRow(0)
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         # for prop_name in list(dir(step_obj)):
-        for prop_name in gv.items:
+        for prop_name in gv.step_attr:
             prop_value = getattr(step_obj, prop_name)
             # if prop_name[0:1].isupper():
             column_cnt = self.ui.tableWidget_2.columnCount()
@@ -717,7 +717,7 @@ class MainForm(TestForm):
             self.ui.tableWidget_2.blockSignals(False)
         # for prop_name in list(dir(step_obj)):
         self.header_new = []
-        for field in gv.items:
+        for field in gv.step_attr:
             # if prop_name[0:1].isupper():
             prop_value = getattr(step_obj, field)
             if prop_value is not None:
@@ -1195,11 +1195,11 @@ class MainForm(TestForm):
             self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(self.SuiteNo),
                                             hint=QAbstractItemView.EnsureVisible)
 
-            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.step_attr) - 1, 1))
         except (IndexError, AttributeError):
             step_obj = self.testcase.clone_suites[0].steps[0]
             self.header_new = []
-            for field in gv.items:
+            for field in gv.step_attr:
                 prop_value = getattr(step_obj, field)
                 if prop_value is not None:
                     self.header_new.append(field)
@@ -1239,11 +1239,11 @@ class MainForm(TestForm):
         self.ui.treeWidget.scrollToItem(self.ui.treeWidget.topLevelItem(self.SuiteNo),
                                         hint=QAbstractItemView.EnsureVisible)
         try:
-            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
+            self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.step_attr) - 1, 1))
         except (IndexError, AttributeError):
             step_obj = self.testcase.clone_suites[0].steps[0]
             self.header_new = []
-            for field in gv.items:
+            for field in gv.step_attr:
                 prop_value = getattr(step_obj, field)
                 if prop_value is not None:
                     self.header_new.append(field)
