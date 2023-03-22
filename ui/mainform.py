@@ -87,7 +87,7 @@ class MainForm(TestForm):
         self.graphic_scene = None
         self.canvas = None
         self.t = 0
-        self.tableWidgetHeader = ["SN", "ItemName", "Spec", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
+        self.tableWidgetHeader = ["SN", "StepName", "SPEC", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         gv.init_create_dirs(self.logger)
