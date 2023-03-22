@@ -688,6 +688,9 @@ class MainForm(TestForm):
                         item.setBackground(Qt.lightGray)
                     if key_pairs[column - 1] == 'NeverUsed':
                         item.setFlags(Qt.ItemIsEnabled)
+                    if key_pairs[column - 1] == 'SuiteName' and self.StepNo != 0:
+                        item.setFlags(Qt.ItemIsEnabled)
+                        item.setBackground(Qt.lightGray)
                 self.ui.tableWidget_2.setItem(row_cnt, column, item)
         # self.ui.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
         self.ui.tableWidget_2.blockSignals(False)
@@ -755,6 +758,8 @@ class MainForm(TestForm):
                     for step in suit.steps:
                         for item in self.header_new:
                             value = getattr(step, item)
+                            if item == 'SuiteName' and suit.steps.index(step) != 0:
+                                value = ''
                             step_value.append('' if value is None else value)
                         ws.append(step_value)
                         step_value = []
