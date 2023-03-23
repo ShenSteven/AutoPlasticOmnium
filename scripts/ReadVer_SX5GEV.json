@@ -55,9 +55,9 @@
                 "_ByPF": "",
                 "_FTC": null,
                 "_Json": "",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -105,9 +105,9 @@
                 "_ByPF": "",
                 "_FTC": null,
                 "_Json": "",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -155,9 +155,9 @@
                 "_ByPF": "P",
                 "_FTC": null,
                 "_Json": "Y",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -205,9 +205,9 @@
                 "_ByPF": "",
                 "_FTC": null,
                 "_Json": "",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -255,9 +255,9 @@
                 "_ByPF": "P",
                 "_FTC": null,
                 "_Json": "Y",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -305,9 +305,9 @@
                 "_ByPF": "",
                 "_FTC": null,
                 "_Json": "",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -355,9 +355,9 @@
                 "_ByPF": "P",
                 "_FTC": null,
                 "_Json": "Y",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -405,9 +405,9 @@
                 "_ByPF": "",
                 "_FTC": null,
                 "_Json": "",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -455,9 +455,9 @@
                 "_ByPF": "P",
                 "_FTC": null,
                 "_Json": "Y",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -505,9 +505,9 @@
                 "_ByPF": "",
                 "_FTC": null,
                 "_Json": "",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -555,9 +555,9 @@
                 "_ByPF": "P",
                 "_FTC": null,
                 "_Json": "Y",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -605,9 +605,9 @@
                 "_ByPF": "",
                 "_FTC": null,
                 "_Json": "",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -655,9 +655,9 @@
                 "_ByPF": "P",
                 "_FTC": null,
                 "_Json": "Y",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -705,9 +705,9 @@
                 "_ByPF": "",
                 "_FTC": null,
                 "_Json": "",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             },
             {
@@ -755,9 +755,9 @@
                 "_ByPF": "P",
                 "_FTC": null,
                 "_Json": "Y",
-                "SetGlobalVar": "",
+                "SetGlobalVar": null,
                 "Param1": null,
-                "TearDown": "",
+                "TearDown": null,
                 "NeverUsed": null
             }
         ],

@@ -111,9 +111,28 @@ class MainForm(TestForm):
         self.open_camera()
 
     def init_select_station(self):
+        """
+        #    - FL_M4 #(前左):0x1E
+        #    - FR_M4 #(前右):0x50
+        #    - RL_M4 #(后左):0x1F
+        #    - RML_M4 #(后中左):0x51
+        #    - RMR_M4 #(后中右):0x52
+        #    - RR_M4 #(后右):0x53
+        #    - FL_SX5GEV #(前左):0x1E
+        #    - FR_SX5GEV #(前右):0x50
+        #    - RL_SX5GEV #(后左):0x1F
+        #    - RM_SX5GEV #(后中):0x51
+        #    - RR_SX5GEV #(后右):0x53
+        #    - FLB_SX5GEV #(前左保杠):0x52
+        #    - FRB_SX5GEV #(前右保杠):0x54
+        #    - FL_M6 #(前左):0x1E
+        #    - FLG_M6 #(左格栅灯):0x52
+        #    - FR_M6 #(前右):0x50
+        #    - FRG_M6 #(右格栅灯):0x54
+        """
         for stationName in gv.cf.station.station_all:
             model_all = []
-            station_model = ['M4', 'M6', 'SX5GEV', 'SX5GEV_EOL', 'ReadVer']
+            station_model = ['M4', 'M6', 'SX5GEV', 'SX5GEV_EOL']
             if stationName not in station_model:
                 station_select = QAction(self)
                 station_select.setObjectName(stationName)
@@ -127,8 +146,6 @@ class MainForm(TestForm):
                     model_all = ['FL', 'FR', 'FLG', 'FRG']
                 elif stationName == 'SX5GEV' or stationName == 'SX5GEV_EOL':
                     model_all = ['FL', 'FR', 'RL', 'RM', 'RR', 'FLB', 'FRB']
-                elif stationName == 'ReadVer':
-                    model_all = ['SX5GEV', 'M4']
 
                 station_menu = QMenu(self.ui.menuSelect_Station)
                 station_menu.setObjectName(stationName)

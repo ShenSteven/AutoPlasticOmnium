@@ -247,7 +247,7 @@ class Step:
             return self._isTest
         if not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'else':
             self._isTest = not self.myWind.testcase.IfCond
-        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower():
+        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower().split():
             self._isTest = False
         if self.myWind.SingleStepTest:
             self._isTest = True
