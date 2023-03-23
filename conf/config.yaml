@@ -10,6 +10,7 @@ station:
     - ReadVer_M4
     - ReadVer_SX5GEV
     - ALE_M4
+    - ALE_M6
     - ALE_SX5GEV
     station_name: ALE_M4
     station_no: ALE_M4
@@ -57,6 +58,7 @@ BLF:
     RespDelay: 10
     readTxCount: 1000
     MRtoMRDelay: 0.1
+    SchedulePeriod: 20
 RUNIN:
     row: 5 # group No,<=10
     col: 4 # <=8

@@ -679,7 +679,7 @@ class PeakLin(QDialog, Ui_PeakLin):
         self.m_objPLinApi.CalculateChecksum(pMsg)
         return pMsg
 
-    def plin_writeALE(self, pMsg32, pMsg33, timeout, once=False):
+    def plin_writeALE(self, pMsg32, pMsg33=None, timeout=1, once=False):
         start_time = time.time()
         while True:
             if time.time() - start_time > timeout:
@@ -688,14 +688,33 @@ class PeakLin(QDialog, Ui_PeakLin):
             self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg32)
             self.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
             # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-            time.sleep(gv.cf.BLF.ReqDelay / 1000)
-            self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg33)
-            self.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
-            # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-            time.sleep(120 / 1000)
+            if pMsg33 is not None:
+                time.sleep(gv.cf.BLF.ReqDelay / 1000)
+                self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg33)
+                self.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
+                # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+            time.sleep(gv.cf.BLF.SchedulePeriod / 1000)
             if once:
                 time.sleep(timeout)
                 return
+
+    # def plin_writeALE(self, pMsg32, pMsg33, timeout, once=False):
+    #     start_time = time.time()
+    #     while True:
+    #         if time.time() - start_time > timeout:
+    #             return
+    #         # pRcvMsg = PLinApi.TLINRcvMsg()
+    #         self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg32)
+    #         self.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
+    #         # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+    #         time.sleep(gv.cf.BLF.ReqDelay / 1000)
+    #         self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg33)
+    #         self.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
+    #         # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
+    #         time.sleep(gv.cf.BLF.SchedulePeriod / 1000)
+    #         if once:
+    #             time.sleep(timeout)
+    #             return
 
     def get_datas(self, file_s19_cmd):
         s19data = ''

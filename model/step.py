@@ -156,10 +156,6 @@ class Step:
             self.EeroName = self.StepName
         return self.EeroName
 
-    # @EeroName.setter
-    # def EeroName(self, value):
-    #     self._EeroName = value
-
     @property
     def subStr1(self):
         if self.SubStr1 is None:
@@ -167,20 +163,12 @@ class Step:
         else:
             return self.SubStr1
 
-    # @SubStr1.setter
-    # def SubStr1(self, value):
-    #     self._SubStr1 = value
-
     @property
     def subStr2(self):
         if self.SubStr2 is None:
             return ''
         else:
             return self.SubStr2
-
-    # @SubStr2.setter
-    # def SubStr2(self, value):
-    #     self._SubStr2 = value
 
     @property
     def FTC(self):
@@ -227,10 +215,6 @@ class Step:
             self.SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].name
         return self.SuiteName
 
-    # @SuiteName.setter
-    # def SuiteName(self, value):
-    #     self._SuiteName = value
-
     @property
     def index(self):
         if self.myWind is not None:
@@ -271,10 +255,6 @@ class Step:
         else:
             return self.parse_var(self.ExpectStr)
 
-    # @expectStr.setter
-    # def expectStr(self, value):
-    #     self._ExpectStr = value
-
     @property
     def checkStr1(self):
         if self.CheckStr1 is None:
@@ -282,20 +262,12 @@ class Step:
         else:
             return self.parse_var(self.CheckStr1)
 
-    # @checkStr1.setter
-    # def checkStr1(self, value):
-    #     self.CheckStr1 = value
-
     @property
     def checkStr2(self):
         if self.CheckStr2 is None:
             return ''
         else:
             return self.parse_var(self.CheckStr2)
-
-    # @CheckStr2.setter
-    # def CheckStr2(self, value):
-    #     self._CheckStr2 = value
 
     @property
     def spec(self):
@@ -309,17 +281,9 @@ class Step:
     def NAD_(self):
         return self.parse_var(self.NAD)
 
-    # @NAD_.setter
-    # def NAD_(self, value):
-    #     self._NAD = value
-
     @property
     def PCI_LEN_(self):
         return self.parse_var(self.PCI_LEN)
-
-    # @PCI_LEN.setter
-    # def PCI_LEN(self, value):
-    #     self._PCI_LEN = value
 
     # @staticmethod
     def parse_var(self, value):
@@ -368,8 +332,6 @@ class Step:
         self.SuiteName = testSuite.name
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
-        # if IsNullOrEmpty(self.EeroName):
-        #     self.EeroName = self.StepName
         info = ''
         test_result = False
         self.set_json_start_time(test_case)

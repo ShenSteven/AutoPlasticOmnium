@@ -224,7 +224,6 @@ class MainForm(TestForm):
             gv.IsDebug = False
             self.ui.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
             self.ui.actionConvertExcelToJson.setEnabled(False)
-            # self.ui.actionSaveToScript.setEnabled(False)
             self.ui.actionReloadScript.setEnabled(False)
             self.ui.actionStart.setEnabled(False)
             self.ui.actionStop.setEnabled(False)
@@ -294,14 +293,11 @@ class MainForm(TestForm):
         self.ui.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
         self.ui.actionStepping.triggered.connect(self.on_actionStepping)
         self.ui.actionLooping.triggered.connect(self.on_actionLooping)
-        # self.ui.actionEditStep.triggered.connect(self.actionEditStep())
         self.ui.actionExpandAll.triggered.connect(self.on_actionExpandAll)
         self.ui.actionCollapseAll.triggered.connect(self.on_actionCollapseAll)
         self.ui.actionBreakpoint.triggered.connect(self.on_actionBreakpoint)
-        # self.ui.actionCutStep.triggered.connect(self.on_actionCutStep)
         self.ui.actionCopy.triggered.connect(self.on_actionCopy)
         self.ui.actionPaste.triggered.connect(self.on_actionPaste)
-        # self.ui.actionNewStep.triggered.connect(self.on_actionNewStep)
         self.ui.actionDelete.triggered.connect(self.on_actionDelete)
 
         self.ui.actionNewSeq.triggered.connect(self.on_actionNewSequence)
@@ -453,13 +449,11 @@ class MainForm(TestForm):
             sub_menu.setObjectName("Edit")
             sub_menu.setTitle("Edit")
             menu.addMenu(sub_menu)
-            # sub_menu.addAction(self.ui.actionCutStep)
             icon7 = QIcon()
             icon7.addPixmap(QPixmap(":/images/edit.png"), QIcon.Normal, QIcon.Off)
             sub_menu.setIcon(icon7)
             sub_menu.addAction(self.ui.actionCopy)
             sub_menu.addAction(self.ui.actionPaste)
-            # sub_menu.addAction(self.ui.actionNewStep)
             sub_menu.addAction(self.ui.actionDelete)
             menu.addAction(self.ui.actionStepping)
             menu.addAction(self.ui.actionLooping)
@@ -696,10 +690,9 @@ class MainForm(TestForm):
         for i in range(0, self.ui.tableWidget_2.rowCount()):
             self.ui.tableWidget_2.removeRow(0)
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
-        # for prop_name in list(dir(step_obj)):
         for prop_name in gv.step_attr:
+        # for prop_name in self.testcase.header:
             prop_value = getattr(step_obj, prop_name)
-            # if prop_name[0:1].isupper():
             column_cnt = self.ui.tableWidget_2.columnCount()
             row_cnt = self.ui.tableWidget_2.rowCount()
             self.ui.tableWidget_2.insertRow(row_cnt)
@@ -744,10 +737,8 @@ class MainForm(TestForm):
             self.ui.tableWidget_2.blockSignals(True)
             item.setBackground(Qt.white)
             self.ui.tableWidget_2.blockSignals(False)
-        # for prop_name in list(dir(step_obj)):
         self.header_new = []
         for field in gv.step_attr:
-            # if prop_name[0:1].isupper():
             prop_value = getattr(step_obj, field)
             if prop_value is not None:
                 self.header_new.append(field)
@@ -880,6 +871,7 @@ class MainForm(TestForm):
         self.ui.treeWidget.resizeColumnToContents(0)
         self.ui.treeWidget.topLevelItem(0).setExpanded(True)
         self.ui.treeWidget.blockSignals(False)
+        self.ui.tabWidget.setCurrentWidget(self.ui.result)
 
     # @QtCore.pyqtSlot(QBrush, int, int, bool)
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
@@ -1278,18 +1270,6 @@ class MainForm(TestForm):
                     self.header_new.append(field)
         except:
             raise
-
-    # def on_actionNewStep(self):
-    #     if self.StepNo == -1:
-    #         new_suit = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo])
-    #         self.testcase.clone_suites.insert(self.SuiteNo, new_suit)
-    #     else:
-    #         new_step = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
-    #         self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo, new_step)
-    #     self.ShowTreeView(self.testSequences)
-    #     self.ui.actionSaveToScript.setEnabled(True)
-    #     self.ui.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-    #     self.on_stepInfoEdit(self.ui.tableWidget_2.item(len(gv.items) - 1, 1))
 
     def on_actionNewSequence(self):
         station_name, ok = QInputDialog.getText(self, 'New TestSequences', 'test station name:')

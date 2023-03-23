@@ -6,8 +6,6 @@
 @Date   : 2021/10/22
 @Desc   : config.yaml 配置对象数据结构模型
 """
-import json
-
 import yaml
 
 

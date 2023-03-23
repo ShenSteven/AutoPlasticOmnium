@@ -14,7 +14,6 @@ import json
 import sys
 from inspect import currentframe
 from types import NoneType
-from typing import Any
 from PyQt5.QtWidgets import QMessageBox
 from openpyxl import load_workbook
 import model.suite
@@ -104,13 +103,11 @@ def param_wrapper_verify_sha256(flag):
                     file_name = os.path.basename(bound_args.args[0])
                     db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{file_name}'")
                     result = db.cur.fetchone()
-                    # QMessageBox.information(None, 'dbSHA!', f"{result}", QMessageBox.Yes)
                     if result:
                         sha256 = result[0]
                         # print(f"  dbSHA:{sha256}")
                 JsonSHA = get_sha256(bound_args.args[0])
                 # print(f"jsonSHA:{JsonSHA}")
-                # QMessageBox.information(None, "jsonSHA!", f"{JsonSHA}", QMessageBox.Yes)
                 if sha256 == JsonSHA:
                     result = fun(*bound_args.args, **bound_args.kwargs)
                 else:

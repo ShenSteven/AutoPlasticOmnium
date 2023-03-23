@@ -10,7 +10,8 @@ import re
 import time
 import traceback
 from telnetlib import Telnet
-from sockets.communication import CommAbstract, IsNullOrEmpty
+from model.basicfunc import IsNullOrEmpty
+from sockets.communication import CommAbstract
 
 
 class TelnetComm(CommAbstract):

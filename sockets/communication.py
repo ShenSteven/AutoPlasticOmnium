@@ -9,11 +9,11 @@
 from abc import ABCMeta, abstractmethod
 
 
-def IsNullOrEmpty(strObj: str):
-    if strObj and len(str(strObj)) > 0:
-        return False
-    else:
-        return True
+# def IsNullOrEmpty(strObj: str):
+#     if strObj and len(str(strObj)) > 0:
+#         return False
+#     else:
+#         return True
 
 
 class CommAbstract(metaclass=ABCMeta):

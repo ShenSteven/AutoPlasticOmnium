@@ -17,15 +17,11 @@ added_files = [
     ('scripts/*.json', 'scripts'),
     ('scripts/*.xlsx', 'scripts')]
 
-flash_files_M4 = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
-      list(Path().absolute().rglob(r"flash\M4"))]
-flash_files_M6 = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
-      list(Path().absolute().rglob(r"flash\M6"))]
-flash_files_SX5GEV = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
-      list(Path().absolute().rglob(r"flash\SX5GEV"))]
-added_files.extend(flash_files_M4)
-added_files.extend(flash_files_M6)
-added_files.extend(flash_files_SX5GEV)
+for folder in ['M4','M6','SX5GEV']:
+    flash_files = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
+          list(Path().absolute().rglob(r"flash\{folder}"))]
+    added_files.extend(flash_files)
+
 
 added_files += copy_metadata('nidaqmx')
 
