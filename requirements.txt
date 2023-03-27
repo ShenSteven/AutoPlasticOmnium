@@ -17,6 +17,7 @@ opencv-python~=4.7.0.72
 zxing~=0.14
 numpy~=1.24.2
 matplotlib==3.7.1
+paramiko~=3.1.0
 
 #=====QtDesigner=====
 #$PyInterpreterDirectory$\designer.exe
@@ -37,3 +38,4 @@ matplotlib==3.7.1
 #======D:\PythonDev\pyside2\venv\Lib\site-packages\PyInstaller\building\utils.py  line:435========
 #             except PermissionError:
 #                 os.system(f'rmdir /S /Q {path}')
+

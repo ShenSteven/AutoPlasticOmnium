@@ -52,7 +52,7 @@ class SerialPort(CommAbstract):
             else:
                 pass
             time.sleep(0.01)
-            self.logger.debug(f"{self.ser.port}_SendComd-->{command}")
+            self.logger.debug(f"{self.ser.port}_SendCmd-->{command}")
             self.ser.reset_output_buffer()
             self.ser.reset_input_buffer()
             if command is not None:

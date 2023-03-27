@@ -48,7 +48,7 @@ class TelnetComm(CommAbstract):
                 command += "\n"
             else:
                 pass
-            self.logger.debug(f"telnet_SendComd-->{command}")
+            self.logger.debug(f"telnet_SendCmd-->{command}")
             self.write(command)
             strRecAll = self.tel.read_until(exceptStr.encode('utf-8'), timeout).decode('utf-8')
             self.logger.debug(strRecAll)

@@ -97,13 +97,14 @@ class MainForm(TestForm):
         self.init_tableWidget()
         self.init_childLabel()
         self.init_label_info()
-        self.init_status_bar()
+
         self.init_lineEdit()
         self.init_graphicsView()
         self.init_signals_connect()
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
                                                                          f'{gv.cf.station.station_name}', self.logger,
                                                                          self)
+        self.init_status_bar()
         self.testSequences = self.testcase.clone_suites
         self.ShowTreeView(self.testSequences)
         self.testThread = TestThread(self)
