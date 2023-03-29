@@ -41,8 +41,12 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 if not myWind.SingleStepTest:
                     myWind.my_signals.textEditClearSignal[str].emit('')
                 myWind.my_signals.lineEditEnableSignal[bool].emit(False)
-                myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Testing', 36,
-                                                                             Qt.yellow)
+                if gv.cf.station.station_name in ['M4', 'M6', 'SX5GEV']:
+                    myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Flashing', 36,
+                                                                                 Qt.yellow)
+                else:
+                    myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Testing', 36,
+                                                                                 Qt.yellow)
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode, '', 20, Qt.yellow)
                 myWind.my_signals.timingSignal[bool].emit(True)
                 # gv.startTime = datetime.now()

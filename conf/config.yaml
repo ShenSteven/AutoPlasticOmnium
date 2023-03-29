@@ -12,8 +12,8 @@ station:
     - ALE_M4
     - ALE_M6
     - ALE_SX5GEV
-    station_name: ALE_M4
-    station_no: ALE_M4
+    station_name: ALE_SX5GEV
+    station_no: ALE_SX5GEV
     log_folder: D:\TestLog
     log_server: 10.90.104.85
     log_server_username: eero
