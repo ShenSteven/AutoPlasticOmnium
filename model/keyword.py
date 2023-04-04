@@ -141,15 +141,15 @@ def testKeyword(test_case, item, testSuite):
             compInfo, rReturn = assert_value(compInfo, item, rReturn)
 
         elif item.Keyword == 'PLINGetMsg32':
-            gv.pMsg32 = gv.PLin.plin_Get_pMsg(item.ID, item.command)
+            gv.pMsg32 = gv.PLin.peakLin_Get_pMsg(item.ID, item.command)
             rReturn = True
         elif item.Keyword == 'PLINGetMsg33':
-            gv.pMsg33 = gv.PLin.plin_Get_pMsg(item.ID, item.command)
+            gv.pMsg33 = gv.PLin.peakLin_Get_pMsg(item.ID, item.command)
             rReturn = True
 
         elif item.Keyword == 'WaitingALE' or item.Keyword == 'PLINWriteALE':
             # gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, int(item.Timeout), True if item.retry == 1 else False)
-            gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, item.Timeout)
+            gv.PLin.peakLin_writeALE(gv.pMsg32, gv.pMsg33, item.Timeout)
             rReturn = True
 
         elif item.Keyword == 'PLINMultiFrame':

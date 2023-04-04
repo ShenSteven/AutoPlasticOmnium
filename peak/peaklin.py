@@ -636,33 +636,26 @@ class PeakLin(QDialog, Ui_PeakLin):
             self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False
 
-    def plin_write(self, _id, data, timeout=None):
-        pMsg = PLinApi.TLINMsg()
-        nPID = c_ubyte(int(_id, 16))
-        data_bytes = data.split()
+    def peakLin_write(self, _id, data, timeout=None, times=None):
+        start_time = time.time()
+        send_counts = 0
+        pMsg = self.peakLin_Get_pMsg(_id, data)
+        while True:
+            if timeout is not None and time.time() - start_time > timeout:
+                return True
+            elif times is not None and times == send_counts:
+                return True
+            time.sleep(gv.cf.BLF.ReqDelay / 1000)
+            linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
+            send_counts += 1
+            if linResult == PLinApi.TLIN_ERROR_OK:
+                self.logger.debug(f"TX {_id},{bytes_to_string(pMsg.Data)},{'{:02X}'.format(pMsg.Checksum)}")
+            else:
+                self.displayError(linResult)
+                self.logger.error("Failed to write message")
+                return False
 
-        self.m_objPLinApi.GetPID(nPID)
-        pMsg.FrameId = c_ubyte(nPID.value)
-        pMsg.Direction = PLinApi.TLIN_DIRECTION_PUBLISHER
-        pMsg.ChecksumType = PLinApi.TLIN_CHECKSUMTYPE_ENHANCED
-        pMsg.Length = c_ubyte(len(data_bytes))
-        for i in range(len(data_bytes)):
-            try:
-                pMsg.Data[i] = c_ubyte(int(data_bytes[i].strip(), 16))
-            except Exception as ex:
-                self.logger.exception(ex)
-        self.m_objPLinApi.CalculateChecksum(pMsg)
-        # write LIN message
-        linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
-        if linResult == PLinApi.TLIN_ERROR_OK:
-            self.logger.debug(f"TX  {_id},{bytes_to_string(pMsg.Data)},{'{:02X}'.format(pMsg.Checksum)}")
-            return True, ''
-        else:
-            self.displayError(linResult)
-            self.logger.error("Failed to write message")
-            return False, ''
-
-    def plin_Get_pMsg(self, _id, data):
+    def peakLin_Get_pMsg(self, _id, data):
         pMsg = PLinApi.TLINMsg()
         nPID = c_ubyte(int(_id, 16))
         data_bytes = data.split()
@@ -679,12 +672,11 @@ class PeakLin(QDialog, Ui_PeakLin):
         self.m_objPLinApi.CalculateChecksum(pMsg)
         return pMsg
 
-    def plin_writeALE(self, pMsg32, pMsg33=None, timeout=1, once=False):
+    def peakLin_writeALE(self, pMsg32, pMsg33=None, timeout=1, once=False):
         start_time = time.time()
         while True:
             if time.time() - start_time > timeout:
                 return
-            # pRcvMsg = PLinApi.TLINRcvMsg()
             self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg32)
             self.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
             # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
@@ -698,24 +690,6 @@ class PeakLin(QDialog, Ui_PeakLin):
                 time.sleep(timeout)
                 return
 
-    # def plin_writeALE(self, pMsg32, pMsg33, timeout, once=False):
-    #     start_time = time.time()
-    #     while True:
-    #         if time.time() - start_time > timeout:
-    #             return
-    #         # pRcvMsg = PLinApi.TLINRcvMsg()
-    #         self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg32)
-    #         self.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
-    #         # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-    #         time.sleep(gv.cf.BLF.ReqDelay / 1000)
-    #         self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg33)
-    #         self.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
-    #         # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-    #         time.sleep(gv.cf.BLF.SchedulePeriod / 1000)
-    #         if once:
-    #             time.sleep(timeout)
-    #             return
-
     def get_datas(self, file_s19_cmd):
         s19data = ''
         try:
@@ -724,7 +698,7 @@ class PeakLin(QDialog, Ui_PeakLin):
                     if line.decode("utf-8").startswith('S1') or line.decode("utf-8").startswith('S2') or line.decode(
                             "utf-8").startswith('S3'):
                         le = len(line)
-                        msg = line[10:(le - 4)]  # Address and checksum are not part of message and they won't be send
+                        msg = line[10:(le - 4)]  # Address and checksum are not part of message, and they won't be sent
                         s19data += msg.decode("utf-8")
         except FileNotFoundError:
             self.logger.debug("File not found")
