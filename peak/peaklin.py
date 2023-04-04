@@ -779,7 +779,6 @@ class PeakLin(QDialog, Ui_PeakLin):
                     self.logger.debug(ex)
             linResult = self.m_objPLinApi.SetFrameEntry(self.m_hClient, self.m_hHw, lFrameEntry)
             if linResult == PLinApi.TLIN_ERROR_OK:
-                # for i in range(11):
                 readTxCount = 0
                 pRcvMsg = PLinApi.TLINRcvMsg()
                 self.m_objPLinApi.ResetClient(self.m_hClient)
@@ -798,9 +797,6 @@ class PeakLin(QDialog, Ui_PeakLin):
                     if readTxCount == gv.cf.BLF.readTxCount:
                         self.logger.warning(f'readTxCount:{gv.cf.BLF.readTxCount}')
                         break
-
-                    # lg.logger.warning(f"rTx  {_id},{bytes_to_string(lFrameEntry.InitialData)}")
-                    # time.sleep(1 / 1000)
             self.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(lFrameEntry.InitialData)}")
             return False
         except Exception as ex:
