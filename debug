@@ -5565,3 +5565,241 @@ AttributeError: 'dict' object has no attribute '__dict__'
 2023-04-06 14:51:01,349 - [DEBUG   ] - delete old json in scripts.
 2023-04-06 14:51:01,353 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json.
 2023-04-06 14:51:01,354 - [DEBUG   ] - convert finish!
+2023-04-06 15:19:58,175 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:19:58,214 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,218 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\Sample.json.
+2023-04-06 15:19:58,259 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,263 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\LTT1.json.
+2023-04-06 15:19:58,342 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,348 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M4.json.
+2023-04-06 15:19:58,448 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,452 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M6.json.
+2023-04-06 15:19:58,535 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,541 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV.json.
+2023-04-06 15:19:58,574 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,577 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV_EOL.json.
+2023-04-06 15:19:58,607 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,609 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_M4.json.
+2023-04-06 15:19:58,641 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,643 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_SX5GEV.json.
+2023-04-06 15:19:58,693 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,697 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M4.json.
+2023-04-06 15:19:58,733 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,736 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M6.json.
+2023-04-06 15:19:58,775 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:19:58,778 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json.
+2023-04-06 15:19:58,783 - [DEBUG   ] - convert finish!
+2023-04-06 15:20:11,756 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:20:11,756 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:20:11,757 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:20:11,822 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:20:11,827 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\LTT1.json.
+2023-04-06 15:20:11,828 - [DEBUG   ] - convert finish!
+2023-04-06 15:20:11,834 - [DEBUG   ] - reload finish!
+2023-04-06 15:21:14,517 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\M4.json finish!
+2023-04-06 15:21:22,311 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:21:22,311 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:21:22,313 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:21:22,482 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:22,488 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M4.json.
+2023-04-06 15:21:22,489 - [DEBUG   ] - convert finish!
+2023-04-06 15:21:22,496 - [DEBUG   ] - reload finish!
+2023-04-06 15:21:57,956 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:21:57,995 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:57,999 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\Sample.json.
+2023-04-06 15:21:58,035 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,039 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\LTT1.json.
+2023-04-06 15:21:58,176 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,181 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M4.json.
+2023-04-06 15:21:58,252 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,257 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M6.json.
+2023-04-06 15:21:58,335 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,340 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV.json.
+2023-04-06 15:21:58,369 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,371 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV_EOL.json.
+2023-04-06 15:21:58,399 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,401 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_M4.json.
+2023-04-06 15:21:58,431 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,434 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_SX5GEV.json.
+2023-04-06 15:21:58,481 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,486 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M4.json.
+2023-04-06 15:21:58,518 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,522 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M6.json.
+2023-04-06 15:21:58,587 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:21:58,591 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json.
+2023-04-06 15:21:58,592 - [DEBUG   ] - convert finish!
+2023-04-06 15:22:45,205 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:22:45,243 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,247 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\Sample.json.
+2023-04-06 15:22:45,283 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,287 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\LTT1.json.
+2023-04-06 15:22:45,421 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,426 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M4.json.
+2023-04-06 15:22:45,499 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,505 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M6.json.
+2023-04-06 15:22:45,583 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,590 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV.json.
+2023-04-06 15:22:45,618 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,620 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV_EOL.json.
+2023-04-06 15:22:45,647 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,649 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_M4.json.
+2023-04-06 15:22:45,679 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,681 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_SX5GEV.json.
+2023-04-06 15:22:45,727 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,732 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M4.json.
+2023-04-06 15:22:45,763 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,766 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M6.json.
+2023-04-06 15:22:45,831 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:22:45,835 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json.
+2023-04-06 15:22:45,836 - [DEBUG   ] - convert finish!
+2023-04-06 15:23:59,286 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:23:59,324 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,328 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\Sample.json.
+2023-04-06 15:23:59,364 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,367 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\LTT1.json.
+2023-04-06 15:23:59,500 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,506 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M4.json.
+2023-04-06 15:23:59,574 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,580 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M6.json.
+2023-04-06 15:23:59,657 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,663 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV.json.
+2023-04-06 15:23:59,692 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,695 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV_EOL.json.
+2023-04-06 15:23:59,721 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,724 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_M4.json.
+2023-04-06 15:23:59,753 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,755 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_SX5GEV.json.
+2023-04-06 15:23:59,801 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,806 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M4.json.
+2023-04-06 15:23:59,837 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,841 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M6.json.
+2023-04-06 15:23:59,904 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:23:59,908 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json.
+2023-04-06 15:23:59,909 - [DEBUG   ] - convert finish!
+2023-04-06 15:24:04,107 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\M6.json finish!
+2023-04-06 15:24:10,364 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:24:10,364 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:24:10,366 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:24:10,522 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:24:10,528 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M6.json.
+2023-04-06 15:24:10,529 - [DEBUG   ] - convert finish!
+2023-04-06 15:24:10,537 - [DEBUG   ] - reload finish!
+2023-04-06 15:24:18,652 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV.json finish!
+2023-04-06 15:24:25,312 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:24:25,312 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:24:25,314 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:24:25,488 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:24:25,495 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV.json.
+2023-04-06 15:24:25,496 - [DEBUG   ] - convert finish!
+2023-04-06 15:24:25,504 - [DEBUG   ] - reload finish!
+2023-04-06 15:24:41,985 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV_EOL.json finish!
+2023-04-06 15:26:32,726 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:26:32,726 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:26:32,728 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:26:32,771 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:26:32,774 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV_EOL.json.
+2023-04-06 15:26:32,774 - [DEBUG   ] - convert finish!
+2023-04-06 15:26:32,780 - [DEBUG   ] - reload finish!
+2023-04-06 15:26:36,648 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_M4.json finish!
+2023-04-06 15:26:42,277 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:26:42,277 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:26:42,278 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:26:42,314 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:26:42,317 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_M4.json.
+2023-04-06 15:26:42,318 - [DEBUG   ] - convert finish!
+2023-04-06 15:26:42,322 - [DEBUG   ] - reload finish!
+2023-04-06 15:26:45,722 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_SX5GEV.json finish!
+2023-04-06 15:26:51,721 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:26:51,721 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:26:51,723 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:26:51,764 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:26:51,768 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_SX5GEV.json.
+2023-04-06 15:26:51,769 - [DEBUG   ] - convert finish!
+2023-04-06 15:26:51,773 - [DEBUG   ] - reload finish!
+2023-04-06 15:27:00,784 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M4.json finish!
+2023-04-06 15:27:06,977 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:27:06,977 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:27:06,980 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:27:07,083 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:27:07,088 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M4.json.
+2023-04-06 15:27:07,090 - [DEBUG   ] - convert finish!
+2023-04-06 15:27:07,095 - [DEBUG   ] - reload finish!
+2023-04-06 15:27:10,034 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M6.json finish!
+2023-04-06 15:27:15,649 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:27:15,649 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:27:15,651 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:27:15,690 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:27:15,694 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M6.json.
+2023-04-06 15:27:15,695 - [DEBUG   ] - convert finish!
+2023-04-06 15:27:15,702 - [DEBUG   ] - reload finish!
+2023-04-06 15:27:19,067 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json finish!
+2023-04-06 15:27:24,296 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:27:24,297 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:27:24,298 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:27:24,345 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:27:24,349 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json.
+2023-04-06 15:27:24,351 - [DEBUG   ] - convert finish!
+2023-04-06 15:27:24,357 - [DEBUG   ] - reload finish!
+2023-04-06 15:27:34,754 - [DEBUG   ] - select D:\PythonDev\AutoPlasticOmnium\scripts\Sample.json finish!
+2023-04-06 15:27:41,665 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:27:41,665 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:27:41,667 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:27:41,730 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:27:41,734 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\Sample.json.
+2023-04-06 15:27:41,735 - [DEBUG   ] - convert finish!
+2023-04-06 15:27:41,741 - [DEBUG   ] - reload finish!
+2023-04-06 15:28:58,702 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:28:58,749 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:58,753 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\Sample.json.
+2023-04-06 15:28:58,790 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:58,794 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\LTT1.json.
+2023-04-06 15:28:58,869 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:58,875 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M4.json.
+2023-04-06 15:28:58,967 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:58,973 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M6.json.
+2023-04-06 15:28:59,050 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:59,056 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV.json.
+2023-04-06 15:28:59,085 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:59,088 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV_EOL.json.
+2023-04-06 15:28:59,115 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:59,117 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_M4.json.
+2023-04-06 15:28:59,147 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:59,149 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_SX5GEV.json.
+2023-04-06 15:28:59,195 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:59,200 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M4.json.
+2023-04-06 15:28:59,231 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:59,234 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M6.json.
+2023-04-06 15:28:59,268 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:28:59,272 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json.
+2023-04-06 15:28:59,273 - [DEBUG   ] - convert finish!
+2023-04-06 15:29:07,717 - [DEBUG   ] - sync save to excel:D:\PythonDev\AutoPlasticOmnium\scripts\PLIN-BLF.xlsx
+2023-04-06 15:29:07,717 - [DEBUG   ] - start reload script,please wait a moment...
+2023-04-06 15:29:07,718 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:29:07,781 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:29:07,786 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\LTT1.json.
+2023-04-06 15:29:07,787 - [DEBUG   ] - convert finish!
+2023-04-06 15:29:07,793 - [DEBUG   ] - reload finish!
+2023-04-06 15:31:06,543 - [DEBUG   ] - Start convert excel testcase to json script,please wait a moment...
+2023-04-06 15:31:06,583 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:06,586 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\Sample.json.
+2023-04-06 15:31:06,633 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:06,637 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\LTT1.json.
+2023-04-06 15:31:06,714 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:06,720 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M4.json.
+2023-04-06 15:31:06,814 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:06,820 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\M6.json.
+2023-04-06 15:31:06,897 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:06,903 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV.json.
+2023-04-06 15:31:06,933 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:06,935 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\SX5GEV_EOL.json.
+2023-04-06 15:31:06,963 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:06,966 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_M4.json.
+2023-04-06 15:31:06,994 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:06,997 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ReadVer_SX5GEV.json.
+2023-04-06 15:31:07,045 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:07,050 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M4.json.
+2023-04-06 15:31:07,081 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:07,085 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_M6.json.
+2023-04-06 15:31:07,120 - [DEBUG   ] - delete old json in scripts.
+2023-04-06 15:31:07,124 - [DEBUG   ] - serializeToJson success! D:\PythonDev\AutoPlasticOmnium\scripts\ALE_SX5GEV.json.
+2023-04-06 15:31:07,124 - [DEBUG   ] - convert finish!
