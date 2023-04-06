@@ -23,7 +23,7 @@ from .basicfunc import IsNullOrEmpty, kill_process, start_process, restart_proce
 from inspect import currentframe
 
 
-def testKeyword(test_case, item, testSuite):
+def testKeyword(test_case, item, testSuite=None):
     # gv.lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
     # time.sleep(0.3)
     # return True, ''
@@ -97,7 +97,10 @@ def testKeyword(test_case, item, testSuite):
 
         elif item.Keyword == 'TelnetLogin':
             if not isinstance(test_case.dut_comm, TelnetComm):
-                test_case.dut_comm = TelnetComm(item.logger, gv.cf.dut.dut_ip, gv.cf.dut.prompt)
+                if not IsNullOrEmpty(item.command):
+                    test_case.dut_comm = TelnetComm(item.logger, item.command, gv.cf.dut.prompt)
+                else:
+                    test_case.dut_comm = TelnetComm(item.logger, gv.cf.dut.dut_ip, gv.cf.dut.prompt)
             rReturn = test_case.dut_comm.open(gv.cf.dut.prompt)
 
         elif item.Keyword == 'TelnetAndSendCmd':
@@ -118,10 +121,10 @@ def testKeyword(test_case, item, testSuite):
                 rReturn = True
 
         elif item.Keyword == 'PLINInitConnect':
-            rReturn = plin_init_connect(rReturn, item.logger)
+            rReturn = peakLin_init_connect(rReturn, item.logger)
 
         elif item.Keyword == 'PLINInitConnectELV':
-            rReturn = plin_init_connectELV(rReturn, item.logger)
+            rReturn = peakLin_init_connectELV(rReturn, item.logger)
 
         elif item.Keyword == 'PLINDisConnect':
             rReturn = gv.PLin.DoLinDisconnect()
@@ -324,7 +327,7 @@ def str_to_int(strs):
         return False, 0
 
 
-def plin_init_connect(rReturn, logger):
+def peakLin_init_connect(rReturn, logger):
     if gv.PLin is None:
         gv.PLin = peak.peaklin.PeakLin(logger)
         ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
@@ -348,7 +351,7 @@ def plin_init_connect(rReturn, logger):
     return rReturn
 
 
-def plin_init_connectELV(rReturn, logger):
+def peakLin_init_connectELV(rReturn, logger):
     if gv.PLin is None:
         gv.PLin = peak.peaklin.PeakLin(logger)
         ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
@@ -357,7 +360,7 @@ def plin_init_connectELV(rReturn, logger):
         gv.PLin.hardwareCbx_IndexChanged()
         if gv.PLin.doLinConnect():
             time.sleep(0.1)
-            rReturn = gv.PLin.runSchedule()
+            gv.PLin.runSchedule()
             time.sleep(0.1)
             rReturn = True
         else:
@@ -365,7 +368,7 @@ def plin_init_connectELV(rReturn, logger):
             return rReturn
     else:
         time.sleep(0.1)
-        rReturn = gv.PLin.runSchedule()
+        gv.PLin.runSchedule()
         time.sleep(0.1)
         rReturn = True
     ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
