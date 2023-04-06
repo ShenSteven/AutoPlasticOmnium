@@ -692,7 +692,7 @@ class MainForm(TestForm):
             self.ui.tableWidget_2.removeRow(0)
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         for prop_name in gv.step_attr:
-        # for prop_name in self.testcase.header:
+            # for prop_name in self.testcase.header:
             prop_value = getattr(step_obj, prop_name)
             column_cnt = self.ui.tableWidget_2.columnCount()
             row_cnt = self.ui.tableWidget_2.rowCount()
@@ -1051,9 +1051,7 @@ class MainForm(TestForm):
         if self.SingleStepTest and self.testcase.Finished:
             pass
         else:
-            self.TestVariables = model.variables.Variables(gv.cf.station.station_name,
-                                                           gv.cf.station.station_no, SN, gv.cf.dut.dut_ip,
-                                                           gv.cf.station.log_folder, gv.cf.RUNIN.channel)
+            self.TestVariables = model.variables.Variables(SN, gv.cf.LTT.channel)
         self.testcase.jsonObj = model.product.JsonObject(SN, gv.cf.station.station_no,
                                                          gv.cf.dut.test_mode, gv.cf.dut.qsdk_ver, gv.version)
         self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'

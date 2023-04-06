@@ -128,10 +128,7 @@ class Cell(QFrame, Ui_cell, TestForm):
     def variable_init(self, SN):
         """测试变量初始化"""
         gv.init_create_dirs(self.logger)
-        self.TestVariables = model.variables.Variables(gv.cf.station.station_name,
-                                                       gv.cf.station.station_no, SN, gv.cf.dut.dut_ip,
-                                                       gv.cf.station.log_folder, str(self.LocalNo),
-                                                       str(gv.cf.RUNIN.row))
+        self.TestVariables = model.variables.Variables(SN, str(self.LocalNo), str(gv.cf.LTT.row))
         self.testcase.jsonObj = model.product.JsonObject(SN, gv.cf.station.station_no,
                                                          gv.cf.dut.test_mode, gv.cf.dut.qsdk_ver, gv.version)
         self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'

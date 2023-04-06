@@ -65,6 +65,7 @@ class Configs:
         self.dut = Conf(dict_['dut'])
         self.BLF = Conf(dict_['BLF'])
         self.RUNIN = Conf(dict_['RUNIN'])
+        self.LTT = Conf(dict_['LTT'])
 
     def __getitem__(self, i):
         if i >= len(self.__dict__.items()):

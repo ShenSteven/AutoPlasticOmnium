@@ -292,7 +292,11 @@ class Step:
         if self.myWind.TestVariables is None:
             return value
         for a in re.findall(r'<(.*?)>', value):
-            varVal = getattr(self.myWind.TestVariables, a)
+            if a.startswith('Config.'):
+                temp = a.split('.')
+                varVal = str(dict(dict(getattr(self.myWind.TestVariables, temp[0]))[temp[1]])[temp[2]])
+            else:
+                varVal = getattr(self.myWind.TestVariables, a)
             if varVal is None:
                 raise Exception(f'Variable:{a} not found in globalVal!!')
             else:
