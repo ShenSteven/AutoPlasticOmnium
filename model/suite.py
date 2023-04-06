@@ -134,18 +134,18 @@ class TestSuite:
         else:
             self.logger.error(f"{self.name} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
 
-    def process_for(self, test_case, step_item: model.step.Step):
+    def process_for(self, test_case, step: model.step.Step):
         """FOR 循环开始判断 FOR(3)"""
-        if not IsNullOrEmpty(step_item.For) and '(' in step_item.For and ')' in step_item.For:
-            test_case.ForTotalCycle = int(re.findall(r'\((.*?)\)', step_item.For)[0])
+        if hasattr(step, 'For') and not IsNullOrEmpty(step.For) and '(' in step.For and ')' in step.For:
+            test_case.ForTotalCycle = int(re.findall(r'\((.*?)\)', step.For)[0])
             test_case.ForStartSuiteNo = self.index
-            test_case.ForStartStepNo = step_item.index
+            test_case.ForStartStepNo = step.index
             test_case.ForFlag = False
             self.logger.debug('=' * 10 + f"Start Cycle-{test_case.ForCycleCounter}." + '=' * 10)
 
-    def process_EndFor(self, test_case, step_item: model.step.Step):
+    def process_EndFor(self, test_case, step: model.step.Step):
         """FOR 循环结束判断 END FOR"""
-        if not IsNullOrEmpty(step_item.For) and step_item.For.lower().startswith('end'):
+        if hasattr(step, 'For') and not IsNullOrEmpty(step.For) and step.For.lower().startswith('end'):
             self.daq_collect(test_case)
             if test_case.ForCycleCounter < test_case.ForTotalCycle:
                 test_case.ForFlag = True
