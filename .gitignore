@@ -9,9 +9,6 @@
 /OutPut/result.db
 /venv/
 /scripts/*.txt
-/OutPut/result.csv
-/ui/main.py
-/venv39/
-/test/excelstyle.py
+/ui/ui_main.py
 /debug
 #Terminal: git rm --cached .\debug
