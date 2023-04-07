@@ -25,6 +25,7 @@ def get_about():
     return about_app
 
 
+isHide = True
 about = get_about()
 version = about['__version__']
 win = platform.system() == 'Windows'

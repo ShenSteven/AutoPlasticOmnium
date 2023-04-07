@@ -168,8 +168,12 @@ class MainForm(TestForm):
         if getattr(sys, 'frozen', False):
             logging.getLogger('testlog').removeHandler(log_console)
             textEdit_handler.formatter = gv.lg.logger.handlers[0].formatter
-            textEdit_handler.level = gv.lg.logger.handlers[0].level
-            self.fileHandle = gv.lg.logger.handlers[0]
+            if gv.isHide:
+                textEdit_handler.level = gv.lg.logger.handlers[1].level
+                self.fileHandle = gv.lg.logger.handlers[2]
+            else:
+                textEdit_handler.level = gv.lg.logger.handlers[0].level
+                self.fileHandle = gv.lg.logger.handlers[0]
         else:
             gv.cf.station.privileges = 'lab'
             textEdit_handler.formatter = gv.lg.logger.handlers[1].formatter
@@ -361,7 +365,8 @@ class MainForm(TestForm):
             cc = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
             anchor = f'testStep:{pp}-{cc}'
             self.ui.textEdit.scrollToAnchor(anchor)
-            self.on_actionShowStepInfo()
+            if not gv.isHide:
+                self.on_actionShowStepInfo()
 
     def on_tableWidget_clear(self):
         for i in range(0, self.ui.tableWidget.rowCount()):
@@ -369,6 +374,8 @@ class MainForm(TestForm):
 
     def on_update_tableWidget(self, result_tuple):
         def thread_update_tableWidget():
+            if gv.isHide:
+                return
             if isinstance(result_tuple, list):
                 row_cnt = self.ui.tableWidget.rowCount()
                 self.ui.tableWidget.insertRow(row_cnt)
@@ -835,7 +842,10 @@ class MainForm(TestForm):
         self.ui.treeWidget.setHeaderLabel(f'{gv.cf.station.station_no}')
         for suite in sequences:
             suite_node = QTreeWidgetItem(self.ui.treeWidget)
-            suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. {suite.name}')
+            if gv.isHide:
+                suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. suite')
+            else:
+                suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. {suite.name}')
             suite_node.setIcon(0, QIcon(':/images/folder-icon.png'))
             if checkall:
                 suite_node.setCheckState(0, Qt.Checked)
@@ -852,7 +862,10 @@ class MainForm(TestForm):
                 suite_node.setFlags(Qt.ItemIsSelectable)
             for step in suite.steps:
                 step_node = QTreeWidgetItem(suite_node)
-                step_node.setData(0, Qt.DisplayRole, f'{step.index + 1}) {step.StepName}')
+                if gv.isHide:
+                    step_node.setData(0, Qt.DisplayRole, f'{step.index + 1}) step')
+                else:
+                    step_node.setData(0, Qt.DisplayRole, f'{step.index + 1}) {step.StepName}')
                 if checkall:
                     step_node.setCheckState(0, Qt.Checked)
                     step.isTest = True

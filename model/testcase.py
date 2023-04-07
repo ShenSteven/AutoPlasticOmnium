@@ -78,8 +78,11 @@ class TestCase:
                 model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger)
             if not os.path.exists(self.test_script_json):
                 model.loadseq.excel_convert_to_json(self.testcase_path, [sheet_name], self.logger)
+            # if gv.isHide:
+            #     self.original_suites, self.header, self.step_count = model.loadseq.load_testcase_from_py(self.sheetName)
+            # else:
             self.original_suites, self.header, self.step_count = model.loadseq.load_testcase_from_json(
-                self.test_script_json, isVerify)
+                    self.test_script_json, isVerify)
             self.clone_suites = copy.deepcopy(self.original_suites)
         except Exception as e:
             # QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)

@@ -160,8 +160,41 @@ def load_testcase_from_json(json_path, isVerify=True):
         return sequences_obj_list, headers, step_count
     except Exception as e:
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
-        raise
-        # sys.exit(e)
+        sys.exit(e)
+
+
+def load_testcase_from_py(name, package='scripts'):
+    try:
+        """Deserialize form json.
+        :param json_path: json file path.
+        :return:object
+        """
+        step_count = 0
+        headers = []
+        import importlib
+        b = importlib.import_module(name='.' + name, package=package)
+        sequences_dict = json.loads(b.get_script_str(name))
+        sequences_obj_list = []
+        for suit_dict in sequences_dict:
+            step_obj_list = []
+            for step_dict in suit_dict['steps']:
+                step_obj = model.step.Step(step_dict)
+                step_count += 1
+                step_obj_list.append(step_obj)
+                if not headers:
+                    param = dict(filter(lambda x: x[0][0:1].isupper() or x[0][1:2].isupper(), step_dict.items()))
+                    param2 = list(filter(lambda x: param[x] is not None, param))
+                    headers = list(map(lambda x: x[1:] if x.startswith('_') else x, param2))
+
+                    items = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), step_obj.__dict__)
+                    gv.step_attr = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
+            suit_obj = model.suite.TestSuite(dict_=suit_dict)
+            suit_obj.steps = step_obj_list
+            sequences_obj_list.append(suit_obj)
+        return sequences_obj_list, headers, step_count
+    except Exception as e:
+        QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
+        sys.exit(e)
 
 
 def wrapper_save_sha256(fun):
@@ -220,5 +253,4 @@ def serialize_to_json(obj, json_path, logger):
     except Exception as e:
         logger.fatal(f'{currentframe().f_code.co_name}:{e}')
         QMessageBox.critical(None, 'Exception!', f'{currentframe().f_code.co_name}:{e}', QMessageBox.Yes)
-        raise
-        # sys.exit(e)
+        sys.exit(e)
