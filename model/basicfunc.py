@@ -6,7 +6,6 @@
 @Date   : 2021/9/2
 @Desc   : 
 """
-import json
 import os
 import csv
 import platform
@@ -14,7 +13,6 @@ import subprocess
 import time
 from datetime import datetime
 import psutil
-import yaml
 import hashlib
 from socket import AddressFamily
 

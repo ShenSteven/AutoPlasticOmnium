@@ -387,7 +387,7 @@ class Step:
 
             for retry in range(self.Retry, -1, -1):
                 if self.myWind.pause_event.wait():
-                    test_result, info = model.keyword.testKeyword(test_case, self, testSuite)
+                    test_result, info = model.keyword.testKeyword(test_case, self)
                 if test_result:
                     break
             self.setColor(Qt.green if test_result else Qt.red)
@@ -440,8 +440,6 @@ class Step:
             self.error_code = self.ErrorCode if hasattr(self, 'ErrorCode') else None
             self.error_details = 'exception!'
         else:
-            # if IsNullOrEmpty(self.error_code) and IsNullOrEmpty(self.error_details):
-            #     return
             if not hasattr(self, 'ErrorCode') or IsNullOrEmpty(self.ErrorCode):
                 self.error_code = self.eeroName
                 self.error_details = self.eeroName

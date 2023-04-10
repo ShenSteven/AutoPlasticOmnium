@@ -53,7 +53,6 @@ class TestCase:
         self.failCount = 0
         self.startTimeJsonFlag = True
         self.startTimeJson = datetime.now()
-        # self.TestVariables: model.variables.Variables = None
         self.mesPhases: model.product.MesInfo
         self.jsonObj: model.product.JsonObject
         self.ArrayListDaq = []
