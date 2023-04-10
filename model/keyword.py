@@ -23,222 +23,221 @@ from .basicfunc import IsNullOrEmpty, kill_process, start_process, restart_proce
 from inspect import currentframe
 
 
-def testKeyword(test_case, item, testSuite=None):
-    # gv.lg.logger.debug(f'isTest:{item.isTest},testName:{item.StepName}')
+def testKeyword(test_case, step):
     # time.sleep(0.3)
     # return True, ''
     rReturn = False
     compInfo = ''
-    # gv.main_form.testSequences[item.suite_index].globalVar = item.globalVar
-    if gv.cf.dut.test_mode == 'debug' or gv.IsDebug and item.Keyword in gv.cf.dut.debug_skip:
-        item.logger.debug('This is debug mode.Skip this step.')
+    if gv.cf.dut.test_mode == 'debug' or gv.IsDebug and step.Keyword in gv.cf.dut.debug_skip:
+        step.logger.debug('This is debug mode.Skip this step.')
         return True, ''
 
     try:
 
-        if item.Keyword == 'Waiting':
-            item.logger.debug(f'waiting {item.Timeout}s')
-            time.sleep(float(item.Timeout))
+        if step.Keyword == 'Waiting':
+            step.logger.debug(f'waiting {step.Timeout}s')
+            time.sleep(float(step.Timeout))
             rReturn = True
 
-        elif item.Keyword == 'SetVar':
-            item.testValue = item.command
+        elif step.Keyword == 'SetVar':
+            step.testValue = step.command
             rReturn = True
             time.sleep(0.1)
 
-        elif item.Keyword == 'MessageBoxShow':
+        elif step.Keyword == 'MessageBoxShow':
             invoke_return = QMetaObject.invokeMethod(
                 ui.mainform.MainForm.main_form,
                 'showMessageBox',
                 Qt.BlockingQueuedConnection,
                 QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
-                QtCore.Q_ARG(str, item.expectStr),
-                QtCore.Q_ARG(str, item.command),
+                QtCore.Q_ARG(str, step.expectStr),
+                QtCore.Q_ARG(str, step.command),
                 QtCore.Q_ARG(int, 2))
             if invoke_return == QMessageBox.Yes or invoke_return == QMessageBox.Ok:
                 rReturn = True
             else:
                 rReturn = False
 
-        elif item.Keyword == 'QInputDialog':
+        elif step.Keyword == 'QInputDialog':
             invoke_return = QMetaObject.invokeMethod(
                 ui.mainform.MainForm.main_form,
                 'showQInputDialog',
                 Qt.BlockingQueuedConnection,
                 QtCore.Q_RETURN_ARG(list),
-                QtCore.Q_ARG(str, item.expectStr),
-                QtCore.Q_ARG(str, item.command))
+                QtCore.Q_ARG(str, step.expectStr),
+                QtCore.Q_ARG(str, step.command))
             if not invoke_return[1]:
                 rReturn = False
             else:
-                item.logger.debug(f'dialog input:{invoke_return[0]}')
+                step.logger.debug(f'dialog input:{invoke_return[0]}')
                 rReturn = True
 
-        elif item.Keyword == 'AppS19Info':
-            file_path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}\{item.command}"
-            item.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(file_path)))
+        elif step.Keyword == 'AppS19Info':
+            file_path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.command}"
+            step.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(file_path)))
             rReturn = True
 
-        elif item.Keyword == 'StartFor':
+        elif step.Keyword == 'StartFor':
             return True, ''
 
-        elif item.Keyword == 'KillProcess':
-            rReturn = kill_process(item.logger, item.command)
+        elif step.Keyword == 'KillProcess':
+            rReturn = kill_process(step.logger, step.command)
 
-        elif item.Keyword == 'StartProcess':
-            rReturn = start_process(item.logger, item.command, item.expectStr)
+        elif step.Keyword == 'StartProcess':
+            rReturn = start_process(step.logger, step.command, step.expectStr)
 
-        elif item.Keyword == 'RestartProcess':
-            rReturn = restart_process(item.logger, item.command, item.expectStr)
+        elif step.Keyword == 'RestartProcess':
+            rReturn = restart_process(step.logger, step.command, step.expectStr)
 
-        elif item.Keyword == 'PingDUT':
-            run_cmd(item.logger, 'arp -d')
-            rReturn = ping(item.logger, item.command)
+        elif step.Keyword == 'PingDUT':
+            run_cmd(step.logger, 'arp -d')
+            rReturn = ping(step.logger, step.command)
 
-        elif item.Keyword == 'TelnetLogin':
+        elif step.Keyword == 'TelnetLogin':
             if not isinstance(test_case.dut_comm, TelnetComm):
-                if not IsNullOrEmpty(item.command):
-                    test_case.dut_comm = TelnetComm(item.logger, item.command, gv.cf.dut.prompt)
+                if not IsNullOrEmpty(step.command):
+                    test_case.dut_comm = TelnetComm(step.logger, step.command, gv.cf.dut.prompt)
                 else:
-                    test_case.dut_comm = TelnetComm(item.logger, gv.cf.dut.dut_ip, gv.cf.dut.prompt)
+                    test_case.dut_comm = TelnetComm(step.logger, gv.cf.dut.dut_ip, gv.cf.dut.prompt)
             rReturn = test_case.dut_comm.open(gv.cf.dut.prompt)
 
-        elif item.Keyword == 'TelnetAndSendCmd':
-            temp = TelnetComm(item.logger, item.Param1, gv.cf.dut.prompt)
+        elif step.Keyword == 'TelnetAndSendCmd':
+            temp = TelnetComm(step.logger, step.Param1, gv.cf.dut.prompt)
             if temp.open(gv.cf.dut.prompt) and \
-                    temp.SendCommand(item.command, item.expectStr, item.Timeout)[0]:
+                    temp.SendCommand(step.command, step.expectStr, step.Timeout)[0]:
                 return True, ''
 
-        elif item.Keyword == 'SerialPortOpen':
+        elif step.Keyword == 'SerialPortOpen':
             if not isinstance(test_case.dut_comm, SerialPort):
-                if not IsNullOrEmpty(item.command):
-                    test_case.dut_comm = SerialPort(item.logger, item.command, int(item.expectStr))
+                if not IsNullOrEmpty(step.command):
+                    test_case.dut_comm = SerialPort(step.logger, step.command, int(step.expectStr))
             rReturn = test_case.dut_comm.open()
 
-        elif item.Keyword == 'CloseDUTCOMM':
+        elif step.Keyword == 'CloseDUTCOMM':
             if test_case.dut_comm is not None:
                 test_case.dut_comm.close()
                 rReturn = True
 
-        elif item.Keyword == 'PLINInitConnect':
-            rReturn = peakLin_init_connect(rReturn, item.logger)
+        elif step.Keyword == 'PLINInitConnect':
+            rReturn = peakLin_init_connect(rReturn, step.logger)
 
-        elif item.Keyword == 'PLINInitConnectELV':
-            rReturn = peakLin_init_connectELV(rReturn, item.logger)
+        elif step.Keyword == 'PLINInitConnectELV':
+            rReturn = peakLin_init_connectELV(rReturn, step.logger)
 
-        elif item.Keyword == 'PLINDisConnect':
+        elif step.Keyword == 'PLINDisConnect':
             rReturn = gv.PLin.DoLinDisconnect()
             ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
                 True, "Not connected | ")
 
-        elif item.Keyword == 'PLINSingleFrame':
-            rReturn, revStr = gv.PLin.SingleFrame(item.ID, item.NAD_, item.PCI_LEN_, item.command, item.Timeout)
-            if rReturn and item.checkStr1 in revStr:
-                item.testValue = subStr(item.subStr1, item.subStr2, revStr, item)
-            compInfo, rReturn = assert_value(compInfo, item, rReturn)
+        elif step.Keyword == 'PLINSingleFrame':
+            rReturn, revStr = gv.PLin.SingleFrame(step.ID, step.NAD_, step.PCI_LEN_, step.command, step.Timeout)
+            if rReturn and step.checkStr1 in revStr:
+                step.testValue = subStr(step.subStr1, step.subStr2, revStr, step)
+            compInfo, rReturn = assert_value(compInfo, step, rReturn)
 
-        elif item.Keyword == 'PLINSingleFrameCF':
-            rReturn, revStr = gv.PLin.SingleFrameCF(item.ID, item.NAD_, item.PCI_LEN_, item.command, item.Timeout)
-            if rReturn and item.checkStr1 in revStr:
-                item.testValue = subStr(item.subStr1, item.subStr2, revStr, item)
-            compInfo, rReturn = assert_value(compInfo, item, rReturn)
+        elif step.Keyword == 'PLINSingleFrameCF':
+            rReturn, revStr = gv.PLin.SingleFrameCF(step.ID, step.NAD_, step.PCI_LEN_, step.command, step.Timeout)
+            if rReturn and step.checkStr1 in revStr:
+                step.testValue = subStr(step.subStr1, step.subStr2, revStr, step)
+            compInfo, rReturn = assert_value(compInfo, step, rReturn)
 
-        elif item.Keyword == 'PLINGetMsg32':
-            gv.pMsg32 = gv.PLin.peakLin_Get_pMsg(item.ID, item.command)
+        elif step.Keyword == 'PLINGetMsg32':
+            gv.pMsg32 = gv.PLin.peakLin_Get_pMsg(step.ID, step.command)
             rReturn = True
-        elif item.Keyword == 'PLINGetMsg33':
-            gv.pMsg33 = gv.PLin.peakLin_Get_pMsg(item.ID, item.command)
+        elif step.Keyword == 'PLINGetMsg33':
+            gv.pMsg33 = gv.PLin.peakLin_Get_pMsg(step.ID, step.command)
             rReturn = True
 
-        elif item.Keyword == 'WaitingALE' or item.Keyword == 'PLINWriteALE':
+        elif step.Keyword == 'WaitingALE' or step.Keyword == 'PLINWriteALE':
             # gv.PLin.plin_writeALE(gv.pMsg32, gv.pMsg33, int(item.Timeout), True if item.retry == 1 else False)
-            gv.PLin.peakLin_writeALE(gv.pMsg32, gv.pMsg33, item.Timeout)
+            gv.PLin.peakLin_writeALE(gv.pMsg32, gv.pMsg33, step.Timeout)
             rReturn = True
 
-        elif item.Keyword == 'PLINMultiFrame':
-            rReturn, revStr = gv.PLin.MultiFrame(item.ID, item.NAD_, item.PCI_LEN_, item.command, item.Timeout)
-            if rReturn and item.checkStr1 in revStr:
-                item.testValue = subStr(item.subStr1, item.subStr2, revStr, item)
+        elif step.Keyword == 'PLINMultiFrame':
+            rReturn, revStr = gv.PLin.MultiFrame(step.ID, step.NAD_, step.PCI_LEN_, step.command, step.Timeout)
+            if rReturn and step.checkStr1 in revStr:
+                step.testValue = subStr(step.subStr1, step.subStr2, revStr, step)
 
-        elif item.Keyword == 'TransferData':
-            file_path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}\{item.command}"
-            s19datas = gv.PLin.get_datas(file_path)
-            item.logger.debug(file_path)
-            rReturn = gv.PLin.TransferData(item.ID, item.NAD_, s19datas, item.PCI_LEN_, item.Timeout)
+        elif step.Keyword == 'TransferData':
+            path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.command}"
+            s19datas = gv.PLin.get_datas(path)
+            step.logger.debug(path)
+            rReturn = gv.PLin.TransferData(step.ID, step.NAD_, s19datas, step.PCI_LEN_, step.Timeout)
 
-        elif item.Keyword == 'SuspendDiagSchedule':
+        elif step.Keyword == 'SuspendDiagSchedule':
             rReturn = gv.PLin.SuspendDiagSchedule()
 
-        elif item.Keyword == 'CalcKey':
-            item.testValue = gv.PLin.CalKey(item.command)
-            item.logger.debug(f"send key is {item.testValue}.")
+        elif step.Keyword == 'CalcKey':
+            step.testValue = gv.PLin.CalKey(step.command)
+            step.logger.debug(f"send key is {step.testValue}.")
             rReturn = True
 
-        elif item.Keyword == 'GetCRC':
-            item.testValue = peak.peaklin.PeakLin.get_crc_apps19(item.logger,
-                                                                 rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}")
-            rReturn = not IsNullOrEmpty(item.testValue)
+        elif step.Keyword == 'GetCRC':
+            path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}"
+            step.testValue = peak.peaklin.PeakLin.get_crc_apps19(step.logger, path)
+            rReturn = not IsNullOrEmpty(step.testValue)
 
-        elif item.Keyword == 'SrecGetStartAdd':
-            rReturn, revStr = run_cmd(item.logger,
-                                      rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}\{item.command}")
+        elif step.Keyword == 'SrecGetStartAdd':
+            cmd = rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.command}"
+            rReturn, revStr = run_cmd(step.logger, cmd)
+
             if rReturn:
-                item.testValue = ' '.join(re.findall(".{2}", revStr.split()[-3].zfill(8)))
+                step.testValue = ' '.join(re.findall(".{2}", revStr.split()[-3].zfill(8)))
             else:
                 pass
 
-        elif item.Keyword == 'SrecGetLen':
-            rReturn, revStr = run_cmd(item.logger,
-                                      rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{item.myWind.dut_model}\{item.command}")
+        elif step.Keyword == 'SrecGetLen':
+            cmd = rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.command}"
+            rReturn, revStr = run_cmd(step.logger, cmd)
             if rReturn:
                 data_len = int(revStr.split()[-1], 16) - int(revStr.split()[-3], 16) + 1
-                item.testValue = ' '.join(re.findall(".{2}", hex(data_len)[2:].upper().zfill(8)))
+                step.testValue = ' '.join(re.findall(".{2}", hex(data_len)[2:].upper().zfill(8)))
             else:
                 pass
 
-        elif item.Keyword == 'NiDAQmxVolt':
+        elif step.Keyword == 'NiDAQmxVolt':
             # https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019Pf1SAE&l=zh-CN
             with nidaqmx.Task() as task:
-                task.ai_channels.add_ai_voltage_chan(item.command, min_val=-10, max_val=10)
+                task.ai_channels.add_ai_voltage_chan(step.command, min_val=-10, max_val=10)
                 data = task.read(number_of_samples_per_channel=1)
-                item.logger.debug(f"get {item.command} sensor Volt: {data}.")
-                item.testValue = "%.2f" % ((data[0] - 0.02) * 10)
-                item.logger.debug(f"DAQmx {item.command} Volt: {item.testValue}.")
-            compInfo, rReturn = assert_value(compInfo, item, rReturn)
+                step.logger.debug(f"get {step.command} sensor Volt: {data}.")
+                step.testValue = "%.2f" % ((data[0] - 0.02) * 10)
+                step.logger.debug(f"DAQmx {step.command} Volt: {step.testValue}.")
+            compInfo, rReturn = assert_value(compInfo, step, rReturn)
 
-        elif item.Keyword == 'NiDAQmxCur':
+        elif step.Keyword == 'NiDAQmxCur':
             with nidaqmx.Task() as task:
-                task.ai_channels.add_ai_voltage_chan(item.command, min_val=-10, max_val=10)
+                task.ai_channels.add_ai_voltage_chan(step.command, min_val=-10, max_val=10)
                 data = task.read(number_of_samples_per_channel=1)
-                item.logger.debug(f"get {item.command} sensor Volt: {data}.")
-                item.testValue = "%.2f" % ((data[0] - 0.02) * 2)
-                item.logger.debug(f"DAQmx {item.command} Current: {item.testValue}.")
-            compInfo, rReturn = assert_value(compInfo, item, rReturn)
+                step.logger.debug(f"get {step.command} sensor Volt: {data}.")
+                step.testValue = "%.2f" % ((data[0] - 0.02) * 2)
+                step.logger.debug(f"DAQmx {step.command} Current: {step.testValue}.")
+            compInfo, rReturn = assert_value(compInfo, step, rReturn)
 
-        elif item.Keyword == 'NiVisaCmd':
-            rReturn, revStr = test_case.NiInstrComm.SendCommand(item.command, item.expectStr, item.Timeout)
-            item.logger.debug(f'{rReturn},{item.checkStr1},{revStr}')
-            if rReturn and item.checkStr1 in revStr:
-                if not IsNullOrEmpty(item.subStr1) or not IsNullOrEmpty(item.subStr2):
-                    item.testValue = subStr(item.subStr1, item.subStr2, revStr, item)
-                elif str_to_int(item.param1)[0]:
-                    item.testValue = "%.2f" % float(revStr.split(',')[str_to_int(item.param1)[1] - 1])
+        elif step.Keyword == 'NiVisaCmd':
+            rReturn, revStr = test_case.NiInstrComm.SendCommand(step.command, step.expectStr, step.Timeout)
+            step.logger.debug(f'{rReturn},{step.checkStr1},{revStr}')
+            if rReturn and step.checkStr1 in revStr:
+                if not IsNullOrEmpty(step.subStr1) or not IsNullOrEmpty(step.subStr2):
+                    step.testValue = subStr(step.subStr1, step.subStr2, revStr, step)
+                elif str_to_int(step.param1)[0]:
+                    step.testValue = "%.2f" % float(revStr.split(',')[str_to_int(step.param1)[1] - 1])
                 else:
                     return True, ''
-                compInfo, rReturn = assert_value(compInfo, item, rReturn)
+                compInfo, rReturn = assert_value(compInfo, step, rReturn)
             else:
                 rReturn = False
 
-        elif item.Keyword == 'NiVisaOpenInstr':
-            test_case.NiInstrComm = VisaComm(item.logger)
-            rReturn = test_case.NiInstrComm.open(item.command)
+        elif step.Keyword == 'NiVisaOpenInstr':
+            test_case.NiInstrComm = VisaComm(step.logger)
+            rReturn = test_case.NiInstrComm.open(step.command)
 
         else:
-            rReturn, revStr = test_case.dut_comm.SendCommand(item.command, item.expectStr, item.Timeout)
-            if rReturn and item.checkStr1 in revStr and item.checkStr2 in revStr:
-                if not IsNullOrEmpty(item.subStr1) or not IsNullOrEmpty(item.subStr2):
-                    item.testValue = subStr(item.subStr1, item.subStr2, revStr, item)
-                    compInfo, rReturn = assert_value(compInfo, item, rReturn)
+            rReturn, revStr = test_case.dut_comm.SendCommand(step.command, step.expectStr, step.Timeout)
+            if rReturn and step.checkStr1 in revStr and step.checkStr2 in revStr:
+                if not IsNullOrEmpty(step.subStr1) or not IsNullOrEmpty(step.subStr2):
+                    step.testValue = subStr(step.subStr1, step.subStr2, revStr, step)
+                    compInfo, rReturn = assert_value(compInfo, step, rReturn)
                 else:
                     return True, ''
             else:
@@ -248,13 +247,13 @@ def testKeyword(test_case, item, testSuite=None):
     else:
         return rReturn, compInfo
     finally:
-        if (item.StepName.startswith("GetDAQResistor") or
-                item.StepName.startswith("GetDAQTemp") or
-                item.Keyword == "NiDAQmxVolt" or
-                item.Keyword == "NiDAQmxCur"):
-            test_case.ArrayListDaq.append("N/A" if IsNullOrEmpty(item.testValue) else item.testValue)
-            test_case.ArrayListDaqHeader.append(item.StepName)
-            item.logger.debug(f"DQA add {item.testValue}")
+        if (step.StepName.startswith("GetDAQResistor") or
+                step.StepName.startswith("GetDAQTemp") or
+                step.Keyword == "NiDAQmxVolt" or
+                step.Keyword == "NiDAQmxCur"):
+            test_case.ArrayListDaq.append("N/A" if IsNullOrEmpty(step.testValue) else step.testValue)
+            test_case.ArrayListDaqHeader.append(step.StepName)
+            step.logger.debug(f"DQA add {step.testValue}")
 
 
 def CompareLimit(limitMin, limitMax, value, item, is_round=False):
