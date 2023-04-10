@@ -173,7 +173,7 @@ def load_testcase_from_py(name, package='scripts'):
         headers = []
         import importlib
         b = importlib.import_module(name='.' + name, package=package)
-        sequences_dict = json.loads(b.get_script_str(name))
+        sequences_dict = json.loads(b.get_script_str())
         sequences_obj_list = []
         for suit_dict in sequences_dict:
             step_obj_list = []
@@ -235,6 +235,12 @@ def default_f(o):
         return None
 
 
+get_fun = """
+def get_script_str():
+    return globals()['script_str']
+"""
+
+
 @wrapper_save_sha256
 def serialize_to_json(obj, json_path, logger):
     """serialize obj to json and encrypt.
@@ -249,6 +255,10 @@ def serialize_to_json(obj, json_path, logger):
             os.remove(json_path)
         with open(json_path, 'w') as wf:
             json.dump(obj, wf, default=default_f, sort_keys=False, indent=4)
+            script_str = json.dumps(obj, default=default_f, sort_keys=False, indent=4)
+            filename = json_path.replace('.json', '.py')
+            with open(filename, 'w') as f:
+                f.write(f'script_str = """\n{script_str}\n"""\n\n{get_fun}')
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
         logger.fatal(f'{currentframe().f_code.co_name}:{e}')

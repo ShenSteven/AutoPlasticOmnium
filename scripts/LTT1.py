@@ -1,4 +1,5 @@
-script_str = """[
+script_str = """
+[
     {
         "myWind": null,
         "logger": null,
@@ -909,8 +910,9 @@ script_str = """[
         "phase_details": "",
         "elapsedTime": null
     }
-]"""
+]
+"""
 
 
 def get_script_str():
-    return globals()[script_str]
+    return globals()['script_str']
