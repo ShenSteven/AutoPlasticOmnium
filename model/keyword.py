@@ -28,13 +28,12 @@ def testKeyword(test_case, step):
     # return True, ''
     rReturn = False
     compInfo = ''
-    if gv.cf.dut.test_mode == 'debug' or gv.IsDebug and step.Keyword in gv.cf.dut.debug_skip:
-        step.logger.debug('This is debug mode.Skip this step.')
-        return True, ''
-
     try:
+        if gv.cf.dut.test_mode == 'debug' or gv.IsDebug and step.Keyword in gv.cf.dut.debug_skip:
+            step.logger.debug('This is debug mode.Skip this step.')
+            rReturn = True
 
-        if step.Keyword == 'Waiting':
+        elif step.Keyword == 'Waiting':
             step.logger.debug(f'waiting {step.Timeout}s')
             time.sleep(float(step.Timeout))
             rReturn = True
@@ -247,10 +246,8 @@ def testKeyword(test_case, step):
     else:
         return rReturn, compInfo
     finally:
-        if (step.StepName.startswith("GetDAQResistor") or
-                step.StepName.startswith("GetDAQTemp") or
-                step.Keyword == "NiDAQmxVolt" or
-                step.Keyword == "NiDAQmxCur"):
+        if (step.StepName.startswith("GetDAQResistor") or step.StepName.startswith("GetDAQTemp") or
+                step.Keyword == "NiDAQmxVolt" or step.Keyword == "NiDAQmxCur"):
             test_case.ArrayListDaq.append("N/A" if IsNullOrEmpty(step.testValue) else step.testValue)
             test_case.ArrayListDaqHeader.append(step.StepName)
             step.logger.debug(f"DQA add {step.testValue}")
