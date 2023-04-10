@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QAction, QLabel
 import model.product
-import model.sqlite
+import database.sqlite
 import model.keyword
 from .basicfunc import IsNullOrEmpty
 import conf.globalvar as gv
@@ -419,7 +419,7 @@ class Step:
     def record_date_to_db(self, test_case, test_result):
         """ record test date to DB."""
         if self.isTest and self.Json is not None and self.Json.upper() == 'Y':
-            with model.sqlite.Sqlite(gv.database_result) as db:
+            with database.sqlite.Sqlite(gv.database_result) as db:
                 self.logger.debug('INSERT test result to result.db table RESULT.')
                 db.execute(
                     f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"

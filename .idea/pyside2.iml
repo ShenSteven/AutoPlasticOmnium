@@ -14,4 +14,11 @@
     <orderEntry type="jdk" jdkName="Python 3.11 (AutoPlasticOmnium)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/database" />
+      </list>
+    </option>
+  </component>
 </module>

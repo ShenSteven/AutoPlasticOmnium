@@ -14,7 +14,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QMetaObject, Qt
 import model.loadseq
 import model.product
-import model.sqlite
+import database.sqlite
 import model.variables
 import conf.globalvar as gv
 import sockets.serialport
@@ -61,7 +61,7 @@ class TestCase:
         self.csv_list_header = []
         self.csv_list_data = []
         self.csv_file_path = ''
-        model.sqlite.init_database(self.logger, gv.database_setting)
+        database.sqlite.init_database(self.logger, gv.database_setting)
         self.load_testcase(testcase_path, sheet_name, logger, cflag, isVerify)
 
     @property

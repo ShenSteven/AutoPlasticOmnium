@@ -53,6 +53,13 @@ dut:
     debug_skip:
     - SetIpaddrEnv
     - SetDHCP
+    mysql_connect:
+        "host": "127.0.0.1"
+        "port": 3307
+        "database": "lebo"
+        "charset": "utf8"
+        "user": "root"
+        "passwd": "root"
 BLF:
     ReqDelay: 10
     RespDelay: 10

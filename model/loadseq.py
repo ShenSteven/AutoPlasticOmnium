@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QMessageBox
 from openpyxl import load_workbook
 import model.suite
 import model.step
-import model.sqlite
+import database.sqlite
 from .basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
 
@@ -105,7 +105,7 @@ def param_wrapper_verify_sha256(flag):
             bound_args = sig.bind(*args, **kwargs)
             bound_args.apply_defaults()
             if flag and bound_args.args[1]:
-                with model.sqlite.Sqlite(gv.database_setting) as db:
+                with database.sqlite.Sqlite(gv.database_setting) as db:
                     file_name = os.path.basename(bound_args.args[0])
                     db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{file_name}'")
                     result = db.cur.fetchone()
@@ -206,7 +206,7 @@ def wrapper_save_sha256(fun):
         bound_args.apply_defaults()
         result = fun(*bound_args.args, **bound_args.kwargs)
         sha256 = get_sha256(bound_args.args[1])
-        with model.sqlite.Sqlite(gv.database_setting) as db:
+        with database.sqlite.Sqlite(gv.database_setting) as db:
             file_name = os.path.basename(bound_args.args[1])
             try:
                 db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")

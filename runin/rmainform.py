@@ -21,7 +21,7 @@ from model.mysignals import on_actionLogFolder
 from runin.cell import Cell
 from runin.ui_runin import Ui_RuninMain
 import conf.globalvar as gv
-import model.sqlite
+import database.sqlite
 
 
 class LoginWind:
@@ -88,7 +88,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
 
     def initCellUi(self):
         gv.init_create_dirs(self.logger)
-        model.sqlite.init_database(self.logger, gv.database_setting)
+        database.sqlite.init_database(self.logger, gv.database_setting)
         if not getattr(sys, 'frozen', False):
             model.loadseq.excel_convert_to_json(f'{gv.excel_file_path}', gv.cf.station.station_all, self.logger)
         for row in range(self.RowCount):

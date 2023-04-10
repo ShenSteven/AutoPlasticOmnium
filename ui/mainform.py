@@ -31,7 +31,7 @@ from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address
 from model.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
-from model.sqlite import Sqlite
+from database.sqlite import Sqlite
 import model.testcase
 from model.testform import TestForm
 from model.teststatus import TestStatus
@@ -939,7 +939,7 @@ class MainForm(TestForm):
     def updateStatusBar(self, info):
         def update_status_bar():
             self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
-            with model.sqlite.Sqlite(gv.database_setting) as db:
+            with database.sqlite.Sqlite(gv.database_setting) as db:
                 db.execute(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
                 db.execute(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
                 db.execute(f"UPDATE COUNT SET VALUE='{self.total_fail_count}' where NAME ='total_fail_count'")
@@ -996,7 +996,7 @@ class MainForm(TestForm):
             return False
 
     def CheckContinueFailNum(self):
-        with model.sqlite.Sqlite(gv.database_setting) as db:
+        with database.sqlite.Sqlite(gv.database_setting) as db:
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
             self.logger.debug(str(self.continue_fail_count))
