@@ -22,15 +22,23 @@ for folder in ['M4','M6','SX5GEV']:
           list(Path().absolute().rglob(rf"flash\{folder}"))]
     added_files.extend(flash_files)
 
-
 added_files += copy_metadata('nidaqmx')
+
+def file_name(file_dir, ext):
+    L = []
+    for root, dirs, files in os.walk(file_dir):
+        for file in files:
+            if os.path.splitext(file)[1] == ext:
+                L.append('scripts.'+os.path.splitext(file)[0])
+    return L
+hiddenimports_files = file_name('./scripts','.py')
 
 a = Analysis(
     ['main.py'],
     pathex=['./'],
     binaries=[],
     datas=added_files,
-    hiddenimports=['scripts.LTT1'],
+    hiddenimports=hiddenimports_files,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

@@ -223,6 +223,21 @@ def GetAllIpv4Address(networkSegment):
                 return str(addr.address)
 
 
+def get_file_ext_list(path_dir, ext):
+    """
+    Gets the files in the directory with the specified suffix.
+    :param path_dir:
+    :param ext: .exe, .py and so on.
+    :return: list
+    """
+    L = []
+    for root, dirs, files in os.walk(path_dir):
+        for file in files:
+            if os.path.splitext(file)[1] == ext:
+                L.append(os.path.join(root, file))
+    return L
+
+
 if __name__ == '__main__':
     pass
     # create_csv_file('test.csv', ['No', 'Phase test_name', 'Test test_name', 'Error Code'])

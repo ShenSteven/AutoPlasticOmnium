@@ -56,18 +56,27 @@ class QTextEditHandler(logging.Handler, QWidget):
             raise
 
     def append_scrollbar(self, msg):
-        if 'INFO' in msg:  # pass
+        """
+        CRITICAL = 50
+        FATAL = CRITICAL
+        ERROR = 40
+        WARNING = 30
+        INFO = 20
+        DEBUG = 10
+        NOTSET = 0
+        """
+        if 'NOTSET' in msg:  #
             self.stream.setTextColor(Qt.blue)
         elif 'DEBUG' in msg:  # debug info
             self.stream.setTextColor(Qt.black)
-        elif 'ERROR' in msg:  # fail
-            self.stream.setTextColor(Qt.red)
-        elif 'CRITICAL' in msg:  # except
-            self.stream.setTextColor(Qt.darkRed)
+        elif 'INFO' in msg:  # pass
+            self.stream.setTextColor(Qt.blue)
         elif 'WARNING' in msg:  # warn
             self.stream.setTextColor(Qt.darkYellow)
-        elif 'NOTSET' in msg:  #
-            self.stream.setTextColor(Qt.blue)
+        elif 'ERROR' in msg:  # fail
+            self.stream.setTextColor(Qt.red)
+        elif 'CRITICAL' in msg or 'FATAL' in msg:  # except
+            self.stream.setTextColor(Qt.darkRed)
         self.stream.append(msg)
         self.stream.ensureCursorVisible()
 
