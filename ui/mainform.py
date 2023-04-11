@@ -36,7 +36,7 @@ import model.testcase
 from model.testform import TestForm
 from model.teststatus import TestStatus
 from model.testthread import TestThread
-from peak.peaklin import PeakLin
+from peak.plin.peaklin import PeakLin
 from inspect import currentframe
 import model.loadseq
 import model.variables

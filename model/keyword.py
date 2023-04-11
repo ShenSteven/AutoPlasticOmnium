@@ -13,7 +13,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QMetaObject, Qt
 from PyQt5.QtWidgets import QAction, QMessageBox
 import ui.mainform
-import peak.peaklin
+import peak.plin.peaklin
 from sockets.serialport import SerialPort
 from sockets.telnet import TelnetComm
 import conf.globalvar as gv
@@ -173,7 +173,7 @@ def testKeyword(test_case, step):
 
         elif step.Keyword == 'GetCRC':
             path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}"
-            step.testValue = peak.peaklin.PeakLin.get_crc_apps19(step.logger, path)
+            step.testValue = peak.plin.peaklin.PeakLin.get_crc_apps19(step.logger, path)
             rReturn = not IsNullOrEmpty(step.testValue)
 
         elif step.Keyword == 'SrecGetStartAdd':
@@ -325,7 +325,7 @@ def str_to_int(strs):
 
 def peakLin_init_connect(rReturn, logger):
     if gv.PLin is None:
-        gv.PLin = peak.peaklin.PeakLin(logger)
+        gv.PLin = peak.plin.peaklin.PeakLin(logger)
         ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
             ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
         gv.PLin.refreshHardware()
@@ -349,7 +349,7 @@ def peakLin_init_connect(rReturn, logger):
 
 def peakLin_init_connectELV(rReturn, logger):
     if gv.PLin is None:
-        gv.PLin = peak.peaklin.PeakLin(logger)
+        gv.PLin = peak.plin.peaklin.PeakLin(logger)
         ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
             ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
         gv.PLin.refreshHardware()

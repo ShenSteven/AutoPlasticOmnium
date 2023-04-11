@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PeakLin</class>
- <widget class="QDialog" name="PeakLin">
+ <class>PeakGui</class>
+ <widget class="QDialog" name="PeakGui">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>LIN</string>
+   <string>PEAK</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -34,9 +34,12 @@
    </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Peak-Lin</string>
+       <string>PEAK-LIN</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
        <property name="leftMargin">
@@ -116,6 +119,11 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>PEAK-CAN</string>
+      </attribute>
      </widget>
     </widget>
    </item>

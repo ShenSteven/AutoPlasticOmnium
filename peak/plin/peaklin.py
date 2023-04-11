@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_lin.ui'
+# Form implementation generated from reading ui file 'ui_peak.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.7
 #
@@ -10,7 +10,7 @@ import traceback
 from PyQt5.QtWidgets import QDialog  # QMessageBox
 from future.moves import collections
 import ui.mainform
-from peak.ui_lin import Ui_PeakLin
+from peak.ui_peak import Ui_PeakGui
 import conf.globalvar as gv
 import binascii
 import os
@@ -18,7 +18,7 @@ import re
 import sys
 import time
 from ctypes import *
-from . import PLinApi
+from peak.plin import PLinApi
 from inspect import currentframe
 from decimal import Decimal, ROUND_UP
 
@@ -36,14 +36,14 @@ def right_round(num, keep_n):
     return Decimal(num).quantize((Decimal('0.' + '0' * keep_n)), rounding=ROUND_UP)
 
 
-class PeakLin(QDialog, Ui_PeakLin):
+class PeakLin(QDialog, Ui_PeakGui):
     """
     bootloader download, uds.
     """
 
     def __init__(self, logger, parent=None):
         QDialog.__init__(self, parent)
-        Ui_PeakLin.__init__(self)
+        Ui_PeakGui.__init__(self)
         self.logger = logger
         self.setupUi(self)
         self.init_signals_connect()
