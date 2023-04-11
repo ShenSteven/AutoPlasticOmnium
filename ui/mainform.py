@@ -31,7 +31,7 @@ from conf.logprint import QTextEditHandler, LogPrint
 from model.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address
 from model.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
-from database.sqlite import Sqlite
+import database.sqlite
 import model.testcase
 from model.testform import TestForm
 from model.teststatus import TestStatus
@@ -247,7 +247,7 @@ class MainForm(TestForm):
         self.ui.action192_168_1_101.setText(GetAllIpv4Address('10.90.'))
 
     def init_status_bar(self):
-        with Sqlite(gv.database_setting) as db:
+        with database.sqlite.Sqlite(gv.database_setting) as db:
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
             db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_pass_count'")
