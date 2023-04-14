@@ -153,7 +153,7 @@ def testKeyword(test_case, step):
             rReturn = True
 
         elif step.Keyword == 'PLINMultiFrame':
-            rReturn, revStr = gv.PLin.MultiFrame(step.ID, step.NAD_, step.PCI_LEN_, step.command, step.Timeout)
+            rReturn, revStr = gv.PLin.MultiFrame(step.ID, step.NAD_, step.PCI_LEN_, step.command, 5, step.Timeout)
             if rReturn and step.checkStr1 in revStr:
                 step.testValue = subStr(step.subStr1, step.subStr2, revStr, step)
 

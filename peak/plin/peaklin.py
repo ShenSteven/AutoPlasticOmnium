@@ -451,36 +451,7 @@ class PeakLin(QDialog, Ui_PeakGui):
             self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False, ""
 
-    def MultiFrame(self, _id, nad, pci, data, timeout=2):
-        tempData = data.split()
-        _len = len(tempData)
-        try:
-            first_data = ' '.join(tempData[0:5])
-            if self.SetFrameEntry(_id, nad, pci, first_data):  # send first frame
-                j = 1
-                remainder = (_len - 5) % 6
-                quotient = (_len - 5) // 6
-                for i in range(quotient + 1):
-                    if j == 16:
-                        j = 0
-                    if i == quotient:
-                        if remainder == 0:
-                            break
-                        else:
-                            conse_data = ' '.join(tempData[5 + i * 6:5 + i * 6 + remainder])
-                    else:
-                        conse_data = ' '.join(tempData[5 + i * 6:5 + i * 6 + 6])
-                    self.ConsecutiveFrame(_id, nad, '{:X}'.format(j), conse_data)
-                    j = j + 1
-                RSID = '{:02X}'.format((int(data.split()[0], 16) + int("40", 16)))
-                return self.SFResp(_id, RSID, timeout)
-            else:
-                return False, ""
-        except Exception as ex:
-            self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
-            return False, ""
-
-    def TransferData(self, _id, nad, file_data, bytesNumOfBlock, timeout=2.0):
+    def TransferData(self, _id, nad, file_data, bytesNumOfBlock, timeout=2):
         tempData = file_data.split()
         _len = len(tempData)
         maxBytesNumOfBlock = int(bytesNumOfBlock.replace(" ", ""), 16)
@@ -506,7 +477,8 @@ class PeakLin(QDialog, Ui_PeakGui):
                     pci = " ".join(re.findall(".{2}", pci))
                     blockData = ' '.join(tempData[i * payloadOfBlock:i * payloadOfBlock + payloadOfBlock])
                 self.logger.debug(f'TransferDataBlock:{i}')
-                if not self.TransferDataBlock(_id, nad, pci, blockData, timeout):
+                if not self.MultiFrame(_id, nad, pci, blockData, 3, timeout)[0]:
+                    self.logger.error('Rx lost!!!')
                     return False
                 j = j + 1
             return True
@@ -603,15 +575,15 @@ class PeakLin(QDialog, Ui_PeakGui):
         except Exception as ex:
             sys.exit(f'{currentframe().f_code.co_name}:{ex}')
 
-    def TransferDataBlock(self, _id, nad, pci, data, timeout):
+    def MultiFrame(self, _id, nad, pci, data, offset, timeout=2):
         tempData = data.split()
         _len = len(tempData)
         try:
-            first_data = ' '.join(tempData[0:3])
+            first_data = ' '.join(tempData[0:offset])
             if self.SetFrameEntry(_id, nad, pci, first_data):  # send first frame
                 j = 1
-                remainder = (_len - 3) % 6
-                quotient = (_len - 3) // 6
+                remainder = (_len - offset) % 6
+                quotient = (_len - offset) // 6
                 for i in range(quotient + 1):
                     if j == 16:
                         j = 0
@@ -619,22 +591,21 @@ class PeakLin(QDialog, Ui_PeakGui):
                         if remainder == 0:
                             break
                         else:
-                            consedata = ' '.join(tempData[3 + i * 6:3 + i * 6 + remainder])
+                            consecutive_data = ' '.join(tempData[offset + i * 6:offset + i * 6 + remainder])
                     else:
-                        consedata = ' '.join(tempData[3 + i * 6:3 + i * 6 + 6])
-
-                    self.ConsecutiveFrame(_id, nad, '{:X}'.format(j), consedata, True)
+                        consecutive_data = ' '.join(tempData[offset + i * 6:offset + i * 6 + 6])
+                    self.ConsecutiveFrame(_id, nad, '{:X}'.format(j), consecutive_data)
                     j = j + 1
-                if self.SFResp(_id, '76', timeout)[0]:
-                    return True
+                if offset == 5:
+                    RSID = '{:02X}'.format((int(data.split()[0], 16) + int("40", 16)))
                 else:
-                    self.logger.error('Rx lost!!!')
-                    return False
+                    RSID = 76  # TransferDataBlock
+                return self.SFResp(_id, RSID, timeout)
             else:
-                return False
+                return False, ""
         except Exception as ex:
             self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
-            return False
+            return False, ""
 
     def peakLin_write(self, _id, data, timeout=None, times=None):
         start_time = time.time()

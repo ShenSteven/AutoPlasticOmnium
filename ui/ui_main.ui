@@ -478,12 +478,12 @@ font: 20pt &quot;宋体&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>1448</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="testcase">
     <property name="title">
-     <string>TestScript</string>
+     <string>Script</string>
     </property>
     <widget class="QMenu" name="menuSelect_Station">
      <property name="title">
@@ -952,7 +952,7 @@ font: 20pt &quot;宋体&quot;;</string>
   </action>
   <action name="actionPeakLin">
    <property name="text">
-    <string>PeakLin</string>
+    <string>PEAK</string>
    </property>
   </action>
   <action name="actionDelete">

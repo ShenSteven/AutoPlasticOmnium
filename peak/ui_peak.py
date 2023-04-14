@@ -79,5 +79,5 @@ class Ui_PeakGui(object):
         self.refreshBt.setText(_translate("PeakGui", "Refresh"))
         self.releaseBt.setText(_translate("PeakGui", "Release"))
         self.identifyBt.setText(_translate("PeakGui", "Identify"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("PeakGui", "PEAK-LIN"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("PeakGui", "PEAK-CAN"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("PeakGui", "PLIN"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("PeakGui", "PCAN"))
