@@ -156,6 +156,20 @@ class Step:
         return self.EeroName
 
     @property
+    def retry(self):
+        if not hasattr(self, 'Retry') or self.Retry is None:
+            return 0
+        else:
+            return self.Retry
+
+    @property
+    def timeout(self):
+        if not hasattr(self, 'Timeout') or self.Timeout is None:
+            return 1
+        else:
+            return self.Timeout
+
+    @property
     def subStr1(self):
         if not hasattr(self, 'SubStr1') or self.SubStr1 is None:
             return ''
@@ -365,8 +379,8 @@ class Step:
                                                                          f"<A href='https://www.qt.io/'>{self.StepName}</A>")
                 self.setColor(Qt.yellow)
                 self.logger.debug(f"<a name='testStep:{self.suiteName}-{self.StepName}'>Start:{self.StepName},"
-                                  f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
-                                  f"SubStr:{self.SubStr1} - {self.SubStr2},"
+                                  f"Keyword:{self.Keyword},Retry:{self.retry},Timeout:{self.timeout}s,"
+                                  f"SubStr:{self.subStr1} - {self.subStr2},"
                                   f"MesVer:{self.MesVar if hasattr(self, 'MesVar') else None},FTC:{self.FTC}</a>")
                 self.init_online_limit()
             else:
@@ -385,7 +399,7 @@ class Step:
             else:
                 self.myWind.pause_event.set()
 
-            for retry in range(self.Retry, -1, -1):
+            for retry in range(self.retry, -1, -1):
                 if self.myWind.pause_event.wait():
                     test_result, info = model.keyword.testKeyword(test_case, self)
                 if test_result:
@@ -608,7 +622,7 @@ class Step:
         self.logger.debug(f'run teardown command...')
         try:
             if self.TearDown == 'ECUReset':
-                gv.PLin.SingleFrame(self.ID, self.NAD_, '02', '11 01', self.Timeout)
+                gv.PLin.SingleFrame(self.ID, self.NAD_, '02', '11 01', self.timeout)
             else:
                 self.logger.warning(f'this teardown({self.TearDown}) no cation.')
         except Exception as e:
