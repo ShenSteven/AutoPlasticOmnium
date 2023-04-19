@@ -842,7 +842,7 @@ font: 20pt &quot;宋体&quot;;</string>
   </action>
   <action name="actionunknow">
    <property name="text">
-    <string>unknow</string>
+    <string>null</string>
    </property>
   </action>
   <action name="actionMode">

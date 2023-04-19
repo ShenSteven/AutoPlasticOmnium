@@ -111,9 +111,9 @@ def param_wrapper_verify_sha256(flag):
                     result = db.cur.fetchone()
                     if result:
                         sha256 = result[0]
-                        # print(f"  dbSHA:{sha256}")
+                        # print(f"{file_name}   dbSHA:{sha256}")
                 JsonSHA = get_sha256(bound_args.args[0])
-                # print(f"jsonSHA:{JsonSHA}")
+                # print(f"{file_name} jsonSHA:{JsonSHA}")
                 if sha256 == JsonSHA:
                     result = fun(*bound_args.args, **bound_args.kwargs)
                 else:
@@ -210,8 +210,10 @@ def wrapper_save_sha256(fun):
             file_name = os.path.basename(bound_args.args[1])
             try:
                 db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")
+                # print(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")
             except sqlite3.IntegrityError:
                 db.execute(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{file_name}'")
+                # print(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{file_name}'")
         os.chmod(args[1], stat.S_IREAD)
         return result
 

@@ -344,7 +344,7 @@ script_str = """
                 "ID": "",
                 "NAD": "",
                 "PCI_LEN": "",
-                "CmdOrParam": "",
+                "CmdOrParam": "DFLZ_M4_appl_para_crc.s19",
                 "CheckStr1": "",
                 "SetGlobalVar": "appCRC32",
                 "_ByPF": "",

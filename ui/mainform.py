@@ -91,7 +91,6 @@ class MainForm(TestForm):
         self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_main.ui'))
         self.ui.setWindowTitle(self.ui.windowTitle() + f' v{gv.version}')
         gv.init_create_dirs(self.logger)
-        self.init_select_station()
         self.init_textEditHandler()
         self.init_lab_factory(gv.cf.station.privileges)
         self.init_tableWidget()
@@ -105,6 +104,7 @@ class MainForm(TestForm):
                                                                          f'{gv.cf.station.station_name}', self.logger,
                                                                          self)
         self.init_status_bar()
+        self.init_select_station()
         self.testSequences = self.testcase.clone_suites
         self.ShowTreeView(self.testSequences)
         self.testThread = TestThread(self)
@@ -131,9 +131,10 @@ class MainForm(TestForm):
         #    - FR_M6 #(前右):0x50
         #    - FRG_M6 #(右格栅灯):0x54
         """
+        station_model = ['M4', 'M6', 'SX5GEV', 'SX5GEV_EOL']
+        flag = True
         for stationName in gv.cf.station.station_all:
             model_all = []
-            station_model = ['M4', 'M6', 'SX5GEV', 'SX5GEV_EOL']
             if stationName not in station_model:
                 station_select = QAction(self)
                 station_select.setObjectName(stationName)
@@ -159,6 +160,9 @@ class MainForm(TestForm):
                     model_select.setText(item)
                     station_menu.addAction(model_select)
                     model_select.triggered.connect(self.on_select_dut_model)
+                    if gv.cf.station.station_name in station_model and flag:
+                        flag = False
+                        model_select.triggered.emit()
 
     def init_textEditHandler(self):
         """create log handler for textEdit"""
@@ -534,6 +538,8 @@ class MainForm(TestForm):
             if isinstance(action, QAction):
                 gv.cf.station.station_name = action.text() if "(" not in action.text() else action.text()[
                                                                                             :action.text().index('(')]
+                self.dut_model = ''
+                self.ui.actionunknow.setText('')
             if isinstance(action, QMenu):
                 gv.cf.station.station_name = action.title() if "(" not in action.title() else action.title()[
                                                                                               :action.title().index(
@@ -557,6 +563,7 @@ class MainForm(TestForm):
         if isinstance(action, QAction):
             self.dut_model = action.text() if "(" not in action.text() else action.text()[
                                                                             :action.text().index('(')]
+            self.ui.actionunknow.setText(self.dut_model)
         self.ui.treeWidget.setHeaderLabel(f'{gv.cf.station.station_no}_{self.dut_model}')
 
     def on_actionConfig(self):
@@ -840,7 +847,8 @@ class MainForm(TestForm):
             return
         self.ui.treeWidget.blockSignals(True)
         self.ui.treeWidget.clear()
-        self.ui.treeWidget.setHeaderLabel(f'{gv.cf.station.station_no}')
+        dut_model = '' if self.dut_model == '' else '_' + self.dut_model
+        self.ui.treeWidget.setHeaderLabel(f'{gv.cf.station.station_no}{dut_model}')
         for suite in sequences:
             suite_node = QTreeWidgetItem(self.ui.treeWidget)
             if gv.isHide:
@@ -1026,6 +1034,8 @@ class MainForm(TestForm):
                 self.dut_model = gv.cf.dut.dut_models[3]
             else:
                 self.dut_model = 'unknown'
+                # if not gv.IsDebug:
+                #     raise Exception('dut_model is unknown!!')
             self.ui.actionunknow.setText(self.dut_model)
 
         """验证dut sn的正则规则"""
@@ -1039,7 +1049,7 @@ class MainForm(TestForm):
             self.SingleStepTest = True
         else:
             self.SingleStepTest = False
-        if not self.dut_model == 'unknown' and not gv.IsDebug:
+        if not gv.IsDebug and (self.dut_model == 'unknown' or len(self.ui.lineEdit.text()) != gv.cf.dut.sn_len):
             str_info = f'无法根据SN判断机种或者SN长度不对! 扫描:{len(self.ui.lineEdit.text())},规定:{gv.cf.dut.sn_len}.'
             QMetaObject.invokeMethod(self, 'showMessageBox', Qt.AutoConnection,
                                      QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),

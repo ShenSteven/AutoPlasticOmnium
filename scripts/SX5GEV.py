@@ -378,7 +378,7 @@ script_str = """
                 "ID": "",
                 "NAD": "",
                 "PCI_LEN": "",
-                "CmdOrParam": "",
+                "CmdOrParam": "DFLZM_SX5GEV_appl_para_crc.s19",
                 "CheckStr1": "",
                 "SetGlobalVar": "appCRC32",
                 "_ByPF": "",

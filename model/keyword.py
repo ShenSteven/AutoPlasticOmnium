@@ -172,7 +172,7 @@ def testKeyword(test_case, step):
             rReturn = True
 
         elif step.Keyword == 'GetCRC':
-            path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}"
+            path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.command}"
             step.testValue = peak.plin.peaklin.PeakLin.get_crc_apps19(step.logger, path)
             rReturn = not IsNullOrEmpty(step.testValue)
 

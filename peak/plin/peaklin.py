@@ -679,20 +679,18 @@ class PeakLin(QDialog, Ui_PeakGui):
         return datas
 
     @staticmethod
-    def get_crc_apps19(logger, file_dir_path):
+    def get_crc_apps19(logger, file_path):
         s19crc = ''
         try:
-            for file in os.listdir(file_dir_path):
-                if 'crc' in file:
-                    with open(os.path.join(file_dir_path, file), 'rb') as f:
-                        logger.debug(os.path.join(file_dir_path, file))
-                        for line in f:
-                            le = len(line)
-                            if le > 13:
-                                s19crc = line[10:18].decode("utf-8")
-                                s19crc = ' '.join(re.findall(".{2}", s19crc))
-                                logger.debug(f'get app s19 crc = {s19crc}')
-                                break
+            logger.debug(file_path)
+            with open(file_path, 'rb') as f:
+                for line in f:
+                    le = len(line)
+                    if le > 13:
+                        s19crc = line[10:18].decode("utf-8")
+                        s19crc = ' '.join(re.findall(".{2}", s19crc))
+                        logger.debug(f'get app s19 crc = {s19crc}')
+                        break
         except FileNotFoundError:
             logger.fatal("File not found")
             raise

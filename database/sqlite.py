@@ -69,9 +69,10 @@ class Sqlite(object):
         self.conn.close()
 
     def execute(self, command):
-        try:
-            self.cur.execute(command)
-            if not command.startswith('SELECT'):
-                self.conn.commit()
-        except:
-            self.conn.rollback()
+        # try:
+        self.cur.execute(command)
+        if not command.startswith('SELECT'):
+            self.conn.commit()
+        # except Exception as e:
+        #     print(e)
+            # self.conn.rollback()

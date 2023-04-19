@@ -35,7 +35,7 @@ class TestForm(QMainWindow):
         self.SaveScriptDisableFlag = False
         self.TestVariables: model.variables.Variables = None
         self.SN = ''
-        self.dut_model = 'unknown'
+        self.dut_model = ''
         self.shop_floor_url = ''
         self.WorkOrder = '1'
         self.DUTMesMac = ''
