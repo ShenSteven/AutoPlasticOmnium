@@ -147,13 +147,48 @@ class Step:
     #         raise IndexError("out of index")
     #     item = self.items[i]
     #     return item
+
+    @property
+    def suiteName(self):
+        if self.myWind is not None:
+            return self.myWind.testcase.clone_suites[self.suiteIndex].name
+
+    @suiteName.setter
+    def suiteName(self, value):
+        self.SuiteName = value
+
+    @property
+    def stepName(self):
+        if not hasattr(self, 'StepName'):
+            raise Exception('StepName is necessary field!')
+        elif IsNullOrEmpty(self.StepName):
+            raise Exception('StepName cannot be null or empty!')
+        else:
+            return self.StepName
+
     @property
     def eeroName(self):
-        if not hasattr(self, 'EeroName') or self.EeroName is None:
+        if not hasattr(self, 'EeroName'):
             return None
         if self.EeroName == '':
-            self.EeroName = self.StepName
+            self.EeroName = self.stepName
         return self.EeroName
+
+    @property
+    def errorCode(self):
+        if not hasattr(self, 'ErrorCode'):
+            return ''
+        else:
+            return self.ErrorCode
+
+    @property
+    def keyword(self):
+        if not hasattr(self, 'Keyword'):
+            raise Exception('Keyword is necessary field!')
+        elif IsNullOrEmpty(self.Keyword):
+            raise Exception('StepName cannot be null or empty!')
+        else:
+            return self.Keyword
 
     @property
     def retry(self):
@@ -182,6 +217,13 @@ class Step:
             return ''
         else:
             return self.SubStr2
+
+    @property
+    def ifElse(self):
+        if not hasattr(self, 'IfElse'):
+            return None
+        else:
+            return self.IfElse.lower()
 
     @property
     def FTC(self):
@@ -230,12 +272,6 @@ class Step:
             self._ByPF = ''
         else:
             raise ValueError("Value: 'P'=bypass，'F'=byFail, None/''=不干涉测试结果")
-
-    @property
-    def suiteName(self):
-        if self.myWind is not None:
-            self.SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].name
-        return self.SuiteName
 
     @property
     def index(self):
@@ -297,6 +333,38 @@ class Step:
         if not hasattr(self, 'SPEC'):
             return None
         return self.parse_var(self.SPEC)
+
+    @property
+    def usl(self):
+        if not hasattr(self, 'USL'):
+            return None
+        else:
+            return self.USL
+
+    @property
+    def lsl(self):
+        if not hasattr(self, 'LSL'):
+            return None
+        else:
+            return self.LSL
+
+    @property
+    def mesVar(self):
+        if not hasattr(self, 'MesVar'):
+            return None
+        else:
+            return self.MesVar
+
+    @mesVar.setter
+    def mesVar(self, value):
+        self.MesVar = value
+
+    @property
+    def tearDown(self):
+        if not hasattr(self, 'TearDown'):
+            return None
+        else:
+            return self.TearDown
 
     @property
     def param1(self):
@@ -364,7 +432,7 @@ class Step:
         self.myWind = test_case.myWind
         if self.logger is None:
             self.logger = testSuite.logger
-        self.SuiteName = testSuite.name
+        self.suiteName = testSuite.name
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
         info = ''
@@ -376,12 +444,12 @@ class Step:
             if self.isTest:
                 if not isinstance(self.myWind, ui.mainform.MainForm):
                     self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
-                                                                         f"<A href='https://www.qt.io/'>{self.StepName}</A>")
+                                                                         f"<A href='https://www.qt.io/'>{self.stepName}</A>")
                 self.setColor(Qt.yellow)
-                self.logger.debug(f"<a name='testStep:{self.suiteName}-{self.StepName}'>Start:{self.StepName},"
-                                  f"Keyword:{self.Keyword},Retry:{self.retry},Timeout:{self.timeout}s,"
+                self.logger.debug(f"<a name='testStep:{self.suiteName}-{self.stepName}'>Start:{self.stepName},"
+                                  f"Keyword:{self.keyword},Retry:{self.retry},Timeout:{self.timeout}s,"
                                   f"SubStr:{self.subStr1} - {self.subStr2},"
-                                  f"MesVer:{self.MesVar if hasattr(self, 'MesVar') else None},FTC:{self.FTC}</a>")
+                                  f"MesVer:{self.mesVar},FTC:{self.FTC}</a>")
                 self.init_online_limit()
             else:
                 if not self.myWind.IsCycle:
@@ -432,16 +500,15 @@ class Step:
 
     def record_date_to_db(self, test_case, test_result):
         """ record test date to DB."""
-        if self.isTest and self.Json is not None and self.Json.upper() == 'Y':
+        if self.isTest and self.Json == 'Y':
             with database.sqlite.Sqlite(gv.database_result) as db:
                 self.logger.debug('INSERT test result to result.db table RESULT.')
                 db.execute(
                     f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
                     f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
                     f"VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
-                    f"'{test_case.myWind.dut_model}','{self.suiteName}','{self.StepName}','{self.spec}',"
-                    f"'{self.LSL if hasattr(self, 'LSL') else None}',"
-                    f"'{self.testValue}','{self.USL if hasattr(self, 'USL') else None}',"
+                    f"'{test_case.myWind.dut_model}','{self.suiteName}','{self.stepName}','{self.spec}',"
+                    f"'{self.lsl}','{self.testValue}','{self.usl}',"
                     f"{self.elapsedTime},'{self.error_code}',"
                     f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
                     f"'{test_result}','{self.status}')")
@@ -454,11 +521,11 @@ class Step:
             self.error_code = self.ErrorCode if hasattr(self, 'ErrorCode') else None
             self.error_details = 'exception!'
         else:
-            if not hasattr(self, 'ErrorCode') or IsNullOrEmpty(self.ErrorCode):
+            if IsNullOrEmpty(self.errorCode):
                 self.error_code = self.eeroName
                 self.error_details = self.eeroName
-            elif ':' in self.ErrorCode:
-                error_list = self.ErrorCode.split()
+            elif ':' in self.errorCode:
+                error_list = self.errorCode.split()
                 if len(error_list) > 1 and info == 'TooHigh':
                     self.error_code = error_list[1].split(':')[0].strip()
                     self.error_details = error_list[1].split(':')[1].strip()
@@ -466,27 +533,24 @@ class Step:
                     self.error_code = error_list[0].split(':')[0].strip()
                     self.error_details = error_list[0].split(':')[1].strip()
             else:
-                self.error_code = self.ErrorCode
-                self.error_details = self.ErrorCode
+                self.error_code = self.errorCode
+                self.error_details = self.errorCode
 
     def process_mesVer(self, test_case):
         """collect data to mes"""
-        if not hasattr(self, 'MesVar'):
-            return
-        if self.Json is not None and self.Json.upper() == 'Y' and IsNullOrEmpty(self.MesVar):
-            self.MesVar = self.eeroName
-        if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(
-                self.testValue).lower() != 'true':
-            setattr(test_case.mesPhases, self.MesVar, self.testValue)
+        if self.Json == 'Y' and IsNullOrEmpty(self.mesVar):
+            self.mesVar = self.eeroName
+        if not IsNullOrEmpty(self.mesVar) and self.testValue is not None and str(self.testValue).lower() != 'true':
+            setattr(test_case.mesPhases, self.mesVar, self.testValue)
 
     def _if_statement(self, test_case, test_result: bool) -> bool:
-        if hasattr(self, 'IfElse') and not IsNullOrEmpty(self.IfElse) and self.IfElse.lower() == 'if':
+        if not IsNullOrEmpty(self.ifElse) and self.ifElse == 'if':
             test_case.IfCond = test_result
             if not test_result:
                 self.setColor('#FF99CC')
                 self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
                 test_result = True
-        elif hasattr(self, 'IfElse') and not IsNullOrEmpty(self.IfElse) and self.IfElse.lower() == 'else':
+        elif not IsNullOrEmpty(self.ifElse) and self.ifElse == 'else':
             pass
         else:
             test_case.IfCond = True
@@ -504,13 +568,13 @@ class Step:
             test_case.mesPhases.first_fail = self.suiteName
 
     def _process_ByPF(self, step_result: bool):
-        if (not IsNullOrEmpty(self.ByPF) and self.ByPF.upper() == 'P') and not step_result:
+        if self.ByPF == 'P' and not step_result:
             self.setColor(Qt.darkGreen)
-            self.logger.warning(f"Let this step:{self.StepName} bypass.")
+            self.logger.warning(f"Let this step:{self.stepName} bypass.")
             return True
-        elif (not IsNullOrEmpty(self.ByPF) and self.ByPF.upper() == 'F') and step_result:
+        elif self.ByPF == 'F' and step_result:
             self.setColor(Qt.darkRed)
-            self.logger.warning(f"Let this step:{self.StepName} by fail.")
+            self.logger.warning(f"Let this step:{self.stepName} by fail.")
             return False
         else:
             return step_result
@@ -532,33 +596,30 @@ class Step:
     def print_test_info(self, test_case, tResult):
         ts = datetime.now() - self.start_time
         self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
-        if self.Keyword == 'Waiting':
+        if self.keyword == 'Waiting':
             return
-        result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
+        result_info = f"{self.stepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
                       f"Symptom:{self.error_code}:{self.error_details}," \
-                      f"spec:{self.spec},Min:{self.LSL if hasattr(self, 'LSL') else None},Value:{self.testValue}," \
-                      f"Max:{self.USL if hasattr(self, 'USL') else None}"
+                      f"spec:{self.spec},Min:{self.lsl},Value:{self.testValue}, Max: {self.usl}"
         if tResult:
             self.logger.info(result_info)
         else:
             self.logger.error(result_info)
-        if self.Json is not None and self.Json.upper() == 'Y':
+        if self.Json == 'Y':
             ts = datetime.now() - self.start_time
             self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
             if isinstance(self.myWind, ui.mainform.MainForm):
                 self.myWind.my_signals.update_tableWidget[list].emit(
-                    [test_case.myWind.SN, self.StepName, self.spec, self.LSL if hasattr(self, 'LSL') else None,
-                     self.testValue, self.USL if hasattr(self, 'USL') else None,
+                    [test_case.myWind.SN, self.stepName, self.spec, self.lsl, self.testValue, self.usl,
                      self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
     def report_to_csv(self, test_case, name):
         """collect test result and data into csv file"""
         if name in test_case.csv_list_header:
             return
-        if (hasattr(self, 'USL') and not IsNullOrEmpty(self.USL)) or (
-                hasattr(self, 'LSL') and not IsNullOrEmpty(self.LSL)):
+        if not IsNullOrEmpty(self.usl) or not IsNullOrEmpty(self.lsl):
             test_case.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
-            test_case.csv_list_data.extend([self.testValue, self.LSL, self.USL])
+            test_case.csv_list_data.extend([self.testValue, self.lsl, self.usl])
         elif not IsNullOrEmpty(self.spec):
             test_case.csv_list_header.extend([name, f"{name}_SPEC"])
             test_case.csv_list_data.extend([self.testValue, self.spec])
@@ -572,7 +633,7 @@ class Step:
             self.start_time_json = test_case.startTimeJson
         obj = model.product.StepItem()
         if self.eeroName is None:
-            obj.test_name = self.StepName
+            obj.test_name = self.stepName
         elif self.eeroName.endswith('_'):
             obj.test_name = self.eeroName + str(test_case.ForCycleCounter)
         else:
@@ -584,9 +645,9 @@ class Step:
         obj.start_time = self.start_time_json.strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         obj.finish_time = self.finish_time
-        obj.lower_limit = self.LSL if hasattr(self, 'LSL') else None
-        obj.upper_limit = self.USL if hasattr(self, 'USL') else None
-        if hasattr(self, 'SPEC') and not IsNullOrEmpty(self.SPEC) and IsNullOrEmpty(self.LSL):
+        obj.lower_limit = self.lsl
+        obj.upper_limit = self.usl
+        if hasattr(self, 'SPEC') and not IsNullOrEmpty(self.SPEC) and IsNullOrEmpty(self.lsl):
             obj.lower_limit = self.spec
         # update gv.stationObj.tests json item
         if test_case.jsonObj.tests is not None:
@@ -609,26 +670,29 @@ class Step:
 
     def generate_report(self, test_case, test_result, suiteItem: model.product.SuiteItem):
         """ according to self.json, if record test result and data into json file"""
-        if self.Json is not None and self.Json.upper() == 'Y':
+        if self.Json == 'Y':
             obj = self.report_to_json(test_case, test_result, suiteItem)
             self.report_to_csv(test_case, obj.test_name)
-        elif not test_result or (not IsNullOrEmpty(self.ByPF) and self.ByPF.upper() == 'F'):
+        elif not test_result or self.ByPF == 'F':
             obj = self.report_to_json(test_case, test_result, suiteItem)
             self.report_to_csv(test_case, obj.test_name)
 
     def process_teardown(self, test_result):
-        if not hasattr(self, 'TearDown') or IsNullOrEmpty(self.TearDown) or test_result:
+        if IsNullOrEmpty(self.tearDown) or test_result:
             return
         self.logger.debug(f'run teardown command...')
         try:
-            if self.TearDown == 'ECUReset':
+            if self.tearDown == 'ECUReset':
                 gv.PLin.SingleFrame(self.ID, self.NAD_, '02', '11 01', self.timeout)
             else:
-                self.logger.warning(f'this teardown({self.TearDown}) no cation.')
+                self.logger.warning(f'this teardown({self.tearDown}) no cation.')
         except Exception as e:
             raise e
 
     def init_online_limit(self):
+        pass
+
+    def check_keyword(self, Keyword):
         pass
 
 

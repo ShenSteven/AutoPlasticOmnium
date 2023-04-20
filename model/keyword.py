@@ -246,10 +246,10 @@ def testKeyword(test_case, step):
     else:
         return rReturn, compInfo
     finally:
-        if (step.StepName.startswith("GetDAQResistor") or step.StepName.startswith("GetDAQTemp") or
-                step.Keyword == "NiDAQmxVolt" or step.Keyword == "NiDAQmxCur"):
+        if (step.stepName.startswith("GetDAQResistor") or step.stepName.startswith("GetDAQTemp") or
+                step.keyword == "NiDAQmxVolt" or step.keyword == "NiDAQmxCur"):
             test_case.ArrayListDaq.append("N/A" if IsNullOrEmpty(step.testValue) else step.testValue)
-            test_case.ArrayListDaqHeader.append(step.StepName)
+            test_case.ArrayListDaqHeader.append(step.stepName)
             step.logger.debug(f"DQA add {step.testValue}")
 
 
