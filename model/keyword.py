@@ -101,7 +101,7 @@ def testKeyword(test_case, step):
             rReturn = test_case.dut_comm.open(gv.cf.dut.prompt)
 
         elif step.Keyword == 'TelnetAndSendCmd':
-            temp = TelnetComm(step.logger, step.Param1, gv.cf.dut.prompt)
+            temp = TelnetComm(step.logger, step.param1, gv.cf.dut.prompt)
             if temp.open(gv.cf.dut.prompt) and \
                     temp.SendCommand(step.command, step.expectStr, step.timeout)[0]:
                 return True, ''
@@ -303,15 +303,15 @@ def assert_value(compInfo, item, rReturn):
             rReturn = True if item.testValue in item.spec else False
         except TypeError as e:
             item.logger.error(f'{currentframe().f_code.co_name}:{e}')
-    elif not IsNullOrEmpty(item.USL) or not IsNullOrEmpty(item.LSL):
+    elif not IsNullOrEmpty(item.usl) or not IsNullOrEmpty(item.lsl):
         try:
-            rReturn, compInfo = CompareLimit(item.LSL, item.USL, item.testValue, item)
+            rReturn, compInfo = CompareLimit(item.lsl, item.usl, item.testValue, item)
         except TypeError as e:
             item.logger.error(f'{currentframe().f_code.co_name}:{e}')
-    elif IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
+    elif IsNullOrEmpty(item.usl) and IsNullOrEmpty(item.lsl):
         pass
     else:
-        item.logger.warning(f"assert is unknown,SPEC:{item.spec},LSL:{item.LSL}USL:{item.USL}.")
+        item.logger.warning(f"assert is unknown,SPEC:{item.spec},LSL:{item.lsl}USL:{item.usl}.")
     return compInfo, rReturn
 
 

@@ -599,7 +599,7 @@ class PeakLin(QDialog, Ui_PeakGui):
                 if offset == 5:
                     RSID = '{:02X}'.format((int(data.split()[0], 16) + int("40", 16)))
                 else:
-                    RSID = 76  # TransferDataBlock
+                    RSID = '76'  # TransferDataBlock
                 return self.SFResp(_id, RSID, timeout)
             else:
                 return False, ""
