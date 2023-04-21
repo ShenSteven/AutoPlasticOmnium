@@ -67,18 +67,19 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger):
                 test_step.index = temp_suite.totalNumber
                 # test_step.suiteIndex = temp_suite.index
                 if not hasattr(test_step, header):
-                    int_header = ['Retry', 'Timeout']
-                    if header in int_header:
-                        setattr(test_step, header, int(cell.value))
-                    else:
-                        setattr(test_step, header, '')
-                T = (type(getattr(test_step, header)))
-                if T is int:
-                    if type(cell.value) is NoneType:
-                        cell.value = getattr(test_step, header)
-                    setattr(test_step, header, T(cell.value))
-                else:
-                    setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value).strip())
+                    # int_header = ['Retry', 'Timeout']
+                    # if header in int_header:
+                    #     setattr(test_step, header, int(cell.value))
+                    # else:
+                    setattr(test_step, header, '')
+                # T = (type(getattr(test_step, header)))
+                # if T is int:
+                #     if type(cell.value) is NoneType:
+                #         cell.value = getattr(test_step, header)
+                #     setattr(test_step, header, T(cell.value))
+                # else:
+                #     setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value).strip())
+                setattr(test_step, header, '' if type(cell.value) is NoneType else str(cell.value).strip())
                 if temp_suite.totalNumber == 0:
                     test_step.SuiteName = temp_suite_name
             else:
