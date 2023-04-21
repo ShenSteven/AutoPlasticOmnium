@@ -39,7 +39,6 @@ class Step:
     Attributes:
         suiteIndex: 测试套序列号
         _index: 当前测试step序列号
-        # stepResult: 测试项测试结果
         start_time: 测试项的开始时
         finish_time: 测试结束时间
         start_time_json = None
@@ -49,34 +48,33 @@ class Step:
         testValue = None: 测试得到的值
         elapsedTime = 0: 测试步骤耗时
         _isTest：bool 决定步骤是否测试，默认都测试
-        _command：test command after parse variant.
-        ### excel header variant ###
-        SuiteName: str = ''：测试套名字
-        StepName: str = None: 当前测试step名字
-        ErrorCode: str = None: 测试错误码
-        Retry: int = None: 测试失败retry次数
-        Timeout: int = None: 测试步骤超时时间
-        SubStr1: str = None: 截取字符串 如截取abc中的b SubStr1=a，SubStr2=cf
-        SubStr2: str = None
-        IfElse: str = None: 测试步骤结果是否做为if条件，决定else步骤是否执行
-        For: str = None: 循环测试for(6)开始6次循环，END FOR结束
-        Model: str = None: 机种，根据机种决定哪些用例不跑，哪些用例需要跑
-        CmdOrParam: str = None: 发送的测试命令
-        ExpectStr: str = None: 期待的提示符，用来判断反馈是不是结束了
-        CheckStr1: str = None: 检查反馈是否包含CheckStr1
-        CheckStr2: str = None: 检查反馈是否包含CheckStr2
-        SPEC: str = None: 测试定义的Spec
-        LSL: str = None: 最小限值
-        USL: str = None: 最大限值
+        ####################### excel header variant ##########################
+        _SuiteName: str = ''：测试套名字
+        _StepName: str = None: 当前测试step名字
+        _ErrorCode: str = None: 测试错误码
         ErrorDetails: str = None: 测试错误码详细描述
+        _Retry: int = None: 测试失败retry次数
+        _Timeout: int = None: 测试步骤超时时间
+        _SubStr1: str = None: 截取字符串 如截取abc中的b SubStr1=a，SubStr2=cf
+        _SubStr2: str = None
+        _IfElse: str = None: 测试步骤结果是否做为if条件，决定else步骤是否执行
+        _For: str = None: 循环测试for(6)开始6次循环，END FOR结束
+        _Model: str = None: 机种，根据机种决定哪些用例不跑，哪些用例需要跑
+        _CmdOrParam: str = None: 发送的测试命令
+        _ExpectStr: str = None: 期待的提示符，用来判断反馈是不是结束了
+        _CheckStr1: str = None: 检查反馈是否包含CheckStr1
+        _CheckStr2: str = None: 检查反馈是否包含CheckStr2
+        _SPEC: str = None: 测试定义的Spec
+        _LSL: str = None: 最小限值
+        _USL: str = None: 最大限值
         Unit: str = None: 测试值单位
-        MesVar: str = None: 上传MES信息的变量名字
+        _MesVar: str = None: 上传MES信息的变量名字
         _ByPF: str = None: 手动人为控制测试结果 P=bypass，F=byFail,空=不干涉测试结果
         _FTC: str = None: 失败继续 fail to continue。y=继续，None|''=不继续
-        Keyword: str = None: 测试步骤对应的关键字，执行对应关键字下的代码段
+        _Keyword: str = None: 测试步骤对应的关键字，执行对应关键字下的代码段
         _Json: str = None: 测试结果数据是否收集到json文件中并上传给客户.y=收集，None|''=不收集
-        EeroName: str = None: 客户定义的测试步骤名字
-        Param1: str = None
+        _EeroName: str = None: 客户定义的测试步骤名字
+        _Param1: str = None
     """
 
     def __init__(self, dict_=None):
@@ -96,38 +94,38 @@ class Step:
         self._isTest = True
         self.suiteVar = ''
         # ============= Excel Column ===============
-        # self.SuiteName: str = ''
-        # self.StepName: str = 'Waiting'
-        # self.EeroName: str = None
-        # self.Keyword: str = 'Waiting'
-        # self.ErrorCode: str = None
-        # self.ErrorDetails: str = None
-        # self.Retry: int = 0
-        # self.Timeout: int = 1
-        # self.IfElse: str = None
-        # self.For: str = None
-        # self.SubStr1: str = None
-        # self.SubStr2: str = None
-        # self.Model: str = None
-        # self.ID: str = None  # PLIN
-        # self.NAD: str = None  # PLIN
-        # self.PCI_LEN: str = None  # PLIN
-        # self.CmdOrParam: str = None
-        # self.Param1: str = None
-        # self.ExpectStr: str = None
-        # self.CheckStr1: str = None
-        # self.CheckStr2: str = None
-        # self.NoContain: str = None
-        # self.SPEC: str = None
-        # self.LSL: str = None
-        # self.USL: str = None
-        # self.Unit: str = None
-        # self.SetGlobalVar: str = None
-        # self.MesVar: str = None
+        # self._SuiteName: str = ''
+        # self._StepName: str = 'Waiting'
+        # self._EeroName: str = None
+        # self._Keyword: str = 'Waiting'
+        # self._ErrorCode: str = None
+        # self._ErrorDetails: str = None
+        # self._Retry: int = 0
+        # self._Timeout: int = 1
+        # self._IfElse: str = None
+        # self._For: str = None
+        # self._SubStr1: str = None
+        # self._SubStr2: str = None
+        # self._Model: str = None
+        # self._ID: str = None  # PLIN
+        # self._NAD: str = None  # PLIN
+        # self._PCI_LEN: str = None  # PLIN
+        # self._CmdOrParam: str = None
+        # self._Param1: str = None
+        # self._ExpectStr: str = None
+        # self._CheckStr1: str = None
+        # self._CheckStr2: str = None
+        # self._NoContain: str = None
+        # self._SPEC: str = None
+        # self._LSL: str = None
+        # self._USL: str = None
+        # self._Unit: str = None
+        # self._SetGlobalVar: str = None
+        # self._MesVar: str = None
         # self._ByPF: str = None
         # self._FTC: str = None
         # self._Json: str = None
-        # self.TearDown: str = None
+        # self._TearDown: str = None
         # self.items = list(filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), self.__dict__))
         if dict_ is not None:
             self.__dict__.update(dict_)
@@ -496,6 +494,16 @@ class Step:
     @Param1.setter
     def Param1(self, value):
         self._Param1 = value
+
+    @property
+    def ID(self):
+        if not hasattr(self, '_ID'):
+            return None
+        return self.parse_var(self._ID)
+
+    @ID.setter
+    def ID(self, value):
+        self._ID = value
 
     @property
     def NAD(self):
