@@ -12,6 +12,7 @@ added_files = [
     ('conf/*.yaml', 'conf'),
     ('conf/*.db', 'conf'),
     ('conf/__version__.py', 'conf'),
+    ('conf/keywords.txt', 'conf'),
     ('manual.docx', '.'),
     ('tool/*', 'tool'),
     ('scripts/*.json', 'scripts'),

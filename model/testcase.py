@@ -8,6 +8,7 @@
 """
 import copy
 import os
+import re
 import sys
 import traceback
 from PyQt5 import QtCore
@@ -21,6 +22,26 @@ import sockets.serialport
 from inspect import currentframe
 from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
+
+
+def save_keywords_to_txt(path, wpath):
+    with open(path, 'r', encoding='utf-8') as rf:
+        readall = rf.read()
+        SubStr1 = "step.Keyword == '"
+        SubStr2 = "'"
+        keywords = re.findall(f'{SubStr1}(.*?){SubStr2}', readall)
+        if os.path.exists(wpath):
+            os.remove(wpath)
+        for item in keywords:
+            with open(wpath, 'a') as wf:
+                wf.write(f'{item}\n')
+        return keywords
+
+
+def get_keywords_list(path):
+    with open(path, 'r', encoding='utf-8') as rf:
+        keywords = [item.strip() for item in rf.readlines()]
+        return keywords
 
 
 class TestCase:
@@ -74,6 +95,8 @@ class TestCase:
             self.testcase_path = testcase_path
             self.logger = logger
             if not getattr(sys, 'frozen', False) and cflag:
+                gv.Keywords = save_keywords_to_txt(rf'{gv.current_dir}\model\keyword.py',
+                                                   rf'{gv.current_dir}\conf\keywords.txt')
                 model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger)
             if not os.path.exists(self.test_script_json):
                 model.loadseq.excel_convert_to_json(self.testcase_path, [sheet_name], self.logger)
@@ -83,16 +106,17 @@ class TestCase:
                 self.original_suites, self.header, self.step_count = model.loadseq.load_testcase_from_json(
                     self.test_script_json, isVerify)
             self.clone_suites = copy.deepcopy(self.original_suites)
+            gv.Keywords = get_keywords_list(rf'{gv.current_dir}\conf\keywords.txt')
         except Exception as e:
-            # QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
-            QMetaObject.invokeMethod(
-                self.myWind,
-                'showMessageBox',
-                Qt.BlockingQueuedConnection,
-                QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
-                QtCore.Q_ARG(str, 'ERROR!'),
-                QtCore.Q_ARG(str, f'{currentframe().f_code.co_name}:{e}'),
-                QtCore.Q_ARG(int, 4))
+            QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
+            # QMetaObject.invokeMethod(
+            #     self.myWind,
+            #     'showMessageBox',
+            #     Qt.BlockingQueuedConnection,
+            #     QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
+            #     QtCore.Q_ARG(str, 'ERROR!'),
+            #     QtCore.Q_ARG(str, f'{currentframe().f_code.co_name}:{e}'),
+            #     QtCore.Q_ARG(int, 4))
             raise
 
     def run(self, global_fail_continue=False):

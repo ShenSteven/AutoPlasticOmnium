@@ -46,6 +46,7 @@ logFolderPath = ''
 critical_log = ''
 errors_log = ''
 CheckSnList = []
+Keywords = []
 
 IsDebug = False
 mainWin = None

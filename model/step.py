@@ -182,27 +182,51 @@ class Step:
             return self.ErrorCode
 
     @property
-    def keyword(self):
-        if not hasattr(self, 'Keyword'):
-            raise Exception('Keyword is necessary field!')
-        elif IsNullOrEmpty(self.Keyword):
+    def Keyword(self):
+        if not hasattr(self, '_Keyword'):
+            return None
+        elif IsNullOrEmpty(self._Keyword):
             raise Exception('StepName cannot be null or empty!')
         else:
-            return self.Keyword
+            return self._Keyword
+
+    @Keyword.setter
+    def Keyword(self, value):
+        if value.lower() == 'default':
+            self._Keyword = value
+            gv.Keywords.append(value)
+        if value not in gv.Keywords:
+            raise ValueError(f"Keyword '{value}' not in keywords list :{gv.Keywords}")
+        else:
+            self._Keyword = value
 
     @property
-    def retry(self):
-        if not hasattr(self, 'Retry') or self.Retry is None:
+    def Retry(self):
+        if not hasattr(self, '_Retry') or self._Retry is None:
             return 0
         else:
-            return self.Retry
+            return self._Retry
+
+    @Retry.setter
+    def Retry(self, value):
+        try:
+            self._Retry = int(value)
+        except ValueError:
+            raise
 
     @property
-    def timeout(self):
-        if not hasattr(self, 'Timeout') or self.Timeout is None:
+    def Timeout(self):
+        if not hasattr(self, '_Timeout') or self._Timeout is None:
             return 1
         else:
-            return self.Timeout
+            return self._Timeout
+
+    @Timeout.setter
+    def Timeout(self, value):
+        try:
+            self._Timeout = int(value)
+        except ValueError:
+            raise
 
     @property
     def subStr1(self):
@@ -447,7 +471,7 @@ class Step:
                                                                          f"<A href='https://www.qt.io/'>{self.stepName}</A>")
                 self.setColor(Qt.yellow)
                 self.logger.debug(f"<a name='testStep:{self.suiteName}-{self.stepName}'>Start:{self.stepName},"
-                                  f"Keyword:{self.keyword},Retry:{self.retry},Timeout:{self.timeout}s,"
+                                  f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
                                   f"SubStr:{self.subStr1} - {self.subStr2},"
                                   f"MesVer:{self.mesVar},FTC:{self.FTC}</a>")
                 self.init_online_limit()
@@ -467,7 +491,7 @@ class Step:
             else:
                 self.myWind.pause_event.set()
 
-            for retry in range(self.retry, -1, -1):
+            for retry in range(self.Retry, -1, -1):
                 if self.myWind.pause_event.wait():
                     test_result, info = model.keyword.testKeyword(test_case, self)
                 if test_result:
@@ -596,7 +620,7 @@ class Step:
     def print_test_info(self, test_case, tResult):
         ts = datetime.now() - self.start_time
         self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
-        if self.keyword == 'Waiting':
+        if self.Keyword == 'Waiting':
             return
         result_info = f"{self.stepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
                       f"Symptom:{self.error_code}:{self.error_details}," \
@@ -683,7 +707,7 @@ class Step:
         self.logger.debug(f'run teardown command...')
         try:
             if self.tearDown == 'ECUReset':
-                gv.PLin.SingleFrame(self.ID, self.NAD_, '02', '11 01', self.timeout)
+                gv.PLin.SingleFrame(self.ID, self.NAD_, '02', '11 01', self.Timeout)
             else:
                 self.logger.warning(f'this teardown({self.tearDown}) no cation.')
         except Exception as e:
