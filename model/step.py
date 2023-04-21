@@ -149,49 +149,63 @@ class Step:
     #     return item
 
     @property
-    def suiteName(self):
-        if self.myWind is not None:
-            return self.myWind.testcase.clone_suites[self.suiteIndex].name
-
-    @suiteName.setter
-    def suiteName(self, value):
-        self.SuiteName = value
-
-    @property
-    def stepName(self):
-        if not hasattr(self, 'StepName'):
-            raise Exception('StepName is necessary field!')
-        elif IsNullOrEmpty(self.StepName):
-            raise Exception('StepName cannot be null or empty!')
-        else:
-            return self.StepName
-
-    @property
-    def eeroName(self):
-        if not hasattr(self, 'EeroName'):
+    def SuiteName(self):
+        if not hasattr(self, '_SuiteName'):
             return None
-        if self.EeroName == '':
-            self.EeroName = self.stepName
-        return self.EeroName
+        if self.myWind is not None:
+            self._SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].name
+        return self._SuiteName
+
+    @SuiteName.setter
+    def SuiteName(self, value):
+        self._SuiteName = value
 
     @property
-    def errorCode(self):
-        if not hasattr(self, 'ErrorCode'):
+    def StepName(self):
+        if not hasattr(self, '_StepName'):
+            return None
+        return self._StepName
+
+    @StepName.setter
+    def StepName(self, value):
+        if IsNullOrEmpty(value):
+            raise Exception('StepName cannot be null or empty!')
+        self._StepName = value
+
+    @property
+    def EeroName(self):
+        if not hasattr(self, '_EeroName'):
+            return None
+        return self._EeroName
+
+    @EeroName.setter
+    def EeroName(self, value):
+        if value == '':
+            self._EeroName = self.StepName
+        else:
+            self._EeroName = value
+
+    @property
+    def ErrorCode(self):
+        if not hasattr(self, '_ErrorCode'):
             return ''
         else:
-            return self.ErrorCode
+            return self._ErrorCode
+
+    @ErrorCode.setter
+    def ErrorCode(self, value):
+        self._ErrorCode = value
 
     @property
     def Keyword(self):
         if not hasattr(self, '_Keyword'):
             return None
-        elif IsNullOrEmpty(self._Keyword):
-            raise Exception('StepName cannot be null or empty!')
-        else:
-            return self._Keyword
+        return self._Keyword
 
     @Keyword.setter
     def Keyword(self, value):
+        if IsNullOrEmpty(value):
+            raise Exception('Keyword cannot be null or empty!')
         if value.lower() == 'default':
             self._Keyword = value
             gv.Keywords.append(value)
@@ -229,37 +243,67 @@ class Step:
             raise
 
     @property
-    def subStr1(self):
-        if not hasattr(self, 'SubStr1') or self.SubStr1 is None:
+    def SubStr1(self):
+        if not hasattr(self, '_SubStr1') or self._SubStr1 is None:
             return ''
         else:
-            return self.SubStr1
+            return self._SubStr1
+
+    @SubStr1.setter
+    def SubStr1(self, value):
+        self._SubStr1 = value
 
     @property
-    def subStr2(self):
-        if not hasattr(self, 'SubStr2') or self.SubStr2 is None:
+    def SubStr2(self):
+        if not hasattr(self, '_SubStr2') or self._SubStr2 is None:
             return ''
         else:
-            return self.SubStr2
+            return self._SubStr2
+
+    @SubStr2.setter
+    def SubStr2(self, value):
+        self._SubStr2 = value
 
     @property
-    def ifElse(self):
-        if not hasattr(self, 'IfElse'):
+    def For(self):
+        if not hasattr(self, '_For') or self._For is None:
             return None
         else:
-            return self.IfElse.lower()
+            return self._For
+
+    @For.setter
+    def For(self, value):
+        if '(' in value and ')' in value:
+            self._For = value
+        elif value.lower().startswith('end'):
+            self._For = value
+        elif IsNullOrEmpty(value):
+            self._For = value
+        else:
+            raise ValueError('Format example: For(10) or END/ENDFOR')
+
+    @property
+    def IfElse(self):
+        if not hasattr(self, '_IfElse'):
+            return None
+        else:
+            return self._IfElse.lower()
+
+    @IfElse.setter
+    def IfElse(self, value):
+        self._IfElse = value
 
     @property
     def FTC(self):
         if not hasattr(self, '_FTC'):
             return None
         else:
-            return self._FTC
+            return self._FTC.upper()
 
     @FTC.setter
     def FTC(self, value):
         if value.upper() == 'Y':
-            self._FTC = value.upper()
+            self._FTC = value
         elif value == 'None' or value == '':
             self._FTC = ''
         else:
@@ -270,12 +314,12 @@ class Step:
         if not hasattr(self, '_Json'):
             return None
         else:
-            return self._Json
+            return self._Json.upper()
 
     @Json.setter
     def Json(self, value):
         if value.upper() == 'Y':
-            self._Json = value.upper()
+            self._Json = value
         elif value == 'None' or value == '':
             self._Json = ''
         else:
@@ -286,12 +330,12 @@ class Step:
         if not hasattr(self, '_ByPF'):
             return None
         else:
-            return self._ByPF
+            return self._ByPF.upper()
 
     @ByPF.setter
     def ByPF(self, value):
         if value.upper() == 'P' or value.upper() == 'F':
-            self._ByPF = value.upper()
+            self._ByPF = value
         elif value == 'None' or value == '':
             self._ByPF = ''
         else:
@@ -311,10 +355,9 @@ class Step:
     def isTest(self):
         if self.myWind is None:
             return self._isTest
-        if hasattr(self, 'IfElse') and not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'else':
+        if not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'else':
             self._isTest = not self.myWind.testcase.IfCond
-        if hasattr(self, 'Model') and not IsNullOrEmpty(
-                self.Model) and self.myWind.dut_model.lower() not in self.Model.lower().split():
+        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.split():
             self._isTest = False
         if self.myWind.SingleStepTest:
             self._isTest = True
@@ -325,88 +368,154 @@ class Step:
         self._isTest = value
 
     @property
-    def command(self):
-        if not hasattr(self, 'CmdOrParam') or self.CmdOrParam is None:
+    def Model(self):
+        if not hasattr(self, '_Model') or self._Model is None:
+            return None
+        else:
+            return self._Model.lower()
+
+    @Model.setter
+    def Model(self, value):
+        self._Model = value
+
+    @property
+    def CmdOrParam(self):
+        if not hasattr(self, '_CmdOrParam') or self._CmdOrParam is None:
             return ''
         else:
-            return parse_expr(self.parse_var(self.CmdOrParam))
+            return parse_expr(self.parse_var(self._CmdOrParam))
+
+    @CmdOrParam.setter
+    def CmdOrParam(self, value):
+        self._CmdOrParam = value
 
     @property
-    def expectStr(self):
-        if not hasattr(self, 'ExpectStr') or self.ExpectStr is None:
+    def ExpectStr(self):
+        if not hasattr(self, '_ExpectStr') or self._ExpectStr is None:
             return ''
         else:
-            return self.parse_var(self.ExpectStr)
+            return self.parse_var(self._ExpectStr)
+
+    @ExpectStr.setter
+    def ExpectStr(self, value):
+        self._ExpectStr = value
 
     @property
-    def checkStr1(self):
-        if not hasattr(self, 'CheckStr1') or self.CheckStr1 is None:
+    def CheckStr1(self):
+        if not hasattr(self, '_CheckStr1') or self._CheckStr1 is None:
             return ''
         else:
-            return self.parse_var(self.CheckStr1)
+            return self.parse_var(self._CheckStr1)
+
+    @CheckStr1.setter
+    def CheckStr1(self, value):
+        self._CheckStr1 = value
 
     @property
-    def checkStr2(self):
-        if not hasattr(self, 'CheckStr2') or self.CheckStr2 is None:
+    def CheckStr2(self):
+        if not hasattr(self, '_CheckStr2') or self._CheckStr2 is None:
             return ''
         else:
-            return self.parse_var(self.CheckStr2)
+            return self.parse_var(self._CheckStr2)
+
+    @CheckStr2.setter
+    def CheckStr2(self, value):
+        self._CheckStr2 = value
 
     @property
-    def spec(self):
-        if not hasattr(self, 'SPEC'):
+    def SPEC(self):
+        if not hasattr(self, '_SPEC'):
             return None
-        return self.parse_var(self.SPEC)
+        return self.parse_var(self._SPEC)
+
+    @SPEC.setter
+    def SPEC(self, value):
+        self._SPEC = value
 
     @property
-    def usl(self):
-        if not hasattr(self, 'USL'):
-            return None
-        else:
-            return self.USL
-
-    @property
-    def lsl(self):
-        if not hasattr(self, 'LSL'):
-            return None
-        else:
-            return self.LSL
-
-    @property
-    def mesVar(self):
-        if not hasattr(self, 'MesVar'):
+    def USL(self):
+        if not hasattr(self, '_USL'):
             return None
         else:
-            return self.MesVar
+            return self._USL
 
-    @mesVar.setter
-    def mesVar(self, value):
-        self.MesVar = value
+    @USL.setter
+    def USL(self, value):
+        self._USL = value
 
     @property
-    def tearDown(self):
-        if not hasattr(self, 'TearDown'):
+    def LSL(self):
+        if not hasattr(self, '_LSL'):
             return None
         else:
-            return self.TearDown
+            return self._LSL
+
+    @LSL.setter
+    def LSL(self, value):
+        self._LSL = value
 
     @property
-    def param1(self):
-        if not hasattr(self, 'Param1'):
+    def SetGlobalVar(self):
+        if not hasattr(self, '_SetGlobalVar'):
             return None
-        return self.parse_var(self.Param1)
+        else:
+            return self._SetGlobalVar
+
+    @SetGlobalVar.setter
+    def SetGlobalVar(self, value):
+        self._SetGlobalVar = value
 
     @property
-    def NAD_(self):
-        if not hasattr(self, 'NAD'):
+    def MesVar(self):
+        if not hasattr(self, '_MesVar'):
             return None
-        return self.parse_var(self.NAD)
+        else:
+            return self._MesVar
+
+    @MesVar.setter
+    def MesVar(self, value):
+        self._MesVar = value
 
     @property
-    def PCI_LEN_(self):
-        if not hasattr(self, 'PCI_LEN'):
+    def TearDown(self):
+        if not hasattr(self, '_TearDown'):
             return None
-        return self.parse_var(self.PCI_LEN)
+        else:
+            return self._TearDown
+
+    @TearDown.setter
+    def TearDown(self, value):
+        self._TearDown = value
+
+    @property
+    def Param1(self):
+        if not hasattr(self, '_Param1'):
+            return None
+        return self.parse_var(self._Param1)
+
+    @Param1.setter
+    def Param1(self, value):
+        self._Param1 = value
+
+    @property
+    def NAD(self):
+        if not hasattr(self, '_NAD'):
+            return None
+        return self.parse_var(self._NAD)
+
+    @NAD.setter
+    def NAD(self, value):
+        self._NAD = value
+
+    @property
+    def PCI_LEN(self):
+        if not hasattr(self, '_PCI_LEN'):
+            return None
+        return self.parse_var(self._PCI_LEN)
+
+    @PCI_LEN.setter
+    def PCI_LEN(self, value):
+        self._PCI_LEN = value
 
     # @staticmethod
     def parse_var(self, value):
@@ -456,7 +565,7 @@ class Step:
         self.myWind = test_case.myWind
         if self.logger is None:
             self.logger = testSuite.logger
-        self.suiteName = testSuite.name
+        self.SuiteName = testSuite.name
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
         info = ''
@@ -468,12 +577,12 @@ class Step:
             if self.isTest:
                 if not isinstance(self.myWind, ui.mainform.MainForm):
                     self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
-                                                                         f"<A href='https://www.qt.io/'>{self.stepName}</A>")
+                                                                         f"<A href='https://www.qt.io/'>{self.StepName}</A>")
                 self.setColor(Qt.yellow)
-                self.logger.debug(f"<a name='testStep:{self.suiteName}-{self.stepName}'>Start:{self.stepName},"
+                self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                   f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
-                                  f"SubStr:{self.subStr1} - {self.subStr2},"
-                                  f"MesVer:{self.mesVar},FTC:{self.FTC}</a>")
+                                  f"SubStr:{self.SubStr1} - {self.SubStr2},"
+                                  f"MesVer:{self.MesVar},FTC:{self.FTC}</a>")
                 self.init_online_limit()
             else:
                 if not self.myWind.IsCycle:
@@ -513,7 +622,7 @@ class Step:
         else:
             return True if self.status == 'True' else False
         finally:
-            if hasattr(self, 'SetGlobalVar') and not IsNullOrEmpty(self.SetGlobalVar) and self.isTest:
+            if not IsNullOrEmpty(self.SetGlobalVar) and self.isTest:
                 if bool(self.status):
                     setattr(test_case.myWind.TestVariables, self.SetGlobalVar, self.testValue)
                     self.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
@@ -531,8 +640,8 @@ class Step:
                     f"INSERT INTO RESULT (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,"
                     f"VALUE,USL,ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) "
                     f"VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',"
-                    f"'{test_case.myWind.dut_model}','{self.suiteName}','{self.stepName}','{self.spec}',"
-                    f"'{self.lsl}','{self.testValue}','{self.usl}',"
+                    f"'{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.SPEC}',"
+                    f"'{self.LSL}','{self.testValue}','{self.USL}',"
                     f"{self.elapsedTime},'{self.error_code}',"
                     f"'{self.error_details}','{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}',"
                     f"'{test_result}','{self.status}')")
@@ -545,11 +654,11 @@ class Step:
             self.error_code = self.ErrorCode if hasattr(self, 'ErrorCode') else None
             self.error_details = 'exception!'
         else:
-            if IsNullOrEmpty(self.errorCode):
-                self.error_code = self.eeroName
-                self.error_details = self.eeroName
-            elif ':' in self.errorCode:
-                error_list = self.errorCode.split()
+            if IsNullOrEmpty(self.ErrorCode):
+                self.error_code = self.EeroName
+                self.error_details = self.EeroName
+            elif ':' in self.ErrorCode:
+                error_list = self.ErrorCode.split()
                 if len(error_list) > 1 and info == 'TooHigh':
                     self.error_code = error_list[1].split(':')[0].strip()
                     self.error_details = error_list[1].split(':')[1].strip()
@@ -557,24 +666,24 @@ class Step:
                     self.error_code = error_list[0].split(':')[0].strip()
                     self.error_details = error_list[0].split(':')[1].strip()
             else:
-                self.error_code = self.errorCode
-                self.error_details = self.errorCode
+                self.error_code = self.ErrorCode
+                self.error_details = self.ErrorCode
 
     def process_mesVer(self, test_case):
         """collect data to mes"""
-        if self.Json == 'Y' and IsNullOrEmpty(self.mesVar):
-            self.mesVar = self.eeroName
-        if not IsNullOrEmpty(self.mesVar) and self.testValue is not None and str(self.testValue).lower() != 'true':
-            setattr(test_case.mesPhases, self.mesVar, self.testValue)
+        if self.Json == 'Y' and IsNullOrEmpty(self.MesVar):
+            self.MesVar = self.EeroName
+        if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(self.testValue).lower() != 'true':
+            setattr(test_case.mesPhases, self.MesVar, self.testValue)
 
     def _if_statement(self, test_case, test_result: bool) -> bool:
-        if not IsNullOrEmpty(self.ifElse) and self.ifElse == 'if':
+        if not IsNullOrEmpty(self.IfElse) and self.IfElse == 'if':
             test_case.IfCond = test_result
             if not test_result:
                 self.setColor('#FF99CC')
                 self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
                 test_result = True
-        elif not IsNullOrEmpty(self.ifElse) and self.ifElse == 'else':
+        elif not IsNullOrEmpty(self.IfElse) and self.IfElse == 'else':
             pass
         else:
             test_case.IfCond = True
@@ -589,16 +698,16 @@ class Step:
         if test_case.failCount == 1 and IsNullOrEmpty(test_case.error_code_first_fail):
             test_case.error_code_first_fail = self.error_code
             test_case.error_details_first_fail = self.error_details
-            test_case.mesPhases.first_fail = self.suiteName
+            test_case.mesPhases.first_fail = self.SuiteName
 
     def _process_ByPF(self, step_result: bool):
         if self.ByPF == 'P' and not step_result:
             self.setColor(Qt.darkGreen)
-            self.logger.warning(f"Let this step:{self.stepName} bypass.")
+            self.logger.warning(f"Let this step:{self.StepName} bypass.")
             return True
         elif self.ByPF == 'F' and step_result:
             self.setColor(Qt.darkRed)
-            self.logger.warning(f"Let this step:{self.stepName} by fail.")
+            self.logger.warning(f"Let this step:{self.StepName} by fail.")
             return False
         else:
             return step_result
@@ -622,9 +731,9 @@ class Step:
         self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
         if self.Keyword == 'Waiting':
             return
-        result_info = f"{self.stepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
+        result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
                       f"Symptom:{self.error_code}:{self.error_details}," \
-                      f"spec:{self.spec},Min:{self.lsl},Value:{self.testValue}, Max: {self.usl}"
+                      f"spec:{self.SPEC},Min:{self.LSL},Value:{self.testValue}, Max: {self.USL}"
         if tResult:
             self.logger.info(result_info)
         else:
@@ -634,19 +743,19 @@ class Step:
             self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
             if isinstance(self.myWind, ui.mainform.MainForm):
                 self.myWind.my_signals.update_tableWidget[list].emit(
-                    [test_case.myWind.SN, self.stepName, self.spec, self.lsl, self.testValue, self.usl,
+                    [test_case.myWind.SN, self.StepName, self.SPEC, self.LSL, self.testValue, self.USL,
                      self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
     def report_to_csv(self, test_case, name):
         """collect test result and data into csv file"""
         if name in test_case.csv_list_header:
             return
-        if not IsNullOrEmpty(self.usl) or not IsNullOrEmpty(self.lsl):
+        if not IsNullOrEmpty(self.USL) or not IsNullOrEmpty(self.LSL):
             test_case.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
-            test_case.csv_list_data.extend([self.testValue, self.lsl, self.usl])
-        elif not IsNullOrEmpty(self.spec):
+            test_case.csv_list_data.extend([self.testValue, self.LSL, self.USL])
+        elif not IsNullOrEmpty(self.SPEC):
             test_case.csv_list_header.extend([name, f"{name}_SPEC"])
-            test_case.csv_list_data.extend([self.testValue, self.spec])
+            test_case.csv_list_data.extend([self.testValue, self.SPEC])
         else:
             test_case.csv_list_header.append(name)
             test_case.csv_list_data.append(self.testValue)
@@ -656,12 +765,12 @@ class Step:
         if self.status != str(True):
             self.start_time_json = test_case.startTimeJson
         obj = model.product.StepItem()
-        if self.eeroName is None:
-            obj.test_name = self.stepName
-        elif self.eeroName.endswith('_'):
-            obj.test_name = self.eeroName + str(test_case.ForCycleCounter)
+        if self.EeroName is None:
+            obj.test_name = self.StepName
+        elif self.EeroName.endswith('_'):
+            obj.test_name = self.EeroName + str(test_case.ForCycleCounter)
         else:
-            obj.test_name = self.eeroName
+            obj.test_name = self.EeroName
         obj.status = 'passed' if testResult else 'failed'
         obj.test_value = str(testResult) if self.testValue is None else self.testValue
         obj.units = self.Unit if hasattr(self, 'Unit') else None
@@ -669,10 +778,10 @@ class Step:
         obj.start_time = self.start_time_json.strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         obj.finish_time = self.finish_time
-        obj.lower_limit = self.lsl
-        obj.upper_limit = self.usl
-        if hasattr(self, 'SPEC') and not IsNullOrEmpty(self.SPEC) and IsNullOrEmpty(self.lsl):
-            obj.lower_limit = self.spec
+        obj.lower_limit = self.LSL
+        obj.upper_limit = self.USL
+        if not IsNullOrEmpty(self.SPEC) and IsNullOrEmpty(self.LSL):
+            obj.lower_limit = self.SPEC
         # update gv.stationObj.tests json item
         if test_case.jsonObj.tests is not None:
             for item in test_case.jsonObj.tests:
@@ -702,14 +811,14 @@ class Step:
             self.report_to_csv(test_case, obj.test_name)
 
     def process_teardown(self, test_result):
-        if IsNullOrEmpty(self.tearDown) or test_result:
+        if IsNullOrEmpty(self.TearDown) or test_result:
             return
         self.logger.debug(f'run teardown command...')
         try:
-            if self.tearDown == 'ECUReset':
-                gv.PLin.SingleFrame(self.ID, self.NAD_, '02', '11 01', self.Timeout)
+            if self.TearDown == 'ECUReset':
+                gv.PLin.SingleFrame(self.ID, self.NAD, '02', '11 01', self.Timeout)
             else:
-                self.logger.warning(f'this teardown({self.tearDown}) no cation.')
+                self.logger.warning(f'this teardown({self.TearDown}) no cation.')
         except Exception as e:
             raise e
 

@@ -136,7 +136,7 @@ class TestSuite:
 
     def process_for(self, test_case, step: model.step.Step):
         """FOR 循环开始判断 FOR(3)"""
-        if hasattr(step, 'For') and not IsNullOrEmpty(step.For) and '(' in step.For and ')' in step.For:
+        if not IsNullOrEmpty(step.For) and '(' in step.For and ')' in step.For:
             test_case.ForTotalCycle = int(re.findall(r'\((.*?)\)', step.For)[0])
             test_case.ForStartSuiteNo = self.index
             test_case.ForStartStepNo = step.index
@@ -145,7 +145,7 @@ class TestSuite:
 
     def process_EndFor(self, test_case, step: model.step.Step):
         """FOR 循环结束判断 END FOR"""
-        if hasattr(step, 'For') and not IsNullOrEmpty(step.For) and step.For.lower().startswith('end'):
+        if not IsNullOrEmpty(step.For) and step.For.lower().startswith('end'):
             self.daq_collect(test_case)
             if test_case.ForCycleCounter < test_case.ForTotalCycle:
                 test_case.ForFlag = True
