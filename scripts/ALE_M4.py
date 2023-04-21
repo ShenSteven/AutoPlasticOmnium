@@ -32,7 +32,7 @@ script_str = """
                 "_Keyword": "PLINInitConnectELV",
                 "_Retry": 0,
                 "_Timeout": 2,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
                 "NeverUsed": null
             },
@@ -57,10 +57,9 @@ script_str = """
                 "_Keyword": "SuspendDiagSchedule",
                 "_Retry": 1,
                 "_Timeout": 1,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -83,10 +82,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 00 00 00 00 80 05 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -109,10 +107,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 08 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -135,10 +132,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 1,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -179,7 +175,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 00 00 00 00 80 05 00",
                 "NeverUsed": null
             },
@@ -204,10 +200,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 00 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -230,10 +225,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 30,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -274,7 +268,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 00 00 00 00 84 05 00",
                 "NeverUsed": null
             },
@@ -299,10 +293,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 00 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -325,10 +318,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 30,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -369,7 +361,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 00 00 00 00 80 05 00",
                 "NeverUsed": null
             },
@@ -394,10 +386,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 00 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -420,10 +411,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 1,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -464,7 +454,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 80 00 00 00 80 05 00",
                 "NeverUsed": null
             },
@@ -489,10 +479,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 00 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -515,10 +504,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 30,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -559,7 +547,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 80 00 00 00 84 05 00",
                 "NeverUsed": null
             },
@@ -584,10 +572,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 00 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -610,10 +597,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 30,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -654,7 +640,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 80 00 00 00 80 05 00",
                 "NeverUsed": null
             },
@@ -679,10 +665,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 00 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -705,10 +690,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 1,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -749,7 +733,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 80 00 00 00 80 05 00",
                 "NeverUsed": null
             },
@@ -774,10 +758,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 00 82 00 02 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -800,10 +783,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 30,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -844,7 +826,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 00 00 00 00 80 05 00",
                 "NeverUsed": null
             },
@@ -869,10 +851,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 00 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -895,10 +876,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 1,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -939,7 +919,7 @@ script_str = """
                 "_Keyword": "PLINGetMsg32",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "32",
+                "_ID": "32",
                 "_CmdOrParam": "00 00 00 00 00 80 05 00",
                 "NeverUsed": null
             },
@@ -964,10 +944,9 @@ script_str = """
                 "_Keyword": "PLINGetMsg33",
                 "_Retry": 0,
                 "_Timeout": 0,
-                "ID": "33",
+                "_ID": "33",
                 "_CmdOrParam": "00 08 82 00 00 00 00 00",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -990,10 +969,9 @@ script_str = """
                 "_Keyword": "WaitingALE",
                 "_Retry": 0,
                 "_Timeout": 10,
-                "ID": "",
+                "_ID": "",
                 "_CmdOrParam": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,

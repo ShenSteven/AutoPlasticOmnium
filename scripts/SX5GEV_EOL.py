@@ -35,7 +35,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "FL",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "1E",
@@ -70,7 +70,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "FR",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "50",
@@ -79,8 +79,7 @@ script_str = """
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -106,7 +105,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "RL",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "1F",
@@ -115,8 +114,7 @@ script_str = """
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -142,7 +140,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "RM",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "51",
@@ -151,8 +149,7 @@ script_str = """
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -178,7 +175,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "RR",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "53",
@@ -187,8 +184,7 @@ script_str = """
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -214,7 +210,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "FLB",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "52",
@@ -223,8 +219,7 @@ script_str = """
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -250,7 +245,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "FRB",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "54",
@@ -259,8 +254,7 @@ script_str = """
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -304,7 +298,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "",
@@ -339,7 +333,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "<NAD>",
                 "_PCI_LEN": "02",
                 "_CmdOrParam": "11 01",
@@ -348,8 +342,7 @@ script_str = """
                 "_SetGlobalVar": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -375,7 +368,7 @@ script_str = """
                 "_SubStr1": "62 F1 55",
                 "_SubStr2": "FF",
                 "_Model": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "<NAD>",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 55",
@@ -384,8 +377,7 @@ script_str = """
                 "_SetGlobalVar": "",
                 "_ByPF": "",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -411,7 +403,7 @@ script_str = """
                 "_SubStr1": "62 F1 56",
                 "_SubStr2": "FF",
                 "_Model": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "<NAD>",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 56",
@@ -420,8 +412,7 @@ script_str = """
                 "_SetGlobalVar": "",
                 "_ByPF": "",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -447,7 +438,7 @@ script_str = """
                 "_SubStr1": "62 F1 57",
                 "_SubStr2": "FF",
                 "_Model": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "<NAD>",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 57",
@@ -456,8 +447,7 @@ script_str = """
                 "_SetGlobalVar": "",
                 "_ByPF": "",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -483,7 +473,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "",
@@ -492,8 +482,7 @@ script_str = """
                 "_SetGlobalVar": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -519,7 +508,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "",
-                "ID": "32",
+                "_ID": "32",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "08 00 00 00 00 00 00 00",
@@ -528,8 +517,7 @@ script_str = """
                 "_SetGlobalVar": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -555,7 +543,7 @@ script_str = """
                 "_SubStr1": "",
                 "_SubStr2": "",
                 "_Model": "",
-                "ID": "32",
+                "_ID": "32",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "08 00 00 00 00 00 00 00",
@@ -564,8 +552,7 @@ script_str = """
                 "_SetGlobalVar": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,

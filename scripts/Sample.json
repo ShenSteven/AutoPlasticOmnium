@@ -76,8 +76,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -111,8 +110,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -146,8 +144,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -181,8 +178,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -216,8 +212,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -251,8 +246,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -286,8 +280,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -321,8 +314,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -356,8 +348,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -443,8 +434,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -530,8 +520,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -669,8 +658,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,
@@ -756,8 +744,7 @@
                 "_USL": "",
                 "Unit": "",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,

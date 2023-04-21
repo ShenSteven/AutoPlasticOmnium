@@ -34,7 +34,7 @@ script_str = """
                 "_Timeout": 2,
                 "_SubStr1": "",
                 "_SubStr2": "",
-                "ID": "",
+                "_ID": "",
                 "_NAD": "",
                 "_PCI_LEN": "",
                 "_CmdOrParam": "",
@@ -66,15 +66,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "",
                 "_SubStr2": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "1E",
                 "_PCI_LEN": "02",
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -99,15 +98,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "62",
                 "_SubStr2": "FF",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "1E",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -132,15 +130,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "",
                 "_SubStr2": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "50",
                 "_PCI_LEN": "02",
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -165,15 +162,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "62",
                 "_SubStr2": "FF",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "50",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -198,15 +194,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "",
                 "_SubStr2": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "1F",
                 "_PCI_LEN": "02",
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -231,15 +226,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "62",
                 "_SubStr2": "FF",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "1F",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -264,15 +258,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "",
                 "_SubStr2": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "51",
                 "_PCI_LEN": "02",
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -297,15 +290,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "62",
                 "_SubStr2": "FF",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "51",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -330,15 +322,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "",
                 "_SubStr2": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "52",
                 "_PCI_LEN": "02",
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -363,15 +354,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "62",
                 "_SubStr2": "FF",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "52",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -396,15 +386,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "",
                 "_SubStr2": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "53",
                 "_PCI_LEN": "02",
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -429,15 +418,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "62",
                 "_SubStr2": "FF",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "53",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -462,15 +450,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "",
                 "_SubStr2": "",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "54",
                 "_PCI_LEN": "02",
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
                 "_Json": "",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             },
             {
                 "myWind": null,
@@ -495,15 +482,14 @@ script_str = """
                 "_Timeout": 1,
                 "_SubStr1": "62",
                 "_SubStr2": "FF",
-                "ID": "3C",
+                "_ID": "3C",
                 "_NAD": "54",
                 "_PCI_LEN": "03",
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
                 "_Json": "Y",
-                "NeverUsed": null,
-                "SuiteName": ""
+                "NeverUsed": null
             }
         ],
         "start_time": null,

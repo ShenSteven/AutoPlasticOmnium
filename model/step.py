@@ -381,7 +381,10 @@ class Step:
         if not hasattr(self, '_CmdOrParam') or self._CmdOrParam is None:
             return ''
         else:
-            return parse_expr(self.parse_var(self._CmdOrParam))
+            if self.myWind is not None and self.myWind.startFlag:
+                return parse_expr(self.parse_var(self._CmdOrParam))
+            else:
+                return self.parse_var(self._CmdOrParam)
 
     @CmdOrParam.setter
     def CmdOrParam(self, value):

@@ -23,6 +23,15 @@ class Variables:
         self.Day = datetime.now().strftime('%d')
         self.Config = gv.cf
 
+    def __getitem__(self, i):
+        if i >= len(self.__dict__.items()):
+            raise IndexError("out of index")
+        item = list(self.__dict__.items())[i]
+        return item
+
 
 if __name__ == '__main__':
     pass
+    TestVariables = Variables('SN0001', '1', '4')
+    print(TestVariables.__dict__)
+

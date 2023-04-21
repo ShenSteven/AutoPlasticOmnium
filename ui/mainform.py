@@ -216,6 +216,7 @@ class MainForm(TestForm):
 
     def init_tableWidget(self):
         self.ui.tableWidget_2.setHorizontalHeaderLabels(['property', 'value'])
+        self.ui.tableWidget_3.setHorizontalHeaderLabels(['variable', 'value'])
         self.ui.tableWidget.setHorizontalHeaderLabels(self.tableWidgetHeader)
         self.ui.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -224,6 +225,7 @@ class MainForm(TestForm):
         strHeaderQss = "QHeaderView::section { background:#CCCCCC; color:black;min-height:3em;}"
         self.ui.tableWidget.setStyleSheet(strHeaderQss)
         self.ui.tableWidget_2.setStyleSheet(strHeaderQss)
+        self.ui.tableWidget_3.setStyleSheet(strHeaderQss)
 
     def init_lab_factory(self, str_):
         if str_ == "lab":
@@ -339,6 +341,7 @@ class MainForm(TestForm):
         self.ui.tableWidget_2.itemChanged.connect(self.on_stepInfoEdit)
         self.ui.pBt_start.clicked.connect(self.run)
         self.ui.pBt_stop.clicked.connect(self.stop)
+        self.ui.tabWidget.tabBarClicked.connect(self.on_tabBarClicked)
 
     def init_treeWidget_color(self):
         self.ui.treeWidget.blockSignals(True)
@@ -759,6 +762,26 @@ class MainForm(TestForm):
             if prop_value is not None:
                 self.header_new.append(field)
         self.ui.actionSaveToScript.setEnabled(True)
+
+    def on_tabBarClicked(self, index):
+        if self.ui.tabWidget.tabText(index) == 'Variables':
+            if self.TestVariables is None:
+                return
+            for i in range(0, self.ui.tableWidget_3.rowCount()):
+                self.ui.tableWidget_3.removeRow(0)
+            for prop_name in self.TestVariables:
+                if prop_name[0] != 'Config':
+                    column_cnt = self.ui.tableWidget_3.columnCount()
+                    row_cnt = self.ui.tableWidget_3.rowCount()
+                    self.ui.tableWidget_3.insertRow(row_cnt)
+                    key_pairs = [prop_name[0], prop_name[1]]
+                    for column in range(column_cnt):
+                        self.ui.tableWidget_3.horizontalHeader().setSectionResizeMode(column,
+                                                                                      QHeaderView.ResizeToContents)
+                        item = QTableWidgetItem(str(key_pairs[column]))
+                        item.setFlags(Qt.ItemIsEnabled)
+                        item.setBackground(Qt.lightGray)
+                        self.ui.tableWidget_3.setItem(row_cnt, column, item)
 
     def on_actionSaveToScript(self):
         # if self.SaveScriptDisableFlag:

@@ -230,7 +230,7 @@ def default_f(o):
         _dict['finish_time'] = None
         if 'steps' not in _dict:
             if _dict['_index'] != 0:
-                _dict['SuiteName'] = ''
+                _dict['_SuiteName'] = ''
             _dict['start_time_json'] = None
             _dict['testValue'] = None
         return _dict
