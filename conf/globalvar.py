@@ -14,7 +14,7 @@ import conf.config
 import platform
 from conf.logprint import LogPrint
 import main
-from model.basicfunc import IsNullOrEmpty
+from model.basicfunc import IsNullOrEmpty, ensure_path_sep
 
 
 def get_about():
@@ -34,12 +34,12 @@ config_yaml_path = abspath(join(dirname(__file__), 'config.yaml'))
 cf = conf.config.read_config(config_yaml_path, conf.config.Configs)
 
 current_dir = main.bundle_dir
-OutPutPath = rf'{current_dir}\OutPut'
-DataPath = rf'{current_dir}\Data'
-scriptFolder = rf'{current_dir}\scripts'
-excel_file_path = rf'{scriptFolder}\{cf.station.testcase}'
-database_setting = rf'{current_dir}\conf\setting.db'
-database_result = rf'{current_dir}\OutPut\result.db'
+OutPutPath = rf'{current_dir}{os.sep}OutPut'
+DataPath = rf'{current_dir}{os.sep}Data'
+scriptFolder = rf'{current_dir}{os.sep}scripts'
+excel_file_path = rf'{scriptFolder}{os.sep}{cf.station.testcase}'
+database_setting = rf'{current_dir}{os.sep}conf{os.sep}setting.db'
+database_result = rf'{current_dir}{os.sep}OutPut{os.sep}result.db'
 step_attr = []
 
 logFolderPath = ''
@@ -70,20 +70,21 @@ def get_global_val(name, defValue=None):
 
 def create_sub_log_folder():
     global logFolderPath, critical_log, errors_log
-    logFolderPath = join(cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
+    logFolderPath = ensure_path_sep(join(cf.station.log_folder, datetime.now().strftime('%Y%m%d')))
     try:
         if not exists(logFolderPath):
             os.makedirs(logFolderPath)
     except FileNotFoundError:
-        cf.station.log_folder = join(current_dir, 'testlog')
-        logFolderPath = join(cf.station.log_folder, datetime.now().strftime('%Y%m%d'))
+        cf.station.log_folder = ensure_path_sep(join(current_dir, 'TestLog'))
+        logFolderPath = ensure_path_sep(join(cf.station.log_folder, datetime.now().strftime('%Y%m%d')))
         if not exists(logFolderPath):
             os.makedirs(logFolderPath)
-    critical_log = join(cf.station.log_folder, 'critical.log').replace('\\', '/')
-    errors_log = join(cf.station.log_folder, 'errors.log').replace('\\', '/')
+    critical_log = (join(cf.station.log_folder, 'critical.log').replace('\\', '/'))
+    errors_log = (join(cf.station.log_folder, 'errors.log').replace('\\', '/'))
 
 
 create_sub_log_folder()
+# print(critical_log, errors_log)
 lg = LogPrint('debug', critical_log, errors_log)
 
 
@@ -91,10 +92,10 @@ def init_create_dirs(logger):
     try:
         if not IsNullOrEmpty(cf.station.setTimeZone):
             os.system(f"tzutil /s \"{cf.station.setTimeZone}\"")
-        os.makedirs(logFolderPath + r"\Json", exist_ok=True)
+        os.makedirs(logFolderPath + rf"{os.sep}Json", exist_ok=True)
         os.makedirs(OutPutPath, exist_ok=True)
         os.makedirs(DataPath, exist_ok=True)
-        os.makedirs(cf.station.log_folder + r"\CsvData\Upload", exist_ok=True)
+        os.makedirs(cf.station.log_folder + rf"{os.sep}CsvData{os.sep}Upload", exist_ok=True)
     except Exception as e:
         logger.fatal(f'{currentframe().f_code.co_name}:{e}')
 

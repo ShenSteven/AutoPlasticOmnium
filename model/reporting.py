@@ -72,8 +72,8 @@ def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
 
 def collect_data_to_csv(mesPhases, csv_list_header, csv_list_data, myWind):
     def thread_update():
-        myWind.testcase.csv_file_path = fr'{gv.cf.station.log_folder}\CsvData\{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
-        csvColumnPath = fr'{gv.scriptFolder}\csv_column.txt'
+        myWind.testcase.csv_file_path = fr'{gv.cf.station.log_folder}{os.sep}CsvData{os.sep}{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
+        csvColumnPath = fr'{gv.scriptFolder}{os.sep}csv_column.txt'
         fix_header = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
                       "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
                       "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]

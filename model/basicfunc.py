@@ -17,6 +17,15 @@ import hashlib
 from socket import AddressFamily
 
 
+def ensure_path_sep(path):
+    """兼容 windows 和 linux 不同环境的操作系统路径 """
+    if "/" in path:
+        path = os.sep.join(path.split("/"))
+    if "\\" in path:
+        path = os.sep.join(path.split("\\"))
+    return path
+
+
 def ping(logger, host, timeout=1):
     """
     Returns True if host (str) responds to a ping request.

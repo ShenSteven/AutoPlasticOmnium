@@ -654,7 +654,7 @@ class MainForm(TestForm):
                 os.rename(self.txtLogPath, rename_log)
                 self.txtLogPath = rename_log
             else:
-                self.txtLogPath = rf'{gv.logFolderPath}\{str(self.finalTestResult).upper()}_{self.SN}_' \
+                self.txtLogPath = rf'{gv.logFolderPath}{os.sep}{str(self.finalTestResult).upper()}_{self.SN}_' \
                                   rf'{self.testcase.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
                 content = self.ui.textEdit.toPlainText()
 
@@ -682,7 +682,7 @@ class MainForm(TestForm):
     def on_actionRestart(self):
         def thread_update():
             run_cmd(self.logger,
-                    rf'{gv.current_dir}\tool\restart.exe -n AutoPlasticOmnium.exe -p AutoPlasticOmnium.exe')
+                    rf'{gv.current_dir}{os.sep}tool{os.sep}restart.exe -n AutoPlasticOmnium.exe -p AutoPlasticOmnium.exe')
 
         thread = Thread(target=thread_update)
         ask = QMessageBox.question(self, "Restart Application?",

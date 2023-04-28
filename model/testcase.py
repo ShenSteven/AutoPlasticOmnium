@@ -87,7 +87,7 @@ class TestCase:
 
     @property
     def test_script_json(self):
-        return rf'{gv.scriptFolder}\{self.sheetName}.json'
+        return rf'{gv.scriptFolder}{os.sep}{self.sheetName}.json'
 
     def load_testcase(self, testcase_path, sheet_name, logger, cflag, isVerify):
         try:
@@ -95,8 +95,8 @@ class TestCase:
             self.testcase_path = testcase_path
             self.logger = logger
             if not getattr(sys, 'frozen', False) and cflag:
-                gv.Keywords = save_keywords_to_txt(rf'{gv.current_dir}\model\keyword.py',
-                                                   rf'{gv.current_dir}\conf\keywords.txt')
+                gv.Keywords = save_keywords_to_txt(rf'{gv.current_dir}{os.sep}model{os.sep}keyword.py',
+                                                   rf'{gv.current_dir}{os.sep}conf{os.sep}keywords.txt')
                 model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger)
             if not os.path.exists(self.test_script_json):
                 model.loadseq.excel_convert_to_json(self.testcase_path, [sheet_name], self.logger)
@@ -106,7 +106,7 @@ class TestCase:
                 self.original_suites, self.header, self.step_count = model.loadseq.load_testcase_from_json(
                     self.test_script_json, isVerify)
             self.clone_suites = copy.deepcopy(self.original_suites)
-            gv.Keywords = get_keywords_list(rf'{gv.current_dir}\conf\keywords.txt')
+            gv.Keywords = get_keywords_list(rf'{gv.current_dir}{os.sep}conf{os.sep}keywords.txt')
         except Exception as e:
             QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
             # QMetaObject.invokeMethod(

@@ -72,7 +72,7 @@ def testKeyword(test_case, step):
                 rReturn = True
 
         elif step.Keyword == 'AppS19Info':
-            file_path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.CmdOrParam}"
+            file_path = rf"{gv.current_dir}{os.sep}flash{os.sep}{gv.cf.station.station_name}{os.sep}{step.myWind.dut_model}{os.sep}{step.CmdOrParam}"
             step.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(file_path)))
             rReturn = True
 
@@ -158,7 +158,7 @@ def testKeyword(test_case, step):
                 step.testValue = subStr(step.SubStr1, step.SubStr2, revStr, step)
 
         elif step.Keyword == 'TransferData':
-            path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.CmdOrParam}"
+            path = rf"{gv.current_dir}{os.sep}flash{os.sep}{gv.cf.station.station_name}{os.sep}{step.myWind.dut_model}{os.sep}{step.CmdOrParam}"
             s19datas = gv.PLin.get_datas(path)
             step.logger.debug(path)
             rReturn = gv.PLin.TransferData(step.ID, step.NAD, s19datas, step.PCI_LEN, step.Timeout)
@@ -172,12 +172,12 @@ def testKeyword(test_case, step):
             rReturn = True
 
         elif step.Keyword == 'GetCRC':
-            path = rf"{gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.CmdOrParam}"
+            path = rf"{gv.current_dir}{os.sep}flash{os.sep}{gv.cf.station.station_name}{os.sep}{step.myWind.dut_model}{os.sep}{step.CmdOrParam}"
             step.testValue = peak.plin.peaklin.PeakLin.get_crc_apps19(step.logger, path)
             rReturn = not IsNullOrEmpty(step.testValue)
 
         elif step.Keyword == 'SrecGetStartAdd':
-            cmd = rf"{gv.current_dir}\tool\srec_info.exe {gv.current_dir}\flash\{gv.cf.station.station_name}\{step.myWind.dut_model}\{step.CmdOrParam}"
+            cmd = rf"{gv.current_dir}{os.sep}tool{os.sep}srec_info.exe {gv.current_dir}{os.sep}flash{os.sep}{gv.cf.station.station_name}{os.sep}{step.myWind.dut_model}\{step.CmdOrParam}"
             rReturn, revStr = run_cmd(step.logger, cmd)
 
             if rReturn:

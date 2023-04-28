@@ -26,7 +26,7 @@ import conf.globalvar as gv
 def excel_convert_to_json(testcase_path_excel, all_stations, logger):
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
     for station in all_stations:
-        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}\{station}.json", logger)
+        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}{os.sep}{station}.json", logger)
     logger.debug("convert finish!")
 
 
@@ -67,18 +67,7 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger):
                 test_step.index = temp_suite.totalNumber
                 # test_step.suiteIndex = temp_suite.index
                 if not hasattr(test_step, header):
-                    # int_header = ['Retry', 'Timeout']
-                    # if header in int_header:
-                    #     setattr(test_step, header, int(cell.value))
-                    # else:
                     setattr(test_step, header, '')
-                # T = (type(getattr(test_step, header)))
-                # if T is int:
-                #     if type(cell.value) is NoneType:
-                #         cell.value = getattr(test_step, header)
-                #     setattr(test_step, header, T(cell.value))
-                # else:
-                #     setattr(test_step, header, '' if IsNullOrEmpty(cell.value) else str(cell.value).strip())
                 setattr(test_step, header, '' if type(cell.value) is NoneType else str(cell.value).strip())
                 if temp_suite.totalNumber == 0:
                     test_step.SuiteName = temp_suite_name
