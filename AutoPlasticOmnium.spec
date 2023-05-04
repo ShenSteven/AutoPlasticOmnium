@@ -20,7 +20,7 @@ added_files = [
 
 for folder in ['M4','M6','SX5GEV']:
     flash_files = [('flash/' + os.path.basename(str(item)), ('flash/' + os.path.basename(str(item)))) for item in
-          list(Path().absolute().rglob(rf"flash\{folder}"))]
+          list(Path().absolute().rglob(rf"flash{os.sep}{folder}"))]
     added_files.extend(flash_files)
 
 added_files += copy_metadata('nidaqmx')

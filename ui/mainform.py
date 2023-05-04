@@ -1119,7 +1119,7 @@ class MainForm(TestForm):
         self.ui.lb_failInfo.setHidden(True)
         self.ui.lb_testTime.setHidden(True)
         self.sec = 1
-        self.txtLogPath = rf'{gv.logFolderPath}\logging_{SN}_details_{time.strftime("%H-%M-%S")}.txt'
+        self.txtLogPath = rf'{gv.logFolderPath}{os.sep}logging_{SN}_details_{time.strftime("%H-%M-%S")}.txt'
         gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
         self.logger = gv.lg.logger
         self.testcase.logger = self.logger
