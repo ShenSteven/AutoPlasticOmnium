@@ -36,7 +36,6 @@ class Cell(QFrame, Ui_cell, TestForm):
         TestForm.__init__(self)
         self.WebPsIp = '192.168.10.'
         self.webSwitchCon = None
-        # self.localNo = -100
         self.row_index = row
         self.col_index = col
         self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
@@ -63,7 +62,6 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
         self.WebPsIp = '192.168.10.' + str(self.row_index)
         self.testcase.myWind = self
-        # self.localNo = (self.row_index - 1) * gv.cf.RUNIN.col + self.col_index
         self.lb_cellNum.setText(str(self.LocalNo))
 
     def init_signals_connect(self):

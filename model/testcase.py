@@ -8,11 +8,8 @@
 """
 import copy
 import os
-import re
 import sys
 import traceback
-from PyQt5 import QtCore
-from PyQt5.QtCore import QMetaObject, Qt
 import model.loadseq
 import model.product
 import database.sqlite
@@ -22,20 +19,6 @@ import sockets.serialport
 from inspect import currentframe
 from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
-
-
-def save_keywords_to_txt(path, wpath):
-    with open(path, 'r', encoding='utf-8') as rf:
-        readall = rf.read()
-        SubStr1 = "step.Keyword == '"
-        SubStr2 = "'"
-        keywords = re.findall(f'{SubStr1}(.*?){SubStr2}', readall)
-        if os.path.exists(wpath):
-            os.remove(wpath)
-        for item in keywords:
-            with open(wpath, 'a') as wf:
-                wf.write(f'{item}\n')
-        return keywords
 
 
 def get_keywords_list(path):
@@ -95,8 +78,6 @@ class TestCase:
             self.testcase_path = testcase_path
             self.logger = logger
             if not getattr(sys, 'frozen', False) and cflag:
-                gv.Keywords = save_keywords_to_txt(rf'{gv.current_dir}{os.sep}model{os.sep}keyword.py',
-                                                   rf'{gv.current_dir}{os.sep}conf{os.sep}keywords.txt')
                 model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger)
             if not os.path.exists(self.test_script_json):
                 model.loadseq.excel_convert_to_json(self.testcase_path, [sheet_name], self.logger)

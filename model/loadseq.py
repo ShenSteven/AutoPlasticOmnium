@@ -8,6 +8,7 @@
 """
 import inspect
 import os
+import re
 import sqlite3
 import stat
 import json
@@ -23,8 +24,24 @@ from .basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
 
 
+def save_keywords_to_txt(path, wpath):
+    with open(path, 'r', encoding='utf-8') as rf:
+        readall = rf.read()
+        SubStr1 = "step.Keyword == '"
+        SubStr2 = "'"
+        keywords = re.findall(f'{SubStr1}(.*?){SubStr2}', readall)
+        if os.path.exists(wpath):
+            os.remove(wpath)
+        for item in keywords:
+            with open(wpath, 'a') as wf:
+                wf.write(f'{item}\n')
+        return keywords
+
+
 def excel_convert_to_json(testcase_path_excel, all_stations, logger):
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
+    gv.Keywords = save_keywords_to_txt(rf'{gv.current_dir}{os.sep}model{os.sep}keyword.py',
+                                       rf'{gv.current_dir}{os.sep}conf{os.sep}keywords.txt')
     for station in all_stations:
         load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}{os.sep}{station}.json", logger)
     logger.debug("convert finish!")
