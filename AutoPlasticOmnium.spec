@@ -11,6 +11,7 @@ added_files = [
     ('runin/ui_login.ui', 'runin'),
     ('conf/*.yaml', 'conf'),
     ('conf/*.db', 'conf'),
+    ('conf/*.wav', 'conf'),
     ('conf/__version__.py', 'conf'),
     ('conf/keywords.txt', 'conf'),
     ('manual.docx', '.'),

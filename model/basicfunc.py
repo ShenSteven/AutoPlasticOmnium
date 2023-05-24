@@ -12,9 +12,13 @@ import platform
 import subprocess
 import time
 from datetime import datetime
+from threading import Thread
+
 import psutil
 import hashlib
 from socket import AddressFamily
+from pydub import AudioSegment
+from pydub.playback import play
 
 
 def ensure_path_sep(path):
@@ -243,6 +247,22 @@ def get_file_ext_list(path_dir, ext):
             if os.path.splitext(file)[1] == ext:
                 L.append(os.path.join(root, file))
     return L
+
+
+def audio_play(audio_path):
+    """use ffmpeg play audio"""
+
+    def thread_update():
+        song = AudioSegment.from_wav(audio_path)
+        play(song)
+
+    thread = Thread(target=thread_update, daemon=True)
+    thread.start()
+
+
+def audio_to_export_30s(sourcePath, wavePath, start):
+    wav = AudioSegment.from_wav(sourcePath)
+    wav[start * 1000:(start + 30) * 1000].export(wavePath, format="wav")
 
 
 if __name__ == '__main__':

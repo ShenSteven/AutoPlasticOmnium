@@ -6,6 +6,7 @@
 @Date   : 12/8/2022
 @Desc   : 
 """
+import os.path
 import traceback
 from datetime import datetime
 from enum import Enum
@@ -13,6 +14,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QLabel, QAction, QWidget
 import conf.globalvar as gv
+from model.basicfunc import audio_play
 
 
 class TestStatus(Enum):
@@ -68,6 +70,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
             else:
                 myWind.total_fail_count += 1
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'FAIL', 36, Qt.red)
+                audio_play(os.path.join(gv.current_dir, 'conf', 'fail2.wav'))
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_testTime, str(myWind.sec), 11,
                                                                              Qt.gray)
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
@@ -83,6 +86,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
             else:
                 myWind.total_pass_count += 1
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'PASS', 36, Qt.green)
+                audio_play(os.path.join(gv.current_dir, 'conf', 'finish2.wav'))
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode, str(myWind.sec),
                                                                              20, Qt.green)
                 myWind.UpdateContinueFail(True)
@@ -97,6 +101,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.testThread.terminate()
                 myWind.testThread.wait(1)
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_status, 'Abort', 36, Qt.gray)
+                audio_play(os.path.join(gv.current_dir, 'conf', 'fail1.wav'))
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_testTime, str(myWind.sec), 11,
                                                                              Qt.gray)
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.ui.lb_errorCode,
