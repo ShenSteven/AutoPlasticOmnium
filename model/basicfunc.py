@@ -9,9 +9,11 @@
 import os
 import csv
 import platform
+import re
 import subprocess
 import time
 from datetime import datetime
+from inspect import currentframe
 from threading import Thread
 
 import psutil
@@ -19,6 +21,67 @@ import hashlib
 from socket import AddressFamily
 from pydub import AudioSegment
 from pydub.playback import play
+
+
+def CompareLimit(limitMin, limitMax, value, item, is_round=False):
+    """比较测试limit"""
+    if IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):
+        return True, ''
+    if IsNullOrEmpty(value):
+        return False, ''
+    temp = round(float(value)) if is_round else float(value)
+    if IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 只需比较最大值
+        item.logger.debug("compare Limit_max...")
+        return temp <= float(limitMax), ''
+    if not IsNullOrEmpty(limitMin) and IsNullOrEmpty(limitMax):  # 只需比较最小值
+        item.logger.debug("compare Limit_min...")
+        return temp >= float(limitMin), ''
+    if not IsNullOrEmpty(limitMin) and not IsNullOrEmpty(limitMax):  # 比较最小最大值
+        item.logger.debug("compare Limit_min and Limit_max...")
+        if float(limitMin) <= temp <= float(limitMax):
+            return True, ''
+        else:
+            if temp < float(limitMin):
+                return False, 'TooLow'
+            else:
+                return False, 'TooHigh'
+
+
+def subStr(SubStr1, SubStr2, revStr, item):
+    """截取字符串"""
+    if IsNullOrEmpty(SubStr1) and IsNullOrEmpty(SubStr2):
+        return None
+    elif IsNullOrEmpty(SubStr1):
+        values = re.findall(f'^(.*?){SubStr2}', revStr)
+    elif IsNullOrEmpty(SubStr2):
+        values = re.findall(f'{SubStr1}(.*?)$', revStr)
+    else:
+        values = re.findall(f'{SubStr1}(.*?){SubStr2}', revStr)
+    if len(values) == 1 and values[0] != '':
+        testValue = values[0]
+        item.logger.debug(f'get TestValue:{testValue}')
+        return testValue.strip()
+    else:
+        raise Exception(f'get TestValue exception:{values}')
+
+
+def assert_value(compInfo, item, rReturn):
+    """判断测试结果"""
+    if not IsNullOrEmpty(item.SPEC):
+        try:
+            rReturn = True if item.testValue in item.SPEC else False
+        except TypeError as e:
+            item.logger.error(f'{currentframe().f_code.co_name}:{e}')
+    elif not IsNullOrEmpty(item.USL) or not IsNullOrEmpty(item.LSL):
+        try:
+            rReturn, compInfo = CompareLimit(item.LSL, item.USL, item.testValue, item)
+        except TypeError as e:
+            item.logger.error(f'{currentframe().f_code.co_name}:{e}')
+    elif IsNullOrEmpty(item.USL) and IsNullOrEmpty(item.LSL):
+        pass
+    else:
+        item.logger.warning(f"assert is unknown,SPEC:{item.SPEC},LSL:{item.LSL}USL:{item.USL}.")
+    return compInfo, rReturn
 
 
 def ensure_path_sep(path):
@@ -88,7 +151,6 @@ def kill_process(logger, process_name, killall=True):
     except Exception as e:
         logger.fatal(e)
         raise e
-        # return False
 
 
 def process_exists(process_name):
@@ -263,6 +325,14 @@ def audio_play(audio_path):
 def audio_to_export_30s(sourcePath, wavePath, start):
     wav = AudioSegment.from_wav(sourcePath)
     wav[start * 1000:(start + 30) * 1000].export(wavePath, format="wav")
+
+
+def str_to_int(strs):
+    try:
+        num = int(strs)
+        return True, num
+    except:
+        return False, 0
 
 
 if __name__ == '__main__':

@@ -613,7 +613,12 @@ class Step:
 
             for retry in range(self.Retry, -1, -1):
                 if self.myWind.pause_event.wait():
-                    test_result, info = model.keyword.testKeyword(test_case, self)
+                    if gv.cf.dut.test_mode == 'debug' or gv.IsDebug and self.Keyword in gv.cf.dut.debug_skip:
+                        self.logger.debug('This is debug mode.Skip this step.')
+                        test_result, info = True, ''
+                    else:
+                        test_result, info = model.keyword.testKeyword(self.Keyword, self, test_case)
+                        self.test_keyword_finally(test_case)
                 if test_result:
                     break
             self.setColor(Qt.green if test_result else Qt.red)
@@ -641,6 +646,13 @@ class Step:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_case, test_result)
             self.clear()
+
+    def test_keyword_finally(self, test_case):
+        if (self.StepName.startswith("GetDAQResistor") or self.StepName.startswith("GetDAQTemp") or
+                self.Keyword == "NiDAQmxVolt" or self.Keyword == "NiDAQmxCur"):
+            test_case.ArrayListDaq.append("N/A" if IsNullOrEmpty(self.testValue) else self.testValue)
+            test_case.ArrayListDaqHeader.append(self.StepName)
+            self.logger.debug(f"DQA add {self.testValue}")
 
     def record_date_to_db(self, test_case, test_result):
         """ record test date to DB."""

@@ -27,9 +27,10 @@ import conf.globalvar as gv
 def save_keywords_to_txt(path, wpath):
     with open(path, 'r', encoding='utf-8') as rf:
         readall = rf.read()
-        SubStr1 = "step.Keyword == '"
-        SubStr2 = "'"
+        SubStr1 = "register\('"
+        SubStr2 = "'\)"
         keywords = re.findall(f'{SubStr1}(.*?){SubStr2}', readall)
+        print(keywords)
         if os.path.exists(wpath):
             os.remove(wpath)
         for item in keywords:

@@ -1,4 +1,4 @@
-#=====QtDesigner=====
+# todo =====QtDesigner=====
 #$PyInterpreterDirectory$\designer.exe
 #$FilePath$
 #$FileDir$
