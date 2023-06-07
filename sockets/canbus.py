@@ -7,9 +7,8 @@
 @Desc   : 
 """
 import time
-from abc import ABC
-
 import can
+from abc import ABC
 from can import Listener
 from can.message import Message
 
@@ -17,11 +16,11 @@ from can.message import Message
 class CanBus:
     def __init__(self, logger, channel=None, interface=None, context=None, **kwargs):
         self.logger = logger
-        self.is_extended_id: bool = True
+        self.is_extended_id: bool = False
         self.is_remote_frame: bool = False
         self.is_error_frame: bool = False
         self.is_fd: bool = False
-        self.is_rx: bool = True
+        self.is_rx: bool = False
         self.bus = can.Bus(interface=interface, channel=channel, config_context=context, ignore_config=False,
                            **kwargs)
 
@@ -42,6 +41,13 @@ class CanBus:
             pass
 
     def send_one(self, fid, data, timeout):
+        """
+        send one can standard frame
+        :param fid:
+        :param data:
+        :param timeout:
+        :return:
+        """
         with self.bus as bus:
             msg = can.Message(arbitration_id=fid, data=data)
             msg.is_extended_id = self.is_extended_id
@@ -57,8 +63,12 @@ class CanBus:
 
     def simple_periodic_send(self, fid, data, period, timeout=2):
         """
-        Sends a message every 20ms with no explicit timeout
-        Sleeps for 2 seconds then stops the task.
+        Sends a message every period with no explicit timeout Sleeps for 2 seconds then stops the task.
+        :param fid: frame ID
+        :param data: frame data field
+        :param period: Unit: second
+        :param timeout: Unit: second
+        :return:
         """
         self.logger.debug(f"Starting to send a message every {period * 1000}ms for {timeout}s")
         msg = can.Message(arbitration_id=fid, data=data)
@@ -74,7 +84,14 @@ class CanBus:
         self.logger.debug("stopped periodic cyclic send")
 
     def limited_periodic_send(self, fid, data, period, duration):
-        """Send using LimitedDurationCyclicSendTaskABC."""
+        """
+        Send using LimitedDurationCyclicSendTaskABC.
+        :param fid: frame ID
+        :param data: frame data field
+        :param period: Unit: second
+        :param duration: Unit: second
+        :return:
+        """
         self.logger.debug("Starting to send a message every 200ms for 1s")
         msg = can.Message(arbitration_id=fid, data=data)
         msg.is_extended_id = self.is_extended_id
@@ -91,6 +108,14 @@ class CanBus:
         self.logger.debug("Cyclic send should have stopped as duration expired")
 
     def SendCommand(self, fid, data, timeout=10, exceptStr=None):
+        """
+
+        :param fid:
+        :param data:
+        :param timeout:
+        :param exceptStr:
+        :return:
+        """
         with self.bus as bus:
             msg = can.Message(arbitration_id=fid, data=data)
             msg.is_extended_id = self.is_extended_id
