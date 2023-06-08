@@ -14,7 +14,7 @@ from can.message import Message
 
 
 class CanBus:
-    def __init__(self, logger, channel=None, interface=None, context=None, **kwargs):
+    def __init__(self, logger=None, interface=None, channel=None, context=None, **kwargs):
         self.logger = logger
         self.is_extended_id: bool = False
         self.is_remote_frame: bool = False
@@ -40,11 +40,11 @@ class CanBus:
         except KeyboardInterrupt:
             pass
 
-    def send_one(self, fid, data, timeout):
+    def send_one(self, fid: int, data, timeout):
         """
         send one can standard frame
         :param fid:
-        :param data:
+        :param data: (bytes | bytearray | int | Iterable[int] | None)
         :param timeout:
         :return:
         """
@@ -57,7 +57,8 @@ class CanBus:
             msg.is_rx = self.is_rx
             try:
                 bus.send(msg, timeout=timeout)
-                self.logger.debug(f"Message sent on {bus.channel_info}:id:{msg.arbitration_id:X}, {msg.data}")
+                # self.logger.debug(f"Message sent on {bus.channel_info}:id:{msg.arbitration_id:X}, {msg.data}")
+                print(f"Message sent on {bus.channel_info}, id:{msg.arbitration_id:X}, {msg.data}")
             except can.CanError:
                 self.logger.fatal("Message NOT sent")
 
@@ -125,7 +126,7 @@ class CanBus:
             msg.is_rx = self.is_rx
             try:
                 bus.send(msg, timeout=timeout)
-                self.logger.debug(f"Message sent on {bus.channel_info}:id:{msg.arbitration_id:X}, {msg.data}")
+                self.logger.debug(f"Message sent on {bus.channel_info}, id:{msg.arbitration_id:X}, {msg.data}")
                 # iterate over received messages
                 for msg in bus:
                     self.logger.debug(f"Message received: {msg.arbitration_id:X}: {msg.data}")
@@ -161,6 +162,10 @@ def print_msg(msg):
 
 if __name__ == "__main__":
     pass
+    # import conf.globalvar as gv
+
+    bus_test = CanBus(None, interface='vector', channel=2)
+    bus_test.send_one(0x451, [0x0, 0x25, 0x0, 0x1, 0x3, 0x1, 0x4, 0x1], 1)
     # bus = can.interface.Bus('virtual_ch', bustype='virtual')
     # logger = can.Logger("logfile.asc")  # save log to asc file
     # listeners = [

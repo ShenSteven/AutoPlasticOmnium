@@ -43,6 +43,11 @@ class CanoeSync(object):
     ConfigPath = ""
 
     def __init__(self):
+        self.TestConfigs = None
+        self.App = None
+        self.TestModules = []
+        self.TestSetup = None
+        self.Configuration = None
         self.App = DispatchEx('CANoe.Application')
         self.App.Configuration.Modified = False
         ver = self.App.Version
@@ -63,7 +68,8 @@ class CanoeSync(object):
         print('Opening: ', cfg)
         self.ConfigPath = os.path.dirname(cfg)
         self.Configuration = self.App.Configuration
-        self.App.Open(cfg)
+        if self.App is not None:
+            self.App.Open(cfg)
 
     def LoadTestSetup(self, testsetup):
         self.TestSetup = self.App.Configuration.TestSetup
@@ -71,15 +77,14 @@ class CanoeSync(object):
         testenv = self.TestSetup.TestEnvironments.Add(path)
         testenv = CastTo(testenv, "ITestEnvironment2")
         # TestModules property to access the test modules
-        self.TestModules = []
         self.TraverseTestItem(testenv, lambda tm: self.TestModules.append(CanoeTestModule(tm)))
 
-    def LoadTestConfiguration(self, testcfgname, testunits):
+    def LoadTestConfiguration(self, test_cfg_name, test_units):
         """ Adds a test configuration and initialize it with a list of existing test units """
         tc = self.App.Configuration.TestConfigurations.Add()
-        tc.Name = testcfgname
+        tc.Name = test_cfg_name
         tus = CastTo(tc.TestUnits, "ITestUnits2")
-        for tu in testunits:
+        for tu in test_units:
             tus.Add(tu)
         # TestConfigs property to access the test configuration
         self.TestConfigs = [CanoeTestConfiguration(tc)]
@@ -118,7 +123,7 @@ class CanoeSync(object):
         for test in parent.TestModules:
             testf(test)
         for folder in parent.Folders:
-            found = self.TraverseTestItem(folder, testf)
+            self.TraverseTestItem(folder, testf)
 
 
 class CanoeMeasurementEvents(object):
@@ -171,6 +176,7 @@ class CanoeTestEvents:
     """Utility class to handle the test events"""
 
     def __init__(self):
+        self.Name = None
         self.started = False
         self.stopped = False
         self.WaitForStart = lambda: DoEventsUntil(lambda: self.started)

@@ -12,10 +12,12 @@ import platform
 import re
 import subprocess
 import time
+from collections import defaultdict
 from datetime import datetime
 from inspect import currentframe
+from itertools import groupby
 from threading import Thread
-
+import openpyxl
 import psutil
 import hashlib
 from socket import AddressFamily
@@ -335,8 +337,85 @@ def str_to_int(strs):
         return False, 0
 
 
+def fetch_logo_data(filename, sheet_name, row_start, row_end, column_start, column_end):
+    workbook = openpyxl.load_workbook(filename)
+    worksheet = workbook[sheet_name]
+    cell_data = []
+
+    mark_color_list = []
+    for r in range(10, 0, -1):
+        mark_color_value = worksheet.cell(row=4, column=r + 3).fill.start_color.rgb
+        mark_color_list.append(mark_color_value)
+    print(mark_color_list)
+
+    for r in range(row_start, row_end + 1):
+        row_color = []
+        for col in range(column_start, column_end + 1):
+            cell_color = worksheet.cell(row=r, column=col).fill.start_color.rgb
+            if cell_color in mark_color_list:
+                rgbColor = mark_color_list.index(cell_color) + 1
+            else:
+                rgbColor = 0
+            row_color.append(rgbColor)
+        cell_data.append(tuple(row_color))
+    workbook.close()
+    return cell_data
+
+
+def de_adjacent_repeat(my_list: list or tuple):
+    """Remove adjacent duplicates from the list, and get index range list"""
+    nodup_list = [k for k, group in groupby(my_list)]  # 去除相邻重复项
+    index_list = []
+    index = 0
+    while index < len(my_list):
+        start_position = index
+        val = my_list[index]
+        while index < len(my_list) and my_list[index] == val:
+            index += 1
+        end_position = index - 1
+        index_list.append([start_position, end_position])
+    print(nodup_list)
+    print(index_list)
+    return nodup_list, index_list
+
+
+def get_nodup_list(my_list: list, sort=True) -> list:
+    """
+    Remove duplicates from the list.
+    :param sort: keep the original order
+    :param my_list:
+    :return:
+    """
+    new_li = list(set(my_list))
+    if sort:
+        new_li.sort(key=my_list.index)
+    print(new_li)
+    return new_li
+
+
+def merge_list_to_dict(list_one: list or tuple, list_two: list or tuple) -> dict:
+    """
+    merge two lists to a dict, if list_one have duplicate key, append to a list value
+    :param list_one:
+    :param list_two:
+    :return:
+    """
+    d = defaultdict(list)
+    for key, value in zip(list_one, list_two):
+        d[key].append(value)
+    print(dict(d))
+    return dict(d)
+
+
 if __name__ == '__main__':
     pass
+    li = [('a', 'a'), ('a', 'a'), ('a', 'a'), ('bb', 'bb'), ('a', 'a'), ('c', 'c'), ('c', 'c')]
+    print(li)
+    # get_nodup_list(li)
+    r1, r2 = de_adjacent_repeat(li)
+    dd = merge_list_to_dict(r1, r2)
+    # print(dd.keys())
+    # print(dd.values())
     # create_csv_file('test.csv', ['No', 'Phase test_name', 'Test test_name', 'Error Code'])
     # write_csv_file('test.csv', ['1wqw', '2', '3', '4'])
     # print(str(True))
