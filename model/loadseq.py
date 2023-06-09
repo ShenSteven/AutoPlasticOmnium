@@ -20,7 +20,7 @@ from openpyxl import load_workbook
 import model.suite
 import model.step
 import database.sqlite
-from .basicfunc import IsNullOrEmpty, get_sha256
+from common.basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
 
 

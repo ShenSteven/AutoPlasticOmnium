@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QAction, QLabel
 import model.product
 import database.sqlite
 import model.keyword
-from .basicfunc import IsNullOrEmpty
+from common.basicfunc import IsNullOrEmpty
 import conf.globalvar as gv
 import ui.mainform
 

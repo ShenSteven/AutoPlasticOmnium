@@ -14,7 +14,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QLabel, QAction, QWidget
 import conf.globalvar as gv
-from model.basicfunc import audio_play
+from common.basicfunc import audio_play
 
 
 class TestStatus(Enum):

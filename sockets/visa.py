@@ -10,7 +10,7 @@ import re
 import time
 import traceback
 import pyvisa
-from model.basicfunc import IsNullOrEmpty
+from common.basicfunc import IsNullOrEmpty
 from sockets.communication import CommAbstract
 from inspect import currentframe
 

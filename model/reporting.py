@@ -12,7 +12,7 @@ import json
 import requests
 from threading import Thread
 import conf.globalvar as gv
-from model.basicfunc import write_csv_file, create_csv_file
+from common.basicfunc import write_csv_file, create_csv_file
 
 
 def check_connection(logger, url):

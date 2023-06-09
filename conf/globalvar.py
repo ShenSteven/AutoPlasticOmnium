@@ -14,7 +14,7 @@ import conf.config
 import platform
 from conf.logprint import LogPrint
 import main
-from model.basicfunc import IsNullOrEmpty, ensure_path_sep
+from common.basicfunc import IsNullOrEmpty, ensure_path_sep
 
 
 def get_about():

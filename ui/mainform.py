@@ -29,7 +29,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 import conf.config
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
-from model.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address
+from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address
 from model.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 import database.sqlite

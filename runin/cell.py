@@ -19,7 +19,7 @@ from PyQt5.QtGui import QBrush, QCursor
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox, QMenu
 import model.variables
 from conf.logprint import LogPrint
-from model.basicfunc import IsNullOrEmpty
+from common.basicfunc import IsNullOrEmpty
 from model.mysignals import update_label
 from model.testform import TestForm
 from model.teststatus import TestStatus

@@ -14,13 +14,13 @@ from PyQt5.QtCore import QMetaObject, Qt
 from PyQt5.QtWidgets import QAction, QMessageBox
 import ui.mainform
 import peak.plin.peaklin
-from model import value_dispatch
+from common import value_dispatch
 from sockets.serialport import SerialPort
 from sockets.telnet import TelnetComm
 import conf.globalvar as gv
 import time
 from sockets.visa import VisaComm
-from .basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping, str_to_int, subStr, \
+from common.basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping, str_to_int, subStr, \
     assert_value
 
 

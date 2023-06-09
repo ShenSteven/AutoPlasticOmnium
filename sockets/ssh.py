@@ -10,7 +10,7 @@ import re
 import traceback
 import time
 import paramiko
-from model.basicfunc import IsNullOrEmpty
+from common.basicfunc import IsNullOrEmpty
 from sockets.communication import CommAbstract
 
 

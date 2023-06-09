@@ -11,7 +11,7 @@ import time
 import traceback
 
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
-from model.basicfunc import IsNullOrEmpty
+from common.basicfunc import IsNullOrEmpty
 from sockets.communication import CommAbstract
 
 
