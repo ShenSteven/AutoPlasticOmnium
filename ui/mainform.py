@@ -14,6 +14,7 @@ import cv2
 import matplotlib
 import numpy as np
 import openpyxl
+import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
@@ -653,6 +654,10 @@ class MainForm(TestForm):
                 self.fileHandle.close()
                 os.rename(self.txtLogPath, rename_log)
                 self.txtLogPath = rename_log
+                myScreenshot = pyautogui.screenshot(
+                    region=(self.ui.x(), self.ui.y(), self.ui.width(), self.ui.height() + 50))
+                ScreenshotPhoto = self.txtLogPath.replace('.txt', '.png')
+                myScreenshot.save(ScreenshotPhoto)
             else:
                 self.txtLogPath = rf'{gv.logFolderPath}{os.sep}{str(self.finalTestResult).upper()}_{self.SN}_' \
                                   rf'{self.testcase.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
