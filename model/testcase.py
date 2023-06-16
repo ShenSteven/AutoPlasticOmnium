@@ -31,6 +31,9 @@ class TestCase:
     """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
     def __init__(self, testcase_path, sheet_name, logger, wind=None, cflag=True, isVerify=True):
+        self.sum_step = 0
+        self.step_finish_num = 0
+        self.step_count = 0
         self.header = []
         self.myWind = wind
         self.FixSerialPort = None  # 治具串口通信
@@ -88,6 +91,7 @@ class TestCase:
                     self.test_script_json, isVerify)
             self.clone_suites = copy.deepcopy(self.original_suites)
             gv.Keywords = get_keywords_list(rf'{gv.current_dir}{os.sep}conf{os.sep}keywords.txt')
+            self.sum_step = self.step_count
         except Exception as e:
             QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
             # QMetaObject.invokeMethod(
@@ -148,6 +152,7 @@ class TestCase:
     def clear(self):
         self.tResult = True
         self.suite_result_list = []
+        self.sum_step = self.step_count
 
     def teardown(self):
         if self.dut_comm is not None:

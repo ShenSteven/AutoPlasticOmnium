@@ -600,6 +600,9 @@ class Step:
                     self.setColor(Qt.gray)
                 test_result = True
                 self.status = str(test_result)
+                test_case.step_finish_num = test_case.step_finish_num - 1
+                test_case.sum_step = test_case.sum_step - 1
+                self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
                 return True
 
             if self.breakpoint or self.myWind.pauseFlag:
@@ -645,6 +648,10 @@ class Step:
                 else:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_case, test_result)
+            test_case.step_finish_num = test_case.step_finish_num + 1
+            if test_case.ForFlag:
+                test_case.sum_step = test_case.sum_step + 1
+            self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.clear()
 
     def test_keyword_finally(self, test_case):

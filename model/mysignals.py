@@ -31,6 +31,7 @@ class MySignals(QObject):
     threadStopSignal = pyqtSignal(str)
     updateConnectStatusSignal = pyqtSignal(bool, str)
     showMessageBox = pyqtSignal([str, str, int])
+    updateProgressBar = pyqtSignal([int], [int, int])
 
 
 def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):

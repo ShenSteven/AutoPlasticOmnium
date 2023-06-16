@@ -278,7 +278,29 @@ class MainForm(TestForm):
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_pass, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_fail, 2)
         self.ui.statusbar.addPermanentWidget(self.ui.lb_count_abort, 2)
-        self.ui.statusbar.addPermanentWidget(self.ui.lb_count_yield, 16)
+        self.ui.statusbar.addPermanentWidget(self.ui.lb_count_yield, 2)
+        self.init_progress_bar()
+        self.ui.statusbar.addPermanentWidget(self.ui.progress_bar, 8)
+
+    def init_progress_bar(self):
+        style = '''
+            QProgressBar {
+                border: 2px solid #000;
+                border-radius: 5px;
+                text-align:center;
+                height: 20px;
+                width:200px;
+            }
+            QProgressBar::chunk {
+                background: #09c;
+                width:1px;
+            }
+        '''
+        self.ui.progress_bar = QtWidgets.QProgressBar(self.ui.statusbar)
+        self.ui.progress_bar.setRange(0, self.testcase.step_count)
+        self.ui.progress_bar.setValue(0)
+        self.ui.progress_bar.setStyleSheet(style)
+        self.ui.progress_bar.setFormat('%v/%m')
 
     def init_signals_connect(self):
         """connect signals to slots"""
@@ -300,6 +322,8 @@ class MainForm(TestForm):
         self.my_signals.threadStopSignal[str].connect(self.on_actionStop)
         self.my_signals.updateConnectStatusSignal[bool, str].connect(self.on_connect_status)
         self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
+        self.my_signals.updateProgressBar[int].connect(self.update_progress_bar)
+        self.my_signals.updateProgressBar[int, int].connect(self.update_progress_bar)
 
         self.ui.actionCheckAll.triggered.connect(self.on_actionCheckAll)
         self.ui.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
@@ -553,6 +577,7 @@ class MainForm(TestForm):
             gv.cf.station.station_no = gv.cf.station.station_name
             self.testcase = model.testcase.TestCase(gv.excel_file_path, gv.cf.station.station_name, self.logger,
                                                     self, False)
+            self.my_signals.updateProgressBar[int, int].emit(self.testcase.step_finish_num, self.testcase.sum_step)
             self.testSequences = self.testcase.clone_suites
             self.logger.debug(f'select {self.testcase.test_script_json} finish!')
 
@@ -994,6 +1019,11 @@ class MainForm(TestForm):
         thread = Thread(target=update_status_bar, daemon=True)
         thread.start()
 
+    def update_progress_bar(self, value: int, _range: int = None):
+        if _range is not None:
+            self.ui.progress_bar.setRange(0, _range)
+        self.ui.progress_bar.setValue(value)
+
     def timerEvent(self, a):
         self.my_signals.updateLabel[QLabel, str, int].emit(self.ui.lb_errorCode, str(self.sec), 20)
         QApplication.processEvents()
@@ -1128,6 +1158,7 @@ class MainForm(TestForm):
         gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
         self.logger = gv.lg.logger
         self.testcase.logger = self.logger
+        self.testcase.step_finish_num = 0
         self.init_textEditHandler()
         if not self.testThread.isRunning():
             self.testThread = TestThread(self)

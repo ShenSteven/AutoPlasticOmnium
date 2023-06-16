@@ -71,11 +71,12 @@ class TestSuite:
         if self.logger is None:
             self.logger = test_case.logger
         if not self.isTest:
+            test_case.sum_step = test_case.sum_step - self.totalNumber
+            self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.setColor(Qt.gray)
             self.suiteResult = True
             return self.suiteResult
-        self.logger.debug(
-            '- ' * 8 + f"<a name='testSuite:{self.name}'>Start testSuite:{self.name}</a>" + '- ' * 9)
+        self.logger.debug('- ' * 8 + f"<a name='testSuite:{self.name}'>Start testSuite:{self.name}</a>" + '- ' * 9)
         self.setColor(Qt.yellow)
         suiteItem = model.product.SuiteItem()
         step_result_list = []
