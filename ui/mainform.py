@@ -19,7 +19,7 @@ import zxing
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QCloseEvent
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
 from matplotlib import pyplot as plt
@@ -30,11 +30,11 @@ import conf.config
 import conf.globalvar as gv
 from conf.logprint import QTextEditHandler, LogPrint
 from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address
-from model.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
+from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 import database.sqlite
 import model.testcase
-from model.testform import TestForm
+from common.testform import TestForm
 from model.teststatus import TestStatus
 from model.testthread import TestThread
 from peak.plin.peaklin import PeakLin

@@ -11,7 +11,7 @@ import threading
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 import model.variables
 import conf.globalvar as gv
-from model.mysignals import MySignals
+from common.mysignals import MySignals
 
 
 class TestForm(QMainWindow):

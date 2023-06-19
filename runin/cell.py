@@ -20,8 +20,8 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox, QMenu
 import model.variables
 from conf.logprint import LogPrint
 from common.basicfunc import IsNullOrEmpty
-from model.mysignals import update_label
-from model.testform import TestForm
+from common.mysignals import update_label
+from common.testform import TestForm
 from model.teststatus import TestStatus
 from model.testthread import TestThread
 from runin.ui_cell import Ui_cell

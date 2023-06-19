@@ -17,7 +17,7 @@ from os.path import dirname, abspath, join
 from PyQt5.uic import loadUi
 import model.testcase
 import model.loadseq
-from model.mysignals import on_actionLogFolder
+from common.mysignals import on_actionLogFolder
 from runin.cell import Cell
 from runin.ui_runin import Ui_RuninMain
 import conf.globalvar as gv
