@@ -21,6 +21,8 @@ import openpyxl
 import psutil
 import hashlib
 from socket import AddressFamily
+from PyQt5.QtCore import QUrl
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from pydub import AudioSegment
 from pydub.playback import play
 
@@ -322,6 +324,15 @@ def audio_play(audio_path):
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()
+
+
+def play_audio(path, parent=None):
+    player = QMediaPlayer(parent)
+    qurl = QUrl.fromLocalFile(path)
+    qmusic = QMediaContent(qurl)
+    player.setMedia(qmusic)
+    player.setVolume(100)
+    player.play()
 
 
 def audio_to_export_30s(sourcePath, wavePath, start):
