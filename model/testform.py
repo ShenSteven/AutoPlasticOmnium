@@ -54,9 +54,12 @@ class TestForm(QMainWindow):
         self.my_signals = MySignals()
 
     def closeEvent(self, event):
+        """
+        重写QWidget类的closeEvent方法，在窗口被关闭的时候自动触发
+        """
+        super().closeEvent(event)  # 先添加父类的方法，以免导致覆盖父类方法（这是重点！！！）
         # self.autoScanFlag = False
-        # print('................closeEvent.....................closeOpenCV')
-        reply = QMessageBox.question(self, '提示', "是否要关闭所有窗口?", QMessageBox.Yes | QMessageBox.No,
+        reply = QMessageBox.question(self, '提示', "是否要关闭程序?", QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()

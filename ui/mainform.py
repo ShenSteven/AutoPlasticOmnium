@@ -111,6 +111,7 @@ class MainForm(TestForm):
         self.testThread = TestThread(self)
         self.testThread.start()
         self.open_camera()
+        self.ui.closeEvent = self.closeEvent
 
     def init_select_station(self):
         """
@@ -1245,13 +1246,13 @@ class MainForm(TestForm):
         except Exception as e:
             print(e)
 
-    def closeEvent(self, a0: QCloseEvent) -> None:
-        """
-        重写QWidget类的closrEvent方法，在窗口被关闭的时候自动触发
-        """
-        # super().closeEvent(a0)  # 先添加父类的方法，以免导致覆盖父类方法（这是重点！！！）
-        self.autoScanFlag = False
-        print('.....................................closeOpenCV')
+    # def closeEvent(self, a0: QCloseEvent) -> None:
+    #     """
+    #     重写QWidget类的closrEvent方法，在窗口被关闭的时候自动触发
+    #     """
+    #     # super().closeEvent(a0)  # 先添加父类的方法，以免导致覆盖父类方法（这是重点！！！）
+    #     self.autoScanFlag = False
+    #     print('.....................................closeOpenCV')
 
     def sinWave(self, i=0):
         fig = plt.figure(figsize=(6, 4), dpi=100)
