@@ -12,7 +12,6 @@ added_files = [
     ('conf/*.yaml', 'conf'),
     ('conf/*.db', 'conf'),
     ('ffmpeg/*.wav', 'ffmpeg'),
-    ('ffmpeg/bin/*', 'ffmpeg/bin'),
     ('conf/__version__.py', 'conf'),
     ('conf/keywords.txt', 'conf'),
     ('manual.docx', '.'),

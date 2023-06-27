@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import QLabel, QAction, QApplication
 
 class MySignals(QObject):
     """自定义信号类"""
-    loadseq = pyqtSignal(str)
+    loadSeq = pyqtSignal(str)
     update_tableWidget = pyqtSignal((list,), (str,))
     updateLabel = pyqtSignal([QLabel, str, int, QBrush], [QLabel, str, int], [QLabel, str])
     treeWidgetColor = pyqtSignal([QBrush, int, int, bool])

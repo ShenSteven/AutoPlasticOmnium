@@ -6,14 +6,6 @@
 @Date   : 4/10/2023
 @Desc   : 
 """
-# !/usr/bin/env python
-# coding: utf-8
-"""
-@File   : mysql.py
-@Author : Steven.Shen
-@Date   : 4/10/2023
-@Desc   : 
-"""
 import pyodbc
 
 

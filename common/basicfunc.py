@@ -23,8 +23,7 @@ import hashlib
 from socket import AddressFamily
 from PyQt5.QtCore import QUrl
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from pydub import AudioSegment
-from pydub.playback import play
+# from pydub import AudioSegment
 
 
 def CompareLimit(limitMin, limitMax, value, item, is_round=False):
@@ -315,15 +314,15 @@ def get_file_ext_list(path_dir, ext):
     return L
 
 
-def audio_play(audio_path):
-    """use ffmpeg play audio"""
-
-    def thread_update():
-        song = AudioSegment.from_wav(audio_path)
-        play(song)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
+# def audio_play(audio_path):
+#     """use ffmpeg play audio"""
+#
+#     def thread_update():
+#         song = AudioSegment.from_wav(audio_path)
+#         play(song)
+#
+#     thread = Thread(target=thread_update, daemon=True)
+#     thread.start()
 
 
 def play_audio(path, parent=None):
@@ -335,9 +334,9 @@ def play_audio(path, parent=None):
     player.play()
 
 
-def audio_to_export_30s(sourcePath, wavePath, start):
-    wav = AudioSegment.from_wav(sourcePath)
-    wav[start * 1000:(start + 30) * 1000].export(wavePath, format="wav")
+# def audio_to_export_30s(sourcePath, wavePath, start):
+#     wav = AudioSegment.from_wav(sourcePath)
+#     wav[start * 1000:(start + 30) * 1000].export(wavePath, format="wav")
 
 
 def str_to_int(strs):

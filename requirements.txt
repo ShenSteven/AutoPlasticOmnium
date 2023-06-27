@@ -49,7 +49,4 @@ paramiko~=3.2.0
 pyodbc~=4.0.39
 PyMySQL~=1.0.3
 python-can~=4.2.1
-scipy~=1.10.1
-PyAudio~=0.2.13
-pydub~=0.25.1
 PyAutoGUI~=0.9.54
