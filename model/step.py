@@ -686,197 +686,184 @@ class Step:
             #           '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
             #           ''')
 
+    def set_errorCode_details(self, status: str, info=''):
+        if status == str(True):
+            self.error_code = ''
+            self.error_details = ''
+        elif status == 'exception':
+            self.error_code = self.ErrorCode if hasattr(self, 'ErrorCode') else None
+            self.error_details = 'exception!'
+        else:
+            if IsNullOrEmpty(self.ErrorCode):
+                self.error_code = self.EeroName
+                self.error_details = self.EeroName
+            elif ':' in self.ErrorCode:
+                error_list = self.ErrorCode.split()
+                if len(error_list) > 1 and info == 'TooHigh':
+                    self.error_code = error_list[1].split(':')[0].strip()
+                    self.error_details = error_list[1].split(':')[1].strip()
+                else:
+                    self.error_code = error_list[0].split(':')[0].strip()
+                    self.error_details = error_list[0].split(':')[1].strip()
+            else:
+                self.error_code = self.ErrorCode
+                self.error_details = self.ErrorCode
 
-def set_errorCode_details(self, status: str, info=''):
-    if status == str(True):
+    def process_mesVer(self, test_case):
+        """collect data to mes"""
+        if self.Json == 'Y' and IsNullOrEmpty(self.MesVar):
+            self.MesVar = self.EeroName
+        if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(self.testValue).lower() != 'true':
+            setattr(test_case.mesPhases, self.MesVar, self.testValue)
+
+    def _if_statement(self, test_case, test_result: bool) -> bool:
+        if not IsNullOrEmpty(self.IfElse) and self.IfElse == 'if':
+            test_case.IfCond = test_result
+            if not test_result:
+                self.setColor('#FF99CC')
+                self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
+                test_result = True
+        elif not IsNullOrEmpty(self.IfElse) and self.IfElse == 'else':
+            pass
+        else:
+            test_case.IfCond = True
+        return test_result
+
+    def record_first_fail(self, test_case, status: str, info):
+        self.set_errorCode_details(status, info)
+        if status != str(True):
+            test_case.failCount += 1
+        else:
+            return
+        if test_case.failCount == 1 and IsNullOrEmpty(test_case.error_code_first_fail):
+            test_case.error_code_first_fail = self.error_code
+            test_case.error_details_first_fail = self.error_details
+            test_case.mesPhases.first_fail = self.SuiteName
+
+    def _process_ByPF(self, step_result: bool):
+        if self.ByPF == 'P' and not step_result:
+            self.setColor(Qt.darkGreen)
+            self.logger.warning(f"Let this step:{self.StepName} bypass.")
+            return True
+        elif self.ByPF == 'F' and step_result:
+            self.setColor(Qt.darkRed)
+            self.logger.warning(f"Let this step:{self.StepName} by fail.")
+            return False
+        else:
+            return step_result
+
+    def clear(self):
         self.error_code = ''
         self.error_details = ''
-    elif status == 'exception':
-        self.error_code = self.ErrorCode if hasattr(self, 'ErrorCode') else None
-        self.error_details = 'exception!'
-    else:
-        if IsNullOrEmpty(self.ErrorCode):
-            self.error_code = self.EeroName
-            self.error_details = self.EeroName
-        elif ':' in self.ErrorCode:
-            error_list = self.ErrorCode.split()
-            if len(error_list) > 1 and info == 'TooHigh':
-                self.error_code = error_list[1].split(':')[0].strip()
-                self.error_details = error_list[1].split(':')[1].strip()
-            else:
-                self.error_code = error_list[0].split(':')[0].strip()
-                self.error_details = error_list[0].split(':')[1].strip()
-        else:
-            self.error_code = self.ErrorCode
-            self.error_details = self.ErrorCode
+        if not gv.IsDebug:
+            self.isTest = True
+        self.testValue = None
+        self.elapsedTime = 0
+        self.status = 'exception'
 
+    def process_if_bypass(self, test_case, test_result: bool) -> str:
+        result_if = self._if_statement(test_case, test_result)
+        by_result = self._process_ByPF(result_if)
+        return str(by_result)
 
-def process_mesVer(self, test_case):
-    """collect data to mes"""
-    if self.Json == 'Y' and IsNullOrEmpty(self.MesVar):
-        self.MesVar = self.EeroName
-    if not IsNullOrEmpty(self.MesVar) and self.testValue is not None and str(self.testValue).lower() != 'true':
-        setattr(test_case.mesPhases, self.MesVar, self.testValue)
-
-
-def _if_statement(self, test_case, test_result: bool) -> bool:
-    if not IsNullOrEmpty(self.IfElse) and self.IfElse == 'if':
-        test_case.IfCond = test_result
-        if not test_result:
-            self.setColor('#FF99CC')
-            self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
-            test_result = True
-    elif not IsNullOrEmpty(self.IfElse) and self.IfElse == 'else':
-        pass
-    else:
-        test_case.IfCond = True
-    return test_result
-
-
-def record_first_fail(self, test_case, status: str, info):
-    self.set_errorCode_details(status, info)
-    if status != str(True):
-        test_case.failCount += 1
-    else:
-        return
-    if test_case.failCount == 1 and IsNullOrEmpty(test_case.error_code_first_fail):
-        test_case.error_code_first_fail = self.error_code
-        test_case.error_details_first_fail = self.error_details
-        test_case.mesPhases.first_fail = self.SuiteName
-
-
-def _process_ByPF(self, step_result: bool):
-    if self.ByPF == 'P' and not step_result:
-        self.setColor(Qt.darkGreen)
-        self.logger.warning(f"Let this step:{self.StepName} bypass.")
-        return True
-    elif self.ByPF == 'F' and step_result:
-        self.setColor(Qt.darkRed)
-        self.logger.warning(f"Let this step:{self.StepName} by fail.")
-        return False
-    else:
-        return step_result
-
-
-def clear(self):
-    self.error_code = ''
-    self.error_details = ''
-    if not gv.IsDebug:
-        self.isTest = True
-    self.testValue = None
-    self.elapsedTime = 0
-    self.status = 'exception'
-
-
-def process_if_bypass(self, test_case, test_result: bool) -> str:
-    result_if = self._if_statement(test_case, test_result)
-    by_result = self._process_ByPF(result_if)
-    return str(by_result)
-
-
-def print_test_info(self, test_case, tResult):
-    ts = datetime.now() - self.start_time
-    self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
-    if self.Keyword == 'Waiting':
-        return
-    result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
-                  f"Symptom:{self.error_code}:{self.error_details}," \
-                  f"spec:{self.SPEC},Min:{self.LSL},Value:{self.testValue}, Max: {self.USL}"
-    if tResult:
-        self.logger.info(result_info)
-    else:
-        self.logger.error(result_info)
-    if self.Json == 'Y':
+    def print_test_info(self, test_case, tResult):
         ts = datetime.now() - self.start_time
         self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
-        if isinstance(self.myWind, ui.mainform.MainForm):
-            self.myWind.my_signals.update_tableWidget[list].emit(
-                [test_case.myWind.SN, self.StepName, self.SPEC, self.LSL, self.testValue, self.USL,
-                 self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
-
-
-def report_to_csv(self, test_case, name):
-    """collect test result and data into csv file"""
-    if name in test_case.csv_list_header:
-        return
-    if not IsNullOrEmpty(self.USL) or not IsNullOrEmpty(self.LSL):
-        test_case.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
-        test_case.csv_list_data.extend([self.testValue, self.LSL, self.USL])
-    elif not IsNullOrEmpty(self.SPEC):
-        test_case.csv_list_header.extend([name, f"{name}_SPEC"])
-        test_case.csv_list_data.extend([self.testValue, self.SPEC])
-    else:
-        test_case.csv_list_header.append(name)
-        test_case.csv_list_data.append(self.testValue)
-
-
-def report_to_json(self, test_case, testResult, suiteItem: model.product.SuiteItem = None):
-    """copy test data to json object"""
-    if self.status != str(True):
-        self.start_time_json = test_case.startTimeJson
-    obj = model.product.StepItem()
-    if self.EeroName is None:
-        obj.test_name = self.StepName
-    elif self.EeroName.endswith('_'):
-        obj.test_name = self.EeroName + str(test_case.ForCycleCounter)
-    else:
-        obj.test_name = self.EeroName
-    obj.status = 'passed' if testResult else 'failed'
-    obj.test_value = str(testResult) if self.testValue is None else self.testValue
-    obj.units = self.Unit if hasattr(self, 'Unit') else None
-    obj.error_code = self.error_code
-    obj.start_time = self.start_time_json.strftime('%Y-%m-%d %H:%M:%S')
-    self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    obj.finish_time = self.finish_time
-    obj.lower_limit = self.LSL
-    obj.upper_limit = self.USL
-    if not IsNullOrEmpty(self.SPEC) and IsNullOrEmpty(self.LSL):
-        obj.lower_limit = self.SPEC
-    # update gv.stationObj.tests json item
-    if test_case.jsonObj.tests is not None:
-        for item in test_case.jsonObj.tests:
-            if item.test_name == obj.test_name:
-                test_case.jsonObj.tests.remove(item)
-                self.logger.debug(f"update testName:{obj.test_name} in json report.")
-                break
-        test_case.jsonObj.tests.append(obj)
-    # update suiteItem.phase_items json item
-    if suiteItem is not None:
-        for item in suiteItem.phase_items:
-            if item.test_name == obj.test_name:
-                suiteItem.phase_items.remove(item)
-                self.logger.debug(f"update testName:{obj.test_name} in json report.")
-                break
-        suiteItem.phase_items.append(obj)
-
-    return obj
-
-
-def generate_report(self, test_case, test_result, suiteItem: model.product.SuiteItem):
-    """ according to self.json, if record test result and data into json file"""
-    if self.Json == 'Y':
-        obj = self.report_to_json(test_case, test_result, suiteItem)
-        self.report_to_csv(test_case, obj.test_name)
-    elif not test_result or self.ByPF == 'F':
-        obj = self.report_to_json(test_case, test_result, suiteItem)
-        self.report_to_csv(test_case, obj.test_name)
-
-
-def process_teardown(self, test_result):
-    if IsNullOrEmpty(self.TearDown) or test_result:
-        return
-    self.logger.debug(f'run teardown command...')
-    try:
-        if self.TearDown == 'ECUReset':
-            gv.PLin.SingleFrame(self.ID, self.NAD, '02', '11 01', self.Timeout)
+        if self.Keyword == 'Waiting':
+            return
+        result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
+                      f"Symptom:{self.error_code}:{self.error_details}," \
+                      f"spec:{self.SPEC},Min:{self.LSL},Value:{self.testValue}, Max: {self.USL}"
+        if tResult:
+            self.logger.info(result_info)
         else:
-            self.logger.warning(f'this teardown({self.TearDown}) no cation.')
-    except Exception as e:
-        raise e
+            self.logger.error(result_info)
+        if self.Json == 'Y':
+            ts = datetime.now() - self.start_time
+            self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
+            if isinstance(self.myWind, ui.mainform.MainForm):
+                self.myWind.my_signals.update_tableWidget[list].emit(
+                    [test_case.myWind.SN, self.StepName, self.SPEC, self.LSL, self.testValue, self.USL,
+                     self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
 
+    def report_to_csv(self, test_case, name):
+        """collect test result and data into csv file"""
+        if name in test_case.csv_list_header:
+            return
+        if not IsNullOrEmpty(self.USL) or not IsNullOrEmpty(self.LSL):
+            test_case.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
+            test_case.csv_list_data.extend([self.testValue, self.LSL, self.USL])
+        elif not IsNullOrEmpty(self.SPEC):
+            test_case.csv_list_header.extend([name, f"{name}_SPEC"])
+            test_case.csv_list_data.extend([self.testValue, self.SPEC])
+        else:
+            test_case.csv_list_header.append(name)
+            test_case.csv_list_data.append(self.testValue)
 
-def init_online_limit(self):
-    pass
+    def report_to_json(self, test_case, testResult, suiteItem: model.product.SuiteItem = None):
+        """copy test data to json object"""
+        if self.status != str(True):
+            self.start_time_json = test_case.startTimeJson
+        obj = model.product.StepItem()
+        if self.EeroName is None:
+            obj.test_name = self.StepName
+        elif self.EeroName.endswith('_'):
+            obj.test_name = self.EeroName + str(test_case.ForCycleCounter)
+        else:
+            obj.test_name = self.EeroName
+        obj.status = 'passed' if testResult else 'failed'
+        obj.test_value = str(testResult) if self.testValue is None else self.testValue
+        obj.units = self.Unit if hasattr(self, 'Unit') else None
+        obj.error_code = self.error_code
+        obj.start_time = self.start_time_json.strftime('%Y-%m-%d %H:%M:%S')
+        self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        obj.finish_time = self.finish_time
+        obj.lower_limit = self.LSL
+        obj.upper_limit = self.USL
+        if not IsNullOrEmpty(self.SPEC) and IsNullOrEmpty(self.LSL):
+            obj.lower_limit = self.SPEC
+        # update gv.stationObj.tests json item
+        if test_case.jsonObj.tests is not None:
+            for item in test_case.jsonObj.tests:
+                if item.test_name == obj.test_name:
+                    test_case.jsonObj.tests.remove(item)
+                    self.logger.debug(f"update testName:{obj.test_name} in json report.")
+                    break
+            test_case.jsonObj.tests.append(obj)
+        # update suiteItem.phase_items json item
+        if suiteItem is not None:
+            for item in suiteItem.phase_items:
+                if item.test_name == obj.test_name:
+                    suiteItem.phase_items.remove(item)
+                    self.logger.debug(f"update testName:{obj.test_name} in json report.")
+                    break
+            suiteItem.phase_items.append(obj)
+
+        return obj
+
+    def generate_report(self, test_case, test_result, suiteItem: model.product.SuiteItem):
+        """ according to self.json, if record test result and data into json file"""
+        if self.Json == 'Y':
+            obj = self.report_to_json(test_case, test_result, suiteItem)
+            self.report_to_csv(test_case, obj.test_name)
+        elif not test_result or self.ByPF == 'F':
+            obj = self.report_to_json(test_case, test_result, suiteItem)
+            self.report_to_csv(test_case, obj.test_name)
+
+    def process_teardown(self, test_result):
+        if IsNullOrEmpty(self.TearDown) or test_result:
+            return
+        self.logger.debug(f'run teardown command...')
+        try:
+            if self.TearDown == 'ECUReset':
+                gv.PLin.SingleFrame(self.ID, self.NAD, '02', '11 01', self.Timeout)
+            else:
+                self.logger.warning(f'this teardown({self.TearDown}) no cation.')
+        except Exception as e:
+            raise e
+
+    def init_online_limit(self):
+        pass
 
 
 if __name__ == "__main__":
