@@ -88,7 +88,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
 
     def initCellUi(self):
         gv.init_create_dirs(self.logger)
-        database.sqlite.init_database(self.logger, gv.database_setting)
+        database.sqlite.init_sqlite_database(self.logger, gv.database_setting)
         if not getattr(sys, 'frozen', False):
             model.loadseq.excel_convert_to_json(f'{gv.excel_file_path}', gv.cf.station.station_all, self.logger)
         for row in range(self.RowCount):

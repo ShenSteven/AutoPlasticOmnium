@@ -256,13 +256,13 @@ class MainForm(TestForm):
 
     def init_status_bar(self):
         with database.sqlite.Sqlite(gv.database_setting) as db:
-            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
+            db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
-            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_pass_count'")
+            db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='total_pass_count'")
             self.total_pass_count = db.cur.fetchone()[0]
-            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_fail_count'")
+            db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='total_fail_count'")
             self.total_fail_count = db.cur.fetchone()[0]
-            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='total_abort_count'")
+            db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='total_abort_count'")
             self.total_abort_count = db.cur.fetchone()[0]
 
         self.ui.lb_continuous_fail = QLabel(f'continuous_fail: {self.continue_fail_count}')
@@ -1002,10 +1002,10 @@ class MainForm(TestForm):
         def update_status_bar():
             self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
             with database.sqlite.Sqlite(gv.database_setting) as db:
-                db.execute(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{self.total_fail_count}' where NAME ='total_fail_count'")
-                db.execute(f"UPDATE COUNT SET VALUE='{self.total_abort_count}' where NAME ='total_abort_count'")
+                db.execute_commit(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
+                db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
+                db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_fail_count}' where NAME ='total_fail_count'")
+                db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_abort_count}' where NAME ='total_abort_count'")
             self.ui.lb_continuous_fail.setText(f'continuous_fail: {self.continue_fail_count}')
             self.ui.lb_count_pass.setText(f'PASS: {self.total_pass_count}')
             self.ui.lb_count_fail.setText(f'FAIL: {self.total_fail_count}')
@@ -1064,7 +1064,7 @@ class MainForm(TestForm):
 
     def CheckContinueFailNum(self):
         with database.sqlite.Sqlite(gv.database_setting) as db:
-            db.execute(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
+            db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
             self.logger.debug(str(self.continue_fail_count))
         if self.continue_fail_count >= gv.cf.station.continue_fail_limit:

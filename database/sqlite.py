@@ -12,27 +12,27 @@ import conf.globalvar as gv
 from inspect import currentframe
 
 
-def init_database(logger, database_name):
+def init_sqlite_database(logger, database_name,table_name='RESULT'):
     """init conf/setting.db, OutPut/result.db"""
     try:
         if not os.path.exists(database_name):
             with Sqlite(database_name) as db:
-                db.execute('''CREATE TABLE SHA256_ENCRYPTION
+                db.execute_commit('''CREATE TABLE SHA256_ENCRYPTION
                                (NAME TEXT PRIMARY KEY     NOT NULL,
                                SHA256           TEXT    NOT NULL
                                );''')
-                db.execute('''CREATE TABLE COUNT
+                db.execute_commit('''CREATE TABLE COUNT
                                            (NAME TEXT PRIMARY KEY     NOT NULL,
                                            VALUE           INT    NOT NULL
                                            );''')
-                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('continue_fail_count', '0')")
-                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_pass_count', '0')")
-                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_fail_count', '0')")
-                db.execute("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_abort_count', '0')")
+                db.execute_commit("INSERT INTO COUNT (NAME,VALUE) VALUES ('continue_fail_count', '0')")
+                db.execute_commit("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_pass_count', '0')")
+                db.execute_commit("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_fail_count', '0')")
+                db.execute_commit("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_abort_count', '0')")
                 logger.debug(f"setting.db table created successfully")
         if not os.path.exists(gv.database_result):
             with Sqlite(gv.database_result) as db:
-                db.execute('''CREATE TABLE RESULT
+                db.execute_commit(f'''CREATE TABLE {table_name}
                                              (ID            INTEGER PRIMARY KEY AUTOINCREMENT,
                                               SN            TEXT,
                                               STATION_NAME  TEXT    NOT NULL,
@@ -68,7 +68,7 @@ class Sqlite(object):
         self.cur.close()
         self.conn.close()
 
-    def execute(self, command):
+    def execute_commit(self, command):
         # try:
         self.cur.execute(command)
         if not command.startswith('SELECT'):

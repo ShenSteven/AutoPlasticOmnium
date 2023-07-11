@@ -115,7 +115,7 @@ def param_wrapper_verify_sha256(flag):
             if flag and bound_args.args[1]:
                 with database.sqlite.Sqlite(gv.database_setting) as db:
                     file_name = os.path.basename(bound_args.args[0])
-                    db.execute(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{file_name}'")
+                    db.execute_commit(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{file_name}'")
                     result = db.cur.fetchone()
                     if result:
                         sha256 = result[0]
@@ -217,11 +217,9 @@ def wrapper_save_sha256(fun):
         with database.sqlite.Sqlite(gv.database_setting) as db:
             file_name = os.path.basename(bound_args.args[1])
             try:
-                db.execute(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")
-                # print(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")
+                db.execute_commit(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")
             except sqlite3.IntegrityError:
-                db.execute(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{file_name}'")
-                # print(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{file_name}'")
+                db.execute_commit(f"UPDATE SHA256_ENCRYPTION SET SHA256='{sha256}' WHERE NAME ='{file_name}'")
         os.chmod(args[1], stat.S_IREAD)
         return result
 

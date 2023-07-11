@@ -68,7 +68,7 @@ class TestCase:
         self.csv_list_header = []
         self.csv_list_data = []
         self.csv_file_path = ''
-        database.sqlite.init_database(self.logger, gv.database_setting)
+        database.sqlite.init_sqlite_database(self.logger, gv.database_setting)
         self.load_testcase(testcase_path, sheet_name, logger, cflag, isVerify)
 
     @property
