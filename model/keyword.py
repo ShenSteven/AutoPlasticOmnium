@@ -20,8 +20,8 @@ from sockets.telnet import TelnetComm
 import conf.globalvar as gv
 import time
 from sockets.visa import VisaComm
-from common.basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping, str_to_int, subStr, \
-    assert_value
+from common.basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping, str_to_int, \
+    subStr, assert_value
 
 
 @value_dispatch.value_dispatch
@@ -34,10 +34,11 @@ def testKeyword(kw, step, test_case):
         step.logger.fatal(f'the keyword {kw} is not exist!!!')
 
 
+@testKeyword.register('Wait')
 @testKeyword.register('Waiting')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    step.logger.debug(f'waiting {step.Timeout}s')
+    step.logger.debug(f'wait {step.Timeout}s')
     time.sleep(float(step.Timeout))
     rReturn = True
     return rReturn, compInfo
@@ -50,6 +51,7 @@ def _testKeyword_what(kw, step, test_case):
     return rReturn, compInfo
 
 
+@testKeyword.register('VarSet')
 @testKeyword.register('SetVar')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
@@ -78,6 +80,7 @@ def _testKeyword_what(kw, step, test_case):
 
 
 @testKeyword.register('QInputDialog')
+@testKeyword.register('DialogInput')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     invoke_return = QMetaObject.invokeMethod(
@@ -105,6 +108,7 @@ def _testKeyword_what(kw, step, test_case):
 
 
 @testKeyword.register('KillProcess')
+@testKeyword.register('ProcessKill')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     rReturn = kill_process(step.logger, step.CmdOrParam)
@@ -112,6 +116,7 @@ def _testKeyword_what(kw, step, test_case):
 
 
 @testKeyword.register('StartProcess')
+@testKeyword.register('ProcessStart')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     rReturn = start_process(step.logger, step.CmdOrParam, step.ExpectStr)
@@ -119,6 +124,7 @@ def _testKeyword_what(kw, step, test_case):
 
 
 @testKeyword.register('RestartProcess')
+@testKeyword.register('ProcessRestart')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     rReturn = restart_process(step.logger, step.CmdOrParam, step.ExpectStr)
@@ -166,6 +172,7 @@ def _testKeyword_what(kw, step, test_case):
 
 
 @testKeyword.register('CloseDUTCOMM')
+@testKeyword.register('CloseDUTConnect')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     if test_case.dut_comm is not None:
@@ -293,6 +300,7 @@ def _testKeyword_what(kw, step, test_case):
 
 
 @testKeyword.register('TransferData')
+@testKeyword.register('UDSTransferData')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     path = rf"{gv.current_dir}{os.sep}flash{os.sep}{gv.cf.station.station_name}{os.sep}{step.myWind.dut_model}{os.sep}{step.CmdOrParam}"
@@ -303,6 +311,7 @@ def _testKeyword_what(kw, step, test_case):
 
 
 @testKeyword.register('SuspendDiagSchedule')
+@testKeyword.register('PLINSuspendDiagSchedule')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     rReturn = gv.PLin.SuspendDiagSchedule()
@@ -429,7 +438,9 @@ def _testKeyword_what(kw, step, test_case):
     rReturn = False
     compInfo = ''
 
-    """ test Keyword action """
+    """ test action
+     ......
+    """
 
     return rReturn, compInfo
 
