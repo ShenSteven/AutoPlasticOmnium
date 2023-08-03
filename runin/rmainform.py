@@ -55,7 +55,7 @@ class LoginWind:
                 return
 
             self.ui.lineEdit.Enabled = False
-            gv.cf.station.station_name = self.FixtureNumber[0:self.FixtureNumber.index('-')]
+            # gv.cf.station.station_name = self.FixtureNumber[0:self.FixtureNumber.index('-')]
             gv.cf.station.station_no = self.FixtureNumber + self.AbFace
             self.runinWin = RuninMainForm()
             self.runinWin.show()
