@@ -18,14 +18,6 @@ import conf.globalvar as gv
 bundle_dir = ''
 
 
-def get_about(about_abspath):
-    """get app about information"""
-    about_app = {}
-    with open(join(dirname(abspath(__file__)), about_abspath), 'r', encoding='utf-8') as f:
-        exec(f.read(), about_app)
-    return about_app
-
-
 def get_app_dir_path():
     global bundle_dir
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
@@ -49,9 +41,8 @@ def main():
     sys.excepthook = excepthook
     app = QApplication([])
     # print("applicationDirPath:", app.applicationDirPath())
-    about_abspath = 'conf/__version__.py'
     try:
-        if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
+        if gv.about['__station__'] == 'RUNIN' or gv.about['__station__'] == 'ORT':
             gv.loginWin = rmf.LoginWind()
             gv.loginWin.show()
         else:
