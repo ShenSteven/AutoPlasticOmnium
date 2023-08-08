@@ -610,7 +610,7 @@ class Step:
                 self.myWind.pauseFlag = True
                 if isinstance(self.myWind, ui.mainform.MainForm):
                     self.myWind.my_signals.setIconSignal[QAction, QIcon].emit(
-                        self.myWind.ui.actionStart, QIcon(':/images/Start-icon.png'))
+                        self.myWind.actionStart, QIcon(':/images/Start-icon.png'))
                 self.myWind.pause_event.clear()
             else:
                 self.myWind.pause_event.set()

@@ -10,19 +10,19 @@ import re
 import socket
 import sys
 from inspect import currentframe
+
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
-# from os.path import dirname, abspath, join
-# from PyQt5.uic import loadUi
-import model.testcase
+
+import conf.globalvar as gv
+import database.sqlite
 import model.loadseq
+import model.testcase
 from common.mysignals import on_actionLogFolder
 from runin.cell import Cell
 from runin.ui_login import Ui_Login
 from runin.ui_runin import Ui_RuninMain
-import conf.globalvar as gv
-import database.sqlite
 
 
 class LoginWind(QMainWindow, Ui_Login):
@@ -184,7 +184,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
 if __name__ == "__main__":
     app = QApplication([])
     # LoginWin = LoginWind()
-    # LoginWin.ui.show()
+    # LoginWin.show()
     runinMainWin = RuninMainForm()
     runinMainWin.show()
     sys.exit(app.exec_())

@@ -47,7 +47,7 @@ def main():
             gv.loginWin.show()
         else:
             gv.mainWin = mf.MainForm()
-            gv.mainWin.ui.show()
+            gv.mainWin.show()
 
         sys.exit(app.exec_())
     except KeyboardInterrupt:

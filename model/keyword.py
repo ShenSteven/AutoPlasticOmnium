@@ -188,7 +188,7 @@ def _testKeyword_what(kw, step, test_case):
     if gv.PLin is None:
         gv.PLin = peak.plin.peaklin.PeakLin(step.logger)
         ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
-            ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
+            ui.mainform.MainForm.main_form.actionPeakLin, False)
         gv.PLin.refreshHardware()
         gv.PLin.hardwareCbx_IndexChanged()
         if gv.PLin.doLinConnect():
@@ -215,7 +215,7 @@ def _testKeyword_what(kw, step, test_case):
     if gv.PLin is None:
         gv.PLin = peak.plin.peaklin.PeakLin(step.logger)
         ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
-            ui.mainform.MainForm.main_form.ui.actionPeakLin, False)
+            ui.mainform.MainForm.main_form.actionPeakLin, False)
         gv.PLin.refreshHardware()
         gv.PLin.hardwareCbx_IndexChanged()
         if gv.PLin.doLinConnect():
