@@ -35,33 +35,21 @@ class MySignals(QObject):
 
 
 def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
-    # def thread_update():
     label.setText(str_)
     if color is not None:
         label.setStyleSheet(f"background-color:{color.color().name()};font: {font_size}pt '宋体';")
     QApplication.processEvents()
 
-    # thread = Thread(target=thread_update, daemon=True)
-    # thread.start()
-
 
 def updateAction(action_, icon: QIcon = None, text: str = None):
-    def thread_update():
-        if icon is not None:
-            action_.setIcon(icon)
-        if text is not None:
-            action_.setText(text)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
+    if icon is not None:
+        action_.setIcon(icon)
+    if text is not None:
+        action_.setText(text)
 
 
 def on_setIcon(action_, icon: QIcon):
-    def thread_update():
-        action_.setIcon(icon)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
+    action_.setIcon(icon)
 
 
 def on_actionLogFolder():
@@ -83,8 +71,4 @@ def on_actionException():
 
 
 def controlEnable(control, isEnable):
-    def thread_update():
-        control.setEnabled(isEnable)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
+    control.setEnabled(isEnable)

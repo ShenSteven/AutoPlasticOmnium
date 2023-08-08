@@ -13,30 +13,34 @@ from inspect import currentframe
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
-from os.path import dirname, abspath, join
-from PyQt5.uic import loadUi
+# from os.path import dirname, abspath, join
+# from PyQt5.uic import loadUi
 import model.testcase
 import model.loadseq
 from common.mysignals import on_actionLogFolder
 from runin.cell import Cell
+from runin.ui_login import Ui_Login
 from runin.ui_runin import Ui_RuninMain
 import conf.globalvar as gv
 import database.sqlite
 
 
-class LoginWind:
+class LoginWind(QMainWindow, Ui_Login):
 
-    def __init__(self):
+    def __init__(self, parent=None):
+        QMainWindow.__init__(self, parent)
+        Ui_Login.__init__(self)
+        self.setupUi(self)
         self.runinWin = None
         self.AbFace = ''
         self.ScanFixName = ''
         self.FixtureNumber = ''
-        self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_login.ui'))
-        self.ui.lineEdit.returnPressed.connect(self.onSignIn)
+        # self.ui = loadUi(join(dirname(abspath(__file__)), 'ui_login.ui'))
+        self.lineEdit.returnPressed.connect(self.onSignIn)
 
     def onSignIn(self):
         try:
-            self.ScanFixName = self.ui.lineEdit.text()
+            self.ScanFixName = self.lineEdit.text()
             runin_mr = re.match(re.compile('RUNIN-[0-9]{4}(A|B)'), self.ScanFixName, flags=0)
             ort_mr = re.match(re.compile('ORT-[0-9]{4}(A|B)'), self.ScanFixName, flags=0)
             if runin_mr is not None:
@@ -47,19 +51,19 @@ class LoginWind:
                 self.AbFace = self.ScanFixName[8:9]
             else:
                 QMessageBox.critical(None, "Error", 'Station name is Wrong!')
-                self.ui.lineEdit.setText('')
-                self.ui.lineEdit.setFocus()
-                self.ui.label_2.setText("RUNIN/ORT-xxxxX")
+                self.lineEdit.setText('')
+                self.lineEdit.setFocus()
+                self.label_2.setText("RUNIN/ORT-xxxxX")
                 self.FixtureNumber = ''
                 self.AbFace = ''
                 return
 
-            self.ui.lineEdit.Enabled = False
+            self.lineEdit.Enabled = False
             # gv.cf.station.station_name = self.FixtureNumber[0:self.FixtureNumber.index('-')]
             gv.cf.station.station_no = self.FixtureNumber + self.AbFace
             self.runinWin = RuninMainForm()
             self.runinWin.show()
-            self.ui.hide()
+            self.hide()
         except Exception as e:
             QMessageBox.critical(None, "Exception", str(e))
 

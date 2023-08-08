@@ -326,12 +326,16 @@ def get_file_ext_list(path_dir, ext):
 
 
 def play_audio(path, parent=None):
-    player = QMediaPlayer(parent)
-    qurl = QUrl.fromLocalFile(path)
-    qmusic = QMediaContent(qurl)
-    player.setMedia(qmusic)
-    player.setVolume(100)
-    player.play()
+    def thread_update():
+        player = QMediaPlayer(parent)
+        qurl = QUrl.fromLocalFile(path)
+        qmusic = QMediaContent(qurl)
+        player.setMedia(qmusic)
+        player.setVolume(100)
+        player.play()
+
+    thread = Thread(target=thread_update, daemon=True)
+    thread.start()
 
 
 # def audio_to_export_30s(sourcePath, wavePath, start):

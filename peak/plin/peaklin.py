@@ -239,6 +239,7 @@ class PeakLin(QDialog, Ui_PeakGui):
             self.m_hHw = PLinApi.HLINHW(0)
             result = False
         if linResult != PLinApi.TLIN_ERROR_OK:
+            self.logger.fatal(f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)}')
             ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
                                                                                          f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
                                                                                          5)

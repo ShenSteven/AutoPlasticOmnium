@@ -985,40 +985,32 @@ class MainForm(TestForm):
         return list(results)
 
     def lineEditEnable(self, isEnable):
-        def thread_update():
-            self.ui.lineEdit.setEnabled(isEnable)
-            if isEnable:
-                self.ui.lineEdit.setText('')
-                self.ui.lineEdit.setFocus()
-
-        thread = Thread(target=thread_update, daemon=True)
-        thread.start()
+        self.ui.lineEdit.setEnabled(isEnable)
+        if isEnable:
+            self.ui.lineEdit.setText('')
+            self.ui.lineEdit.setFocus()
 
     def on_textEditClear(self, info):
         self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
         self.ui.textEdit.clear()
 
     def updateStatusBar(self, info):
-        def update_status_bar():
-            self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
-            with database.sqlite.Sqlite(gv.database_setting) as db:
-                db.execute_commit(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
-                db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
-                db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_fail_count}' where NAME ='total_fail_count'")
-                db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_abort_count}' where NAME ='total_abort_count'")
-            self.ui.lb_continuous_fail.setText(f'continuous_fail: {self.continue_fail_count}')
-            self.ui.lb_count_pass.setText(f'PASS: {self.total_pass_count}')
-            self.ui.lb_count_fail.setText(f'FAIL: {self.total_fail_count}')
-            self.ui.lb_count_abort.setText(f'ABORT: {self.total_abort_count}')
-            try:
-                self.ui.lb_count_yield.setText('Yield: {:.2%}'.format(self.total_pass_count / (
-                        self.total_pass_count + self.total_fail_count + self.total_abort_count)))
-            except ZeroDivisionError:
-                self.ui.lb_count_yield.setText('Yield: 0.00%')
-            # QApplication.processEvents()
-
-        thread = Thread(target=update_status_bar, daemon=True)
-        thread.start()
+        self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
+        with database.sqlite.Sqlite(gv.database_setting) as db:
+            db.execute_commit(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
+            db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
+            db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_fail_count}' where NAME ='total_fail_count'")
+            db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_abort_count}' where NAME ='total_abort_count'")
+        self.ui.lb_continuous_fail.setText(f'continuous_fail: {self.continue_fail_count}')
+        self.ui.lb_count_pass.setText(f'PASS: {self.total_pass_count}')
+        self.ui.lb_count_fail.setText(f'FAIL: {self.total_fail_count}')
+        self.ui.lb_count_abort.setText(f'ABORT: {self.total_abort_count}')
+        try:
+            self.ui.lb_count_yield.setText('Yield: {:.2%}'.format(self.total_pass_count / (
+                    self.total_pass_count + self.total_fail_count + self.total_abort_count)))
+        except ZeroDivisionError:
+            self.ui.lb_count_yield.setText('Yield: 0.00%')
+        # QApplication.processEvents()
 
     def update_progress_bar(self, value: int, _range: int = None):
         if _range is not None:

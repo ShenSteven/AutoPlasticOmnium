@@ -29,12 +29,12 @@ def get_about(about_abspath):
 def get_app_dir_path():
     global bundle_dir
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        print('running in a PyInstaller bundle')
+        # print('running in a PyInstaller bundle')
         bundle_dir = sys._MEIPASS
     else:
-        print('running in a normal Python process')
+        # print('running in a normal Python process')
         bundle_dir = dirname(abspath(__file__))
-    print(bundle_dir)
+    # print(bundle_dir)
 
 
 get_app_dir_path()
@@ -48,12 +48,12 @@ def excepthook(cls, exception, traceback):
 def main():
     sys.excepthook = excepthook
     app = QApplication([])
-    print("applicationDirPath:", app.applicationDirPath())
+    # print("applicationDirPath:", app.applicationDirPath())
     about_abspath = 'conf/__version__.py'
     try:
         if get_about(about_abspath)['__station__'] == 'RUNIN' or get_about(about_abspath)['__station__'] == 'ORT':
             gv.loginWin = rmf.LoginWind()
-            gv.loginWin.ui.show()
+            gv.loginWin.show()
         else:
             gv.mainWin = mf.MainForm()
             gv.mainWin.ui.show()
