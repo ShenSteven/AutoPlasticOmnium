@@ -9,6 +9,5 @@
 /OutPut/result.db
 /venv/
 /scripts/*.txt
-/ui/ui_main.py
 /debug
 #Terminal: git rm --cached .\debug

@@ -106,7 +106,7 @@ class CanoeSync(object):
             tm.Start()
 
         # wait for test modules to stop
-        while not all([not tm.Enabled or tm.IsDone() for tm in app.TestModules]):
+        while not all([not tm.Enabled or tm.IsDone() for tm in self.App.TestModules]):
             DoEvents()
 
     def RunTestConfigs(self):
@@ -116,7 +116,7 @@ class CanoeSync(object):
             tc.Start()
 
         # wait for test modules to stop
-        while not all([not tc.Enabled or tc.IsDone() for tc in app.TestConfigs]):
+        while not all([not tc.Enabled or tc.IsDone() for tc in self.App.TestConfigs]):
             DoEvents()
 
     def TraverseTestItem(self, parent, testf):
@@ -193,35 +193,44 @@ class CanoeTestEvents:
         print("<", self.Name, " stopped >")
 
 
+class IEEvents:
+    def OnVisible(self, visible):
+        print("Visible changed:", visible)
+
+
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
     pass
-    app = CanoeSync()
-
-    # loads the sample configuration
-    app.Load('CANoeConfig\PythonBasicEmpty.cfg')
-
-    # add test modules to the configuration
-    app.LoadTestSetup('TestEnvironments\Test Environment.tse')
-
-    # add a test configuration and a list of test units
-    app.LoadTestConfiguration('TestConfiguration', ['TestConfiguration\EasyTest\EasyTest.vtuexe'])
-
-    # start the measurement
-    app.Start()
-
-    # runs the test modules
-    app.RunTestModules()
-
-    # runs the test configurations
-    app.RunTestConfigs()
-
-    # wait for a keypress to end the program
-    print("Press any key to exit ...")
-    while not msvcrt.kbhit():
-        DoEvents()
-
-    # stops the measurement
-    app.Stop()
+    ie = Dispatch("InternetExplorer.Application")
+    ie_events = WithEvents(ie, IEEvents)
+    ie.Visible = 1
+    print(ie.__dir__())
+    # app = CanoeSync()
+    #
+    # # loads the sample configuration
+    # app.Load('CANoeConfig\PythonBasicEmpty.cfg')
+    #
+    # # add test modules to the configuration
+    # app.LoadTestSetup('TestEnvironments\Test Environment.tse')
+    #
+    # # add a test configuration and a list of test units
+    # app.LoadTestConfiguration('TestConfiguration', ['TestConfiguration\EasyTest\EasyTest.vtuexe'])
+    #
+    # # start the measurement
+    # app.Start()
+    #
+    # # runs the test modules
+    # app.RunTestModules()
+    #
+    # # runs the test configurations
+    # app.RunTestConfigs()
+    #
+    # # wait for a keypress to end the program
+    # print("Press any key to exit ...")
+    # while not msvcrt.kbhit():
+    #     DoEvents()
+    #
+    # # stops the measurement
+    # app.Stop()
