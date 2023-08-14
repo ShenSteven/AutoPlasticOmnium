@@ -263,10 +263,14 @@ def serialize_to_json(obj, json_path, logger):
             os.remove(json_path)
         with open(json_path, 'w') as wf:
             json.dump(obj, wf, default=default_f, sort_keys=False, indent=4)
-            script_str = json.dumps(obj, default=default_f, sort_keys=False, indent=4)
             filename = json_path.replace('.json', '.py')
-            with open(filename, 'w') as f:
-                f.write(f'script_str = """\n{script_str}\n"""\n\n{get_fun}')
+            if gv.isHide:
+                script_str = json.dumps(obj, default=default_f, sort_keys=False, indent=4)
+                with open(filename, 'w') as f:
+                    f.write(f'script_str = """\n{script_str}\n"""\n\n{get_fun}')
+            else:
+                if os.path.exists(filename):
+                    os.remove(filename)
         logger.debug(f"serializeToJson success! {json_path}.")
     except Exception as e:
         logger.fatal(f'{currentframe().f_code.co_name}:{e}')
