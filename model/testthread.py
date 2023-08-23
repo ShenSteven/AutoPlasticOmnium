@@ -12,7 +12,7 @@ import conf.globalvar as gv
 from PyQt5.QtWidgets import QWidget, QFrame, QMainWindow
 from PyQt5.QtCore import QThread, pyqtSignal
 from model.teststatus import TestStatus, SetTestStatus
-from model.reporting import upload_Json_to_client, upload_result_to_mes, collect_data_to_csv
+from model.datastore import upload_Json_to_client, upload_result_to_mes, collect_data_to_csv
 
 
 class TestThread(QThread):

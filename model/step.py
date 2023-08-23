@@ -664,27 +664,21 @@ class Step:
 
     def record_date_to_db(self, test_case, test_result):
         """ record test date to DB."""
-        if self.isTest and self.Json == 'Y':
-            with database.sqlite.Sqlite(gv.database_result) as db:
-                self.logger.debug('INSERT test result to result.db table RESULT.')
-                db.execute_commit(f'''INSERT INTO RESULT 
+        SQL_statements = f'''INSERT INTO RESULT 
                       (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,
                       ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) 
                       VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',
                       '{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.SPEC}','{self.LSL}',
                       '{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',
                       '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
-                      ''')
+                      '''
+        if self.isTest and self.Json == 'Y':
+            with database.sqlite.Sqlite(gv.database_result) as db:
+                self.logger.debug('INSERT test result to result.db table RESULT.')
+                db.execute_commit(SQL_statements)
             # with database.mysql.MySQL(host='127.0.0.1', port=3306, user='root', passwd='123456') as db:
             #     self.logger.debug('INSERT test result to result.db table RESULT.')
-            #     db.execute_commit(f'''INSERT INTO RESULT
-            #           (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,
-            #           ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS)
-            #           VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',
-            #           '{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.SPEC}','{self.LSL}',
-            #           '{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',
-            #           '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
-            #           ''')
+            #     db.execute_commit(SQL_statements)
 
     def set_errorCode_details(self, status: str, info=''):
         if status == str(True):
