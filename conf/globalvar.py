@@ -28,8 +28,8 @@ def get_about():
 isHide = False
 about = get_about()
 version = about['__version__']
-win = platform.system() == 'Windows'
-linux = platform.system() == 'Linux'
+win: bool = platform.system() == 'Windows'
+linux: bool = platform.system() == 'Linux'
 config_yaml_path = abspath(join(dirname(__file__), 'config.yaml'))
 cf = conf.config.read_config(config_yaml_path, conf.config.Configs)
 
@@ -86,8 +86,8 @@ def create_sub_log_folder():
 create_sub_log_folder()
 # print(critical_log, errors_log)
 lg = LogPrint('debug', critical_log, errors_log)
-if win == 'Windows':
-    os.environ['Path'] = os.environ['Path'] + ";;" + os.path.join(current_dir, rf'ffmpeg{os.sep}bin')
+if win:
+    os.environ['PATH'] = os.environ['PATH'] + ";;" + os.path.join(current_dir, rf'ffmpeg{os.sep}bin')
 else:
     print(os.environ)
 

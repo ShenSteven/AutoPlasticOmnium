@@ -16,13 +16,10 @@ from collections import defaultdict
 from datetime import datetime
 from inspect import currentframe
 from itertools import groupby
-from threading import Thread
 import openpyxl
 import psutil
 import hashlib
 from socket import AddressFamily
-from PyQt5.QtCore import QUrl
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 # from pydub import AudioSegment
 
 
