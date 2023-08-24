@@ -18,8 +18,9 @@ import openpyxl
 import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer
+from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
 from matplotlib import pyplot as plt
@@ -329,6 +330,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
         self.my_signals.updateProgressBar[int].connect(self.update_progress_bar)
         self.my_signals.updateProgressBar[int, int].connect(self.update_progress_bar)
+        self.my_signals.play_audio[str].connect(self.on_play_audio)
 
         self.actionCheckAll.triggered.connect(self.on_actionCheckAll)
         self.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
@@ -428,7 +430,7 @@ class MainForm(Ui_MainWindow, TestForm):
                     self.tableWidget.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
                 # self.tableWidget.resizeColumnsToContents()
                 self.tableWidget.scrollToItem(self.tableWidget.item(row_cnt - 1, 0),
-                                                 hint=QAbstractItemView.EnsureVisible)
+                                              hint=QAbstractItemView.EnsureVisible)
                 # clear all rows if var is str
             elif isinstance(result_tuple, str):
                 for i in range(0, self.tableWidget.rowCount()):
@@ -812,7 +814,7 @@ class MainForm(Ui_MainWindow, TestForm):
                     key_pairs = [prop_name[0], prop_name[1]]
                     for column in range(column_cnt):
                         self.tableWidget_3.horizontalHeader().setSectionResizeMode(column,
-                                                                                      QHeaderView.ResizeToContents)
+                                                                                   QHeaderView.ResizeToContents)
                         item = QTableWidgetItem(str(key_pairs[column]))
                         item.setFlags(Qt.ItemIsEnabled)
                         item.setBackground(Qt.lightGray)
@@ -967,7 +969,7 @@ class MainForm(Ui_MainWindow, TestForm):
         else:
             self.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
             self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
-                                            hint=QAbstractItemView.EnsureVisible)
+                                         hint=QAbstractItemView.EnsureVisible)
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
     def showMessageBox(self, title, text, level=2):
@@ -1020,6 +1022,14 @@ class MainForm(Ui_MainWindow, TestForm):
         if _range is not None:
             self.progress_bar.setRange(0, _range)
         self.progress_bar.setValue(value)
+
+    def on_play_audio(self, path):
+        player = QMediaPlayer(self)
+        qurl = QUrl.fromLocalFile(path)
+        qmusic = QMediaContent(qurl)
+        player.setMedia(qmusic)
+        player.setVolume(100)
+        player.play()
 
     def timerEvent(self, a):
         self.my_signals.updateLabel[QLabel, str, int].emit(self.lb_errorCode, str(self.sec), 20)
@@ -1293,7 +1303,7 @@ class MainForm(Ui_MainWindow, TestForm):
         try:
             self.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
             self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(self.SuiteNo),
-                                            hint=QAbstractItemView.EnsureVisible)
+                                         hint=QAbstractItemView.EnsureVisible)
 
             self.on_stepInfoEdit(self.tableWidget_2.item(len(gv.step_attr) - 1, 1))
         except (IndexError, AttributeError):
@@ -1337,7 +1347,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionSaveToScript.setEnabled(True)
         self.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
         self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(self.SuiteNo),
-                                        hint=QAbstractItemView.EnsureVisible)
+                                     hint=QAbstractItemView.EnsureVisible)
         try:
             self.on_stepInfoEdit(self.tableWidget_2.item(len(gv.step_attr) - 1, 1))
         except (IndexError, AttributeError):

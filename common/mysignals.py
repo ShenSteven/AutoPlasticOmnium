@@ -32,6 +32,7 @@ class MySignals(QObject):
     updateConnectStatusSignal = pyqtSignal(bool, str)
     showMessageBox = pyqtSignal([str, str, int])
     updateProgressBar = pyqtSignal([int], [int, int])
+    play_audio = pyqtSignal(str)
 
 
 def update_label(label: QLabel, str_: str, font_size: int = 36, color: QBrush = None):
