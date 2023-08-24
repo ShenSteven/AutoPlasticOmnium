@@ -86,7 +86,10 @@ def create_sub_log_folder():
 create_sub_log_folder()
 # print(critical_log, errors_log)
 lg = LogPrint('debug', critical_log, errors_log)
-os.environ['Path'] = os.environ['Path'] + ";;" + os.path.join(current_dir, rf'ffmpeg{os.sep}bin')
+if win == 'Windows':
+    os.environ['Path'] = os.environ['Path'] + ";;" + os.path.join(current_dir, rf'ffmpeg{os.sep}bin')
+else:
+    print(os.environ)
 
 
 def init_create_dirs(logger):
