@@ -417,6 +417,7 @@ def _testKeyword_what(kw, step, test_case):
     return rReturn, compInfo
 
 
+@testKeyword.register('Default')
 @testKeyword.register('default')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''

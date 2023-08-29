@@ -106,11 +106,11 @@ if __name__ == '__main__':
                                       TEST_RESULT   TEXT    NOT NULL,
                                       STATUS        TEXT    NOT NULL
                                      );''')
-        mydb.execute_commit(f'''INSERT INTO RESULT 
-                      (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,
-                      ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) 
-                      VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',
-                      '{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.SPEC}','{self.LSL}',
-                      '{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',
-                      '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
-                      ''')
+        # mydb.execute_commit(f'''INSERT INTO RESULT
+        #               (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,
+        #               ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS)
+        #               VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',
+        #               '{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.SPEC}','{self.LSL}',
+        #               '{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',
+        #               '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
+        #               ''')

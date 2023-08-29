@@ -187,7 +187,7 @@ class Step:
     @property
     def ErrorCode(self):
         if not hasattr(self, '_ErrorCode'):
-            return ''
+            return None
         else:
             return self._ErrorCode
 
@@ -205,9 +205,6 @@ class Step:
     def Keyword(self, value):
         if IsNullOrEmpty(value):
             raise Exception('Keyword cannot be null or empty!')
-        if value.lower() == 'default':
-            self._Keyword = value
-            gv.Keywords.append(value)
         if value not in gv.Keywords:
             raise ValueError(f"Keyword '{value}' not in keywords list :{gv.Keywords}")
         else:
