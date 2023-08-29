@@ -16,6 +16,7 @@ import database.sqlite
 import model.variables
 import conf.globalvar as gv
 import sockets.serialport
+import flowcontrol.forloop
 from inspect import currentframe
 from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
@@ -50,11 +51,7 @@ class TestCase:
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = ''
         self.tResult = True
-        self.ForStartSuiteNo = 0
-        self.ForFlag = False
-        self.ForStartStepNo = 0
-        self.ForTotalCycle = 0
-        self.ForCycleCounter = 1
+        self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
         self.IfCond = True
         self.Finished = False
         self.failCount = 0
@@ -107,18 +104,18 @@ class TestCase:
     def run(self, global_fail_continue=False):
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
-                if self.ForFlag:
-                    if i < self.ForStartSuiteNo:
+                if not self.ForLoop.IsForEnd:
+                    if i < self.ForLoop.ForStartSuiteNo:
                         continue
                     else:
-                        stepNo = self.ForStartStepNo
+                        stepNo = self.ForLoop.ForStartStepNo
                 else:
                     stepNo = -1
                 suite_result = self.clone_suites[i].run(self, global_fail_continue, stepNo)
                 self.suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break
-                if self.ForFlag:
+                if not self.ForLoop.IsForEnd:
                     return self.run(global_fail_continue)
 
             self.tResult = all(self.suite_result_list)

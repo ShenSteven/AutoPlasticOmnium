@@ -647,7 +647,7 @@ class Step:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_case, test_result)
             test_case.step_finish_num = test_case.step_finish_num + 1
-            if test_case.ForFlag:
+            if test_case.ForLoop.ForFlag:
                 test_case.sum_step = test_case.sum_step + 1
             self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.clear()
@@ -799,7 +799,7 @@ class Step:
         if self.EeroName is None:
             obj.test_name = self.StepName
         elif self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(test_case.ForCycleCounter)
+            obj.test_name = self.EeroName + str(test_case.ForLoop.ForCycleCounter)
         else:
             obj.test_name = self.EeroName
         obj.status = 'passed' if testResult else 'failed'

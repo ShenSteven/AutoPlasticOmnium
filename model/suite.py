@@ -138,31 +138,21 @@ class TestSuite:
     def process_for(self, test_case, step: model.step.Step):
         """FOR 循环开始判断 FOR(3)"""
         if not IsNullOrEmpty(step.For) and '(' in step.For and ')' in step.For:
-            test_case.ForTotalCycle = int(re.findall(r'\((.*?)\)', step.For)[0])
-            test_case.ForStartSuiteNo = self.index
-            test_case.ForStartStepNo = step.index
-            test_case.ForFlag = False
-            self.logger.debug('=' * 10 + f"Start Cycle-{test_case.ForCycleCounter}." + '=' * 10)
+            test_case.ForLoop.start_for(int(re.findall(r'\((.*?)\)', step.For)[0]), self.index, step.index)
 
     def process_EndFor(self, test_case, step: model.step.Step):
         """FOR 循环结束判断 END FOR"""
         if not IsNullOrEmpty(step.For) and step.For.lower().startswith('end'):
-            self.daq_collect(test_case)
-            if test_case.ForCycleCounter < test_case.ForTotalCycle:
-                test_case.ForFlag = True
-                test_case.ForCycleCounter += 1
-                return True
-            test_case.ForFlag = False
-            self.logger.debug('=' * 10 + f"Have Complete all ({test_case.ForCycleCounter}) Cycle test." + '=' * 10)
-            test_case.ForCycleCounter = 1
-            return False
+            # self.daq_collect(test_case)
+            is_end = test_case.ForLoop.is_end_for()
+            return not is_end
         else:
             return False
 
     def daq_collect(self, test_case):
         self.logger.debug(f"collect DAQ data to {test_case.daq_data_path}")
         create_csv_file(self.logger, test_case.daq_data_path, test_case.ArrayListDaqHeader)
-        data_list = [str(test_case.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+        data_list = [str(test_case.ForLoop.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
         data_list.extend(test_case.ArrayListDaq)
         write_csv_file(self.logger, test_case.daq_data_path, data_list)
         test_case.ArrayListDaq = []
