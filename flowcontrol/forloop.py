@@ -12,31 +12,38 @@ class ForLoop:
 
     def __init__(self, logger):
         self.logger = logger
-        self.ForStartStepNo = 0
-        self.ForStartSuiteNo = 0
-        self.ForTotalCycle = 0
+        self.ForStartStepNo = -1
+        self.ForStartSuiteNo = -1
+        self._ForTotalCycle = 0
         self.ForCycleCounter = 1  # current loop number
-        self.IsForEnd = False  # it is in a loop?
-        self.ForFlag = False
+        self.IsForEnd = True  # it is in a loop?
+        self._forFlag = False
 
     def start_for(self, totalCycle, StartSuiteNo, StartStepNo):
-        if self.ForFlag:
+        if self._forFlag:
             raise Exception("For loops cannot be used nested!")
         else:
-            self.ForFlag = True
-        self.ForTotalCycle = totalCycle
+            self._forFlag = True
+        self.IsForEnd = False  # it is in a loop?
+        self._ForTotalCycle = totalCycle
         self.ForStartSuiteNo = StartSuiteNo
         self.ForStartStepNo = StartStepNo
-        self.logger.debug('=' * 10 + f"Start Cycle-{self.ForCycleCounter},TotalCycle-{self.ForTotalCycle}" + '=' * 10)
+        self.logger.debug('=' * 10 + f"Start Cycle-{self.ForCycleCounter},Total Cycle-{self._ForTotalCycle}" + '=' * 10)
 
     def is_end_for(self):
-        if self.ForCycleCounter < self.ForTotalCycle:
+        if self.ForCycleCounter < self._ForTotalCycle:
             self.IsForEnd = False
-            self.ForFlag = False
+            self._forFlag = False
             self.ForCycleCounter += 1
         else:
             self.IsForEnd = True
-            self.ForFlag = False
-            self.ForCycleCounter = 1
-            self.logger.debug('=' * 10 + f"Have Complete all ({self.ForTotalCycle}) Cycle test." + '=' * 10)
+            self.logger.debug('=' * 10 + f"Have Complete all ({self._ForTotalCycle}) Cycle test." + '=' * 10)
+            self.clear()
         return self.IsForEnd
+
+    def clear(self):
+        self.ForStartStepNo = -1
+        self.ForStartSuiteNo = -1
+        self._ForTotalCycle = 0
+        self.ForCycleCounter = 1  # current loop number
+        self._forFlag = False

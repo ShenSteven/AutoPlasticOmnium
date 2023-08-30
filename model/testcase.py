@@ -17,6 +17,7 @@ import model.variables
 import conf.globalvar as gv
 import sockets.serialport
 import flowcontrol.forloop
+import flowcontrol.ifelse
 from inspect import currentframe
 from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
@@ -52,6 +53,7 @@ class TestCase:
         self.finish_time = ''
         self.tResult = True
         self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
+        self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
         self.IfCond = True
         self.Finished = False
         self.failCount = 0
@@ -111,7 +113,7 @@ class TestCase:
                         stepNo = self.ForLoop.ForStartStepNo
                 else:
                     stepNo = -1
-                suite_result = self.clone_suites[i].run(self, global_fail_continue, stepNo)
+                suite_result = suite.run(self, global_fail_continue, stepNo)
                 self.suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break

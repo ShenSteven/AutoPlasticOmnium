@@ -144,8 +144,8 @@ class TestSuite:
         """FOR 循环结束判断 END FOR"""
         if not IsNullOrEmpty(step.For) and step.For.lower().startswith('end'):
             # self.daq_collect(test_case)
-            is_end = test_case.ForLoop.is_end_for()
-            return not is_end
+            is_end = not test_case.ForLoop.is_end_for()
+            return is_end
         else:
             return False
 

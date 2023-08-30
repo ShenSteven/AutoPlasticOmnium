@@ -131,6 +131,34 @@ class Step:
         if dict_ is not None:
             self.__dict__.update(dict_)
 
+    @property
+    def index(self):
+        if self.myWind is not None:
+            self._index = self.myWind.testcase.clone_suites[self.suiteIndex].steps.index(self)
+        return self._index
+
+    @index.setter
+    def index(self, value):
+        self._index = value
+
+    @property
+    def isTest(self):
+        if self.myWind is None:
+            return self._isTest
+        if not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'else':
+            self._isTest = not self.myWind.testcase.IfElseFlow.ifCond_all
+        if not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'elif':
+            self._isTest = not self.myWind.testcase.IfElseFlow.ifCond_all
+        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.split():
+            self._isTest = False
+        if self.myWind.SingleStepTest:
+            self._isTest = True
+        return self._isTest
+
+    @isTest.setter
+    def isTest(self, value):
+        self._isTest = value
+
     # def __iter__(self):
     #     self.index = -1
     #     return self
@@ -336,32 +364,6 @@ class Step:
             self._ByPF = ''
         else:
             raise ValueError("Value: 'P'=bypass，'F'=byFail, None/''=不干涉测试结果")
-
-    @property
-    def index(self):
-        if self.myWind is not None:
-            self._index = self.myWind.testcase.clone_suites[self.suiteIndex].steps.index(self)
-        return self._index
-
-    @index.setter
-    def index(self, value):
-        self._index = value
-
-    @property
-    def isTest(self):
-        if self.myWind is None:
-            return self._isTest
-        if not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'else':
-            self._isTest = not self.myWind.testcase.IfCond
-        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.split():
-            self._isTest = False
-        if self.myWind.SingleStepTest:
-            self._isTest = True
-        return self._isTest
-
-    @isTest.setter
-    def isTest(self, value):
-        self._isTest = value
 
     @property
     def Model(self):
@@ -628,7 +630,7 @@ class Step:
             self.process_teardown(test_result)
             self.status = self.process_if_bypass(test_case, test_result)
             self.record_first_fail(test_case, str(self.status), info)
-            self.generate_report(test_case, test_result, suiteItem)
+            self.generate_report(test_case, str(self.status), suiteItem)
             self.process_mesVer(test_case)
         except Exception as e:
             self.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
@@ -647,10 +649,11 @@ class Step:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_case, test_result)
             test_case.step_finish_num = test_case.step_finish_num + 1
-            if test_case.ForLoop.ForFlag:
+            if not test_case.ForLoop.IsForEnd:
                 test_case.sum_step = test_case.sum_step + 1
             self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.clear()
+            test_case.IfElseFlow.clear(self.IfElse)
 
     def test_keyword_finally(self, test_case):
         if (self.StepName.startswith("GetDAQResistor") or self.StepName.startswith("GetDAQTemp") or
@@ -708,16 +711,14 @@ class Step:
             setattr(test_case.mesPhases, self.MesVar, self.testValue)
 
     def _if_statement(self, test_case, test_result: bool) -> bool:
-        if not IsNullOrEmpty(self.IfElse) and self.IfElse == 'if':
-            test_case.IfCond = test_result
-            if not test_result:
-                self.setColor('#FF99CC')
-                self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
-                test_result = True
-        elif not IsNullOrEmpty(self.IfElse) and self.IfElse == 'else':
+        if IsNullOrEmpty(self.IfElse):
             pass
         else:
-            test_case.IfCond = True
+            condition = test_case.IfElseFlow.process_if_else_flow(self.IfElse, test_result)
+            if not condition:
+                self.setColor(Qt.darkCyan)
+                self.logger.warning(f"if statement fail needs to continue, setting the test result to true")
+                test_result = True
         return test_result
 
     def record_first_fail(self, test_case, status: str, info):
@@ -833,7 +834,7 @@ class Step:
         return obj
 
     def generate_report(self, test_case, test_result, suiteItem: model.product.SuiteItem):
-        """ according to self.json, if record test result and data into json file"""
+        """ according to self.Json record test result and data into json file"""
         if self.Json == 'Y':
             obj = self.report_to_json(test_case, test_result, suiteItem)
             self.report_to_csv(test_case, obj.test_name)
