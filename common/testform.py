@@ -57,7 +57,7 @@ class TestForm(QMainWindow):
         """
         重写QWidget类的closeEvent方法，在窗口被关闭的时候自动触发
         """
-        if getattr(sys, 'frozen', True):
+        if not getattr(sys, 'frozen', False):
             return
         super().closeEvent(event)  # 先添加父类的方法，以免导致覆盖父类方法（这是重点！！！）
         # self.autoScanFlag = False

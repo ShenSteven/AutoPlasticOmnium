@@ -56,7 +56,6 @@ class TestCase:
         self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
         self.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
         self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
-        self.IfCond = True
         self.Finished = False
         self.failCount = 0
         self.startTimeJsonFlag = True
@@ -108,7 +107,7 @@ class TestCase:
     def run(self, global_fail_continue=False):
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
-                if not self.ForLoop.IsForEnd:
+                if not self.ForLoop.IsForEnd and self.ForLoop.jump:
                     if i < self.ForLoop.ForStartSuiteNo:
                         continue
                     else:
@@ -119,7 +118,7 @@ class TestCase:
                 self.suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break
-                if not self.ForLoop.IsForEnd:
+                if not self.ForLoop.IsForEnd and self.ForLoop.jump:
                     return self.run(global_fail_continue)
 
             self.tResult = all(self.suite_result_list)
@@ -154,6 +153,9 @@ class TestCase:
         self.tResult = True
         self.suite_result_list = []
         self.sum_step = self.step_count
+        self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
+        self.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
+        self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
 
     def teardown(self):
         if self.dut_comm is not None:

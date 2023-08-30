@@ -18,6 +18,7 @@ class ForLoop:
         self.ForCycleCounter = 1  # current loop number
         self.IsForEnd = True  # it is in a loop?
         self._forFlag = False
+        self.jump = False
 
     def start(self, totalCycle, StartSuiteNo, StartStepNo):
         if self._forFlag:
@@ -25,6 +26,7 @@ class ForLoop:
         else:
             self._forFlag = True
         self.IsForEnd = False  # it is in a loop?
+        self.jump = False
         self._ForTotalCycle = totalCycle
         self.ForStartSuiteNo = StartSuiteNo
         self.ForStartStepNo = StartStepNo
@@ -35,6 +37,7 @@ class ForLoop:
             self.IsForEnd = False
             self._forFlag = False
             self.ForCycleCounter += 1
+            self.jump = True
         else:
             self.IsForEnd = True
             self.logger.debug('=' * 10 + f"Have Complete all ({self._ForTotalCycle}) Cycle test." + '=' * 10)
@@ -47,3 +50,4 @@ class ForLoop:
         self._ForTotalCycle = 0
         self.ForCycleCounter = 1  # current loop number
         self._forFlag = False
+        self.jump = False

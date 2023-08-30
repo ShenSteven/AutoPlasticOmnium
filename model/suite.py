@@ -6,7 +6,6 @@
 @Date   : 2021/9/2
 @Desc   : 
 """
-import re
 import traceback
 from datetime import datetime
 from PyQt5.QtCore import Qt
