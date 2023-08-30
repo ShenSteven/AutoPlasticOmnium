@@ -17,6 +17,7 @@ import model.variables
 import conf.globalvar as gv
 import sockets.serialport
 import flowcontrol.forloop
+import flowcontrol.dowhile
 import flowcontrol.ifelse
 from inspect import currentframe
 from datetime import datetime
@@ -53,6 +54,7 @@ class TestCase:
         self.finish_time = ''
         self.tResult = True
         self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
+        self.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
         self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
         self.IfCond = True
         self.Finished = False

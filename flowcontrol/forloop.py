@@ -19,7 +19,7 @@ class ForLoop:
         self.IsForEnd = True  # it is in a loop?
         self._forFlag = False
 
-    def start_for(self, totalCycle, StartSuiteNo, StartStepNo):
+    def start(self, totalCycle, StartSuiteNo, StartStepNo):
         if self._forFlag:
             raise Exception("For loops cannot be used nested!")
         else:
@@ -30,7 +30,7 @@ class ForLoop:
         self.ForStartStepNo = StartStepNo
         self.logger.debug('=' * 10 + f"Start Cycle-{self.ForCycleCounter},Total Cycle-{self._ForTotalCycle}" + '=' * 10)
 
-    def is_end_for(self):
+    def is_end(self) -> bool:
         if self.ForCycleCounter < self._ForTotalCycle:
             self.IsForEnd = False
             self._forFlag = False

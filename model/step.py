@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QAction, QLabel
 import model.product
 import database.sqlite
 import model.keyword
-from common.basicfunc import IsNullOrEmpty
+from common.basicfunc import IsNullOrEmpty, str_to_int
 import conf.globalvar as gv
 import ui.mainform
 import database.mysql
@@ -293,7 +293,10 @@ class Step:
         if not hasattr(self, '_For') or self._For is None:
             return None
         else:
-            return self._For
+            if '(' in self._For and ')' in self._For:
+                return re.findall(r'\((.*?)\)', self._For)[0]
+            else:
+                return self._For
 
     @For.setter
     def For(self, value):
@@ -303,8 +306,10 @@ class Step:
             self._For = value
         elif IsNullOrEmpty(value):
             self._For = value
+        elif str_to_int(value)[0]:
+            self._For = value
         else:
-            raise ValueError('Format example: For(10) or END/ENDFOR')
+            raise ValueError('Format example:for(10)...end/do...while/while...do')
 
     @property
     def IfElse(self):

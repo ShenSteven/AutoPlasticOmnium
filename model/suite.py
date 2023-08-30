@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 import model.product
 import model.step
-from common.basicfunc import IsNullOrEmpty, create_csv_file, write_csv_file
+from common.basicfunc import IsNullOrEmpty, create_csv_file, write_csv_file, str_to_int
 import ui.mainform
 
 
@@ -82,18 +82,18 @@ class TestSuite:
         step_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
-            for i, step_item in enumerate(self.steps, start=0):
+            for i, step in enumerate(self.steps, start=0):
                 if i < stepNo:
                     continue
-                self.process_for(test_case, self.steps[i])
-                step_item.suiteVar = self.suiteVar
-                step_result = self.steps[i].run(test_case, self, suiteItem)
+                self.start_loop(test_case, step)
+                step.suiteVar = self.suiteVar
+                step_result = step.run(test_case, self, suiteItem)
                 step_result_list.append(step_result)
 
-                if not step_result and not fail_continue(self.steps[i], global_fail_continue):
+                if not step_result and not fail_continue(step, global_fail_continue):
                     break
 
-                if self.process_EndFor(test_case, self.steps[i]):
+                if self.end_loop(test_case, step):
                     break
 
             self.suiteResult = all(step_result_list)
@@ -135,18 +135,28 @@ class TestSuite:
         else:
             self.logger.error(f"{self.name} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
 
-    def process_for(self, test_case, step: model.step.Step):
+    def start_loop(self, test_case, step: model.step.Step):
         """FOR 循环开始判断 FOR(3)"""
-        if not IsNullOrEmpty(step.For) and '(' in step.For and ')' in step.For:
-            test_case.ForLoop.start_for(int(re.findall(r'\((.*?)\)', step.For)[0]), self.index, step.index)
+        if IsNullOrEmpty(step.For):
+            return
+        if str_to_int(step.For)[0]:
+            test_case.ForLoop.start(int(step.For), self.index, step.index)
+        elif step.For.lower() == "do":
+            pass
+        elif step.For.lower() == "while":
+            pass
 
-    def process_EndFor(self, test_case, step: model.step.Step):
+    def end_loop(self, test_case, step: model.step.Step):
         """FOR 循环结束判断 END FOR"""
-        if not IsNullOrEmpty(step.For) and step.For.lower().startswith('end'):
+        if IsNullOrEmpty(step.For):
+            return False
+        if step.For.lower().startswith('end'):
             # self.daq_collect(test_case)
-            is_end = not test_case.ForLoop.is_end_for()
+            is_end = not test_case.ForLoop.is_end()
             return is_end
-        else:
+        elif step.For.lower() == "do":
+            return False
+        elif step.For.lower() == "while":
             return False
 
     def daq_collect(self, test_case):
