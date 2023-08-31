@@ -84,7 +84,6 @@ class TestSuite:
             for i, step in enumerate(self.steps, start=0):
                 if i < stepNo:
                     continue
-                self.start_loop(test_case, step)
                 step.suiteVar = self.suiteVar
                 step_result = step.run(test_case, self, suiteItem)
                 step_result_list.append(step_result)
@@ -92,7 +91,7 @@ class TestSuite:
                 if not step_result and not fail_continue(step, global_fail_continue):
                     break
 
-                if self.end_loop(test_case, step):
+                if step.end_loop(test_case, step.test_result):
                     break
 
             self.suiteResult = all(step_result_list)
@@ -133,30 +132,6 @@ class TestSuite:
             self.logger.info(f"{self.name} Test Pass!,ElapsedTime:{self.elapsedTime.seconds}")
         else:
             self.logger.error(f"{self.name} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
-
-    def start_loop(self, test_case, step: model.step.Step):
-        """FOR 循环开始判断 FOR(3)"""
-        if IsNullOrEmpty(step.For):
-            return
-        if str_to_int(step.For)[0]:
-            test_case.ForLoop.start(int(step.For), self.index, step.index)
-        elif step.For.lower() == "do":
-            pass
-        elif step.For.lower() == "while":
-            pass
-
-    def end_loop(self, test_case, step: model.step.Step):
-        """FOR 循环结束判断 END FOR"""
-        if IsNullOrEmpty(step.For):
-            return False
-        if step.For.lower().startswith('end'):
-            # self.daq_collect(test_case)
-            is_end = not test_case.ForLoop.is_end()
-            return is_end
-        elif step.For.lower() == "do":
-            return False
-        elif step.For.lower() == "while":
-            return False
 
     def daq_collect(self, test_case):
         self.logger.debug(f"collect DAQ data to {test_case.daq_data_path}")

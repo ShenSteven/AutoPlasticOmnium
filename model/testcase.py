@@ -107,18 +107,25 @@ class TestCase:
     def run(self, global_fail_continue=False):
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
-                if not self.ForLoop.IsForEnd and self.ForLoop.jump:
+                if not self.ForLoop.IsEnd and self.ForLoop.jump:
                     if i < self.ForLoop.ForStartSuiteNo:
                         continue
                     else:
                         stepNo = self.ForLoop.ForStartStepNo
+                elif not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
+                    if i < self.DoWhileLoop.StartSuiteNo:
+                        continue
+                    else:
+                        stepNo = self.DoWhileLoop.StartStepNo
                 else:
                     stepNo = -1
                 suite_result = suite.run(self, global_fail_continue, stepNo)
                 self.suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break
-                if not self.ForLoop.IsForEnd and self.ForLoop.jump:
+                if not self.ForLoop.IsEnd and self.ForLoop.jump:
+                    return self.run(global_fail_continue)
+                if not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
                     return self.run(global_fail_continue)
 
             self.tResult = all(self.suite_result_list)

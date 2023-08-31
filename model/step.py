@@ -79,6 +79,7 @@ class Step:
     """
 
     def __init__(self, dict_=None):
+        self.test_result = False
         self.myWind = None
         self.logger = None
         self.breakpoint: bool = False
@@ -302,7 +303,7 @@ class Step:
     def For(self, value):
         if '(' in value and ')' in value:
             self._For = value
-        elif value.lower().startswith('end'):
+        elif value.lower().startswith('end') or value.lower() == 'do' or value.lower() == 'while':
             self._For = value
         elif IsNullOrEmpty(value):
             self._For = value
@@ -585,7 +586,6 @@ class Step:
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar
         info = ''
-        test_result = False
         self.set_json_start_time(test_case)
         self.start_time = datetime.now()
 
@@ -600,42 +600,35 @@ class Step:
                                   f"SubStr:{self.SubStr1} - {self.SubStr2},"
                                   f"MesVer:{self.MesVar},FTC:{self.FTC}</a>")
                 self.init_online_limit()
+                self.start_loop(test_case, testSuite)
             else:
                 if not self.myWind.IsCycle:
                     self.setColor(Qt.gray)
-                test_result = True
-                self.status = str(test_result)
+                self.test_result = True
+                self.status = str(self.test_result)
                 test_case.step_finish_num = test_case.step_finish_num - 1
                 test_case.sum_step = test_case.sum_step - 1
                 self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
                 return True
-
-            if self.breakpoint or self.myWind.pauseFlag:
-                self.myWind.pauseFlag = True
-                if isinstance(self.myWind, ui.mainform.MainForm):
-                    self.myWind.my_signals.setIconSignal[QAction, QIcon].emit(
-                        self.myWind.actionStart, QIcon(':/images/Start-icon.png'))
-                self.myWind.pause_event.clear()
-            else:
-                self.myWind.pause_event.set()
-
+            self.set_breakpoint()
             for retry in range(self.Retry, -1, -1):
                 if self.myWind.pause_event.wait():
                     if gv.cf.dut.test_mode == 'debug' or gv.IsDebug and self.Keyword in gv.cf.dut.debug_skip:
                         self.logger.debug('This is debug mode.Skip this step.')
-                        test_result, info = True, ''
+                        self.test_result, info = True, ''
                     else:
-                        test_result, info = model.keyword.testKeyword(self.Keyword, self, test_case)
+                        self.test_result, info = model.keyword.testKeyword(self.Keyword, self, test_case)
                         self.test_keyword_finally(test_case)
-                if test_result:
+                if self.test_result:
                     break
-            self.setColor(Qt.green if test_result else Qt.red)
-            self.set_errorCode_details(str(test_result), info)
-            self.print_test_info(test_case, test_result)
-            self.process_teardown(test_result)
-            self.status = self.process_if_bypass(test_case, test_result)
+            self.setColor(Qt.green if self.test_result else Qt.red)
+            self.set_errorCode_details(str(self.test_result), info)
+            self.print_test_info(test_case)
+            self.process_teardown()
+            result_if = self._if_statement(test_case, self.test_result)
+            self.status = str(self._process_bypass_byfail(result_if))
             self.record_first_fail(test_case, str(self.status), info)
-            self.generate_report(test_case, str(self.status), suiteItem)
+            self.record_test_data(test_case, str(self.status), suiteItem)
             self.process_mesVer(test_case)
         except Exception as e:
             self.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
@@ -647,18 +640,28 @@ class Step:
             return True if self.status == 'True' else False
         finally:
             if not IsNullOrEmpty(self.SetGlobalVar) and self.isTest:
-                if bool(self.status):
+                if bool(self.test_result):
                     setattr(test_case.myWind.TestVariables, self.SetGlobalVar, self.testValue)
                     self.logger.debug(f"setGlobalVar:{self.SetGlobalVar} = {self.testValue}")
                 else:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
-            self.record_date_to_db(test_case, test_result)
+            self.record_date_to_db(test_case, self.test_result)
             test_case.step_finish_num = test_case.step_finish_num + 1
-            if not test_case.ForLoop.IsForEnd:
+            if not test_case.ForLoop.IsEnd or not test_case.DoWhileLoop.IsEnd:
                 test_case.sum_step = test_case.sum_step + 1
             self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.clear()
             test_case.IfElseFlow.clear(self.IfElse)
+
+    def set_breakpoint(self):
+        if self.breakpoint or self.myWind.pauseFlag:
+            self.myWind.pauseFlag = True
+            if isinstance(self.myWind, ui.mainform.MainForm):
+                self.myWind.my_signals.setIconSignal[QAction, QIcon].emit(
+                    self.myWind.actionStart, QIcon(':/images/Start-icon.png'))
+            self.myWind.pause_event.clear()
+        else:
+            self.myWind.pause_event.set()
 
     def test_keyword_finally(self, test_case):
         if (self.StepName.startswith("GetDAQResistor") or self.StepName.startswith("GetDAQTemp") or
@@ -737,7 +740,12 @@ class Step:
             test_case.error_details_first_fail = self.error_details
             test_case.mesPhases.first_fail = self.SuiteName
 
-    def _process_ByPF(self, step_result: bool):
+    def _process_bypass_byfail(self, step_result: bool):
+        if not IsNullOrEmpty(self.For) and self.For == 'while':
+            if not step_result:
+                self.setColor(Qt.darkMagenta)
+                self.logger.warning(f"do while condition fail, needs to continue, setting the test result to true")
+                step_result = True
         if self.ByPF == 'P' and not step_result:
             self.setColor(Qt.darkGreen)
             self.logger.warning(f"Let this step:{self.StepName} bypass.")
@@ -757,21 +765,17 @@ class Step:
         self.testValue = None
         self.elapsedTime = 0
         self.status = 'exception'
+        self.test_result = False
 
-    def process_if_bypass(self, test_case, test_result: bool) -> str:
-        result_if = self._if_statement(test_case, test_result)
-        by_result = self._process_ByPF(result_if)
-        return str(by_result)
-
-    def print_test_info(self, test_case, tResult):
+    def print_test_info(self, test_case):
         ts = datetime.now() - self.start_time
         self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
         if self.Keyword == 'Waiting':
             return
-        result_info = f"{self.StepName} {'pass' if tResult else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
+        result_info = f"{self.StepName} {'pass' if self.test_result else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
                       f"Symptom:{self.error_code}:{self.error_details}," \
                       f"spec:{self.SPEC},Min:{self.LSL},Value:{self.testValue}, Max: {self.USL}"
-        if tResult:
+        if self.test_result:
             self.logger.info(result_info)
         else:
             self.logger.error(result_info)
@@ -781,9 +785,10 @@ class Step:
             if isinstance(self.myWind, ui.mainform.MainForm):
                 self.myWind.my_signals.update_tableWidget[list].emit(
                     [test_case.myWind.SN, self.StepName, self.SPEC, self.LSL, self.testValue, self.USL,
-                     self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), 'Pass' if tResult else 'Fail'])
+                     self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                     'Pass' if self.test_result else 'Fail'])
 
-    def report_to_csv(self, test_case, name):
+    def record_to_csv(self, test_case, name):
         """collect test result and data into csv file"""
         if name in test_case.csv_list_header:
             return
@@ -797,7 +802,7 @@ class Step:
             test_case.csv_list_header.append(name)
             test_case.csv_list_data.append(self.testValue)
 
-    def report_to_json(self, test_case, testResult, suiteItem: model.product.SuiteItem = None):
+    def record_to_json(self, test_case, testResult, suiteItem: model.product.SuiteItem = None):
         """copy test data to json object"""
         if self.status != str(True):
             self.start_time_json = test_case.startTimeJson
@@ -838,17 +843,17 @@ class Step:
 
         return obj
 
-    def generate_report(self, test_case, test_result, suiteItem: model.product.SuiteItem):
+    def record_test_data(self, test_case, test_result, suiteItem: model.product.SuiteItem):
         """ according to self.Json record test result and data into json file"""
         if self.Json == 'Y':
-            obj = self.report_to_json(test_case, test_result, suiteItem)
-            self.report_to_csv(test_case, obj.test_name)
+            obj = self.record_to_json(test_case, test_result, suiteItem)
+            self.record_to_csv(test_case, obj.test_name)
         elif not test_result or self.ByPF == 'F':
-            obj = self.report_to_json(test_case, test_result, suiteItem)
-            self.report_to_csv(test_case, obj.test_name)
+            obj = self.record_to_json(test_case, test_result, suiteItem)
+            self.record_to_csv(test_case, obj.test_name)
 
-    def process_teardown(self, test_result):
-        if IsNullOrEmpty(self.TearDown) or test_result:
+    def process_teardown(self):
+        if IsNullOrEmpty(self.TearDown) or self.test_result:
             return
         self.logger.debug(f'run teardown command...')
         try:
@@ -861,6 +866,26 @@ class Step:
 
     def init_online_limit(self):
         pass
+
+    def start_loop(self, test_case, suit):
+        """FOR 循环开始判断 FOR(3)"""
+        if IsNullOrEmpty(self.For):
+            return
+        if str_to_int(self.For)[0]:
+            test_case.ForLoop.start(int(self.For), suit.index, self.index)
+        elif self.For.lower() == "do":
+            test_case.DoWhileLoop.start(suit.index, self.index)
+
+    def end_loop(self, test_case, step_result):
+        """FOR 循环结束判断 END FOR"""
+        if IsNullOrEmpty(self.For):
+            return False
+        if self.For.lower().startswith('end'):
+            is_end = not test_case.ForLoop.is_end()
+            return is_end
+        elif self.For.lower() == "while":
+            is_end = not test_case.DoWhileLoop.is_end(step_result)
+            return is_end
 
 
 if __name__ == "__main__":

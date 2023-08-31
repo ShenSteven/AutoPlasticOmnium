@@ -27,6 +27,7 @@ class DoWhile:
         self.LoopCounter = 1  # current loop number
         self.IsEnd = True  # it is in a loop?
         self._Flag = False
+        self.jump = False
 
     def start(self, StartSuiteNo, StartStepNo):
         if self._Flag:
@@ -34,6 +35,7 @@ class DoWhile:
         else:
             self._Flag = True
         self.IsEnd = False  # it is in a loop?
+        self.jump = False
         self.StartSuiteNo = StartSuiteNo
         self.StartStepNo = StartStepNo
         self.logger.debug('=' * 10 + f"Start {self.CycleName}, Cycle-{self.LoopCounter}" + '=' * 10)
@@ -43,6 +45,7 @@ class DoWhile:
             self.IsEnd = False
             self._Flag = False
             self.LoopCounter += 1
+            self.jump = True
         else:
             self.IsEnd = True
             self.logger.debug('=' * 10 + f"Have Complete {self.CycleName}, ({self.LoopCounter}) Cycle test." + '=' * 10)
@@ -54,3 +57,4 @@ class DoWhile:
         self.StartSuiteNo = -1
         self.LoopCounter = 1  # current loop number
         self._Flag = False
+        self.jump = False
