@@ -810,7 +810,7 @@ class Step:
         if self.EeroName is None:
             obj.test_name = self.StepName
         elif self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(test_case.ForLoop.ForCycleCounter)
+            obj.test_name = self.EeroName + str(test_case.ForLoop.CycleCounter)
         else:
             obj.test_name = self.EeroName
         obj.status = 'passed' if testResult else 'failed'
@@ -872,9 +872,11 @@ class Step:
         if IsNullOrEmpty(self.For):
             return
         if str_to_int(self.For)[0]:
-            test_case.ForLoop.start(int(self.For), suit.index, self.index)
+            test_case.ForLoop.start(suit.index, self.index, int(self.For))
         elif self.For.lower() == "do":
             test_case.DoWhileLoop.start(suit.index, self.index)
+        # elif self.For.lower() == "while":
+        #     test_case.DoWhileLoop.start(suit.index, self.index)
 
     def end_loop(self, test_case, step_result):
         """FOR 循环结束判断 END FOR"""

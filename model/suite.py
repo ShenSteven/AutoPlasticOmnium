@@ -136,7 +136,7 @@ class TestSuite:
     def daq_collect(self, test_case):
         self.logger.debug(f"collect DAQ data to {test_case.daq_data_path}")
         create_csv_file(self.logger, test_case.daq_data_path, test_case.ArrayListDaqHeader)
-        data_list = [str(test_case.ForLoop.ForCycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+        data_list = [str(test_case.ForLoop.CycleCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
         data_list.extend(test_case.ArrayListDaq)
         write_csv_file(self.logger, test_case.daq_data_path, data_list)
         test_case.ArrayListDaq = []

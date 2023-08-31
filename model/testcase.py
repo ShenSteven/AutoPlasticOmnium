@@ -108,10 +108,10 @@ class TestCase:
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
                 if not self.ForLoop.IsEnd and self.ForLoop.jump:
-                    if i < self.ForLoop.ForStartSuiteNo:
+                    if i < self.ForLoop.StartSuiteNo:
                         continue
                     else:
-                        stepNo = self.ForLoop.ForStartStepNo
+                        stepNo = self.ForLoop.StartStepNo
                 elif not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
                     if i < self.DoWhileLoop.StartSuiteNo:
                         continue
