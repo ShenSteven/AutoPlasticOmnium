@@ -47,16 +47,25 @@ class WhileLoop:
             self.jump = True
             self.while_condition = True
         else:
-            self.IsEnd = True
+            self.IsEnd = False  # it is in a loop?
+            self._Flag = False
+            # self.LoopCounter += 1
+            self.jump = False
             self.while_condition = False
-            self.logger.debug('=' * 10 + f"Have Complete {self.CycleName}, ({self.LoopCounter}) Cycle test." + '=' * 10)
-            self.clear()
+            # self.IsEnd = True
+            # self.while_condition = False
+            # self.logger.debug('=' * 10 + f"Have Complete {self.CycleName}, ({self.LoopCounter}) Cycle test." + '=' * 10)
+            # self.clear()
 
     def is_end(self) -> bool:
-        self.IsEnd = False
-        self._Flag = False
-        self.jump = True
-        self.while_condition = None
+        if self.while_condition:
+            self.IsEnd = False
+            self._Flag = False
+            self.jump = True
+            self.while_condition = None
+        else:
+            self.IsEnd = True
+            self.clear()
         return self.IsEnd
 
     def clear(self):

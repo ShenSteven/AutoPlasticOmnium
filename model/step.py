@@ -334,6 +334,8 @@ class Step:
     def FTC(self, value):
         if value.upper() == 'Y':
             self._FTC = value
+        elif value.upper() == 'N':
+            self._FTC = value
         elif value == 'None' or value == '':
             self._FTC = ''
         else:
@@ -589,21 +591,23 @@ class Step:
         self.set_json_start_time(test_case)
         self.start_time = datetime.now()
         self.test_result = False
+
         try:
             if self.isTest:
                 if test_case.WhileLoop.while_condition is not None:
                     if not test_case.WhileLoop.while_condition:
                         self.test_result = True
                         self.status = str(self.test_result)
+                        self.setColor(Qt.lightGray)
                         return True
                 if not isinstance(self.myWind, ui.mainform.MainForm):
                     self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
                                                                          f"<A href='https://www.qt.io/'>{self.StepName}</A>")
-                self.setColor(Qt.yellow)
                 self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                   f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
                                   f"SubStr:{self.SubStr1} - {self.SubStr2},"
                                   f"MesVer:{self.MesVar},FTC:{self.FTC}</a>")
+                self.setColor(Qt.yellow)
                 self.init_online_limit()
                 self.start_loop(test_case, testSuite)
             else:
@@ -615,6 +619,14 @@ class Step:
                 test_case.sum_step = test_case.sum_step - 1
                 self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
                 return True
+        except Exception as e:
+            self.logger.fatal(f"TestStep precondition Exception!{e},{traceback.format_exc()}")
+            self.setColor(Qt.darkRed)
+            self.status = 'exception'
+            self.record_first_fail(test_case, str(self.status), 'TestStep precondition Exception!!!')
+            return False
+
+        try:
             self.set_breakpoint()
             for retry in range(self.Retry, -1, -1):
                 if self.myWind.pause_event.wait():
@@ -894,13 +906,13 @@ class Step:
             is_end = not test_case.WhileLoop.is_end()
             return is_end
         if self.For.lower() == "whiledo":
-            test_case.WhileLoop.start(index, self.index, step_result)
             if step_result:
+                test_case.WhileLoop.start(index, self.index, step_result)
                 return False
             else:
                 if not IsNullOrEmpty(self.FTC) and self.FTC == 'Y':
                     test_case.WhileLoop.start(index, self.index, False)
-                    return True
+                    return False
                 else:
                     return False
 
