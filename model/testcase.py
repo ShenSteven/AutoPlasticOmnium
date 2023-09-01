@@ -128,17 +128,17 @@ class TestCase:
                 else:
                     stepNo = -1
 
-                suite_result = suite.run(self, global_fail_continue, stepNo)
+                suite_result = suite.run(self, stepNo)
                 self.suite_result_list.append(suite_result)
-                if not suite_result and not global_fail_continue:
+                if not suite_result:
                     break
 
                 if not self.ForLoop.IsEnd and self.ForLoop.jump:
-                    return self.run(global_fail_continue)
+                    return self.run()
                 if not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
-                    return self.run(global_fail_continue)
+                    return self.run()
                 if not self.WhileLoop.IsEnd and self.WhileLoop.jump:
-                    return self.run(global_fail_continue)
+                    return self.run()
 
             self.tResult = all(self.suite_result_list)
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

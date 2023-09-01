@@ -326,15 +326,15 @@ class Step:
     @property
     def FTC(self):
         if not hasattr(self, '_FTC'):
-            return None
-        else:
+            return 'Y' if gv.cf.station.fail_continue else 'N'
+        elif self._FTC.lower() == 'n' or self._FTC.lower() == 'y':
             return self._FTC.upper()
+        else:
+            return 'Y' if gv.cf.station.fail_continue else 'N'
 
     @FTC.setter
     def FTC(self, value):
-        if value.upper() == 'Y':
-            self._FTC = value
-        elif value.upper() == 'N':
+        if value.upper() == 'Y' or value.upper() == 'N':
             self._FTC = value
         elif value == 'None' or value == '':
             self._FTC = ''
@@ -912,6 +912,7 @@ class Step:
             else:
                 if not IsNullOrEmpty(self.FTC) and self.FTC == 'Y':
                     test_case.WhileLoop.start(index, self.index, False)
+                    self.logger.warning(f"while condition fail, but by pass to continue.")
                     return False
                 else:
                     return False

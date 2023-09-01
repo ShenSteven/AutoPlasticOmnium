@@ -12,19 +12,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 import model.product
 import model.step
-from common.basicfunc import IsNullOrEmpty, create_csv_file, write_csv_file, str_to_int
+from common.basicfunc import create_csv_file, write_csv_file
 import ui.mainform
-
-
-def fail_continue(test_step: model.step.Step, failContinue):
-    if IsNullOrEmpty(test_step.FTC):
-        return failContinue
-    if test_step.FTC.lower() == 'n':
-        return False
-    elif test_step.FTC.lower() == 'y':
-        return True
-    else:
-        return failContinue
 
 
 class TestSuite:
@@ -58,7 +47,7 @@ class TestSuite:
     def index(self, value):
         self._index = value
 
-    def run(self, test_case, global_fail_continue, stepNo=-1):
+    def run(self, test_case, stepNo=-1):
         """
         run test suite.
         :param test_case:
@@ -88,7 +77,7 @@ class TestSuite:
                 step_result = step.run(test_case, self, suiteItem)
                 step_result_list.append(step_result)
 
-                if not step_result and not fail_continue(step, global_fail_continue):
+                if not step_result and step.FTC == 'N':
                     break
 
                 if step.end_loop(test_case, step.test_result, self.index):

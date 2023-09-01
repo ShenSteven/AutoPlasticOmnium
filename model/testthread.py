@@ -37,7 +37,7 @@ class TestThread(QThread):
                 if self.myWind.startFlag:
                     if self.myWind.IsCycle:
                         while self.myWind.IsCycle:
-                            if self.myWind.testcase.run(gv.cf.station.fail_continue):
+                            if self.myWind.testcase.run():
                                 self.myWind.PassNumOfCycleTest += 1
                             else:
                                 self.myWind.FailNumOfCycleTest += 1
@@ -58,7 +58,7 @@ class TestThread(QThread):
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)
                         time.sleep(0.5)
                     else:
-                        result = self.myWind.testcase.run(gv.cf.station.fail_continue)
+                        result = self.myWind.testcase.run()
                         result1 = upload_Json_to_client(self.myWind.logger, self.myWind.rs_url, self.myWind.txtLogPath,
                                                         self.myWind.SN, self.myWind.testcase.jsonObj)
                         result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mes_result,
