@@ -91,7 +91,7 @@ class TestSuite:
                 if not step_result and not fail_continue(step, global_fail_continue):
                     break
 
-                if step.end_loop(test_case, step.test_result):
+                if step.end_loop(test_case, step.test_result, self.index):
                     break
 
             self.suiteResult = all(step_result_list)

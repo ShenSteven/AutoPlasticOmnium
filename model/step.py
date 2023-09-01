@@ -301,16 +301,16 @@ class Step:
 
     @For.setter
     def For(self, value):
-        if '(' in value and ')' in value:
+        if '(' in value and ')' in value or value.lower() == 'endfor':
             self._For = value
-        elif value.lower().startswith('end') or value.lower() == 'do' or value.lower() == 'while':
+        elif value.lower() == 'do' or value.lower() == 'while':
             self._For = value
-        elif IsNullOrEmpty(value):
+        elif IsNullOrEmpty(value) or value.lower() == 'whiledo' or value.lower() == 'endwhiledo':
             self._For = value
         elif str_to_int(value)[0]:
             self._For = value
         else:
-            raise ValueError('Format example:for(10)...end/do...while/while...do')
+            raise ValueError('Format example:for(10)...endfor/do...while/whiledo...endwhile')
 
     @property
     def IfElse(self):
@@ -588,9 +588,14 @@ class Step:
         info = ''
         self.set_json_start_time(test_case)
         self.start_time = datetime.now()
-
+        self.test_result = False
         try:
             if self.isTest:
+                if test_case.WhileLoop.while_condition is not None:
+                    if not test_case.WhileLoop.while_condition:
+                        self.test_result = True
+                        self.status = str(self.test_result)
+                        return True
                 if not isinstance(self.myWind, ui.mainform.MainForm):
                     self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
                                                                          f"<A href='https://www.qt.io/'>{self.StepName}</A>")
@@ -647,7 +652,7 @@ class Step:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_case, self.test_result)
             test_case.step_finish_num = test_case.step_finish_num + 1
-            if not test_case.ForLoop.IsEnd or not test_case.DoWhileLoop.IsEnd:
+            if not test_case.ForLoop.IsEnd or not test_case.DoWhileLoop.IsEnd or not test_case.WhileLoop.IsEnd:
                 test_case.sum_step = test_case.sum_step + 1
             self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.clear()
@@ -765,7 +770,6 @@ class Step:
         self.testValue = None
         self.elapsedTime = 0
         self.status = 'exception'
-        self.test_result = False
 
     def print_test_info(self, test_case):
         ts = datetime.now() - self.start_time
@@ -875,19 +879,30 @@ class Step:
             test_case.ForLoop.start(suit.index, self.index, int(self.For))
         elif self.For.lower() == "do":
             test_case.DoWhileLoop.start(suit.index, self.index)
-        # elif self.For.lower() == "while":
-        #     test_case.DoWhileLoop.start(suit.index, self.index)
 
-    def end_loop(self, test_case, step_result):
+    def end_loop(self, test_case, step_result, index):
         """FOR 循环结束判断 END FOR"""
         if IsNullOrEmpty(self.For):
             return False
-        if self.For.lower().startswith('end'):
+        if self.For.lower() == 'endfor':
             is_end = not test_case.ForLoop.is_end()
             return is_end
         elif self.For.lower() == "while":
             is_end = not test_case.DoWhileLoop.is_end(step_result)
             return is_end
+        elif self.For.lower() == "endwhiledo":
+            is_end = not test_case.WhileLoop.is_end()
+            return is_end
+        if self.For.lower() == "whiledo":
+            test_case.WhileLoop.start(index, self.index, step_result)
+            if step_result:
+                return False
+            else:
+                if not IsNullOrEmpty(self.FTC) and self.FTC == 'Y':
+                    test_case.WhileLoop.start(index, self.index, False)
+                    return True
+                else:
+                    return False
 
 
 if __name__ == "__main__":

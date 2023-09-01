@@ -18,6 +18,7 @@ import conf.globalvar as gv
 import sockets.serialport
 import flowcontrol.forloop
 import flowcontrol.dowhile
+import flowcontrol.whileloop
 import flowcontrol.ifelse
 from inspect import currentframe
 from datetime import datetime
@@ -55,13 +56,14 @@ class TestCase:
         self.tResult = True
         self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
         self.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
+        self.WhileLoop = flowcontrol.whileloop.WhileLoop(self.logger)
         self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
         self.Finished = False
         self.failCount = 0
         self.startTimeJsonFlag = True
         self.startTimeJson = datetime.now()
-        self.mesPhases: model.product.MesInfo
-        self.jsonObj: model.product.JsonObject
+        self.mesPhases: model.product.MesInfo = None
+        self.jsonObj: model.product.JsonObject = None
         self.ArrayListDaq = []
         self.ArrayListDaqHeader = ['SN', 'DateTime']
         self.daq_data_path = ''
@@ -107,6 +109,7 @@ class TestCase:
     def run(self, global_fail_continue=False):
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
+
                 if not self.ForLoop.IsEnd and self.ForLoop.jump:
                     if i < self.ForLoop.StartSuiteNo:
                         continue
@@ -117,15 +120,24 @@ class TestCase:
                         continue
                     else:
                         stepNo = self.DoWhileLoop.StartStepNo
+                elif not self.WhileLoop.IsEnd and self.WhileLoop.jump:
+                    if i < self.WhileLoop.StartSuiteNo:
+                        continue
+                    else:
+                        stepNo = self.WhileLoop.StartStepNo
                 else:
                     stepNo = -1
+
                 suite_result = suite.run(self, global_fail_continue, stepNo)
                 self.suite_result_list.append(suite_result)
                 if not suite_result and not global_fail_continue:
                     break
+
                 if not self.ForLoop.IsEnd and self.ForLoop.jump:
                     return self.run(global_fail_continue)
                 if not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
+                    return self.run(global_fail_continue)
+                if not self.WhileLoop.IsEnd and self.WhileLoop.jump:
                     return self.run(global_fail_continue)
 
             self.tResult = all(self.suite_result_list)
@@ -162,6 +174,7 @@ class TestCase:
         self.sum_step = self.step_count
         self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
         self.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
+        self.WhileLoop = flowcontrol.whileloop.WhileLoop(self.logger)
         self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
 
     def teardown(self):
