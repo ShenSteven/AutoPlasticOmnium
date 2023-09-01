@@ -106,7 +106,7 @@ class TestCase:
             #     QtCore.Q_ARG(int, 4))
             raise
 
-    def run(self, global_fail_continue=False):
+    def run(self):
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
 

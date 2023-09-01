@@ -11,6 +11,7 @@
         "suiteVar": "",
         "steps": [
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -45,6 +46,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -79,6 +81,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -113,6 +116,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -147,6 +151,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -181,6 +186,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -215,6 +221,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -249,6 +256,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -283,6 +291,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -317,6 +326,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -351,6 +361,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -385,6 +396,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -419,6 +431,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -471,6 +484,7 @@
         "suiteVar": "",
         "steps": [
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -505,6 +519,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -539,6 +554,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -573,6 +589,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -607,6 +624,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -641,6 +659,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -675,6 +694,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -709,6 +729,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -743,6 +764,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -777,6 +799,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -811,6 +834,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -863,6 +887,7 @@
         "suiteVar": "",
         "steps": [
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -897,6 +922,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -931,6 +957,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -965,6 +992,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -999,6 +1027,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1051,6 +1080,7 @@
         "suiteVar": "",
         "steps": [
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1085,6 +1115,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1119,6 +1150,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1153,6 +1185,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1187,6 +1220,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1239,6 +1273,7 @@
         "suiteVar": "",
         "steps": [
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1273,6 +1308,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1307,6 +1343,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1341,6 +1378,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
@@ -1375,6 +1413,7 @@
                 "NeverUsed": null
             },
             {
+                "test_result": false,
                 "myWind": null,
                 "logger": null,
                 "breakpoint": false,
