@@ -310,7 +310,7 @@ class Step:
         elif str_to_int(value)[0]:
             self._For = value
         else:
-            raise ValueError('Format example:for(10)...endfor/do...while/whiledo...endwhile')
+            raise ValueError('Format string: for(10)...endfor/do...while/whiledo...endwhile')
 
     @property
     def IfElse(self):
@@ -321,7 +321,12 @@ class Step:
 
     @IfElse.setter
     def IfElse(self, value):
-        self._IfElse = value
+        if value.lower() == 'if' or value.lower() == '&if' or value.lower() == '||if':
+            self._IfElse = value
+        elif value.lower() == 'elif' or value.lower() == 'else':
+            self._IfElse = value
+        else:
+            raise ValueError('Format string: if,&if,||if,elif,else')
 
     @property
     def FTC(self):

@@ -100,6 +100,7 @@ def _testKeyword_what(kw, step, test_case):
 
 @testKeyword.register('AppS19Info')
 def _testKeyword_what(kw, step, test_case):
+    return False, ''
     compInfo = ''
     file_path = rf"{gv.current_dir}{os.sep}flash{os.sep}{gv.cf.station.station_name}{os.sep}{step.myWind.dut_model}{os.sep}{step.CmdOrParam}"
     step.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(file_path)))
