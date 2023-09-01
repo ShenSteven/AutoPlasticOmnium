@@ -8,26 +8,14 @@
 """
 from enum import Enum
 
-
-class CycleType(Enum):
-    """测试状态枚举类"""
-    FOR = 'FOR'
-    DoWhile = 'DoWhile'
-    WhileDo = 'WhileDo'
+from flowcontrol.loop import CycleType, Loop
 
 
-class DoWhile:
+class DoWhile(Loop):
 
     def __init__(self, logger):
         self.logger = logger
-        self.StartStepNo = -1
-        self.StartSuiteNo = -1
-        self.TotalCycle = -1
         self.CycleName = CycleType.DoWhile
-        self.LoopCounter = 1  # current loop number
-        self.IsEnd = True  # it is in a loop?
-        self._Flag = False
-        self.jump = False
 
     def start(self, StartSuiteNo, StartStepNo):
         if self._Flag:

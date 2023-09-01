@@ -6,31 +6,14 @@
 @Date   : 8/30/2023
 @Desc   : 
 """
-from enum import Enum
+from flowcontrol.loop import CycleType, Loop
 
 
-class CycleType(Enum):
-    """测试状态枚举类"""
-    FOR = 'FOR'
-    DoWhile = 'DoWhile'
-    While = 'While'
-
-
-class WhileLoop:
+class WhileLoop(Loop):
 
     def __init__(self, logger):
-        self.EndStepNo = -2
-        self.EndSuiteNo = -2
         self.logger = logger
-        self.StartStepNo = -1
-        self.StartSuiteNo = -1
-        self.TotalCycle = -1
         self.CycleName = CycleType.While
-        self.LoopCounter = 1  # current loop number
-        self.IsEnd = True  # it is in a loop?
-        self._Flag = False
-        self.jump = False
-        self.while_condition = None
 
     def start(self, StartSuiteNo, StartStepNo, condition):
         if self._Flag:
@@ -49,13 +32,9 @@ class WhileLoop:
         else:
             self.IsEnd = False  # it is in a loop?
             self._Flag = False
-            # self.LoopCounter += 1
             self.jump = False
             self.while_condition = False
-            # self.IsEnd = True
-            # self.while_condition = False
             # self.logger.debug('=' * 10 + f"Have Complete {self.CycleName}, ({self.LoopCounter}) Cycle test." + '=' * 10)
-            # self.clear()
 
     def is_end(self) -> bool:
         if self.while_condition:

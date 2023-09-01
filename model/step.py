@@ -831,7 +831,7 @@ class Step:
         if self.EeroName is None:
             obj.test_name = self.StepName
         elif self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(test_case.ForLoop.CycleCounter)
+            obj.test_name = self.EeroName + str(test_case.ForLoop.LoopCounter)
         else:
             obj.test_name = self.EeroName
         obj.status = 'passed' if testResult else 'failed'

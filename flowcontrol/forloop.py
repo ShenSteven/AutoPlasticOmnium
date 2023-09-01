@@ -6,19 +6,14 @@
 @Date   : 8/29/2023
 @Desc   : 
 """
+from flowcontrol.loop import Loop, CycleType
 
 
-class ForLoop:
+class ForLoop(Loop):
 
     def __init__(self, logger):
         self.logger = logger
-        self.StartStepNo = -1
-        self.StartSuiteNo = -1
-        self._TotalCycle = 0
-        self.CycleCounter = 1  # current loop number
-        self.IsEnd = True  # it is in a loop?
-        self._Flag = False
-        self.jump = False
+        self.CycleName = CycleType.FOR
 
     def start(self, StartSuiteNo, StartStepNo, totalCycle):
         if self._Flag:
@@ -30,13 +25,13 @@ class ForLoop:
         self._TotalCycle = totalCycle
         self.StartSuiteNo = StartSuiteNo
         self.StartStepNo = StartStepNo
-        self.logger.debug('=' * 10 + f"Start Cycle-{self.CycleCounter},Total Cycle-{self._TotalCycle}" + '=' * 10)
+        self.logger.debug('=' * 10 + f"Start Cycle-{self.LoopCounter},Total Cycle-{self._TotalCycle}" + '=' * 10)
 
     def is_end(self) -> bool:
-        if self.CycleCounter < self._TotalCycle:
+        if self.LoopCounter < self._TotalCycle:
             self.IsEnd = False
             self._Flag = False
-            self.CycleCounter += 1
+            self.LoopCounter += 1
             self.jump = True
         else:
             self.IsEnd = True
@@ -48,6 +43,6 @@ class ForLoop:
         self.StartStepNo = -1
         self.StartSuiteNo = -1
         self._TotalCycle = 0
-        self.CycleCounter = 1  # current loop number
+        self.LoopCounter = 1  # current loop number
         self._Flag = False
         self.jump = False
