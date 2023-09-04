@@ -297,7 +297,7 @@ class Step:
             if '(' in self._For and ')' in self._For:
                 return re.findall(r'\((.*?)\)', self._For)[0]
             else:
-                return self._For
+                return self._For.lower()
 
     @For.setter
     def For(self, value):
@@ -322,8 +322,10 @@ class Step:
     @IfElse.setter
     def IfElse(self, value):
         if value.lower() == 'if' or value.lower() == '&if' or value.lower() == '||if':
-            self._IfElse = value
+            self._IfElse = value.lower()
         elif value.lower() == 'elif' or value.lower() == 'else':
+            self._IfElse = value.lower()
+        elif IsNullOrEmpty(value):
             self._IfElse = value
         else:
             raise ValueError('Format string: if,&if,||if,elif,else')

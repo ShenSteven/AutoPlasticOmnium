@@ -35,7 +35,7 @@ import model.loadseq
 import model.product
 import model.testcase
 import model.variables
-from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address
+from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int
 from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from common.testform import TestForm
@@ -510,8 +510,8 @@ class MainForm(Ui_MainWindow, TestForm):
             menu.addAction(self.actionUncheckAll)
             menu.addAction(self.actionExpandAll)
             menu.addAction(self.actionCollapseAll)
-            if getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint') == str(False):
-                self.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-set.png'))
+            if not getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
+                self.actionBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
             else:
                 self.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-clear.png'))
             menu.exec_(QCursor.pos())
@@ -535,10 +535,10 @@ class MainForm(Ui_MainWindow, TestForm):
         if not getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
             setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', True)
             self.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-clear.png'))
-            self.treeWidget.currentItem().setIcon(0, QIcon(':/images/breakpoint-set.png'))
+            self.treeWidget.currentItem().setIcon(0, QIcon(':/images/StepBreakpoint.ico'))
         else:
             setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', False)
-            self.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-set.png'))
+            self.actionBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
             self.treeWidget.currentItem().setIcon(0, QIcon(':/images/Document-txt-icon.png'))
 
     def on_actionOpen_TestCase(self):
@@ -948,7 +948,23 @@ class MainForm(Ui_MainWindow, TestForm):
                     step_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 else:
                     step_node.setFlags(Qt.ItemIsSelectable)
-                step_node.setIcon(0, QIcon(':/images/Document-txt-icon.png'))
+                if step.IfElse == 'if' or step.IfElse == '&if' or step.IfElse == '||if':
+                    step_node.setIcon(0, QIcon(':/images/NI_If.ico'))
+                elif step.IfElse == 'elif':
+                    step_node.setIcon(0, QIcon(':/images/NI_ElseIf.ico'))
+                elif step.IfElse == 'else':
+                    step_node.setIcon(0, QIcon(':/images/NI_Else.ico'))
+                else:
+                    if str_to_int(step.For)[0]:
+                        step_node.setIcon(0, QIcon(':/images/NI_For.ico'))
+                    elif step.For == 'do' or step.For == 'while':
+                        step_node.setIcon(0, QIcon(':/images/NI_DoWhile.ico'))
+                    elif step.For == 'whiledo':
+                        step_node.setIcon(0, QIcon(':/images/NI_While.ico'))
+                    elif not IsNullOrEmpty(step.For) and step.For.startswith('end'):
+                        step_node.setIcon(0, QIcon(':/images/NI_End.ico'))
+                    else:
+                        step_node.setIcon(0, QIcon(':/images/Document-txt-icon.png'))
                 suite_node.addChild(step_node)
         self.treeWidget.setStyle(QStyleFactory.create('windows'))
         self.treeWidget.resizeColumnToContents(0)

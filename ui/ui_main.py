@@ -217,7 +217,7 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.widget_4)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1448, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1448, 26))
         self.menubar.setObjectName("menubar")
         self.testcase = QtWidgets.QMenu(self.menubar)
         self.testcase.setObjectName("testcase")

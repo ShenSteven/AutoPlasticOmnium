@@ -1,5 +1,13 @@
 <RCC>
   <qresource>
+    <file>images/NI_DoWhile.ico</file>
+    <file>images/NI_Else.ico</file>
+    <file>images/NI_ElseIf.ico</file>
+    <file>images/NI_End.ico</file>
+    <file>images/NI_For.ico</file>
+    <file>images/NI_If.ico</file>
+    <file>images/NI_While.ico</file>
+    <file>images/StepBreakpoint.ico</file>
     <file>images/breakpoint-clear.png</file>
     <file>images/breakpoint-set.png</file>
     <file>images/Letter-T-blue-icon.png</file>
