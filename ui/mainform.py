@@ -513,7 +513,8 @@ class MainForm(Ui_MainWindow, TestForm):
             if not getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
                 self.actionBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
             else:
-                self.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-clear.png'))
+                self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
+                self.actionBreakpoint.setText('Breakpoint Clear')
             menu.exec_(QCursor.pos())
 
     def on_actionCheckAll(self):
@@ -534,7 +535,7 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_actionBreakpoint(self):
         if not getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
             setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', True)
-            self.actionBreakpoint.setIcon(QIcon(':/images/breakpoint-clear.png'))
+            self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
             self.treeWidget.currentItem().setIcon(0, QIcon(':/images/StepBreakpoint.ico'))
         else:
             setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', False)
@@ -948,29 +949,35 @@ class MainForm(Ui_MainWindow, TestForm):
                     step_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 else:
                     step_node.setFlags(Qt.ItemIsSelectable)
-                if step.IfElse == 'if' or step.IfElse == '&if' or step.IfElse == '||if':
-                    step_node.setIcon(0, QIcon(':/images/NI_If.ico'))
-                elif step.IfElse == 'elif':
-                    step_node.setIcon(0, QIcon(':/images/NI_ElseIf.ico'))
-                elif step.IfElse == 'else':
-                    step_node.setIcon(0, QIcon(':/images/NI_Else.ico'))
-                else:
-                    if str_to_int(step.For)[0]:
-                        step_node.setIcon(0, QIcon(':/images/NI_For.ico'))
-                    elif step.For == 'do' or step.For == 'while':
-                        step_node.setIcon(0, QIcon(':/images/NI_DoWhile.ico'))
-                    elif step.For == 'whiledo':
-                        step_node.setIcon(0, QIcon(':/images/NI_While.ico'))
-                    elif not IsNullOrEmpty(step.For) and step.For.startswith('end'):
-                        step_node.setIcon(0, QIcon(':/images/NI_End.ico'))
-                    else:
-                        step_node.setIcon(0, QIcon(':/images/Document-txt-icon.png'))
+                self.set_step_ico(step, step_node)
                 suite_node.addChild(step_node)
         self.treeWidget.setStyle(QStyleFactory.create('windows'))
         self.treeWidget.resizeColumnToContents(0)
         self.treeWidget.topLevelItem(0).setExpanded(True)
         self.treeWidget.blockSignals(False)
         self.tabWidget.setCurrentWidget(self.result)
+
+    def set_step_ico(self, step, step_node):
+        if step.Keyword == 'MessageBoxShow' or step.Keyword == 'QInputDialog' or step.Keyword == 'DialogInput':
+            step_node.setIcon(0, QIcon(':/images/MsgBox.ico'))
+        else:
+            if step.IfElse == 'if' or step.IfElse == '&if' or step.IfElse == '||if':
+                step_node.setIcon(0, QIcon(':/images/NI_If.ico'))
+            elif step.IfElse == 'elif':
+                step_node.setIcon(0, QIcon(':/images/NI_ElseIf.ico'))
+            elif step.IfElse == 'else':
+                step_node.setIcon(0, QIcon(':/images/NI_Else.ico'))
+            else:
+                if str_to_int(step.For)[0]:
+                    step_node.setIcon(0, QIcon(':/images/NI_For.ico'))
+                elif step.For == 'do' or step.For == 'while':
+                    step_node.setIcon(0, QIcon(':/images/NI_DoWhile.ico'))
+                elif step.For == 'whiledo':
+                    step_node.setIcon(0, QIcon(':/images/NI_While.ico'))
+                elif not IsNullOrEmpty(step.For) and step.For.startswith('end'):
+                    step_node.setIcon(0, QIcon(':/images/NI_End.ico'))
+                else:
+                    step_node.setIcon(0, QIcon(':/images/Document-txt-icon.png'))
 
     # @QtCore.pyqtSlot(QBrush, int, int, bool)
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):

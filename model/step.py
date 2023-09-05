@@ -102,6 +102,7 @@ class Step:
         # self._Keyword: str = 'Waiting'
         # self._ErrorCode: str = None
         # self._ErrorDetails: str = None
+        # self._ErrorMsg: str = None
         # self._Retry: int = 0
         # self._Timeout: int = 1
         # self._IfElse: str = None
@@ -789,6 +790,7 @@ class Step:
         self.testValue = None
         self.elapsedTime = 0
         self.status = 'exception'
+        # self.logger = None
 
     def print_test_info(self, test_case):
         ts = datetime.now() - self.start_time

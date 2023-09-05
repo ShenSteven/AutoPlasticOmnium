@@ -50,9 +50,10 @@ class TestThread(QThread):
                                 time.sleep(gv.cf.station.loop_interval)
                     elif self.myWind.SingleStepTest:
                         self.myWind.logger.debug(f'Suite:{self.myWind.SuiteNo},Step:{self.myWind.StepNo}')
+                        # self.myWind.testcase.logger = self.myWind.logger
                         result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[
-                            self.myWind.StepNo].run(
-                            self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
+                            self.myWind.StepNo].run(self.myWind.testcase,
+                                                    self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
                         self.myWind.finalTestResult = result
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)

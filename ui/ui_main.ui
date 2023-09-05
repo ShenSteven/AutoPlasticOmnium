@@ -807,7 +807,7 @@ font: 20pt &quot;宋体&quot;;</string>
      <normaloff>:/images/repeat.png</normaloff>:/images/repeat.png</iconset>
    </property>
    <property name="text">
-    <string>Stepping</string>
+    <string>Run Single-Step</string>
    </property>
   </action>
   <action name="actionLooping">
@@ -816,7 +816,7 @@ font: 20pt &quot;宋体&quot;;</string>
      <normaloff>:/images/loop.png</normaloff>:/images/loop.png</iconset>
    </property>
    <property name="text">
-    <string>Looping</string>
+    <string>Loop All Selected</string>
    </property>
   </action>
   <action name="actionEditStep">
@@ -976,7 +976,7 @@ font: 20pt &quot;宋体&quot;;</string>
      <normaloff>:/images/StepBreakpoint.ico</normaloff>:/images/StepBreakpoint.ico</iconset>
    </property>
    <property name="text">
-    <string>Breakpoint</string>
+    <string>Breakpoint Set</string>
    </property>
    <property name="toolTip">
     <string>Breakpoint</string>
