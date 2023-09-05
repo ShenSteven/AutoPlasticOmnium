@@ -972,8 +972,8 @@ font: 20pt &quot;宋体&quot;;</string>
   </action>
   <action name="actionBreakpoint">
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/breakpoint-set.png</normaloff>:/images/breakpoint-set.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/StepBreakpoint.ico</normaloff>:/images/StepBreakpoint.ico</iconset>
    </property>
    <property name="text">
     <string>Breakpoint</string>
@@ -998,6 +998,10 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
   </action>
   <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/edit_copy.ico</normaloff>:/images/edit_copy.ico</iconset>
+   </property>
    <property name="text">
     <string>Copy</string>
    </property>
@@ -1008,6 +1012,10 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionPaste">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/edit_paste.ico</normaloff>:/images/edit_paste.ico</iconset>
    </property>
    <property name="text">
     <string>Paste</string>
@@ -1030,6 +1038,10 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
   </action>
   <action name="actionCutStep">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/edit_cut.ico</normaloff>:/images/edit_cut.ico</iconset>
+   </property>
    <property name="text">
     <string>Cut</string>
    </property>

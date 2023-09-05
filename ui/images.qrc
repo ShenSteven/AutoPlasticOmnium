@@ -1,5 +1,13 @@
 <RCC>
   <qresource>
+    <file>images/RunSingle.ico</file>
+    <file>images/RunUUT.ico</file>
+    <file>images/BreakpointCondition.ico</file>
+    <file>images/BreakpointDisabled.ico</file>
+    <file>images/edit_copy.ico</file>
+    <file>images/edit_cut.ico</file>
+    <file>images/edit_paste.ico</file>
+    <file>images/MsgBox.ico</file>
     <file>images/NI_DoWhile.ico</file>
     <file>images/NI_Else.ico</file>
     <file>images/NI_ElseIf.ico</file>
