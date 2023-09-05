@@ -972,7 +972,7 @@ font: 20pt &quot;宋体&quot;;</string>
   </action>
   <action name="actionBreakpoint">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/images/breakpoint-set.png</normaloff>:/images/breakpoint-set.png</iconset>
    </property>
    <property name="text">
