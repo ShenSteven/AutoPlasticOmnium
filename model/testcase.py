@@ -16,9 +16,6 @@ import database.sqlite
 import model.variables
 import conf.globalvar as gv
 import sockets.serialport
-import flowcontrol.forloop
-import flowcontrol.dowhile
-import flowcontrol.whileloop
 import flowcontrol.ifelse
 from inspect import currentframe
 from datetime import datetime
@@ -54,9 +51,10 @@ class TestCase:
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = ''
         self.tResult = True
-        self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
-        self.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
-        self.WhileLoop = flowcontrol.whileloop.WhileLoop(self.logger)
+        self.ForLoop = None
+        self.DoWhileLoop = None
+        self.WhileLoop = None
+        self.loop = None
         self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
         self.Finished = False
         self.failCount = 0
@@ -110,17 +108,22 @@ class TestCase:
         try:
             for i, suite in enumerate(self.clone_suites, start=0):
 
-                if not self.ForLoop.IsEnd and self.ForLoop.jump:
+                if self.loop is not None and not self.loop.IsEnd and self.loop.jump:
+                    if i < self.loop.StartSuiteNo:
+                        continue
+                    else:
+                        stepNo = self.loop.StartStepNo
+                elif self.ForLoop is not None and not self.ForLoop.IsEnd and self.ForLoop.jump:
                     if i < self.ForLoop.StartSuiteNo:
                         continue
                     else:
                         stepNo = self.ForLoop.StartStepNo
-                elif not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
+                elif self.DoWhileLoop is not None and not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
                     if i < self.DoWhileLoop.StartSuiteNo:
                         continue
                     else:
                         stepNo = self.DoWhileLoop.StartStepNo
-                elif not self.WhileLoop.IsEnd and self.WhileLoop.jump:
+                elif self.WhileLoop is not None and not self.WhileLoop.IsEnd and self.WhileLoop.jump:
                     if i < self.WhileLoop.StartSuiteNo:
                         continue
                     else:
@@ -133,11 +136,13 @@ class TestCase:
                 if not suite_result:
                     break
 
-                if not self.ForLoop.IsEnd and self.ForLoop.jump:
+                if self.loop is not None and self.loop.IsEnd and self.loop.jump:
                     return self.run()
-                if not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
+                if self.ForLoop is not None and not self.ForLoop.IsEnd and self.ForLoop.jump:
                     return self.run()
-                if not self.WhileLoop.IsEnd and self.WhileLoop.jump:
+                if self.DoWhileLoop is not None and not self.DoWhileLoop.IsEnd and self.DoWhileLoop.jump:
+                    return self.run()
+                if self.WhileLoop is not None and not self.WhileLoop.IsEnd and self.WhileLoop.jump:
                     return self.run()
 
             self.tResult = all(self.suite_result_list)
@@ -172,10 +177,11 @@ class TestCase:
         self.tResult = True
         self.suite_result_list = []
         self.sum_step = self.step_count
-        self.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
-        self.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
-        self.WhileLoop = flowcontrol.whileloop.WhileLoop(self.logger)
+        self.ForLoop = None
+        self.DoWhileLoop = None
+        self.WhileLoop = None
         self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
+        self.loop = None
 
     def teardown(self):
         if self.dut_comm is not None:

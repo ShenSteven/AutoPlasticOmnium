@@ -602,7 +602,7 @@ class Step:
 
         try:
             if self.isTest:
-                if test_case.WhileLoop.while_condition is not None:
+                if test_case.WhileLoop is not None and test_case.WhileLoop.while_condition is not None:
                     if not test_case.WhileLoop.while_condition:
                         self.test_result = True
                         self.status = str(self.test_result)
@@ -672,7 +672,10 @@ class Step:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_case, self.test_result)
             test_case.step_finish_num = test_case.step_finish_num + 1
-            if not test_case.ForLoop.IsEnd or not test_case.DoWhileLoop.IsEnd or not test_case.WhileLoop.IsEnd:
+            if (test_case.ForLoop is not None and not test_case.ForLoop.IsEnd) or \
+                    (test_case.DoWhileLoop is not None and not test_case.DoWhileLoop.IsEnd) or \
+                    (test_case.WhileLoop is not None and not test_case.WhileLoop.IsEnd):
+                # if test_case.loop is not None and not test_case.loop.IsEnd:
                 test_case.sum_step = test_case.sum_step + 1
             self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.clear()
@@ -835,7 +838,8 @@ class Step:
         if self.EeroName is None:
             obj.test_name = self.StepName
         elif self.EeroName.endswith('_'):
-            obj.test_name = self.EeroName + str(test_case.ForLoop.LoopCounter)
+            # obj.test_name = self.EeroName + str(test_case.ForLoop.LoopCounter)
+            obj.test_name = self.EeroName + str(test_case.loop.LoopCounter)
         else:
             obj.test_name = self.EeroName
         obj.status = 'passed' if testResult else 'failed'
@@ -894,33 +898,48 @@ class Step:
 
     def start_loop(self, test_case, suit):
         """FOR 循环开始判断 FOR(3)"""
+        import flowcontrol.forloop
+        import flowcontrol.dowhile
         if IsNullOrEmpty(self.For):
             return
         if str_to_int(self.For)[0]:
+            test_case.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
             test_case.ForLoop.start(suit.index, self.index, int(self.For))
+            # test_case.loop = flowcontrol.forloop.ForLoop(self.logger)
+            # test_case.loop.start(suit.index, self.index, int(self.For))
         elif self.For.lower() == "do":
+            test_case.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
             test_case.DoWhileLoop.start(suit.index, self.index)
+            # test_case.loop = flowcontrol.dowhile.DoWhile(self.logger)
+            # test_case.loop.start(suit.index, self.index)
 
     def end_loop(self, test_case, step_result, index):
         """FOR 循环结束判断 END FOR"""
+        import flowcontrol.whileloop
         if IsNullOrEmpty(self.For):
             return False
         if self.For.lower() == 'endfor':
             is_end = not test_case.ForLoop.is_end()
+            # is_end = not test_case.loop.is_end()
             return is_end
         elif self.For.lower() == "while":
             is_end = not test_case.DoWhileLoop.is_end(step_result)
+            # is_end = not test_case.loop.is_end(step_result)
             return is_end
         elif self.For.lower() == "endwhiledo":
             is_end = not test_case.WhileLoop.is_end()
+            # is_end = not test_case.loop.is_end()
             return is_end
         if self.For.lower() == "whiledo":
+            test_case.WhileLoop = flowcontrol.whileloop.WhileLoop(self.logger)
             if step_result:
                 test_case.WhileLoop.start(index, self.index, step_result)
+                # test_case.loop.start(index, self.index, step_result)
                 return False
             else:
                 if not IsNullOrEmpty(self.FTC) and self.FTC == 'Y':
                     test_case.WhileLoop.start(index, self.index, False)
+                    # test_case.loop.start(index, self.index, False)
                     self.logger.warning(f"while condition fail, but by pass to continue.")
                     return False
                 else:
