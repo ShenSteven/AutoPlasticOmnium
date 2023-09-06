@@ -27,8 +27,9 @@ station:
     rs_url: http://xxxxxx/api/1/
     csv_column: csv_column.txt
     continue_fail_limit: 3
-    loop_interval: 0
-    loop_count: 0
+    LoopInterval: 0
+    LoopMaximum: -1 # <=0:无线循环
+    LoopNumPassed: -1 # -1
     setTimeZone:
     fix_flag: false
     fail_continue: false
@@ -63,7 +64,7 @@ dut:
 BLF:
     ReqDelay: 10
     RespDelay: 10
-    readTxCount: 1000
+    ReadTxCount: 1000
     MRtoMRDelay: 0.1
     SchedulePeriod: 20
 RUNIN:

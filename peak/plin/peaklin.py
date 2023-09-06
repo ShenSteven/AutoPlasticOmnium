@@ -764,8 +764,8 @@ class PeakLin(QDialog, Ui_PeakGui):
                         if log:
                             self.logger.debug(f"Tx  {_id},{bytes_to_string(pRcvMsg.Data)}")
                         return True
-                    if readTxCount == gv.cfg.BLF.readTxCount:
-                        self.logger.warning(f'readTxCount:{gv.cfg.BLF.readTxCount}')
+                    if readTxCount == gv.cfg.BLF.ReadTxCount:
+                        self.logger.warning(f'readTxCount:{gv.cfg.BLF.ReadTxCount}')
                         break
             self.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(lFrameEntry.InitialData)}")
             return False

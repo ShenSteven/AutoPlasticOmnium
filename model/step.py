@@ -591,7 +591,7 @@ class Step:
         """run test step"""
         self.myWind = test_case.myWind
         if self.logger is None:
-            self.logger = testSuite.logger
+            self.logger = test_case.logger
         self.SuiteName = testSuite.name
         self.suiteIndex = testSuite.index
         self.suiteVar = testSuite.suiteVar

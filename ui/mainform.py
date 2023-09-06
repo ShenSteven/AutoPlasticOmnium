@@ -100,7 +100,6 @@ class MainForm(Ui_MainWindow, TestForm):
         self.init_tableWidget()
         self.init_childLabel()
         self.init_label_info()
-
         self.init_lineEdit()
         self.init_graphicsView()
         self.init_signals_connect()
@@ -138,34 +137,34 @@ class MainForm(Ui_MainWindow, TestForm):
         """
         station_model = ['M4', 'M6', 'SX5GEV', 'SX5GEV_EOL']
         flag = True
-        for stationName in gv.cfg.station.station_all:
+        for item in gv.cfg.station.station_all:
             model_all = []
-            if stationName not in station_model:
+            if item not in station_model:
                 station_select = QAction(self)
-                station_select.setObjectName(stationName)
-                station_select.setText(stationName)
+                station_select.setObjectName(item)
+                station_select.setText(item)
                 self.menuSelect_Station.addAction(station_select)
                 station_select.triggered.connect(self.on_select_station)
             else:
-                if stationName == 'M4':
+                if item == 'M4':
                     model_all = ['FL', 'FR', 'RL', 'RML', 'RMR', 'RR']
-                elif stationName == 'M6':
+                elif item == 'M6':
                     model_all = ['FL', 'FR', 'FLG', 'FRG']
-                elif stationName == 'SX5GEV' or stationName == 'SX5GEV_EOL':
+                elif item == 'SX5GEV' or item == 'SX5GEV_EOL':
                     model_all = ['FL', 'FR', 'RL', 'RM', 'RR', 'FLB', 'FRB']
 
                 station_menu = QMenu(self.menuSelect_Station)
-                station_menu.setObjectName(stationName)
-                station_menu.setTitle(stationName)
+                station_menu.setObjectName(item)
+                station_menu.setTitle(item)
                 self.menuSelect_Station.addMenu(station_menu)
                 station_menu.triggered.connect(self.on_select_station)
-                for item in model_all:
+                for item_ in model_all:
                     model_select = QAction(self)
-                    model_select.setObjectName(item)
-                    model_select.setText(item)
+                    model_select.setObjectName(item_)
+                    model_select.setText(item_)
                     station_menu.addAction(model_select)
                     model_select.triggered.connect(self.on_select_dut_model)
-                    if gv.cfg.station.station_name in station_model and flag:
+                    if gv.cfg.station.station_name == station_menu.title() and flag:
                         flag = False
                         model_select.triggered.emit()
 
@@ -571,13 +570,13 @@ class MainForm(Ui_MainWindow, TestForm):
             action = self.sender()
             if isinstance(action, QAction):
                 gv.cfg.station.station_name = action.text() if "(" not in action.text() else action.text()[
-                                                                                            :action.text().index('(')]
+                                                                                             :action.text().index('(')]
                 self.dut_model = ''
                 self.actionunknow.setText('')
             if isinstance(action, QMenu):
                 gv.cfg.station.station_name = action.title() if "(" not in action.title() else action.title()[
-                                                                                              :action.title().index(
-                                                                                                  '(')]
+                                                                                               :action.title().index(
+                                                                                                   '(')]
             if gv.cfg.station.station_name.startswith('ReadVer'):
                 gv.IsDebug = True
             gv.cfg.station.station_no = gv.cfg.station.station_name
@@ -596,8 +595,7 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_select_dut_model(self):
         action = self.sender()
         if isinstance(action, QAction):
-            self.dut_model = action.text() if "(" not in action.text() else action.text()[
-                                                                            :action.text().index('(')]
+            self.dut_model = action.text() if "(" not in action.text() else action.text()[:action.text().index('(')]
             self.actionunknow.setText(self.dut_model)
         self.treeWidget.setHeaderLabel(f'{gv.cfg.station.station_no}_{self.dut_model}')
 
@@ -685,8 +683,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 self.fileHandle.close()
                 os.rename(self.txtLogPath, rename_log)
                 self.txtLogPath = rename_log
-                myScreenshot = pyautogui.screenshot(
-                    region=(self.x(), self.y(), self.width(), self.height() + 50))
+                myScreenshot = pyautogui.screenshot(region=(self.x(), self.y(), self.width(), self.height() + 50))
                 ScreenshotPhoto = self.txtLogPath.replace('.txt', '.png')
                 myScreenshot.save(ScreenshotPhoto)
             else:
@@ -1168,11 +1165,11 @@ class MainForm(Ui_MainWindow, TestForm):
         self.logger = gv.lg.logger
         gv.InitCreateDirs(self.logger)
         self.init_textEditHandler()
-        self.testcase.jsonObj = model.product.JsonObject(SN, gv.cfg.station.station_no,
-                                                         gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
-        self.testcase.startTimeJson = datetime.now()
         self.testcase.logger = self.logger
         self.testcase.step_finish_num = 0
+        self.testcase.startTimeJson = datetime.now()
+        self.testcase.jsonObj = model.product.JsonObject(SN, gv.cfg.station.station_no,
+                                                         gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
         self.testcase.daq_data_path = rf'{gv.OutPutPath}\{gv.cfg.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         self.mes_result = f'http://{gv.cfg.station.mes_result}/api/2/serial/{SN}/station/{gv.cfg.station.station_no}/info'
@@ -1273,14 +1270,6 @@ class MainForm(Ui_MainWindow, TestForm):
             print('RuntimeError')
         except Exception as e:
             print(e)
-
-    # def closeEvent(self, a0: QCloseEvent) -> None:
-    #     """
-    #     重写QWidget类的closrEvent方法，在窗口被关闭的时候自动触发
-    #     """
-    #     # super().closeEvent(a0)  # 先添加父类的方法，以免导致覆盖父类方法（这是重点！！！）
-    #     self.autoScanFlag = False
-    #     print('.....................................closeOpenCV')
 
     def sinWave(self, i=0):
         fig = plt.figure(figsize=(6, 4), dpi=100)

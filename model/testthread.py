@@ -41,19 +41,19 @@ class TestThread(QThread):
                                 self.myWind.PassNumOfCycleTest += 1
                             else:
                                 self.myWind.FailNumOfCycleTest += 1
-                            if self.myWind.PassNumOfCycleTest + self.myWind.FailNumOfCycleTest == gv.cfg.station.loop_count:
+                            if self.myWind.PassNumOfCycleTest + self.myWind.FailNumOfCycleTest == gv.cfg.station.LoopMaximum \
+                                    or self.myWind.PassNumOfCycleTest == gv.cfg.station.LoopNumPassed:
                                 self.myWind.logger.debug(
                                     f"***** All loop({gv.cfg.station.loop_count}) have completed! *****")
-                                self.myWind.my_signals.threadStopSignal[str].emit('stop test.')
+                                self.myWind.my_signals.threadStopSignal[str].emit('stop loop test.')
                                 time.sleep(0.5)
                             else:
-                                time.sleep(gv.cfg.station.loop_interval)
+                                time.sleep(gv.cfg.station.LoopInterval)
                     elif self.myWind.SingleStepTest:
-                        self.myWind.logger.debug(f'Suite:{self.myWind.SuiteNo},Step:{self.myWind.StepNo}')
-                        # self.myWind.testcase.logger = self.myWind.logger
-                        result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[
-                            self.myWind.StepNo].run(self.myWind.testcase,
-                                                    self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
+                        self.myWind.logger.debug(
+                            f'Run single-step,SuiteNo:{self.myWind.SuiteNo},StepNo:{self.myWind.StepNo}')
+                        result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[self.myWind.StepNo].run(
+                            self.myWind.testcase, self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
                         self.myWind.finalTestResult = result
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)

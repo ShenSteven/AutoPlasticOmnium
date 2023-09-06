@@ -804,7 +804,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionStepping">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/images/repeat.png</normaloff>:/images/repeat.png</iconset>
+     <normaloff>:/images/RunSingle.ico</normaloff>:/images/RunSingle.ico</iconset>
    </property>
    <property name="text">
     <string>Run Single-Step</string>
@@ -887,7 +887,7 @@ font: 20pt &quot;宋体&quot;;</string>
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Mode:</string>
+    <string>Model:</string>
    </property>
   </action>
   <action name="actionTestMode">
