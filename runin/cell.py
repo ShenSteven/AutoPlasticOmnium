@@ -38,8 +38,8 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.webSwitchCon = None
         self.row_index = row
         self.col_index = col
-        self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.excel_file_path}',
-                                                                         f'{gv.cf.station.station_name}', self.logger,
+        self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.ExcelFilePath}',
+                                                                         f'{gv.cfg.station.station_name}', self.logger,
                                                                          self, False)
         self.setupUi(self)
         self.init_cell_ui()
@@ -48,10 +48,10 @@ class Cell(QFrame, Ui_cell, TestForm):
 
     @property
     def LocalNo(self):
-        if gv.cf.RUNIN.col > 8:
+        if gv.cfg.RUNIN.col > 8:
             raise ValueError('out of! config.RUNIN.col must is 8 or less.')
         else:
-            return (self.row_index - 1) * gv.cf.RUNIN.col + self.col_index
+            return (self.row_index - 1) * gv.cfg.RUNIN.col + self.col_index
 
     def init_cell_ui(self):
         self.lb_cellNum.setText('')
@@ -125,15 +125,15 @@ class Cell(QFrame, Ui_cell, TestForm):
 
     def variable_init(self, SN):
         """测试变量初始化"""
-        gv.init_create_dirs(self.logger)
-        self.TestVariables = model.variables.Variables(SN, str(self.LocalNo), str(gv.cf.LTT.row))
-        self.testcase.jsonObj = model.product.JsonObject(SN, gv.cf.station.station_no,
-                                                         gv.cf.dut.test_mode, gv.cf.dut.qsdk_ver, gv.version)
-        self.mes_result = f'http://{gv.cf.station.mes_result}/api/2/serial/{SN}/station/{gv.cf.station.station_no}/info'
-        self.rs_url = gv.cf.station.rs_url
-        self.shop_floor_url = f'http://{gv.cf.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cf.station.station_name}'
-        self.testcase.daq_data_path = rf'{gv.OutPutPath}{os.sep}{gv.cf.station.station_no}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
-        self.testcase.mesPhases = model.product.MesInfo(SN, gv.cf.station.station_no, gv.version)
+        gv.InitCreateDirs(self.logger)
+        self.TestVariables = model.variables.Variables(SN, str(self.LocalNo), str(gv.cfg.LTT.row))
+        self.testcase.jsonObj = model.product.JsonObject(SN, gv.cfg.station.station_no,
+                                                         gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
+        self.mes_result = f'http://{gv.cfg.station.mes_result}/api/2/serial/{SN}/station/{gv.cfg.station.station_no}/info'
+        self.rs_url = gv.cfg.station.rs_url
+        self.shop_floor_url = f'http://{gv.cfg.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cfg.station.station_name}'
+        self.testcase.daq_data_path = rf'{gv.OutPutPath}{os.sep}{gv.cfg.station.station_no}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
+        self.testcase.mesPhases = model.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
         self.finalTestResult = False
         self.setIpFlag = False
         self.DUTMesIP = ''
@@ -144,8 +144,8 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.WorkOrder = '1'
         self.testcase.startTimeJson = datetime.now()
         self.sec = 1
-        self.txtLogPath = rf'{gv.logFolderPath}{os.sep}logging_{self.LocalNo}_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
-        gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.critical_log, gv.errors_log)
+        self.txtLogPath = rf'{gv.LogFolderPath}{os.sep}logging_{self.LocalNo}_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
+        gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.CriticalLog, gv.ErrorsLog)
         self.logger = gv.lg.logger
         self.testcase.logger = self.logger
         self.init_textEditHandler()
@@ -161,11 +161,11 @@ class Cell(QFrame, Ui_cell, TestForm):
             logging.getLogger('testlog').removeHandler(log_console)
             self.fileHandle = gv.lg.logger.handlers[0]
         else:
-            gv.cf.station.privileges = 'lab'
+            gv.cfg.station.privileges = 'lab'
             self.fileHandle = gv.lg.logger.handlers[1]
 
     def UpdateContinueFail(self, testResult: bool):
-        if gv.IsDebug or gv.cf.dut.test_mode.lower() == 'debug':
+        if gv.IsDebug or gv.cfg.dut.test_mode.lower() == 'debug':
             return
         if testResult:
             self.continue_fail_count = 0

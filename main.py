@@ -42,12 +42,12 @@ def main():
     app = QApplication([])
     # print("applicationDirPath:", app.applicationDirPath())
     try:
-        if gv.about['__station__'] == 'RUNIN' or gv.about['__station__'] == 'ORT':
-            gv.loginWin = rmf.LoginWind()
-            gv.loginWin.show()
+        if gv.About['__station__'] == 'RUNIN' or gv.About['__station__'] == 'ORT':
+            gv.LoginWin = rmf.LoginWind()
+            gv.LoginWin.show()
         else:
-            gv.mainWin = mf.MainForm()
-            gv.mainWin.show()
+            gv.MainWin = mf.MainForm()
+            gv.MainWin.show()
 
         sys.exit(app.exec_())
     except KeyboardInterrupt:

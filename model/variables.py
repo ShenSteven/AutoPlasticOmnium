@@ -21,7 +21,7 @@ class Variables:
         self.Year = datetime.now().strftime('%y')
         self.Month = datetime.now().strftime('%m')
         self.Day = datetime.now().strftime('%d')
-        self.Config = gv.cf
+        self.Config = gv.cfg
 
     def __getitem__(self, i):
         if i >= len(self.__dict__.items()):

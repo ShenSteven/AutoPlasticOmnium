@@ -28,21 +28,21 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
     """设置并处理不同的测试状态"""
     try:
         if status == TestStatus.START:
-            if gv.loginWin is not None:
+            if gv.LoginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 255, 0);")
                 myWind.start_time = datetime.now()
                 myWind.startFlag = True
                 myWind.my_signals.timingSignal[bool].emit(True)
                 print(
-                    f"Start test,SN:{myWind.SN},CellNO={myWind.LocalNo},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
-                    f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},FTC:{gv.cf.station.fail_continue},"
-                    f"SoftVersion:{gv.version},WebPS={myWind.WebPsIp}")
+                    f"Start test,SN:{myWind.SN},CellNO={myWind.LocalNo},Station:{gv.cfg.station.station_no},DUTMode:{myWind.dut_model},"
+                    f"TestMode:{gv.cfg.dut.test_mode},IsDebug:{gv.IsDebug},FTC:{gv.cfg.station.fail_continue},"
+                    f"SoftVersion:{gv.VERSION},WebPS={myWind.WebPsIp}")
             else:
                 myWind.treeWidget.blockSignals(True)
                 if not myWind.SingleStepTest:
                     myWind.my_signals.textEditClearSignal[str].emit('')
                 myWind.my_signals.lineEditEnableSignal[bool].emit(False)
-                if gv.cf.station.station_name in ['M4', 'M6', 'SX5GEV']:
+                if gv.cfg.station.station_name in ['M4', 'M6', 'SX5GEV']:
                     myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'Flashing', 36,
                                                                                  Qt.yellow)
                 else:
@@ -56,20 +56,20 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.my_signals.controlEnableSignal[QAction, bool].emit(myWind.actionStop, True)
                 myWind.startFlag = True
                 myWind.logger.debug(
-                    f"Start test,SN:{myWind.SN},Station:{gv.cf.station.station_no},DUTMode:{myWind.dut_model},"
-                    f"TestMode:{gv.cf.dut.test_mode},IsDebug:{gv.IsDebug},"
-                    f"FTC:{gv.cf.station.fail_continue},SoftVersion:{gv.version}")
+                    f"Start test,SN:{myWind.SN},Station:{gv.cfg.station.station_no},DUTMode:{myWind.dut_model},"
+                    f"TestMode:{gv.cfg.dut.test_mode},IsDebug:{gv.IsDebug},"
+                    f"FTC:{gv.cfg.station.fail_continue},SoftVersion:{gv.VERSION}")
                 myWind.my_signals.update_tableWidget[str].emit('clear')
                 myWind.pause_event.set()
         elif status == TestStatus.FAIL:
-            if gv.loginWin is not None:
+            if gv.LoginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 0, 0);")
                 myWind.my_signals.updateLabel[QLabel, str].emit(myWind.lb_testName,
                                                                 f"<A href='https://www.qt.io/'>{myWind.testcase.error_details_first_fail}</A>")
             else:
                 myWind.total_fail_count += 1
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'FAIL', 36, Qt.red)
-                myWind.my_signals.play_audio[str].emit(os.path.join(gv.current_dir, 'ffmpeg', 'fail2.wav'))
+                myWind.my_signals.play_audio[str].emit(os.path.join(gv.CurrentDir, 'ffmpeg', 'fail2.wav'))
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testTime, str(myWind.sec), 11,
                                                                              Qt.gray)
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
@@ -77,20 +77,20 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                                                                              20, Qt.red)
                 myWind.UpdateContinueFail(False)
                 if myWind.setIpFlag:
-                    myWind.testcase.dut_comm.send_command(f"luxsetip {gv.cf.dut.dut_ip} 255.255.255.0",
-                                                          gv.cf.dut.prompt, 1)
+                    myWind.testcase.dut_comm.send_command(f"luxsetip {gv.cfg.dut.dut_ip} 255.255.255.0",
+                                                          gv.cfg.dut.prompt, 1)
         elif status == TestStatus.PASS:
-            if gv.loginWin is not None:
+            if gv.LoginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(0, 255, 0);")
             else:
                 myWind.total_pass_count += 1
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'PASS', 36, Qt.green)
-                myWind.my_signals.play_audio[str].emit(os.path.join(gv.current_dir, 'ffmpeg', 'finish2.wav'))
+                myWind.my_signals.play_audio[str].emit(os.path.join(gv.CurrentDir, 'ffmpeg', 'finish2.wav'))
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode, str(myWind.sec),
                                                                              20, Qt.green)
                 myWind.UpdateContinueFail(True)
         elif status == TestStatus.ABORT:
-            if gv.loginWin is not None:
+            if gv.LoginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 255, 255);")
                 myWind.total_abort_count += 1
                 myWind.testThread.terminate()
@@ -100,7 +100,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.testThread.terminate()
                 myWind.testThread.wait(1)
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'Abort', 36, Qt.gray)
-                myWind.my_signals.play_audio[str].emit(os.path.join(gv.current_dir, 'ffmpeg', 'fail1.wav'))
+                myWind.my_signals.play_audio[str].emit(os.path.join(gv.CurrentDir, 'ffmpeg', 'fail1.wav'))
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testTime, str(myWind.sec), 11,
                                                                              Qt.gray)
                 myWind.my_signals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
@@ -111,7 +111,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
         myWind.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
     finally:
         try:
-            if gv.loginWin is not None:
+            if gv.LoginWin is not None:
                 if status != TestStatus.START:
                     gv.CheckSnList.remove(myWind.SN)
                     myWind.SN = ''

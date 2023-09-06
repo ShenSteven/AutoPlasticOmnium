@@ -30,8 +30,8 @@ def init_sqlite_database(logger, database_name,table_name='RESULT'):
                 db.execute_commit("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_fail_count', '0')")
                 db.execute_commit("INSERT INTO COUNT (NAME,VALUE) VALUES ('total_abort_count', '0')")
                 logger.debug(f"setting.db table created successfully")
-        if not os.path.exists(gv.database_result):
-            with Sqlite(gv.database_result) as db:
+        if not os.path.exists(gv.DatabaseResult):
+            with Sqlite(gv.DatabaseResult) as db:
                 db.execute_commit(f'''CREATE TABLE {table_name}
                                              (ID            INTEGER PRIMARY KEY AUTOINCREMENT,
                                               SN            TEXT,

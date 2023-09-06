@@ -70,12 +70,12 @@ class TestCase:
         self.csv_list_header = []
         self.csv_list_data = []
         self.csv_file_path = ''
-        database.sqlite.init_sqlite_database(self.logger, gv.database_setting)
+        database.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
         self.load_testcase(testcase_path, sheet_name, logger, cflag, isVerify)
 
     @property
     def test_script_json(self):
-        return rf'{gv.scriptFolder}{os.sep}{self.sheetName}.json'
+        return rf'{gv.ScriptFolder}{os.sep}{self.sheetName}.json'
 
     def load_testcase(self, testcase_path, sheet_name, logger, cflag, isVerify):
         try:
@@ -83,16 +83,16 @@ class TestCase:
             self.testcase_path = testcase_path
             self.logger = logger
             if not getattr(sys, 'frozen', False) and cflag:
-                model.loadseq.excel_convert_to_json(self.testcase_path, gv.cf.station.station_all, self.logger)
+                model.loadseq.excel_convert_to_json(self.testcase_path, gv.cfg.station.station_all, self.logger)
             if not os.path.exists(self.test_script_json):
                 model.loadseq.excel_convert_to_json(self.testcase_path, [sheet_name], self.logger)
-            if gv.isHide:
+            if gv.IsHide:
                 self.original_suites, self.header, self.step_count = model.loadseq.load_testcase_from_py(self.sheetName)
             else:
                 self.original_suites, self.header, self.step_count = model.loadseq.load_testcase_from_json(
                     self.test_script_json, isVerify)
             self.clone_suites = copy.deepcopy(self.original_suites)
-            gv.Keywords = get_keywords_list(rf'{gv.current_dir}{os.sep}conf{os.sep}keywords.txt')
+            gv.Keywords = get_keywords_list(rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
             self.sum_step = self.step_count
         except Exception as e:
             QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
@@ -182,22 +182,22 @@ class TestCase:
             self.dut_comm.close()
         if gv.PLin is not None:
             gv.PLin.close()
-        if gv.cf.station.fix_flag and gv.cf.station.pop_fix and self.FixSerialPort is not None:
+        if gv.cfg.station.fix_flag and gv.cfg.station.pop_fix and self.FixSerialPort is not None:
             self.FixSerialPort.open()
             self.FixSerialPort.sendCommand('AT+TESTEND%', )
 
     def get_stationNo(self):
         """通过串口读取治具中设置的测试工站名字"""
-        if not gv.cf.station.fix_flag:
+        if not gv.cfg.station.fix_flag:
             return
-        self.FixSerialPort = sockets.serialport.SerialPort(gv.cf.station.fix_com_port,
-                                                           gv.cf.station.fix_com_baudRate)
+        self.FixSerialPort = sockets.serialport.SerialPort(gv.cfg.station.fix_com_port,
+                                                           gv.cfg.station.fix_com_baudRate)
         for i in range(0, 3):
             rReturn, revStr = self.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
             if rReturn:
-                gv.cf.station.station_no = revStr.replace('\r\n', '').strip()
-                gv.cf.station.station_name = gv.cf.station.station_no[0, gv.cf.station.station_no.index('-')]
-                self.logger.debug(f"Read fix number success,stationName:{gv.cf.station.station_name}")
+                gv.cfg.station.station_no = revStr.replace('\r\n', '').strip()
+                gv.cfg.station.station_name = gv.cfg.station.station_no[0, gv.cfg.station.station_no.index('-')]
+                self.logger.debug(f"Read fix number success,stationName:{gv.cfg.station.station_name}")
                 break
         else:
             QMessageBox.Critical(self, 'Read StationNO', "Read FixNum error,Please check it!")

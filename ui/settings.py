@@ -27,7 +27,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.refresh()
 
     def init_tabWidget(self):
-        for x in gv.cf.__dict__:
+        for x in gv.cfg.__dict__:
             setattr(self, x, QtWidgets.QWidget())
             tab = getattr(self, x)
             tab.setObjectName(x)
@@ -41,8 +41,8 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.timer.stop()
 
     def updateDialog(self, tab, x):
-        for y in gv.cf.__dict__[x].__dict__:
-            setting = getattr(gv.cf.__dict__[x], y)
+        for y in gv.cfg.__dict__[x].__dict__:
+            setting = getattr(gv.cfg.__dict__[x], y)
             if isinstance(setting, list) or isinstance(setting, dict):
                 continue
             # horizontalLayout
@@ -85,13 +85,13 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         control = self.sender()
         tab_name = control.parent().objectName()
         if isinstance(control, QtWidgets.QCheckBox):
-            setattr(getattr(gv.cf, tab_name), control.objectName(), control.isChecked())
+            setattr(getattr(gv.cfg, tab_name), control.objectName(), control.isChecked())
         elif isinstance(control, QtWidgets.QLineEdit):
-            setting = getattr(gv.cf.__dict__[tab_name], control.objectName())
+            setting = getattr(gv.cfg.__dict__[tab_name], control.objectName())
             if isinstance(setting, int):
-                setattr(getattr(gv.cf, tab_name), control.objectName(), int(control.text()))
+                setattr(getattr(gv.cfg, tab_name), control.objectName(), int(control.text()))
             else:
-                setattr(getattr(gv.cf, tab_name), control.objectName(), control.text())
+                setattr(getattr(gv.cfg, tab_name), control.objectName(), control.text())
         self.isChange = True
 
     def refresh(self):

@@ -334,11 +334,11 @@ class Step:
     @property
     def FTC(self):
         if not hasattr(self, '_FTC'):
-            return 'Y' if gv.cf.station.fail_continue else 'N'
+            return 'Y' if gv.cfg.station.fail_continue else 'N'
         elif self._FTC.lower() == 'n' or self._FTC.lower() == 'y':
             return self._FTC.upper()
         else:
-            return 'Y' if gv.cf.station.fail_continue else 'N'
+            return 'Y' if gv.cfg.station.fail_continue else 'N'
 
     @FTC.setter
     def FTC(self, value):
@@ -638,7 +638,7 @@ class Step:
             self.set_breakpoint()
             for retry in range(self.Retry, -1, -1):
                 if self.myWind.pause_event.wait():
-                    if gv.cf.dut.test_mode == 'debug' or gv.IsDebug and self.Keyword in gv.cf.dut.debug_skip:
+                    if gv.cfg.dut.test_mode == 'debug' or gv.IsDebug and self.Keyword in gv.cfg.dut.debug_skip:
                         self.logger.debug('This is debug mode.Skip this step.')
                         self.test_result, info = True, ''
                     else:
@@ -700,13 +700,13 @@ class Step:
         SQL_statements = f'''INSERT INTO RESULT 
                       (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,
                       ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) 
-                      VALUES (NULL,'{test_case.myWind.SN}','{gv.cf.station.station_name}','{gv.cf.station.station_no}',
+                      VALUES (NULL,'{test_case.myWind.SN}','{gv.cfg.station.station_name}','{gv.cfg.station.station_no}',
                       '{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.SPEC}','{self.LSL}',
                       '{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',
                       '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
                       '''
         if self.isTest and self.Json == 'Y':
-            with database.sqlite.Sqlite(gv.database_result) as db:
+            with database.sqlite.Sqlite(gv.DatabaseResult) as db:
                 self.logger.debug('INSERT test result to result.db table RESULT.')
                 db.execute_commit(SQL_statements)
             # with database.mysql.MySQL(host='127.0.0.1', port=3306, user='root', passwd='123456') as db:

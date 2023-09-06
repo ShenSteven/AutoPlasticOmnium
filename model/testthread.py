@@ -41,13 +41,13 @@ class TestThread(QThread):
                                 self.myWind.PassNumOfCycleTest += 1
                             else:
                                 self.myWind.FailNumOfCycleTest += 1
-                            if self.myWind.PassNumOfCycleTest + self.myWind.FailNumOfCycleTest == gv.cf.station.loop_count:
+                            if self.myWind.PassNumOfCycleTest + self.myWind.FailNumOfCycleTest == gv.cfg.station.loop_count:
                                 self.myWind.logger.debug(
-                                    f"***** All loop({gv.cf.station.loop_count}) have completed! *****")
+                                    f"***** All loop({gv.cfg.station.loop_count}) have completed! *****")
                                 self.myWind.my_signals.threadStopSignal[str].emit('stop test.')
                                 time.sleep(0.5)
                             else:
-                                time.sleep(gv.cf.station.loop_interval)
+                                time.sleep(gv.cfg.station.loop_interval)
                     elif self.myWind.SingleStepTest:
                         self.myWind.logger.debug(f'Suite:{self.myWind.SuiteNo},Step:{self.myWind.StepNo}')
                         # self.myWind.testcase.logger = self.myWind.logger
@@ -67,7 +67,7 @@ class TestThread(QThread):
                         self.myWind.finalTestResult = result & result1 & result2
                         collect_data_to_csv(self.myWind.testcase.mesPhases, self.myWind.testcase.csv_list_header,
                                             self.myWind.testcase.csv_list_data, self.myWind)
-                        if gv.mainWin is not None:
+                        if gv.MainWin is not None:
                             self.myWind.saveTestResult()
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)

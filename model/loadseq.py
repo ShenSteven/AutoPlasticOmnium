@@ -41,10 +41,10 @@ def save_keywords_to_txt(path, wpath):
 
 def excel_convert_to_json(testcase_path_excel, all_stations, logger):
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
-    gv.Keywords = save_keywords_to_txt(rf'{gv.current_dir}{os.sep}model{os.sep}keyword.py',
-                                       rf'{gv.current_dir}{os.sep}conf{os.sep}keywords.txt')
+    gv.Keywords = save_keywords_to_txt(rf'{gv.CurrentDir}{os.sep}model{os.sep}keyword.py',
+                                       rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
     for station in all_stations:
-        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.scriptFolder}{os.sep}{station}.json", logger)
+        load_testcase_from_excel(testcase_path_excel, station, rf"{gv.ScriptFolder}{os.sep}{station}.json", logger)
     logger.debug("convert finish!")
 
 
@@ -113,7 +113,7 @@ def param_wrapper_verify_sha256(flag):
             bound_args = sig.bind(*args, **kwargs)
             bound_args.apply_defaults()
             if flag and bound_args.args[1]:
-                with database.sqlite.Sqlite(gv.database_setting) as db:
+                with database.sqlite.Sqlite(gv.DatabaseSetting) as db:
                     file_name = os.path.basename(bound_args.args[0])
                     db.execute_commit(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{file_name}'")
                     result = db.cur.fetchone()
@@ -161,7 +161,7 @@ def load_testcase_from_json(json_path, isVerify=True):
                     headers = list(map(lambda x: x[1:] if x.startswith('_') else x, param2))
 
                     items = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), step_obj.__dict__)
-                    gv.step_attr = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
+                    gv.StepAttr = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
             suit_obj = model.suite.TestSuite(dict_=suit_dict)
             suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)
@@ -195,7 +195,7 @@ def load_testcase_from_py(name, package='scripts'):
                     headers = list(map(lambda x: x[1:] if x.startswith('_') else x, param2))
 
                     items = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), step_obj.__dict__)
-                    gv.step_attr = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
+                    gv.StepAttr = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
             suit_obj = model.suite.TestSuite(dict_=suit_dict)
             suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)
@@ -214,7 +214,7 @@ def wrapper_save_sha256(fun):
         bound_args.apply_defaults()
         result = fun(*bound_args.args, **bound_args.kwargs)
         sha256 = get_sha256(bound_args.args[1])
-        with database.sqlite.Sqlite(gv.database_setting) as db:
+        with database.sqlite.Sqlite(gv.DatabaseSetting) as db:
             file_name = os.path.basename(bound_args.args[1])
             try:
                 db.execute_commit(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")
@@ -264,7 +264,7 @@ def serialize_to_json(obj, json_path, logger):
         with open(json_path, 'w') as wf:
             json.dump(obj, wf, default=default_f, sort_keys=False, indent=4)
             filename = json_path.replace('.json', '.py')
-            if gv.isHide:
+            if gv.IsHide:
                 script_str = json.dumps(obj, default=default_f, sort_keys=False, indent=4)
                 with open(filename, 'w') as f:
                     f.write(f'script_str = """\n{script_str}\n"""\n\n{get_fun}')

@@ -60,7 +60,7 @@ class LoginWind(QMainWindow, Ui_Login):
 
             self.lineEdit.Enabled = False
             # gv.cf.station.station_name = self.FixtureNumber[0:self.FixtureNumber.index('-')]
-            gv.cf.station.station_no = self.FixtureNumber + self.AbFace
+            gv.cfg.station.station_no = self.FixtureNumber + self.AbFace
             self.runinWin = RuninMainForm()
             self.runinWin.show()
             self.hide()
@@ -76,14 +76,14 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.dut_model = None
         self.logger = gv.lg.logger
         self.CellList = []
-        self.RowCount = gv.cf.RUNIN.row
-        self.ColCount = gv.cf.RUNIN.col
+        self.RowCount = gv.cfg.RUNIN.row
+        self.ColCount = gv.cfg.RUNIN.col
         self.setupUi(self)
         self.lb_ip.setText('IP: ' + socket.gethostbyname(socket.gethostname()))
-        self.lb_station.setText(gv.cf.station.station_no)
-        self.lb_testMode.setText(gv.cf.dut.test_mode)
+        self.lb_station.setText(gv.cfg.station.station_no)
+        self.lb_testMode.setText(gv.cfg.dut.test_mode)
         self.lb_info.setText('Please scan sn.')
-        self.setWindowTitle('RUNIN/ORT ' + gv.version)
+        self.setWindowTitle('RUNIN/ORT ' + gv.VERSION)
         self.initCellUi()
         self.lineEdit.returnPressed.connect(self.locationInput)
         self.lineEdit_2.textEdited.connect(self.on_textEdited)
@@ -91,10 +91,10 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.bt_openLog.clicked.connect(on_actionLogFolder)
 
     def initCellUi(self):
-        gv.init_create_dirs(self.logger)
-        database.sqlite.init_sqlite_database(self.logger, gv.database_setting)
+        gv.InitCreateDirs(self.logger)
+        database.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
         if not getattr(sys, 'frozen', False):
-            model.loadseq.excel_convert_to_json(f'{gv.excel_file_path}', gv.cf.station.station_all, self.logger)
+            model.loadseq.excel_convert_to_json(f'{gv.ExcelFilePath}', gv.cfg.station.station_all, self.logger)
         for row in range(self.RowCount):
             for col in range(self.ColCount):
                 widget_cell = Cell(self.body, row + 1, col + 1)
@@ -138,7 +138,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
                     self.lb_info.setText('Location is testing!')
                     self.clear_input()
             else:
-                if len(scanSN) != gv.cf.dut.sn_len:
+                if len(scanSN) != gv.cfg.dut.sn_len:
                     self.lineEdit_2.setStyleSheet("background-color: rgb(255, 0, 0);")
                     self.lb_info.setText('SN length error!')
                     self.clear_input()
@@ -151,19 +151,19 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
             """通过SN判断机种"""
             sn = self.lineEdit_2.text()
             if sn[0] == 'J' or sn[0] == '6':
-                self.dut_model = gv.cf.dut.dut_models[0]
+                self.dut_model = gv.cfg.dut.dut_models[0]
             elif sn[0] == 'N' or sn[0] == '7':
-                self.dut_model = gv.cf.dut.dut_models[1]
+                self.dut_model = gv.cfg.dut.dut_models[1]
             elif sn[0] == 'Q' or sn[0] == '8':
-                self.dut_model = gv.cf.dut.dut_models[2]
+                self.dut_model = gv.cfg.dut.dut_models[2]
             elif sn[0] == 'S' or sn[0] == 'G':
-                self.dut_model = gv.cf.dut.dut_models[3]
+                self.dut_model = gv.cfg.dut.dut_models[3]
             else:
                 self.dut_model = 'unknown'
 
         """验证dut sn的正则规则"""
         if JudgeProdMode() != 'unknown' and not gv.IsDebug:
-            reg = QRegExp(gv.cf.dut.dut_regex[self.dut_model])
+            reg = QRegExp(gv.cfg.dut.dut_regex[self.dut_model])
             pValidator = QRegExpValidator(reg, self)
             self.lineEdit_2.setValidator(pValidator)
 

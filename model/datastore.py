@@ -36,7 +36,7 @@ def check_connection(logger, url):
 def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
     """上传json内容和测试log到客户服务器"""
     return True
-    json_upload_path = os.path.join(gv.logFolderPath, 'Json', f'{SN}_{time.strftime("%H%M%S")}.json')
+    json_upload_path = os.path.join(gv.LogFolderPath, 'Json', f'{SN}_{time.strftime("%H%M%S")}.json')
     # gv.jsonOfResult = json_upload_path
     jsonStr = json.dumps(jsonObj, default=lambda o: o.__dict__, sort_keys=True, indent=4)
     with open(json_upload_path, 'w') as fw:
@@ -72,8 +72,8 @@ def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
 
 def collect_data_to_csv(mesPhases, csv_list_header, csv_list_data, myWind):
     def thread_update():
-        myWind.testcase.csv_file_path = fr'{gv.cf.station.log_folder}{os.sep}CsvData{os.sep}{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cf.station.station_no}.csv'
-        csvColumnPath = fr'{gv.scriptFolder}{os.sep}csv_column.txt'
+        myWind.testcase.csv_file_path = fr'{gv.cfg.station.log_folder}{os.sep}CsvData{os.sep}{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cfg.station.station_no}.csv'
+        csvColumnPath = fr'{gv.ScriptFolder}{os.sep}csv_column.txt'
         fix_header = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
                       "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
                       "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
@@ -85,13 +85,13 @@ def collect_data_to_csv(mesPhases, csv_list_header, csv_list_data, myWind):
         with open(csvColumnPath, 'w') as f:
             header = '\t'.join(fix_header)
             f.write(header)
-        fix_header_value = [myWind.dut_model, gv.cf.station.station_name, "Luxxxxx", myWind.WorkOrder,
-                            gv.cf.station.station_no,
-                            "1", myWind.SN, gv.cf.dut.qsdk_ver, mesPhases.HW_REVISION, gv.version,
+        fix_header_value = [myWind.dut_model, gv.cfg.station.station_name, "Luxxxxx", myWind.WorkOrder,
+                            gv.cfg.station.station_no,
+                            "1", myWind.SN, gv.cfg.dut.qsdk_ver, mesPhases.HW_REVISION, gv.VERSION,
                             time.strftime("%Y/%m/%d %H:%M:%S"), str(myWind.sec),
                             myWind.finalTestResult,
                             mesPhases.first_fail, myWind.testcase.error_details_first_fail, "UTC",
-                            gv.cf.dut.test_mode,
+                            gv.cfg.dut.test_mode,
                             mesPhases.JSON_UPLOAD, mesPhases.MES_UPLOAD]
         fix_header_value.extend(csv_list_data)
         myWind.logger.debug(f'CollectResultToCsv {myWind.testcase.csv_file_path}')

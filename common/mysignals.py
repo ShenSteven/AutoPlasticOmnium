@@ -55,8 +55,8 @@ def on_setIcon(action_, icon: QIcon):
 
 def on_actionLogFolder():
     def thread_update():
-        if os.path.exists(gv.logFolderPath):
-            os.startfile(gv.logFolderPath)
+        if os.path.exists(gv.LogFolderPath):
+            os.startfile(gv.LogFolderPath)
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()
@@ -64,8 +64,8 @@ def on_actionLogFolder():
 
 def on_actionException():
     def thread_update():
-        if os.path.exists(gv.critical_log):
-            os.startfile(gv.critical_log)
+        if os.path.exists(gv.CriticalLog):
+            os.startfile(gv.CriticalLog)
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()

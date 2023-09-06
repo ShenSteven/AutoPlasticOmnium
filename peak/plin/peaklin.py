@@ -48,9 +48,9 @@ class PeakLin(QDialog, Ui_PeakGui):
         self.setupUi(self)
         self.init_signals_connect()
         self.initialize()
-        self.ReqDelay = c_ushort(gv.cf.BLF.ReqDelay)
-        self.RespDelay = c_ushort(gv.cf.BLF.RespDelay)
-        self._interval = gv.cf.BLF.ReqDelay + gv.cf.BLF.RespDelay
+        self.ReqDelay = c_ushort(gv.cfg.BLF.ReqDelay)
+        self.RespDelay = c_ushort(gv.cfg.BLF.RespDelay)
+        self._interval = gv.cfg.BLF.ReqDelay + gv.cfg.BLF.RespDelay
         self.Master3C = PLinApi.TLINScheduleSlot()
         self.Slave3D = PLinApi.TLINScheduleSlot()
 
@@ -617,7 +617,7 @@ class PeakLin(QDialog, Ui_PeakGui):
                 return True
             elif times is not None and times == send_counts:
                 return True
-            time.sleep(gv.cf.BLF.ReqDelay / 1000)
+            time.sleep(gv.cfg.BLF.ReqDelay / 1000)
             linResult = self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg)
             send_counts += 1
             if linResult == PLinApi.TLIN_ERROR_OK:
@@ -653,11 +653,11 @@ class PeakLin(QDialog, Ui_PeakGui):
             self.logger.debug(f"Tx32  {bytes_to_string(pMsg32.Data)}")
             # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
             if pMsg33 is not None:
-                time.sleep(gv.cf.BLF.ReqDelay / 1000)
+                time.sleep(gv.cfg.BLF.ReqDelay / 1000)
                 self.m_objPLinApi.Write(self.m_hClient, self.m_hHw, pMsg33)
                 self.logger.debug(f"Tx33  {bytes_to_string(pMsg33.Data)}")
                 # self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
-            time.sleep(gv.cf.BLF.SchedulePeriod / 1000)
+            time.sleep(gv.cfg.BLF.SchedulePeriod / 1000)
             if once:
                 time.sleep(timeout)
                 return
@@ -755,7 +755,7 @@ class PeakLin(QDialog, Ui_PeakGui):
                 self.m_objPLinApi.UpdateByteArray(self.m_hClient, self.m_hHw, lFrameEntry.FrameId,
                                                   c_ubyte(0), lFrameEntry.Length, lFrameEntry.InitialData)
                 while pRcvMsg.FrameId != c_ubyte(int('3C', 16)):
-                    time.sleep(gv.cf.BLF.MRtoMRDelay / 1000)
+                    time.sleep(gv.cfg.BLF.MRtoMRDelay / 1000)
                     self.m_objPLinApi.Read(self.m_hClient, pRcvMsg)
                     readTxCount += 1
                     if pRcvMsg.Data[1] == lFrameEntry.InitialData[1] \
@@ -764,8 +764,8 @@ class PeakLin(QDialog, Ui_PeakGui):
                         if log:
                             self.logger.debug(f"Tx  {_id},{bytes_to_string(pRcvMsg.Data)}")
                         return True
-                    if readTxCount == gv.cf.BLF.readTxCount:
-                        self.logger.warning(f'readTxCount:{gv.cf.BLF.readTxCount}')
+                    if readTxCount == gv.cfg.BLF.readTxCount:
+                        self.logger.warning(f'readTxCount:{gv.cfg.BLF.readTxCount}')
                         break
             self.logger.error(f"Failed to send Consecutive Frame: {_id},{bytes_to_string(lFrameEntry.InitialData)}")
             return False

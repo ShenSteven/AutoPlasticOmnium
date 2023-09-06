@@ -25,83 +25,83 @@ def get_about():
     return about_app
 
 
-isHide = False
-about = get_about()
-version = about['__version__']
-win: bool = platform.system() == 'Windows'
-linux: bool = platform.system() == 'Linux'
-config_yaml_path = abspath(join(dirname(__file__), 'config.yaml'))
-cf = conf.config.read_config(config_yaml_path, conf.config.Configs)
+IsHide = False
+About = get_about()
+VERSION = About['__version__']
+WIN: bool = platform.system() == 'Windows'
+LINUX: bool = platform.system() == 'Linux'
+ConfigYamlPath = abspath(join(dirname(__file__), 'config.yaml'))
+cfg = conf.config.read_config(ConfigYamlPath, conf.config.Configs)
 
-current_dir = main.bundle_dir
-OutPutPath = rf'{current_dir}{os.sep}OutPut'
-DataPath = rf'{current_dir}{os.sep}Data'
-scriptFolder = rf'{current_dir}{os.sep}scripts'
-excel_file_path = rf'{scriptFolder}{os.sep}{cf.station.testcase}'
-database_setting = rf'{current_dir}{os.sep}conf{os.sep}setting.db'
-database_result = rf'{current_dir}{os.sep}OutPut{os.sep}result.db'
-step_attr = []
+CurrentDir = main.bundle_dir
+OutPutPath = rf'{CurrentDir}{os.sep}OutPut'
+DataPath = rf'{CurrentDir}{os.sep}Data'
+ScriptFolder = rf'{CurrentDir}{os.sep}scripts'
+ExcelFilePath = rf'{ScriptFolder}{os.sep}{cfg.station.testcase}'
+DatabaseSetting = rf'{CurrentDir}{os.sep}conf{os.sep}setting.db'
+DatabaseResult = rf'{CurrentDir}{os.sep}OutPut{os.sep}result.db'
+LogFolderPath = ''
+CriticalLog = ''
+ErrorsLog = ''
 
-logFolderPath = ''
-critical_log = ''
-errors_log = ''
+StepAttr = []
 CheckSnList = []
 Keywords = []
 
 IsDebug = False
-mainWin = None
-loginWin = None
+MainWin = None
+LoginWin = None
 
 PLin = None
 pMsg32 = None
 pMsg33 = None
 
 
-def set_global_val(name, value):
-    globals()[name] = value
+# def set_global_val(name, value):
+#     globals()[name] = value
+#
+#
+# def get_global_val(name, defValue=None):
+#     try:
+#         return globals()[name]
+#     except KeyError:
+#         return defValue
 
 
-def get_global_val(name, defValue=None):
+def CreateSubLogFolder():
+    global LogFolderPath, CriticalLog, ErrorsLog
+    LogFolderPath = ensure_path_sep(join(cfg.station.log_folder, datetime.now().strftime('%Y%m%d')))
     try:
-        return globals()[name]
-    except KeyError:
-        return defValue
-
-
-def create_sub_log_folder():
-    global logFolderPath, critical_log, errors_log
-    logFolderPath = ensure_path_sep(join(cf.station.log_folder, datetime.now().strftime('%Y%m%d')))
-    try:
-        if not exists(logFolderPath):
-            os.makedirs(logFolderPath)
+        if not exists(LogFolderPath):
+            os.makedirs(LogFolderPath)
     except FileNotFoundError:
-        cf.station.log_folder = ensure_path_sep(join(current_dir, 'TestLog'))
-        logFolderPath = ensure_path_sep(join(cf.station.log_folder, datetime.now().strftime('%Y%m%d')))
-        if not exists(logFolderPath):
-            os.makedirs(logFolderPath)
-    critical_log = (join(cf.station.log_folder, 'critical.log').replace('\\', '/'))
-    errors_log = (join(cf.station.log_folder, 'errors.log').replace('\\', '/'))
+        cfg.station.log_folder = ensure_path_sep(join(CurrentDir, 'TestLog'))
+        LogFolderPath = ensure_path_sep(join(cfg.station.log_folder, datetime.now().strftime('%Y%m%d')))
+        if not exists(LogFolderPath):
+            os.makedirs(LogFolderPath)
+    CriticalLog = (join(cfg.station.log_folder, 'critical.log').replace('\\', '/'))
+    ErrorsLog = (join(cfg.station.log_folder, 'errors.log').replace('\\', '/'))
 
 
-create_sub_log_folder()
+CreateSubLogFolder()
 # print(critical_log, errors_log)
-lg = LogPrint('debug', critical_log, errors_log)
-if win:
-    os.environ['PATH'] = os.environ['PATH'] + ";;" + os.path.join(current_dir, rf'ffmpeg{os.sep}bin')
+lg = LogPrint('debug', CriticalLog, ErrorsLog)
+if WIN:
+    os.environ['PATH'] = os.environ['PATH'] + ";;" + os.path.join(CurrentDir, rf'ffmpeg{os.sep}bin')
 else:
     print(os.environ)
 
 
-def init_create_dirs(logger):
+def InitCreateDirs(logger=None):
     try:
-        if not IsNullOrEmpty(cf.station.setTimeZone):
-            os.system(f"tzutil /s \"{cf.station.setTimeZone}\"")
-        os.makedirs(logFolderPath + rf"{os.sep}Json", exist_ok=True)
+        if not IsNullOrEmpty(cfg.station.setTimeZone):
+            os.system(f"tzutil /s \"{cfg.station.setTimeZone}\"")
+        os.makedirs(LogFolderPath + rf"{os.sep}Json", exist_ok=True)
         os.makedirs(OutPutPath, exist_ok=True)
         os.makedirs(DataPath, exist_ok=True)
-        os.makedirs(cf.station.log_folder + rf"{os.sep}CsvData{os.sep}Upload", exist_ok=True)
+        os.makedirs(cfg.station.log_folder + rf"{os.sep}CsvData{os.sep}Upload", exist_ok=True)
     except Exception as e:
-        logger.fatal(f'{currentframe().f_code.co_name}:{e}')
+        raise Exception(f'{currentframe().f_code.co_name}:{e}')
 
 
 if __name__ == '__main__':
