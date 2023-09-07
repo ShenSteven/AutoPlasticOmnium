@@ -932,6 +932,10 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
   </action>
   <action name="actionExpandAll">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/ExpandAll.ico</normaloff>:/images/ExpandAll.ico</iconset>
+   </property>
    <property name="text">
     <string>ExpandAll</string>
    </property>
@@ -940,6 +944,10 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
   </action>
   <action name="actionCollapseAll">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/CollapseAll.ico</normaloff>:/images/CollapseAll.ico</iconset>
+   </property>
    <property name="text">
     <string>CollapseAll</string>
    </property>

@@ -1,5 +1,9 @@
 <RCC>
   <qresource>
+    <file>images/LockedObject.ico</file>
+    <file>images/UnlockedObject.ico</file>
+    <file>images/CollapseAll.ico</file>
+    <file>images/ExpandAll.ico</file>
     <file>images/RunSingle.ico</file>
     <file>images/RunUUT.ico</file>
     <file>images/BreakpointCondition.ico</file>
