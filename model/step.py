@@ -903,12 +903,14 @@ class Step:
         if IsNullOrEmpty(self.For):
             return
         if str_to_int(self.For)[0]:
-            test_case.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
+            if test_case.ForLoop is None:
+                test_case.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
             test_case.ForLoop.start(suit.index, self.index, int(self.For))
             # test_case.loop = flowcontrol.forloop.ForLoop(self.logger)
             # test_case.loop.start(suit.index, self.index, int(self.For))
         elif self.For.lower() == "do":
-            test_case.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
+            if test_case.DoWhileLoop is None:
+                test_case.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
             test_case.DoWhileLoop.start(suit.index, self.index)
             # test_case.loop = flowcontrol.dowhile.DoWhile(self.logger)
             # test_case.loop.start(suit.index, self.index)
@@ -931,7 +933,8 @@ class Step:
             # is_end = not test_case.loop.is_end()
             return is_end
         if self.For.lower() == "whiledo":
-            test_case.WhileLoop = flowcontrol.whileloop.WhileLoop(self.logger)
+            if test_case.WhileLoop is None:
+                test_case.WhileLoop = flowcontrol.whileloop.WhileLoop(self.logger)
             if step_result:
                 test_case.WhileLoop.start(index, self.index, step_result)
                 # test_case.loop.start(index, self.index, step_result)

@@ -825,7 +825,6 @@ class MainForm(Ui_MainWindow, TestForm):
             raise ValueError('the list of excel header_new cannot be empty!')
 
         def SaveToScript():
-            self.actionSaveToScript.setEnabled(False)
             step_value = []
             sheet_name = gv.cfg.station.station_name
             workbook = openpyxl.load_workbook(gv.ExcelFilePath)
@@ -865,6 +864,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 # ws.protection.enable()
                 # ws.protection.password = '....'
             except Exception as e:
+                self.logger.error(f'{currentframe().f_code.co_name}:{e}')
                 QMetaObject.invokeMethod(
                     self,
                     'showMessageBox',
@@ -873,11 +873,18 @@ class MainForm(Ui_MainWindow, TestForm):
                     QtCore.Q_ARG(str, 'ERROR!'),
                     QtCore.Q_ARG(str, f'{currentframe().f_code.co_name}:{e}'),
                     QtCore.Q_ARG(int, 4))
-                raise
             else:
-                workbook.save(gv.ExcelFilePath)
-                self.logger.debug(f'sync save to excel:{gv.ExcelFilePath}')
-                self.on_reloadSeqs()
+                try:
+                    workbook.save(gv.ExcelFilePath)
+                    self.logger.debug(f'sync save to excel:{gv.ExcelFilePath}')
+                    self.on_reloadSeqs()
+                except PermissionError as e:
+                    self.logger.error(f'{e},Please close the excel file first.')
+                except Exception as e:
+                    self.logger.error(f'{e}')
+                    raise
+                else:
+                    self.actionSaveToScript.setEnabled(False)
 
         thread = Thread(target=SaveToScript, daemon=True)
         thread.start()
