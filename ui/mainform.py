@@ -8,6 +8,7 @@ import sys
 import threading
 import time
 from datetime import datetime
+from ftplib import FTP
 from inspect import currentframe
 from threading import Thread
 
@@ -361,6 +362,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionAbout.triggered.connect(self.on_actionAbout)
         self.actionRestart.triggered.connect(self.on_actionRestart)
         self.actionPeakLin.triggered.connect(self.on_peak_lin)
+        self.actionUpdates.triggered.connect(self.on_actionUpdates)
 
         self.lineEdit.textEdited.connect(self.on_textEdited)
         self.lineEdit.returnPressed.connect(self.on_returnPressed)
@@ -711,6 +713,12 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_actionAbout(self):
         QMessageBox.about(self, 'About', 'Python3.11+PyQt5\nTechnical support: StevenShen\nWeChat:chenhlzqbx')
+
+    def on_actionUpdates(self):
+        pass
+        # self.ftp_updates = FTP(gv.cfg.FTP.host, gv.cfg.FTP.user, gv.cfg.FTP.passwd)
+        # self.ftp_updates.dir()
+        # self.ftp_updates.cwd(gv.cfg.FTP.dirName)
 
     def on_actionRestart(self):
         def thread_update():

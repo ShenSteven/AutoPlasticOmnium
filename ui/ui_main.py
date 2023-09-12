@@ -355,8 +355,8 @@ class Ui_MainWindow(object):
         icon21.addPixmap(QtGui.QPixmap(":/images/blue-document-convert-icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionConvertExcelToJson.setIcon(icon21)
         self.actionConvertExcelToJson.setObjectName("actionConvertExcelToJson")
-        self.actionReport_bug = QtWidgets.QAction(MainWindow)
-        self.actionReport_bug.setObjectName("actionReport_bug")
+        self.actionUpdates = QtWidgets.QAction(MainWindow)
+        self.actionUpdates.setObjectName("actionUpdates")
         self.actionFeedback = QtWidgets.QAction(MainWindow)
         self.actionFeedback.setObjectName("actionFeedback")
         self.actionPause = QtWidgets.QAction(MainWindow)
@@ -443,7 +443,7 @@ class Ui_MainWindow(object):
         self.testcase.addAction(self.menuSelect_Station.menuAction())
         self.settings.addAction(self.actionConfig)
         self.help.addAction(self.actionHelper)
-        self.help.addAction(self.actionReport_bug)
+        self.help.addAction(self.actionUpdates)
         self.help.addAction(self.actionFeedback)
         self.help.addAction(self.actionAbout)
         self.tools.addAction(self.actionPeakLin)
@@ -500,7 +500,7 @@ class Ui_MainWindow(object):
         self.toolBar.addSeparator()
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -556,7 +556,7 @@ class Ui_MainWindow(object):
         self.actionClearLog.setText(_translate("MainWindow", "ClearLog"))
         self.actionOpen_TestCase.setText(_translate("MainWindow", "Open TestCase"))
         self.actionConvertExcelToJson.setText(_translate("MainWindow", "ConvertExcelToJson"))
-        self.actionReport_bug.setText(_translate("MainWindow", "Report bug"))
+        self.actionUpdates.setText(_translate("MainWindow", "Updates"))
         self.actionFeedback.setText(_translate("MainWindow", "Feedback"))
         self.actionPause.setText(_translate("MainWindow", "Pause"))
         self.actionunknow.setText(_translate("MainWindow", "null"))

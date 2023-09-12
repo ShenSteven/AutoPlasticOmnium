@@ -121,7 +121,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="result">
           <attribute name="title">
@@ -544,7 +544,7 @@ font: 20pt &quot;宋体&quot;;</string>
      <string>Help</string>
     </property>
     <addaction name="actionHelper"/>
-    <addaction name="actionReport_bug"/>
+    <addaction name="actionUpdates"/>
     <addaction name="actionFeedback"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -858,9 +858,9 @@ font: 20pt &quot;宋体&quot;;</string>
     <string>ConvertExcelToJson</string>
    </property>
   </action>
-  <action name="actionReport_bug">
+  <action name="actionUpdates">
    <property name="text">
-    <string>Report bug</string>
+    <string>Updates</string>
    </property>
   </action>
   <action name="actionFeedback">
