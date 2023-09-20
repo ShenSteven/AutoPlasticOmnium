@@ -151,7 +151,7 @@ class Step:
             self._isTest = not self.myWind.testcase.IfElseFlow.ifCond_all
         if not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'elif':
             self._isTest = not self.myWind.testcase.IfElseFlow.ifCond_all
-        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.split():
+        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower().split():
             self._isTest = False
         if self.myWind.SingleStepTest:
             self._isTest = True
@@ -386,7 +386,7 @@ class Step:
         if not hasattr(self, '_Model') or self._Model is None:
             return None
         else:
-            return self._Model.lower()
+            return self._Model
 
     @Model.setter
     def Model(self, value):

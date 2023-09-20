@@ -11,10 +11,11 @@ from abc import ABCMeta, abstractmethod
 
 class CommAbstract(metaclass=ABCMeta):
     # isOpen = False
-    # hostIP = ''
+    # host = ''
     # port = ''
-    # username = ''
-    # password = ''
+    # user = ''
+    # passwd = ''
+    # logger = None
 
     @abstractmethod
     def open(self, *args):

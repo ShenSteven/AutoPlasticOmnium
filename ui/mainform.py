@@ -20,7 +20,7 @@ import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
@@ -36,7 +36,7 @@ import model.loadseq
 import model.product
 import model.testcase
 import model.variables
-from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int
+from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int, ensure_path_sep
 from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from common.testform import TestForm
@@ -658,7 +658,8 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_actionOpenLog(self):
         def thread_update():
             if os.path.exists(self.txtLogPath):
-                os.startfile(self.txtLogPath)
+                # os.startfile(self.txtLogPath)
+                QDesktopServices.openUrl(QUrl(f'file:///{ensure_path_sep(self.txtLogPath)}'))
             else:
                 self.logger.warning(f"no find txt log,path:{self.txtLogPath}")
 

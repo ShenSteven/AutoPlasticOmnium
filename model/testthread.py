@@ -6,7 +6,6 @@
 # @Date   : 12/8/2022
 # @Desc   :
 # """
-import time
 import traceback
 import conf.globalvar as gv
 from PyQt5.QtWidgets import QWidget, QFrame, QMainWindow
@@ -46,9 +45,9 @@ class TestThread(QThread):
                                 self.myWind.logger.debug(
                                     f"***** All loop({gv.cfg.station.loop_count}) have completed! *****")
                                 self.myWind.my_signals.threadStopSignal[str].emit('stop loop test.')
-                                time.sleep(0.5)
+                                QThread.msleep(500)
                             else:
-                                time.sleep(gv.cfg.station.LoopInterval)
+                                QThread.sleep(gv.cfg.station.LoopInterval)
                     elif self.myWind.SingleStepTest:
                         self.myWind.logger.debug(
                             f'Run single-step,SuiteNo:{self.myWind.SuiteNo},StepNo:{self.myWind.StepNo}')
@@ -57,7 +56,7 @@ class TestThread(QThread):
                         self.myWind.finalTestResult = result
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)
-                        time.sleep(0.5)
+                        QThread.msleep(500)
                     else:
                         result = self.myWind.testcase.run()
                         result1 = upload_Json_to_client(self.myWind.logger, self.myWind.rs_url, self.myWind.txtLogPath,
@@ -71,9 +70,9 @@ class TestThread(QThread):
                             self.myWind.saveTestResult()
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)
-                        time.sleep(0.5)
+                        QThread.msleep(500)
                 else:
-                    time.sleep(0.001)
+                    QThread.msleep(1)
         except Exception as e:
             self.myWind.logger.fatal(f"TestThread() Exception:{e},{traceback.format_exc()}")
             self.signal[QWidget, TestStatus].emit(self.myWind, TestStatus.ABORT)

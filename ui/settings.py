@@ -93,6 +93,8 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
             else:
                 setattr(getattr(gv.cfg, tab_name), control.objectName(), control.text())
         self.isChange = True
+        # self.done(QDialog.Accepted)
+        # self.done(QDialog.Rejected)
 
     def refresh(self):
         self.timer = QTimer()
