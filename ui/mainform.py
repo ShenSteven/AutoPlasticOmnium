@@ -8,7 +8,6 @@ import sys
 import threading
 import time
 from datetime import datetime
-from ftplib import FTP
 from inspect import currentframe
 from threading import Thread
 
@@ -41,8 +40,7 @@ from common.mysignals import update_label, on_setIcon, updateAction, controlEnab
     on_actionException
 from common.testform import TestForm
 from conf.logprint import QTextEditHandler, LogPrint
-from model.teststatus import TestStatus
-from model.testthread import TestThread
+from model.testthread import TestThread, TestStatus
 from peak.plin.peaklin import PeakLin
 from ui.settings import SettingsDialog
 from ui.ui_main import Ui_MainWindow
@@ -83,7 +81,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 cls.main_form = super().__new__(cls, *args, **kwargs)
             return cls.main_form
 
-    def __init__(self, parent=None):
+    def __init__(self):
         Ui_MainWindow.__init__(self)
         TestForm.__init__(self)
         self.setupUi(self)
@@ -308,27 +306,27 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def init_signals_connect(self):
         """connect signals to slots"""
-        self.my_signals.timingSignal[bool].connect(self.timing)
-        self.my_signals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
-        self.my_signals.updateLabel[QLabel, str, int].connect(update_label)
-        self.my_signals.updateLabel[QLabel, str].connect(update_label)
-        self.my_signals.update_tableWidget[list].connect(self.on_update_tableWidget)
-        self.my_signals.update_tableWidget[str].connect(self.on_update_tableWidget)
-        self.my_signals.textEditClearSignal[str].connect(self.on_textEditClear)
-        self.my_signals.lineEditEnableSignal[bool].connect(self.lineEditEnable)
-        self.my_signals.setIconSignal[QAction, QIcon].connect(on_setIcon)
-        self.my_signals.updateActionSignal[QAction, QIcon].connect(updateAction)
-        self.my_signals.updateActionSignal[QAction, QIcon, str].connect(updateAction)
-        self.my_signals.updateStatusBarSignal[str].connect(self.updateStatusBar)
-        self.my_signals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
-        self.my_signals.controlEnableSignal[QAction, bool].connect(controlEnable)
-        self.my_signals.treeWidgetColor[QBrush, int, int, bool].connect(self.update_treeWidget_color)
-        self.my_signals.threadStopSignal[str].connect(self.on_actionStop)
-        self.my_signals.updateConnectStatusSignal[bool, str].connect(self.on_connect_status)
-        self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
-        self.my_signals.updateProgressBar[int].connect(self.update_progress_bar)
-        self.my_signals.updateProgressBar[int, int].connect(self.update_progress_bar)
-        self.my_signals.play_audio[str].connect(self.on_play_audio)
+        self.mySignals.timingSignal[bool].connect(self.timing)
+        self.mySignals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
+        self.mySignals.updateLabel[QLabel, str, int].connect(update_label)
+        self.mySignals.updateLabel[QLabel, str].connect(update_label)
+        self.mySignals.update_tableWidget[list].connect(self.on_update_tableWidget)
+        self.mySignals.update_tableWidget[str].connect(self.on_update_tableWidget)
+        self.mySignals.textEditClearSignal[str].connect(self.on_textEditClear)
+        self.mySignals.lineEditEnableSignal[bool].connect(self.lineEditEnable)
+        self.mySignals.setIconSignal[QAction, QIcon].connect(on_setIcon)
+        self.mySignals.updateActionSignal[QAction, QIcon].connect(updateAction)
+        self.mySignals.updateActionSignal[QAction, QIcon, str].connect(updateAction)
+        self.mySignals.updateStatusBarSignal[str].connect(self.updateStatusBar)
+        self.mySignals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
+        self.mySignals.controlEnableSignal[QAction, bool].connect(controlEnable)
+        self.mySignals.treeWidgetColor[QBrush, int, int, bool].connect(self.update_treeWidget_color)
+        self.mySignals.threadStopSignal[str].connect(self.on_actionStop)
+        self.mySignals.updateConnectStatusSignal[bool, str].connect(self.on_connect_status)
+        self.mySignals.showMessageBox[str, str, int].connect(self.showMessageBox)
+        self.mySignals.updateProgressBar[int].connect(self.update_progress_bar)
+        self.mySignals.updateProgressBar[int, int].connect(self.update_progress_bar)
+        self.mySignals.play_audio[str].connect(self.on_play_audio)
 
         self.actionCheckAll.triggered.connect(self.on_actionCheckAll)
         self.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
@@ -584,7 +582,7 @@ class MainForm(Ui_MainWindow, TestForm):
             gv.cfg.station.station_no = gv.cfg.station.station_name
             self.testcase = model.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger,
                                                     self, False)
-            self.my_signals.updateProgressBar[int, int].emit(self.testcase.step_finish_num, self.testcase.sum_step)
+            self.mySignals.updateProgressBar[int, int].emit(self.testcase.step_finish_num, self.testcase.sum_step)
             self.testSequences = self.testcase.clone_suites
             self.logger.debug(f'select {self.testcase.test_script_json} finish!')
 
@@ -600,6 +598,7 @@ class MainForm(Ui_MainWindow, TestForm):
             self.dut_model = action.text() if "(" not in action.text() else action.text()[:action.text().index('(')]
             self.actionunknow.setText(self.dut_model)
         self.treeWidget.setHeaderLabel(f'{gv.cfg.station.station_no}_{self.dut_model}')
+        self.lineEdit.textEdited.disconnect(self.on_textEdited)
 
     def on_actionConfig(self):
         settings_wind = SettingsDialog(self)
@@ -717,9 +716,6 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_actionUpdates(self):
         pass
-        # self.ftp_updates = FTP(gv.cfg.FTP.host, gv.cfg.FTP.user, gv.cfg.FTP.passwd)
-        # self.ftp_updates.dir()
-        # self.ftp_updates.cwd(gv.cfg.FTP.dirName)
 
     def on_actionRestart(self):
         def thread_update():
@@ -1066,7 +1062,7 @@ class MainForm(Ui_MainWindow, TestForm):
         player.play()
 
     def timerEvent(self, a):
-        self.my_signals.updateLabel[QLabel, str, int].emit(self.lb_errorCode, str(self.sec), 20)
+        self.mySignals.updateLabel[QLabel, str, int].emit(self.lb_errorCode, str(self.sec), 20)
         QApplication.processEvents()
         self.sec += 1
 
@@ -1166,17 +1162,12 @@ class MainForm(Ui_MainWindow, TestForm):
             self.testSequences = copy.deepcopy(self.testcase.original_suites)
             self.testcase.clone_suites = self.testSequences
             self.ShowTreeView(self.testSequences)
-        self.SN = self.lineEdit.text()
-        self.variable_init(self.SN)
+        # self.SN = self.lineEdit.text()
+        self.test_initialize(self.lineEdit.text())
 
-    def variable_init(self, SN):
+    def test_initialize(self, SN):
         """测试变量初始化"""
-        if self.SingleStepTest and self.testcase.Finished:
-            pass
-        else:
-            self.TestVariables = model.variables.Variables(SN, gv.cfg.LTT.channel)
-
-        self.txtLogPath = rf'{gv.LogFolderPath}{os.sep}logging_{SN}_details_{time.strftime("%H-%M-%S")}.txt'
+        self.init_variable(SN)
         gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.CriticalLog, gv.ErrorsLog)
         self.logger = gv.lg.logger
         gv.InitCreateDirs(self.logger)
@@ -1188,18 +1179,6 @@ class MainForm(Ui_MainWindow, TestForm):
                                                          gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
         self.testcase.daq_data_path = rf'{gv.OutPutPath}\{gv.cfg.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
-        self.mes_result = f'http://{gv.cfg.station.mes_result}/api/2/serial/{SN}/station/{gv.cfg.station.station_no}/info'
-        self.rs_url = gv.cfg.station.rs_url
-        self.shop_floor_url = f'http://{gv.cfg.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cfg.station.station_name}'
-        self.WorkOrder = '1'
-        self.DUTMesIP = ''
-        self.DUTMesMac = ''
-        self.sec = 1
-        self.finalTestResult = False
-        self.setIpFlag = False
-        if not self.SingleStepTest:
-            self.SuiteNo = -1
-            self.StepNo = -1
         self.lb_failInfo.setHidden(True)
         self.lb_testTime.setHidden(True)
         if not self.testThread.isRunning():

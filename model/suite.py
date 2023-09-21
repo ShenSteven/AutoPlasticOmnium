@@ -60,7 +60,7 @@ class TestSuite:
             self.logger = test_case.logger
         if not self.isTest:
             test_case.sum_step = test_case.sum_step - self.totalNumber
-            self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
+            self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.setColor(Qt.gray)
             self.suiteResult = True
             return self.suiteResult
@@ -109,7 +109,7 @@ class TestSuite:
         """set treeWidget item color"""
         try:
             if isinstance(self.myWind, ui.mainform.MainForm):
-                self.myWind.my_signals.treeWidgetColor.emit(color, self.index, -1, False)
+                self.myWind.mySignals.treeWidgetColor.emit(color, self.index, -1, False)
         except RuntimeError:
             pass
 

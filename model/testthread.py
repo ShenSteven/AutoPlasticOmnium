@@ -44,7 +44,7 @@ class TestThread(QThread):
                                     or self.myWind.PassNumOfCycleTest == gv.cfg.station.LoopNumPassed:
                                 self.myWind.logger.debug(
                                     f"***** All loop({gv.cfg.station.loop_count}) have completed! *****")
-                                self.myWind.my_signals.threadStopSignal[str].emit('stop loop test.')
+                                self.myWind.mySignals.threadStopSignal[str].emit('stop loop test.')
                                 QThread.msleep(500)
                             else:
                                 QThread.sleep(gv.cfg.station.LoopInterval)
@@ -78,5 +78,4 @@ class TestThread(QThread):
             self.signal[QWidget, TestStatus].emit(self.myWind, TestStatus.ABORT)
         finally:
             pass
-            # gv.testThread.join(3)
-            # lg.logger.debug('finally')
+

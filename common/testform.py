@@ -6,8 +6,10 @@
 @Date   : 2/6/2023
 @Desc   : 
 """
+import os
 import sys
 import threading
+import time
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 import model.variables
 import conf.globalvar as gv
@@ -19,9 +21,6 @@ class TestForm(QMainWindow):
     def __init__(self, parent=None):
         super(TestForm, self).__init__(parent)
         self.logger = gv.lg.logger
-        self.autoScanFlag = True
-        self._lastSn = ''
-        self.cap = None
         self.fileHandle = None
         self.timer = None
         self.sec = 1
@@ -29,20 +28,10 @@ class TestForm(QMainWindow):
         self.startFlag = False
         self.IsCycle = False
         self.pauseFlag = False
-        self.setIpFlag = False  # 是否设置dut IP为默认ip
         self.SingleStepTest = False
         self.finalTestResult = False
         self.SaveScriptDisableFlag = False
         self.TestVariables: model.variables.Variables = None
-        self.SN = ''
-        self.dut_model = ''
-        self.shop_floor_url = ''
-        self.WorkOrder = '1'
-        self.DUTMesMac = ''
-        self.DUTMesIP = ''
-        self.txtLogPath = ''
-        self.rs_url = ''
-        self.mes_result = ''
         self.StepNo = -1
         self.SuiteNo = -1
         self.FailNumOfCycleTest = 0
@@ -51,7 +40,42 @@ class TestForm(QMainWindow):
         self.total_fail_count = 0
         self.total_pass_count = 0
         self.continue_fail_count = 0
-        self.my_signals = MySignals()
+        self.autoScanFlag = True
+        self._lastSn = ''
+        self.cap = None
+
+        self.testcase = None
+        self.SN = ''
+        self.txtLogPath = ''
+        self.dut_model = ''
+        self.shop_floor_url = ''
+        self.mes_result = ''
+        self.rs_url = ''
+        self.WorkOrder = '1'
+        self.DUTMesIP = ''
+        self.DUTMesMac = ''
+        self.setIpFlag = False  # 是否设置dut IP为默认ip
+        self.mySignals = MySignals()
+
+    def init_variable(self, sn):
+        self.sec = 1
+        self.SN = sn
+        self.txtLogPath = rf'{gv.LogFolderPath}{os.sep}logging_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
+        self.shop_floor_url = f'http://{gv.cfg.station.mes_shop_floor}/api/CHKRoute/serial/{self.SN}/station/{gv.cfg.station.station_name}'
+        self.mes_result = f'http://{gv.cfg.station.mes_result}/api/2/serial/{self.SN}/station/{gv.cfg.station.station_no}/info'
+        self.rs_url = gv.cfg.station.rs_url
+        self.WorkOrder = '1'
+        self.DUTMesIP = ''
+        self.DUTMesMac = ''
+        self.setIpFlag = False
+        self.finalTestResult = False
+        if self.SingleStepTest and self.testcase.Finished:
+            pass
+        else:
+            self.TestVariables = model.variables.Variables(self.SN, gv.cfg.LTT.channel)
+        if not self.SingleStepTest:
+            self.SuiteNo = -1
+            self.StepNo = -1
 
     def closeEvent(self, event):
         """

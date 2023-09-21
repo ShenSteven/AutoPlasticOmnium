@@ -187,7 +187,7 @@ def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     if gv.PLin is None:
         gv.PLin = peak.plin.peaklin.PeakLin(step.logger)
-        ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
+        ui.mainform.MainForm.main_form.mySignals.controlEnableSignal[QAction, bool].emit(
             ui.mainform.MainForm.main_form.actionPeakLin, False)
         gv.PLin.refreshHardware()
         gv.PLin.hardwareCbx_IndexChanged()
@@ -202,7 +202,7 @@ def _testKeyword_what(kw, step, test_case):
         time.sleep(0.1)
         rReturn = gv.PLin.runScheduleDiag()
         time.sleep(0.1)
-    ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
+    ui.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(
         rReturn,
         f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
     return rReturn, compInfo
@@ -214,7 +214,7 @@ def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     if gv.PLin is None:
         gv.PLin = peak.plin.peaklin.PeakLin(step.logger)
-        ui.mainform.MainForm.main_form.my_signals.controlEnableSignal[QAction, bool].emit(
+        ui.mainform.MainForm.main_form.mySignals.controlEnableSignal[QAction, bool].emit(
             ui.mainform.MainForm.main_form.actionPeakLin, False)
         gv.PLin.refreshHardware()
         gv.PLin.hardwareCbx_IndexChanged()
@@ -231,7 +231,7 @@ def _testKeyword_what(kw, step, test_case):
         gv.PLin.runSchedule()
         time.sleep(0.1)
         rReturn = True
-    ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(
+    ui.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(
         rReturn,
         f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
     return rReturn, compInfo
@@ -241,7 +241,7 @@ def _testKeyword_what(kw, step, test_case):
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     rReturn = gv.PLin.DoLinDisconnect()
-    ui.mainform.MainForm.main_form.my_signals.updateConnectStatusSignal[bool, str].emit(True, "Not connected | ")
+    ui.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(True, "Not connected | ")
     return rReturn, compInfo
 
 

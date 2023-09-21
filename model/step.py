@@ -583,7 +583,7 @@ class Step:
         """set treeWidget item color"""
         try:
             if isinstance(self.myWind, ui.mainform.MainForm):
-                self.myWind.my_signals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
+                self.myWind.mySignals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
         except RuntimeError:
             pass
 
@@ -609,7 +609,7 @@ class Step:
                         self.setColor(Qt.lightGray)
                         return True
                 if not isinstance(self.myWind, ui.mainform.MainForm):
-                    self.myWind.my_signals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
+                    self.myWind.mySignals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
                                                                          f"<A href='https://www.qt.io/'>{self.StepName}</A>")
                 self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                   f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
@@ -625,7 +625,7 @@ class Step:
                 self.status = str(self.test_result)
                 test_case.step_finish_num = test_case.step_finish_num - 1
                 test_case.sum_step = test_case.sum_step - 1
-                self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
+                self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
                 return True
         except Exception as e:
             self.logger.fatal(f"TestStep precondition Exception!{e},{traceback.format_exc()}")
@@ -677,7 +677,7 @@ class Step:
                     (test_case.WhileLoop is not None and not test_case.WhileLoop.IsEnd):
                 # if test_case.loop is not None and not test_case.loop.IsEnd:
                 test_case.sum_step = test_case.sum_step + 1
-            self.myWind.my_signals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
+            self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
             self.clear()
             test_case.IfElseFlow.clear(self.IfElse)
 
@@ -685,7 +685,7 @@ class Step:
         if self.breakpoint or self.myWind.pauseFlag:
             self.myWind.pauseFlag = True
             if isinstance(self.myWind, ui.mainform.MainForm):
-                self.myWind.my_signals.setIconSignal[QAction, QIcon].emit(
+                self.myWind.mySignals.setIconSignal[QAction, QIcon].emit(
                     self.myWind.actionStart, QIcon(':/images/Start-icon.png'))
             self.myWind.pause_event.clear()
         else:
@@ -811,7 +811,7 @@ class Step:
             ts = datetime.now() - self.start_time
             self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
             if isinstance(self.myWind, ui.mainform.MainForm):
-                self.myWind.my_signals.update_tableWidget[list].emit(
+                self.myWind.mySignals.update_tableWidget[list].emit(
                     [test_case.myWind.SN, self.StepName, self.SPEC, self.LSL, self.testValue, self.USL,
                      self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
                      'Pass' if self.test_result else 'Fail'])

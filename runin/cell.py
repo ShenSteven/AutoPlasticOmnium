@@ -66,12 +66,12 @@ class Cell(QFrame, Ui_cell, TestForm):
 
     def init_signals_connect(self):
         """connect signals to slots"""
-        self.my_signals.timingSignal[bool].connect(self.timing)
-        self.my_signals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
-        self.my_signals.updateLabel[QLabel, str, int].connect(update_label)
-        self.my_signals.updateLabel[QLabel, str].connect(update_label)
-        self.my_signals.showMessageBox[str, str, int].connect(self.showMessageBox)
-        self.my_signals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
+        self.mySignals.timingSignal[bool].connect(self.timing)
+        self.mySignals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
+        self.mySignals.updateLabel[QLabel, str, int].connect(update_label)
+        self.mySignals.updateLabel[QLabel, str].connect(update_label)
+        self.mySignals.showMessageBox[str, str, int].connect(self.showMessageBox)
+        self.mySignals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
         self.lb_testName.linkActivated.connect(self.link_clicked)
         self.customContextMenuRequested.connect(self.on_menu)
         self.actionClearCell.triggered.connect(self.On_actionClearCell)
@@ -112,8 +112,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         try:
             # if not self.checkContinueFailNum():
             #     return False
-            self.SN = self.lb_sn.text()
-            self.variable_init(self.SN)
+            self.test_initialize(self.lb_sn.text())
         except Exception as e:
             self.logger.fatal(f" step run Exception！！{e},{traceback.format_exc()}")
             return False
@@ -123,27 +122,16 @@ class Cell(QFrame, Ui_cell, TestForm):
     def checkContinueFailNum(self):
         pass
 
-    def variable_init(self, SN):
+    def test_initialize(self, SN):
         """测试变量初始化"""
         gv.InitCreateDirs(self.logger)
-        self.TestVariables = model.variables.Variables(SN, str(self.LocalNo), str(gv.cfg.LTT.row))
+        self.init_variable(SN)
         self.testcase.jsonObj = model.product.JsonObject(SN, gv.cfg.station.station_no,
                                                          gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
-        self.mes_result = f'http://{gv.cfg.station.mes_result}/api/2/serial/{SN}/station/{gv.cfg.station.station_no}/info'
-        self.rs_url = gv.cfg.station.rs_url
-        self.shop_floor_url = f'http://{gv.cfg.station.mes_shop_floor}/api/CHKRoute/serial/{SN}/station/{gv.cfg.station.station_name}'
         self.testcase.daq_data_path = rf'{gv.OutPutPath}{os.sep}{gv.cfg.station.station_no}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         self.testcase.mesPhases = model.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
-        self.finalTestResult = False
-        self.setIpFlag = False
-        self.DUTMesIP = ''
-        self.DUTMesMac = ''
-        if not self.SingleStepTest:
-            self.SuiteNo = -1
-            self.StepNo = -1
-        self.WorkOrder = '1'
         self.testcase.startTimeJson = datetime.now()
-        self.sec = 1
+        self.TestVariables = model.variables.Variables(SN, str(self.LocalNo), str(gv.cfg.LTT.row))
         self.txtLogPath = rf'{gv.LogFolderPath}{os.sep}logging_{self.LocalNo}_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
         gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.CriticalLog, gv.ErrorsLog)
         self.logger = gv.lg.logger
@@ -181,7 +169,7 @@ class Cell(QFrame, Ui_cell, TestForm):
             self.killTimer(self.timer)
 
     def timerEvent(self, a):
-        self.my_signals.updateLabel[QLabel, str].emit(self.lb_testTime, strftime("%H:%M:%S", gmtime(self.sec)))
+        self.mySignals.updateLabel[QLabel, str].emit(self.lb_testTime, strftime("%H:%M:%S", gmtime(self.sec)))
         QApplication.processEvents()
         self.sec += 1
 

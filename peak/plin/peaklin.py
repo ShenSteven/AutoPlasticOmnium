@@ -163,9 +163,9 @@ class PeakLin(QDialog, Ui_PeakGui):
             self.hardwareCbx.setCurrentIndex(0)
             # self.hardwareCbx.blockSignals(False)
         else:
-            ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+            ui.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
                                                                                          f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
-                                                                                         5)
+                                                                                        5)
 
     def getFormattedError(self, linError):
         # get error string from code
@@ -240,9 +240,9 @@ class PeakLin(QDialog, Ui_PeakGui):
             result = False
         if linResult != PLinApi.TLIN_ERROR_OK:
             self.logger.fatal(f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)}')
-            ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+            ui.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
                                                                                          f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
-                                                                                         5)
+                                                                                        5)
         return result
 
     def doLinDisconnect(self):
@@ -298,9 +298,9 @@ class PeakLin(QDialog, Ui_PeakGui):
                     return True
                 else:
                     # Error while disconnecting from hardware.
-                    ui.mainform.MainForm.main_form.my_signals.showMessageBox[str, str, int].emit('Exception!',
+                    ui.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
                                                                                                  f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
-                                                                                                 5)
+                                                                                                5)
                     return False
             else:
                 return True
