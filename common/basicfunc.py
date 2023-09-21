@@ -20,6 +20,8 @@ import openpyxl
 import psutil
 import hashlib
 from socket import AddressFamily
+
+
 # from pydub import AudioSegment
 
 
@@ -124,7 +126,7 @@ def run_cmd(logger, command, timeout=3):
         IsWind = platform.system() == 'Windows'
         logger.debug(f'run_cmd-->{command}')
         ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             encoding=("gbk" if IsWind else "utf8"), timeout=timeout)
+                             encoding=("gbk" if IsWind else "utf8"), timeout=timeout, input='')
         if ret.returncode == 0:  # 表示命令下发成功，不对命令内容结果做判断
             logger.debug(ret.stdout)
             return True, ret.stdout

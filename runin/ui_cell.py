@@ -32,7 +32,7 @@ class Ui_cell(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.lb_cellNum = QtWidgets.QLabel(self.frame)
         self.lb_cellNum.setMinimumSize(QtCore.QSize(28, 17))
-        self.lb_cellNum.setStyleSheet("background-color: rgb(69, 143, 255);")
+        self.lb_cellNum.setStyleSheet("background-color: rgb(189, 189, 189);")
         self.lb_cellNum.setTextFormat(QtCore.Qt.AutoText)
         self.lb_cellNum.setScaledContents(False)
         self.lb_cellNum.setAlignment(QtCore.Qt.AlignCenter)

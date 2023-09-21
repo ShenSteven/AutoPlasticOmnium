@@ -54,7 +54,7 @@
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(69, 143, 255);</string>
+             <string notr="true">background-color: rgb(189, 189, 189);</string>
             </property>
             <property name="text">
              <string>80</string>

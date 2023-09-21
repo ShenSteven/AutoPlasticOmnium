@@ -15,6 +15,7 @@ import cv2
 import matplotlib
 import numpy as np
 import openpyxl
+import psutil
 import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
@@ -719,8 +720,8 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_actionRestart(self):
         def thread_update():
-            run_cmd(self.logger,
-                    rf'{gv.CurrentDir}{os.sep}tool{os.sep}restart.exe -n AutoPlasticOmnium.exe -p AutoPlasticOmnium.exe')
+            process_name = psutil.Process(os.getpid()).name()
+            run_cmd(self.logger, rf'{gv.CurrentDir}{os.sep}tool{os.sep}restart -n {process_name} -p {process_name}')
 
         thread = Thread(target=thread_update)
         ask = QMessageBox.question(self, "Restart Application?",
