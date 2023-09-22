@@ -600,7 +600,8 @@ class MainForm(Ui_MainWindow, TestForm):
             self.dut_model = action.text() if "(" not in action.text() else action.text()[:action.text().index('(')]
             self.actionunknow.setText(self.dut_model)
         self.treeWidget.setHeaderLabel(f'{gv.cfg.station.station_no}_{self.dut_model}')
-        self.lineEdit.textEdited.disconnect(self.on_textEdited)
+        if self.lineEdit.receivers(self.lineEdit.textEdited) == 1:
+            self.lineEdit.textEdited.disconnect(self.on_textEdited)
 
     def on_actionConfig(self):
         settings_wind = SettingsDialog(self)
