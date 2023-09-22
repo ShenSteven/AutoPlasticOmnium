@@ -7,7 +7,7 @@
 @Desc   : 
 """
 import sys
-from os.path import dirname, abspath, join
+from os.path import dirname, abspath
 from traceback import format_exception
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import ui.mainform as mf
@@ -42,7 +42,8 @@ def main():
     app = QApplication([])
     # print("applicationDirPath:", app.applicationDirPath())
     try:
-        if gv.About['__station__'] == 'RUNIN' or gv.About['__station__'] == 'ORT':
+        # if gv.About['__station__'] == 'RUNIN' or gv.About['__station__'] == 'ORT':
+        if gv.cfg.RUNIN.IsRUNIN:
             gv.LoginWin = rmf.LoginWind()
             gv.LoginWin.show()
         else:

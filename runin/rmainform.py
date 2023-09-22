@@ -80,7 +80,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.ColCount = gv.cfg.RUNIN.col
         self.setupUi(self)
         self.lb_ip.setText('IP: ' + socket.gethostbyname(socket.gethostname()))
-        self.lb_station.setText(gv.cfg.station.station_no)
+        self.lb_station.setText(gv.cfg.station.station_no + ' / ' + gv.cfg.station.station_name)
         self.lb_testMode.setText(gv.cfg.dut.test_mode)
         self.lb_info.setText('Please scan sn.')
         self.setWindowTitle('RUNIN/ORT ' + gv.VERSION)

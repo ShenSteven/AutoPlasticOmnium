@@ -160,17 +160,17 @@ class Cell(QFrame, Ui_cell, TestForm):
         else:
             self.continue_fail_count += 1
 
-    def timing(self, flag):
-        if flag:
-            self.logger.debug('start timing...')
-            self.timer = self.startTimer(1000)
-        else:
-            self.logger.debug('stop timing...')
-            self.killTimer(self.timer)
+    # def timing(self, flag):
+    #     if flag:
+    #         self.logger.debug('start timing...')
+    #         self.timer = self.startTimer(1000)
+    #     else:
+    #         self.logger.debug('stop timing...')
+    #         self.killTimer(self.timer)
 
     def timerEvent(self, a):
         self.mySignals.updateLabel[QLabel, str].emit(self.lb_testTime, strftime("%H:%M:%S", gmtime(self.sec)))
-        QApplication.processEvents()
+        # QApplication.processEvents()
         self.sec += 1
 
     def link_clicked(self):

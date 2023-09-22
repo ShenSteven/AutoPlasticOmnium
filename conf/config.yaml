@@ -68,6 +68,7 @@ BLF:
     MRtoMRDelay: 0.1
     SchedulePeriod: 20
 RUNIN:
+    IsRUNIN: true
     row: 5 # group No,<=10
     col: 4 # <=8
 LTT:

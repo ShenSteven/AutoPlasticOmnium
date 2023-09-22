@@ -92,6 +92,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.graphic_scene = None
         self.canvas = None
         self.t = 0
+        self.QtimerID = None
         self.tableWidgetHeader = ["SN", "StepName", "SPEC", "LSL", "Value", "USL", "Time", "StartTime", "Result"]
         self.setWindowTitle(self.windowTitle() + f' v{gv.VERSION}')
         gv.InitCreateDirs(self.logger)
@@ -1064,16 +1065,16 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def timerEvent(self, a):
         self.mySignals.updateLabel[QLabel, str, int].emit(self.lb_errorCode, str(self.sec), 20)
-        QApplication.processEvents()
+        # QApplication.processEvents()
         self.sec += 1
 
-    def timing(self, flag):
-        if flag:
-            self.logger.debug('start timing...')
-            self.timer = self.startTimer(1000)
-        else:
-            self.logger.debug('stop timing...')
-            self.killTimer(self.timer)
+    # def timing(self, flag):
+    #     if flag:
+    #         self.logger.debug('start timing...')
+    #         self.timerID = self.startTimer(1000, timerType=Qt.VeryCoarseTimer)
+    #     else:
+    #         self.logger.debug('stop timing...')
+    #         self.killTimer(self.timerID)
 
     def UpdateContinueFail(self, testResult: bool):
         if gv.IsDebug or gv.cfg.dut.test_mode.lower() == 'debug':
@@ -1285,12 +1286,12 @@ class MainForm(Ui_MainWindow, TestForm):
         self.graphic_scene.addWidget(self.canvas)
 
     def run(self):
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.count)
-        self.timer.start(50)
+        self.QtimerID = QTimer()
+        self.QtimerID.timeout.connect(self.count)
+        self.QtimerID.start(50)
 
     def stop(self):
-        self.timer.stop()
+        self.QtimerID.stop()
 
     def on_actionDelete(self):
         if self.StepNo == -1:

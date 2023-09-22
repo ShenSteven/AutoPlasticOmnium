@@ -10,6 +10,7 @@ import os
 import sys
 import threading
 import time
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 import model.variables
 import conf.globalvar as gv
@@ -22,7 +23,7 @@ class TestForm(QMainWindow):
         super(TestForm, self).__init__(parent)
         self.logger = gv.lg.logger
         self.fileHandle = None
-        self.timer = None
+        self.timerID = None
         self.sec = 1
         self.pause_event = threading.Event()
         self.startFlag = False
@@ -76,6 +77,14 @@ class TestForm(QMainWindow):
         if not self.SingleStepTest:
             self.SuiteNo = -1
             self.StepNo = -1
+
+    def timing(self, flag):
+        if flag:
+            self.logger.debug('start timing...')
+            self.timerID = self.startTimer(1000, timerType=Qt.VeryCoarseTimer)
+        else:
+            self.logger.debug('stop timing...')
+            self.killTimer(self.timerID)
 
     def closeEvent(self, event):
         """
