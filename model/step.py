@@ -610,7 +610,7 @@ class Step:
                         return True
                 if not isinstance(self.myWind, ui.mainform.MainForm):
                     self.myWind.mySignals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
-                                                                         f"<A href='https://www.qt.io/'>{self.StepName}</A>")
+                                                                         f"<A href='file:///{self.myWind.txtLogPath}'>{self.StepName}</A>")
                 self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                   f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
                                   f"SubStr:{self.SubStr1} - {self.SubStr2},"
@@ -764,8 +764,8 @@ class Step:
         else:
             return
         if test_case.failCount == 1 and IsNullOrEmpty(test_case.error_code_first_fail):
-            test_case.error_code_first_fail = self.error_code
-            test_case.error_details_first_fail = self.error_details
+            test_case.error_code_first_fail = self.error_code if self.error_code is not None else '0.0.0'
+            test_case.error_details_first_fail = self.error_details if self.error_details is not None else 'NoErrorCode'
             test_case.mesPhases.first_fail = self.SuiteName
 
     def _process_bypass_byfail(self, step_result: bool):

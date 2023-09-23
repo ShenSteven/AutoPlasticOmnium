@@ -60,6 +60,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.lb_testTime.setText('')
         self.lbl_failCount.setText('')
         self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
+        self.lb_testName.setOpenExternalLinks(True)
         self.WebPsIp = '192.168.10.' + str(self.row_index)
         self.testcase.myWind = self
         self.lb_cellNum.setText(str(self.LocalNo))
@@ -72,7 +73,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.mySignals.updateLabel[QLabel, str].connect(update_label)
         self.mySignals.showMessageBox[str, str, int].connect(self.showMessageBox)
         self.mySignals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
-        self.lb_testName.linkActivated.connect(self.link_clicked)
+        # self.lb_testName.linkActivated.connect(self.link_clicked)
         self.customContextMenuRequested.connect(self.on_menu)
         self.actionClearCell.triggered.connect(self.On_actionClearCell)
         self.actionRetest.triggered.connect(self.On_actionRetest)
@@ -107,6 +108,7 @@ class Cell(QFrame, Ui_cell, TestForm):
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
+        thread.join()
 
     def startTest(self):
         try:
@@ -173,15 +175,15 @@ class Cell(QFrame, Ui_cell, TestForm):
         # QApplication.processEvents()
         self.sec += 1
 
-    def link_clicked(self):
-        def open_testlog():
-            if os.path.exists(self.txtLogPath):
-                os.startfile(self.txtLogPath)
-            else:
-                self.logger.warning(f"no find txt log,path:{self.txtLogPath}")
-
-        thread = Thread(target=open_testlog, daemon=True)
-        thread.start()
+    # def link_clicked(self):
+    #     def open_testlog():
+    #         if os.path.exists(self.txtLogPath):
+    #             os.startfile(self.txtLogPath)
+    #         else:
+    #             self.logger.warning(f"no find txt log,path:{self.txtLogPath}")
+    #
+    #     thread = Thread(target=open_testlog, daemon=True)
+    #     thread.start()
 
     def on_menu(self):
         menu = QMenu(self)

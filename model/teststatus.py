@@ -14,6 +14,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QLabel, QAction, QWidget
 import conf.globalvar as gv
+from common.basicfunc import ensure_path_sep
 
 
 class TestStatus(Enum):
@@ -44,15 +45,15 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.mySignals.lineEditEnableSignal[bool].emit(False)
                 if gv.cfg.station.station_name in ['M4', 'M6', 'SX5GEV']:
                     myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'Flashing', 36,
-                                                                                 Qt.yellow)
+                                                                                Qt.yellow)
                 else:
                     myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'Testing', 36,
-                                                                                 Qt.yellow)
+                                                                                Qt.yellow)
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode, '', 20, Qt.yellow)
                 myWind.mySignals.timingSignal[bool].emit(True)
                 # gv.startTime = datetime.now()
                 myWind.mySignals.setIconSignal[QAction, QIcon].emit(myWind.actionStart,
-                                                                     QIcon(':/images/Pause-icon.png'))
+                                                                    QIcon(':/images/Pause-icon.png'))
                 myWind.mySignals.controlEnableSignal[QAction, bool].emit(myWind.actionStop, True)
                 myWind.startFlag = True
                 myWind.logger.debug(
@@ -65,16 +66,16 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
             if gv.LoginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 0, 0);")
                 myWind.mySignals.updateLabel[QLabel, str].emit(myWind.lb_testName,
-                                                                f"<A href='https://www.qt.io/'>{myWind.testcase.error_details_first_fail}</A>")
+                                                               f"<A href='file:///{myWind.txtLogPath}'>{myWind.testcase.error_details_first_fail}</A>")
             else:
                 myWind.total_fail_count += 1
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'FAIL', 36, Qt.red)
                 myWind.mySignals.play_audio[str].emit(os.path.join(gv.CurrentDir, 'ffmpeg', 'fail2.wav'))
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testTime, str(myWind.sec), 11,
-                                                                             Qt.gray)
+                                                                            Qt.gray)
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
-                                                                             myWind.testcase.error_details_first_fail,
-                                                                             20, Qt.red)
+                                                                            myWind.testcase.error_details_first_fail,
+                                                                            20, Qt.red)
                 myWind.UpdateContinueFail(False)
                 if myWind.setIpFlag:
                     myWind.testcase.dut_comm.send_command(f"luxsetip {gv.cfg.dut.dut_ip} 255.255.255.0",
@@ -87,7 +88,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'PASS', 36, Qt.green)
                 myWind.mySignals.play_audio[str].emit(os.path.join(gv.CurrentDir, 'ffmpeg', 'finish2.wav'))
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode, str(myWind.sec),
-                                                                             20, Qt.green)
+                                                                            20, Qt.green)
                 myWind.UpdateContinueFail(True)
         elif status == TestStatus.ABORT:
             if gv.LoginWin is not None:
@@ -102,10 +103,10 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'Abort', 36, Qt.gray)
                 myWind.mySignals.play_audio[str].emit(os.path.join(gv.CurrentDir, 'ffmpeg', 'fail1.wav'))
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testTime, str(myWind.sec), 11,
-                                                                             Qt.gray)
+                                                                            Qt.gray)
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
-                                                                             myWind.testcase.error_details_first_fail,
-                                                                             20, Qt.gray)
+                                                                            myWind.testcase.error_details_first_fail,
+                                                                            20, Qt.gray)
                 myWind.saveTestResult()
     except Exception as e:
         myWind.logger.fatal(f"SetTestStatus Exception！！{e},{traceback.format_exc()}")
@@ -121,14 +122,14 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                     myWind.mySignals.saveTextEditSignal[str].emit('rename')
                     if not myWind.finalTestResult:
                         myWind.mySignals.updateLabel[QLabel, str].emit(myWind.lb_testName,
-                                                                        f"<A href='https://www.qt.io/'>{myWind.testcase.error_details_first_fail}</A>")
+                                                                       rf"<A href='file:///{ensure_path_sep(myWind.txtLogPath)}'>{myWind.testcase.error_details_first_fail}</A>")
                     else:
                         pass
             else:
                 myWind.SaveScriptDisableFlag = True
                 if status != TestStatus.START:
                     myWind.mySignals.setIconSignal[QAction, QIcon].emit(myWind.actionStart,
-                                                                         QIcon(':/images/Start-icon.png'))
+                                                                        QIcon(':/images/Start-icon.png'))
                     myWind.mySignals.controlEnableSignal[QAction, bool].emit(myWind.actionStop, False)
                     myWind.mySignals.timingSignal[bool].emit(False)
                     myWind.logger.debug(f"Test end,ElapsedTime:{myWind.sec}s.")
@@ -138,11 +139,9 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                     myWind.mySignals.saveTextEditSignal[str].emit('rename')
                     if not myWind.finalTestResult:
                         myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
-                                                                                     myWind.testcase.error_details_first_fail,
-                                                                                     20,
-                                                                                     Qt.red)
+                                                                                    myWind.testcase.error_details_first_fail,
+                                                                                    20, Qt.red)
                     myWind.main_form.treeWidget.blockSignals(False)
         except Exception as e:
             myWind.logger.fatal(f"SetTestStatus Exception！！{e}")
             raise
-
