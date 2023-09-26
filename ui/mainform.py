@@ -20,7 +20,8 @@ import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices, QStandardItemModel, \
+    QStandardItem, QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
     QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
@@ -105,7 +106,8 @@ class MainForm(Ui_MainWindow, TestForm):
         self.init_graphicsView()
         self.init_signals_connect()
         self.testcase: models.testcase.TestCase = models.testcase.TestCase(rf'{gv.ExcelFilePath}',
-                                                                         f'{gv.cfg.station.station_name}', self.logger,
+                                                                           f'{gv.cfg.station.station_name}',
+                                                                           self.logger,
                                                                            self)
         self.init_status_bar()
         self.init_select_station()
@@ -221,7 +223,7 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def init_tableWidget(self):
         self.tableWidget_2.setHorizontalHeaderLabels(['property', 'value'])
-        self.tableWidget_3.setHorizontalHeaderLabels(['variable', 'value'])
+        # self.tableWidget_3.setHorizontalHeaderLabels(['variable', 'value'])
         self.tableWidget.setHorizontalHeaderLabels(self.tableWidgetHeader)
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -230,7 +232,7 @@ class MainForm(Ui_MainWindow, TestForm):
         strHeaderQss = "QHeaderView::section { background:#CCCCCC; color:black;min-height:3em;}"
         self.tableWidget.setStyleSheet(strHeaderQss)
         self.tableWidget_2.setStyleSheet(strHeaderQss)
-        self.tableWidget_3.setStyleSheet(strHeaderQss)
+        # self.tableWidget_3.setStyleSheet(strHeaderQss)
 
     def init_lab_factory(self, str_):
         if str_ == "lab":
@@ -808,21 +810,21 @@ class MainForm(Ui_MainWindow, TestForm):
         if self.tabWidget.tabText(index) == 'Variables':
             if self.TestVariables is None:
                 return
-            for i in range(0, self.tableWidget_3.rowCount()):
-                self.tableWidget_3.removeRow(0)
-            for prop_name in self.TestVariables:
-                if prop_name[0] != 'Config':
-                    column_cnt = self.tableWidget_3.columnCount()
-                    row_cnt = self.tableWidget_3.rowCount()
-                    self.tableWidget_3.insertRow(row_cnt)
-                    key_pairs = [prop_name[0], prop_name[1]]
-                    for column in range(column_cnt):
-                        self.tableWidget_3.horizontalHeader().setSectionResizeMode(column,
-                                                                                   QHeaderView.ResizeToContents)
-                        item = QTableWidgetItem(str(key_pairs[column]))
-                        item.setFlags(Qt.ItemIsEnabled)
-                        item.setBackground(Qt.lightGray)
-                        self.tableWidget_3.setItem(row_cnt, column, item)
+            if not gv.IsDebug:
+                self.tableViewVar.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+            self.tableViewVar.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+            self.tableViewVar.horizontalHeader().setStyleSheet(
+                "QHeaderView::section { background:#CCCCCC; color:black;min-height:2em;}")
+            modelVar = QStandardItemModel(0, 2, self.tableViewVar)
+            for prop in self.TestVariables:
+                if prop[0] != 'Config':
+                    modelVar.setHorizontalHeaderLabels(['variable', 'value'])
+                    prop_name = QStandardItem(prop[0])
+                    prop_name.setBackground(QColor('#E6E6E6'))
+                    prop_name.setFlags(Qt.ItemIsEnabled)
+                    prop_value = QStandardItem(prop[1])
+                    modelVar.appendRow([prop_name, prop_value])
+            self.tableViewVar.setModel(modelVar)
 
     def on_actionSaveToScript(self):
         # if self.SaveScriptDisableFlag:

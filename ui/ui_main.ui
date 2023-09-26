@@ -121,7 +121,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>3</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="result">
           <attribute name="title">
@@ -231,21 +231,13 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QTableWidget" name="tableWidget_3">
-             <property name="enabled">
-              <bool>true</bool>
+            <widget class="QTableView" name="tableViewVar">
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustToContents</enum>
              </property>
-             <property name="sortingEnabled">
-              <bool>true</bool>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
              </property>
-             <property name="columnCount">
-              <number>2</number>
-             </property>
-             <attribute name="horizontalHeaderCascadingSectionResizes">
-              <bool>true</bool>
-             </attribute>
-             <column/>
-             <column/>
             </widget>
            </item>
           </layout>
