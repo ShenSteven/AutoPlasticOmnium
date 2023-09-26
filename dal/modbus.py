@@ -12,7 +12,7 @@ import modbus_tk.defines as cst
 from modbus_tk import modbus_rtu
 import modbus_tk.modbus_tcp as modbus_tcp
 from common.basicfunc import IsNullOrEmpty
-from sockets.serialport import SerialPort
+from dal.serialport import SerialPort
 
 
 class ErrorCode(Enum):

@@ -11,7 +11,7 @@ import time
 import traceback
 from telnetlib import Telnet
 from common.basicfunc import IsNullOrEmpty
-from sockets.communication import CommAbstract
+from dal.communication import CommAbstract
 
 
 class TelnetComm(CommAbstract):

@@ -17,9 +17,9 @@ from inspect import currentframe
 from types import NoneType
 from PyQt5.QtWidgets import QMessageBox
 from openpyxl import load_workbook
-import model.suite
-import model.step
-import database.sqlite
+import models.suite
+import models.step
+import dal.database.sqlite
 from common.basicfunc import IsNullOrEmpty, get_sha256
 import conf.globalvar as gv
 
@@ -41,7 +41,7 @@ def save_keywords_to_txt(path, wpath):
 
 def excel_convert_to_json(testcase_path_excel, all_stations, logger):
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
-    gv.Keywords = save_keywords_to_txt(rf'{gv.CurrentDir}{os.sep}model{os.sep}keyword.py',
+    gv.Keywords = save_keywords_to_txt(rf'{gv.CurrentDir}{os.sep}models{os.sep}keyword.py',
                                        rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
     for station in all_stations:
         load_testcase_from_excel(testcase_path_excel, station, rf"{gv.ScriptFolder}{os.sep}{station}.json", logger)
@@ -76,10 +76,10 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger):
                 break
             if not IsNullOrEmpty(line[0].value):  # 实例化test suite
                 temp_suite_name = line[0].value
-                temp_suite = model.suite.TestSuite(line[0].value, len(suites_list))
+                temp_suite = models.suite.TestSuite(line[0].value, len(suites_list))
                 suites_list.append(temp_suite)
             # 给step对象属性赋值
-            test_step = model.step.Step()
+            test_step = models.step.Step()
             step_count += 1
             for header, cell in dict(zip(headers, line)).items():
                 test_step.index = temp_suite.totalNumber
@@ -113,7 +113,7 @@ def param_wrapper_verify_sha256(flag):
             bound_args = sig.bind(*args, **kwargs)
             bound_args.apply_defaults()
             if flag and bound_args.args[1]:
-                with database.sqlite.Sqlite(gv.DatabaseSetting) as db:
+                with dal.database.sqlite.Sqlite(gv.DatabaseSetting) as db:
                     file_name = os.path.basename(bound_args.args[0])
                     db.execute_commit(f"SELECT SHA256  from SHA256_ENCRYPTION WHERE NAME='{file_name}'")
                     result = db.cur.fetchone()
@@ -152,7 +152,7 @@ def load_testcase_from_json(json_path, isVerify=True):
         for suit_dict in sequences_dict:
             step_obj_list = []
             for step_dict in suit_dict['steps']:
-                step_obj = model.step.Step(step_dict)
+                step_obj = models.step.Step(step_dict)
                 step_count += 1
                 step_obj_list.append(step_obj)
                 if not headers:
@@ -162,7 +162,7 @@ def load_testcase_from_json(json_path, isVerify=True):
 
                     items = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), step_obj.__dict__)
                     gv.StepAttr = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
-            suit_obj = model.suite.TestSuite(dict_=suit_dict)
+            suit_obj = models.suite.TestSuite(dict_=suit_dict)
             suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)
         return sequences_obj_list, headers, step_count
@@ -186,7 +186,7 @@ def load_testcase_from_py(name, package='scripts'):
         for suit_dict in sequences_dict:
             step_obj_list = []
             for step_dict in suit_dict['steps']:
-                step_obj = model.step.Step(step_dict)
+                step_obj = models.step.Step(step_dict)
                 step_count += 1
                 step_obj_list.append(step_obj)
                 if not headers:
@@ -196,7 +196,7 @@ def load_testcase_from_py(name, package='scripts'):
 
                     items = filter(lambda x: x[0:1].isupper() or x[1:2].isupper(), step_obj.__dict__)
                     gv.StepAttr = list(map(lambda x: x[1:] if x.startswith('_') else x, items))
-            suit_obj = model.suite.TestSuite(dict_=suit_dict)
+            suit_obj = models.suite.TestSuite(dict_=suit_dict)
             suit_obj.steps = step_obj_list
             sequences_obj_list.append(suit_obj)
         return sequences_obj_list, headers, step_count
@@ -214,7 +214,7 @@ def wrapper_save_sha256(fun):
         bound_args.apply_defaults()
         result = fun(*bound_args.args, **bound_args.kwargs)
         sha256 = get_sha256(bound_args.args[1])
-        with database.sqlite.Sqlite(gv.DatabaseSetting) as db:
+        with dal.database.sqlite.Sqlite(gv.DatabaseSetting) as db:
             file_name = os.path.basename(bound_args.args[1])
             try:
                 db.execute_commit(f"INSERT INTO SHA256_ENCRYPTION (NAME,SHA256) VALUES ('{file_name}', '{sha256}')")

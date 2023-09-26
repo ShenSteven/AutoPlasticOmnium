@@ -31,17 +31,17 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 
 import conf.config
 import conf.globalvar as gv
-import database.sqlite
-import model.loadseq
-import model.product
-import model.testcase
-import model.variables
+import dal.database.sqlite
+import models.loadseq
+import models.product
+import models.testcase
+import models.variables
 from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int, ensure_path_sep
 from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from common.testform import TestForm
 from conf.logprint import QTextEditHandler, LogPrint
-from model.testthread import TestThread, TestStatus
+from bll.testthread import TestThread, TestStatus
 from peak.plin.peaklin import PeakLin
 from ui.settings import SettingsDialog
 from ui.ui_main import Ui_MainWindow
@@ -104,9 +104,9 @@ class MainForm(Ui_MainWindow, TestForm):
         self.init_lineEdit()
         self.init_graphicsView()
         self.init_signals_connect()
-        self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.ExcelFilePath}',
+        self.testcase: models.testcase.TestCase = models.testcase.TestCase(rf'{gv.ExcelFilePath}',
                                                                          f'{gv.cfg.station.station_name}', self.logger,
-                                                                         self)
+                                                                           self)
         self.init_status_bar()
         self.init_select_station()
         self.testSequences = self.testcase.clone_suites
@@ -258,7 +258,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.action192_168_1_101.setText(GetAllIpv4Address('10.90.'))
 
     def init_status_bar(self):
-        with database.sqlite.Sqlite(gv.DatabaseSetting) as db:
+        with dal.database.sqlite.Sqlite(gv.DatabaseSetting) as db:
             db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
             db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='total_pass_count'")
@@ -450,8 +450,8 @@ class MainForm(Ui_MainWindow, TestForm):
             if os.path.exists(self.testcase.test_script_json):
                 os.chmod(self.testcase.test_script_json, stat.S_IWRITE)
                 os.remove(self.testcase.test_script_json)
-            self.testcase = model.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger, self,
-                                                    False)
+            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger, self,
+                                                     False)
             self.testSequences = self.testcase.clone_suites
 
         thread = Thread(target=thread_convert_and_load_script, daemon=True)
@@ -553,8 +553,8 @@ class MainForm(Ui_MainWindow, TestForm):
             QMessageBox.information(self, 'Infor', 'Test is running, can not do it!', QMessageBox.Yes)
             return
         thread = Thread(
-            target=model.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
-                                                              gv.cfg.station.station_all, self.logger), daemon=True)
+            target=models.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
+                                                               gv.cfg.station.station_all, self.logger), daemon=True)
         thread.start()
 
     def on_actionOpenScript(self):
@@ -582,8 +582,8 @@ class MainForm(Ui_MainWindow, TestForm):
             if gv.cfg.station.station_name.startswith('ReadVer'):
                 gv.IsDebug = True
             gv.cfg.station.station_no = gv.cfg.station.station_name
-            self.testcase = model.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger,
-                                                    self, False)
+            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger,
+                                                     self, False)
             self.mySignals.updateProgressBar[int, int].emit(self.testcase.step_finish_num, self.testcase.sum_step)
             self.testSequences = self.testcase.clone_suites
             self.logger.debug(f'select {self.testcase.test_script_json} finish!')
@@ -1035,7 +1035,7 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def updateStatusBar(self, info):
         self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
-        with database.sqlite.Sqlite(gv.DatabaseSetting) as db:
+        with dal.database.sqlite.Sqlite(gv.DatabaseSetting) as db:
             db.execute_commit(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
             db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
             db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_fail_count}' where NAME ='total_fail_count'")
@@ -1102,7 +1102,7 @@ class MainForm(Ui_MainWindow, TestForm):
             return False
 
     def CheckContinueFailNum(self):
-        with database.sqlite.Sqlite(gv.DatabaseSetting) as db:
+        with dal.database.sqlite.Sqlite(gv.DatabaseSetting) as db:
             db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
             self.logger.debug(str(self.continue_fail_count))
@@ -1178,9 +1178,9 @@ class MainForm(Ui_MainWindow, TestForm):
         self.testcase.logger = self.logger
         self.testcase.step_finish_num = 0
         self.testcase.startTimeJson = datetime.now()
-        self.testcase.jsonObj = model.product.JsonObject(SN, gv.cfg.station.station_no,
-                                                         gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
-        self.testcase.mesPhases = model.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
+        self.testcase.jsonObj = models.product.JsonObject(SN, gv.cfg.station.station_no,
+                                                          gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
+        self.testcase.mesPhases = models.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
         self.testcase.daq_data_path = rf'{gv.OutPutPath}\{gv.cfg.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         self.lb_failInfo.setHidden(True)
         self.lb_testTime.setHidden(True)
@@ -1380,8 +1380,8 @@ class MainForm(Ui_MainWindow, TestForm):
                 gv.cfg.station.station_name = station_name
                 gv.cfg.station.station_no = gv.cfg.station.station_name
                 os.system(f'copy {gv.ScriptFolder}\\sample.json {gv.ScriptFolder}\\{gv.cfg.station.station_name}.json')
-            self.testcase = model.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger, self,
-                                                    False, False)
+            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger, self,
+                                                     False, False)
             self.testSequences = self.testcase.clone_suites
             gv.cfg.station.station_all.append(station_name)
             conf.config.save_config(gv.cfg, gv.ConfigYamlPath)

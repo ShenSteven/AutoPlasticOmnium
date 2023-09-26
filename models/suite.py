@@ -10,8 +10,8 @@ import traceback
 from datetime import datetime
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
-import model.product
-import model.step
+import models.product
+import models.step
 from common.basicfunc import create_csv_file, write_csv_file
 import ui.mainform
 
@@ -66,7 +66,7 @@ class TestSuite:
             return self.suiteResult
         self.logger.debug('- ' * 8 + f"<a name='testSuite:{self.name}'>Start testSuite:{self.name}</a>" + '- ' * 9)
         self.setColor(Qt.yellow)
-        suiteItem = model.product.SuiteItem()
+        suiteItem = models.product.SuiteItem()
         step_result_list = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         try:
@@ -130,7 +130,7 @@ class TestSuite:
         write_csv_file(self.logger, test_case.daq_data_path, data_list)
         test_case.ArrayListDaq = []
 
-    def copy_to_json_obj(self, obj: model.product.SuiteItem):
+    def copy_to_json_obj(self, obj: models.product.SuiteItem):
         obj.phase_name = self.name
         obj.status = "passed" if self.suiteResult else "failed"
         obj.start_time = self.start_time

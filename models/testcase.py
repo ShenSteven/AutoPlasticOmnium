@@ -10,13 +10,13 @@ import copy
 import os
 import sys
 import traceback
-import model.loadseq
-import model.product
-import database.sqlite
-import model.variables
+import models.loadseq
+import models.product
+import dal.database.sqlite
+import models.variables
 import conf.globalvar as gv
-import sockets.serialport
-import flowcontrol.ifelse
+import dal.serialport
+import bll.flowcontrol.ifelse
 from inspect import currentframe
 from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
@@ -55,20 +55,20 @@ class TestCase:
         self.DoWhileLoop = None
         self.WhileLoop = None
         self.loop = None
-        self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
+        self.IfElseFlow = bll.flowcontrol.ifelse.IfElse(self.logger)
         self.Finished = False
         self.failCount = 0
         self.startTimeJsonFlag = True
         self.startTimeJson = datetime.now()
-        self.mesPhases: model.product.MesInfo = None
-        self.jsonObj: model.product.JsonObject = None
+        self.mesPhases: models.product.MesInfo = None
+        self.jsonObj: models.product.JsonObject = None
         self.ArrayListDaq = []
         self.ArrayListDaqHeader = ['SN', 'DateTime']
         self.daq_data_path = ''
         self.csv_list_header = []
         self.csv_list_data = []
         self.csv_file_path = ''
-        database.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
+        dal.database.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
         self.load_testcase(testcase_path, sheet_name, logger, cflag, isVerify)
 
     @property
@@ -81,13 +81,13 @@ class TestCase:
             self.testcase_path = testcase_path
             self.logger = logger
             if not getattr(sys, 'frozen', False) and cflag:
-                model.loadseq.excel_convert_to_json(self.testcase_path, gv.cfg.station.station_all, self.logger)
+                models.loadseq.excel_convert_to_json(self.testcase_path, gv.cfg.station.station_all, self.logger)
             if not os.path.exists(self.test_script_json):
-                model.loadseq.excel_convert_to_json(self.testcase_path, [sheet_name], self.logger)
+                models.loadseq.excel_convert_to_json(self.testcase_path, [sheet_name], self.logger)
             if gv.IsHide:
-                self.original_suites, self.header, self.step_count = model.loadseq.load_testcase_from_py(self.sheetName)
+                self.original_suites, self.header, self.step_count = models.loadseq.load_testcase_from_py(self.sheetName)
             else:
-                self.original_suites, self.header, self.step_count = model.loadseq.load_testcase_from_json(
+                self.original_suites, self.header, self.step_count = models.loadseq.load_testcase_from_json(
                     self.test_script_json, isVerify)
             self.clone_suites = copy.deepcopy(self.original_suites)
             gv.Keywords = get_keywords_list(rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
@@ -159,14 +159,14 @@ class TestCase:
             self.teardown()
             self.Finished = True
 
-    def copy_to_json(self, obj: model.product.JsonObject):
+    def copy_to_json(self, obj: models.product.JsonObject):
         obj.status = 'passed' if self.tResult else 'failed'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
         obj.error_code = self.error_code_first_fail
         obj.error_details = self.error_details_first_fail
 
-    def copy_to_mes(self, obj: model.product.MesInfo):
+    def copy_to_mes(self, obj: models.product.MesInfo):
         obj.status = 'PASS' if self.tResult else 'FAIL'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
@@ -180,7 +180,7 @@ class TestCase:
         self.ForLoop = None
         self.DoWhileLoop = None
         self.WhileLoop = None
-        self.IfElseFlow = flowcontrol.ifelse.IfElse(self.logger)
+        self.IfElseFlow = bll.flowcontrol.ifelse.IfElse(self.logger)
         self.loop = None
 
     def teardown(self):
@@ -196,8 +196,8 @@ class TestCase:
         """通过串口读取治具中设置的测试工站名字"""
         if not gv.cfg.station.fix_flag:
             return
-        self.FixSerialPort = sockets.serialport.SerialPort(gv.cfg.station.fix_com_port,
-                                                           gv.cfg.station.fix_com_baudRate)
+        self.FixSerialPort = dal.serialport.SerialPort(gv.cfg.station.fix_com_port,
+                                                       gv.cfg.station.fix_com_baudRate)
         for i in range(0, 3):
             rReturn, revStr = self.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
             if rReturn:

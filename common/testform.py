@@ -11,8 +11,8 @@ import sys
 import threading
 import time
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
-import model.variables
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QStyleFactory
+import models.variables
 import conf.globalvar as gv
 from common.mysignals import MySignals
 
@@ -32,7 +32,7 @@ class TestForm(QMainWindow):
         self.SingleStepTest = False
         self.finalTestResult = False
         self.SaveScriptDisableFlag = False
-        self.TestVariables: model.variables.Variables = None
+        self.TestVariables: models.variables.Variables = None
         self.StepNo = -1
         self.SuiteNo = -1
         self.FailNumOfCycleTest = 0
@@ -57,6 +57,8 @@ class TestForm(QMainWindow):
         self.DUTMesMac = ''
         self.setIpFlag = False  # 是否设置dut IP为默认ip
         self.mySignals = MySignals()
+        QApplication.setStyle(QStyleFactory.create("fusion"))
+        # QApplication.setStyle(QStyleFactory.create("macintosh"))
 
     def init_variable(self, sn):
         self.sec = 1
@@ -73,7 +75,7 @@ class TestForm(QMainWindow):
         if self.SingleStepTest and self.testcase.Finished:
             pass
         else:
-            self.TestVariables = model.variables.Variables(self.SN, gv.cfg.LTT.channel)
+            self.TestVariables = models.variables.Variables(self.SN, gv.cfg.LTT.channel)
         if not self.SingleStepTest:
             self.SuiteNo = -1
             self.StepNo = -1

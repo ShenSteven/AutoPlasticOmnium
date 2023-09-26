@@ -12,13 +12,12 @@ from datetime import datetime
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QAction, QLabel
-import model.product
-import database.sqlite
-import model.keyword
+import models.product
+import dal.database.sqlite
+import models.keyword
 from common.basicfunc import IsNullOrEmpty, str_to_int
 import conf.globalvar as gv
 import ui.mainform
-import database.mysql
 
 
 def parse_expr(value):
@@ -587,7 +586,7 @@ class Step:
         except RuntimeError:
             pass
 
-    def run(self, test_case, testSuite, suiteItem: model.product.SuiteItem = None):
+    def run(self, test_case, testSuite, suiteItem: models.product.SuiteItem = None):
         """run test step"""
         self.myWind = test_case.myWind
         if self.logger is None:
@@ -642,7 +641,7 @@ class Step:
                         self.logger.debug('This is debug mode.Skip this step.')
                         self.test_result, info = True, ''
                     else:
-                        self.test_result, info = model.keyword.testKeyword(self.Keyword, self, test_case)
+                        self.test_result, info = models.keyword.testKeyword(self.Keyword, self, test_case)
                         self.test_keyword_finally(test_case)
                 if self.test_result:
                     break
@@ -709,7 +708,7 @@ class Step:
                       '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
                       '''
         if self.isTest and self.Json == 'Y':
-            with database.sqlite.Sqlite(gv.DatabaseResult) as db:
+            with dal.database.sqlite.Sqlite(gv.DatabaseResult) as db:
                 self.logger.debug('INSERT test result to result.db table RESULT.')
                 db.execute_commit(SQL_statements)
             # with database.mysql.MySQL(host='127.0.0.1', port=3306, user='root', passwd='123456') as db:
@@ -830,11 +829,11 @@ class Step:
             test_case.csv_list_header.append(name)
             test_case.csv_list_data.append(self.testValue)
 
-    def record_to_json(self, test_case, testResult, suiteItem: model.product.SuiteItem = None):
+    def record_to_json(self, test_case, testResult, suiteItem: models.product.SuiteItem = None):
         """copy test data to json object"""
         if self.status != str(True):
             self.start_time_json = test_case.startTimeJson
-        obj = model.product.StepItem()
+        obj = models.product.StepItem()
         if self.EeroName is None:
             obj.test_name = self.StepName
         elif self.EeroName.endswith('_'):
@@ -872,7 +871,7 @@ class Step:
 
         return obj
 
-    def record_test_data(self, test_case, test_result, suiteItem: model.product.SuiteItem):
+    def record_test_data(self, test_case, test_result, suiteItem: models.product.SuiteItem):
         """ according to self.Json record test result and data into json file"""
         if self.Json == 'Y':
             obj = self.record_to_json(test_case, test_result, suiteItem)
@@ -898,26 +897,25 @@ class Step:
 
     def start_loop(self, test_case, suit):
         """FOR 循环开始判断 FOR(3)"""
-        import flowcontrol.forloop
-        import flowcontrol.dowhile
+        import bll.flowcontrol.dowhile
         if IsNullOrEmpty(self.For):
             return
         if str_to_int(self.For)[0]:
             if test_case.ForLoop is None:
-                test_case.ForLoop = flowcontrol.forloop.ForLoop(self.logger)
+                test_case.ForLoop = bll.flowcontrol.forloop.ForLoop(self.logger)
             test_case.ForLoop.start(suit.index, self.index, int(self.For))
             # test_case.loop = flowcontrol.forloop.ForLoop(self.logger)
             # test_case.loop.start(suit.index, self.index, int(self.For))
         elif self.For.lower() == "do":
             if test_case.DoWhileLoop is None:
-                test_case.DoWhileLoop = flowcontrol.dowhile.DoWhile(self.logger)
+                test_case.DoWhileLoop = bll.flowcontrol.dowhile.DoWhile(self.logger)
             test_case.DoWhileLoop.start(suit.index, self.index)
             # test_case.loop = flowcontrol.dowhile.DoWhile(self.logger)
             # test_case.loop.start(suit.index, self.index)
 
     def end_loop(self, test_case, step_result, index):
         """FOR 循环结束判断 END FOR"""
-        import flowcontrol.whileloop
+        import bll.flowcontrol.whileloop
         if IsNullOrEmpty(self.For):
             return False
         if self.For.lower() == 'endfor':
@@ -934,7 +932,7 @@ class Step:
             return is_end
         if self.For.lower() == "whiledo":
             if test_case.WhileLoop is None:
-                test_case.WhileLoop = flowcontrol.whileloop.WhileLoop(self.logger)
+                test_case.WhileLoop = bll.flowcontrol.whileloop.WhileLoop(self.logger)
             if step_result:
                 test_case.WhileLoop.start(index, self.index, step_result)
                 # test_case.loop.start(index, self.index, step_result)

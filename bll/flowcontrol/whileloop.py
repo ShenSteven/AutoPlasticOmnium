@@ -6,7 +6,7 @@
 @Date   : 8/30/2023
 @Desc   : 
 """
-from flowcontrol.loop import CycleType, Loop
+from bll.flowcontrol.loop import CycleType, Loop
 
 
 class WhileLoop(Loop):

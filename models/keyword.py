@@ -15,11 +15,11 @@ from PyQt5.QtWidgets import QAction, QMessageBox
 import ui.mainform
 import peak.plin.peaklin
 from common import value_dispatch
-from sockets.serialport import SerialPort
-from sockets.telnet import TelnetComm
+from dal.serialport import SerialPort
+from dal.telnet import TelnetComm
 import conf.globalvar as gv
 import time
-from sockets.visa import VisaComm
+from dal.visa import VisaComm
 from common.basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping, str_to_int, \
     subStr, assert_value
 

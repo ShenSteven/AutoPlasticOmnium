@@ -11,7 +11,7 @@ import time
 import traceback
 import pyvisa
 from common.basicfunc import IsNullOrEmpty
-from sockets.communication import CommAbstract
+from dal.communication import CommAbstract
 from inspect import currentframe
 
 

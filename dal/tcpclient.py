@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-@File   : udpclient.py
+@File   : tcpclient.py
 @Author : Steven.Shen
-@Date   : 4/3/2023
+@Date   : 3/31/2023
 @Desc   : 
 """
 import json
@@ -12,10 +12,10 @@ import socket
 import time
 import traceback
 from common.basicfunc import IsNullOrEmpty
-from sockets.communication import CommAbstract
+from dal.communication import CommAbstract
 
 
-class UDPClient(CommAbstract):
+class TCPClient(CommAbstract):
     def __init__(self, logger, host, port, prompt):
         self.client_socket = None
         self.logger = logger
@@ -26,8 +26,8 @@ class UDPClient(CommAbstract):
         self.port = port
 
     def open(self, *args):
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.client_socket.settimeout(2)
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.connect(self.SERVER_ADDR)
 
     def close(self):
         self.client_socket.close()
@@ -49,9 +49,9 @@ class UDPClient(CommAbstract):
             send_bytes = json.dumps(message).encode('utf8')
         else:
             send_bytes = message.encode('utf8')
-        self.client_socket.sendto(send_bytes, self.SERVER_ADDR)
+        self.client_socket.sendto(send_bytes)
         try:
-            recv_bytes, server = self.client_socket.recvfrom(self.BUFF_LEN)
+            recv_bytes = self.client_socket.recvfrom(self.BUFF_LEN)
             strRecAll = json.loads(recv_bytes.decode('utf8'))
             self.logger.debug(strRecAll)
             if IsNullOrEmpty(exceptStr):

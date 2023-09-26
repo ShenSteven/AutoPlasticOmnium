@@ -17,13 +17,13 @@ import conf.globalvar as gv
 from PyQt5 import QtCore
 from PyQt5.QtGui import QBrush, QCursor
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox, QMenu
-import model.variables
+import models.variables
 from conf.logprint import LogPrint
 from common.basicfunc import IsNullOrEmpty
 from common.mysignals import update_label
 from common.testform import TestForm
-from model.teststatus import TestStatus
-from model.testthread import TestThread
+from bll.teststatus import TestStatus
+from bll.testthread import TestThread
 from runin.ui_cell import Ui_cell
 from time import strftime
 from time import gmtime
@@ -38,9 +38,9 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.webSwitchCon = None
         self.row_index = row
         self.col_index = col
-        self.testcase: model.testcase.TestCase = model.testcase.TestCase(rf'{gv.ExcelFilePath}',
+        self.testcase: models.testcase.TestCase = models.testcase.TestCase(rf'{gv.ExcelFilePath}',
                                                                          f'{gv.cfg.station.station_name}', self.logger,
-                                                                         self, False)
+                                                                           self, False)
         self.setupUi(self)
         self.init_cell_ui()
         self.init_signals_connect()
@@ -128,12 +128,12 @@ class Cell(QFrame, Ui_cell, TestForm):
         """测试变量初始化"""
         gv.InitCreateDirs(self.logger)
         self.init_variable(SN)
-        self.testcase.jsonObj = model.product.JsonObject(SN, gv.cfg.station.station_no,
-                                                         gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
+        self.testcase.jsonObj = models.product.JsonObject(SN, gv.cfg.station.station_no,
+                                                          gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
         self.testcase.daq_data_path = rf'{gv.OutPutPath}{os.sep}{gv.cfg.station.station_no}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
-        self.testcase.mesPhases = model.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
+        self.testcase.mesPhases = models.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
         self.testcase.startTimeJson = datetime.now()
-        self.TestVariables = model.variables.Variables(SN, str(self.LocalNo), str(gv.cfg.LTT.row))
+        self.TestVariables = models.variables.Variables(SN, str(self.LocalNo), str(gv.cfg.LTT.row))
         self.txtLogPath = rf'{gv.LogFolderPath}{os.sep}logging_{self.LocalNo}_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
         gv.lg = LogPrint(self.txtLogPath.replace('\\', '/'), gv.CriticalLog, gv.ErrorsLog)
         self.logger = gv.lg.logger
