@@ -60,6 +60,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.result)
         self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.tableViewRet = QtWidgets.QTableView(self.result)
+        self.tableViewRet.setObjectName("tableViewRet")
+        self.horizontalLayout_5.addWidget(self.tableViewRet)
         self.tableWidget = QtWidgets.QTableWidget(self.result)
         self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.tableWidget.setRowCount(0)
@@ -76,13 +79,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.stepInfo)
         self.horizontalLayout_6.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-        self.tableWidget_2 = QtWidgets.QTableWidget(self.stepInfo)
-        self.tableWidget_2.setEnabled(True)
-        self.tableWidget_2.setColumnCount(2)
-        self.tableWidget_2.setObjectName("tableWidget_2")
-        self.tableWidget_2.setRowCount(0)
-        self.tableWidget_2.horizontalHeader().setCascadingSectionResizes(True)
-        self.horizontalLayout_6.addWidget(self.tableWidget_2)
+        self.tableViewStepProp = QtWidgets.QTableView(self.stepInfo)
+        self.tableViewStepProp.setObjectName("tableViewStepProp")
+        self.horizontalLayout_6.addWidget(self.tableViewStepProp)
         self.tabWidget.addTab(self.stepInfo, "")
         self.variables = QtWidgets.QWidget()
         self.variables.setObjectName("variables")
@@ -91,7 +90,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout_9.setObjectName("horizontalLayout_9")
         self.tableViewVar = QtWidgets.QTableView(self.variables)
         self.tableViewVar.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
-        # self.tableViewVar.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableViewVar.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.tableViewVar.setObjectName("tableViewVar")
         self.horizontalLayout_9.addWidget(self.tableViewVar)
@@ -499,14 +497,13 @@ class Ui_MainWindow(object):
         self.toolBar.addSeparator()
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "PlasticOmniumLighting"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.result), _translate("MainWindow", "Result"))
-        self.tableWidget_2.setSortingEnabled(True)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.stepInfo), _translate("MainWindow", "Property"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.variables), _translate("MainWindow", "Variables"))
         self.pBt_start.setText(_translate("MainWindow", "Start"))
@@ -586,4 +583,4 @@ class Ui_MainWindow(object):
         self.actionNewStep.setToolTip(_translate("MainWindow", "New step"))
         self.actionCutStep.setText(_translate("MainWindow", "Cut"))
         self.actionCutStep.setToolTip(_translate("MainWindow", "Cut step"))
-import ui.images_rc
+import images_rc

@@ -40,8 +40,7 @@
                 "_CmdOrParam": "",
                 "_CheckStr1": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -73,8 +72,7 @@
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -106,8 +104,7 @@
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -139,8 +136,7 @@
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -172,8 +168,7 @@
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -205,8 +200,7 @@
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -238,8 +232,7 @@
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -271,8 +264,7 @@
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -304,8 +296,7 @@
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -337,8 +328,7 @@
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -370,8 +360,7 @@
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -403,8 +392,7 @@
                 "_CmdOrParam": "11 01",
                 "_CheckStr1": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -436,8 +424,7 @@
                 "_CmdOrParam": "22 F1 55",
                 "_CheckStr1": "",
                 "_ByPF": "P",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             }
         ],
         "start_time": null,

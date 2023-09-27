@@ -42,8 +42,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -77,8 +76,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -112,8 +110,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -147,8 +144,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -182,8 +178,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -217,8 +212,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -252,8 +246,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -287,8 +280,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -322,8 +314,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -357,8 +348,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             }
         ],
         "start_time": null,
@@ -410,8 +400,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -445,8 +434,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             }
         ],
         "start_time": null,
@@ -498,8 +486,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -533,8 +520,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             }
         ],
         "start_time": null,
@@ -586,8 +572,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             }
         ],
         "start_time": null,
@@ -639,8 +624,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -674,8 +658,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             }
         ],
         "start_time": null,
@@ -727,8 +710,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -762,8 +744,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             }
         ],
         "start_time": null,
@@ -815,8 +796,7 @@
                 "_LSL": "-10",
                 "_USL": "10",
                 "Unit": "A",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             }
         ],
         "start_time": null,
@@ -868,8 +848,7 @@
                 "_LSL": "-20",
                 "_USL": "30",
                 "Unit": "V",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             }
         ],
         "start_time": null,
@@ -921,8 +900,7 @@
                 "_LSL": "",
                 "_USL": "",
                 "Unit": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             }
         ],
         "start_time": null,

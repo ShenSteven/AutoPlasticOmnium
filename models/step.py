@@ -373,6 +373,9 @@ class Step:
 
     @ByPF.setter
     def ByPF(self, value):
+        if value is None:
+            del self._ByPF
+            return
         if value.upper() == 'P' or value.upper() == 'F':
             self._ByPF = value
         elif value == 'None' or value == '':

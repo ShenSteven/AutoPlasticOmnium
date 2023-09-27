@@ -43,8 +43,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -79,8 +78,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -115,8 +113,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -151,8 +148,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -187,8 +183,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -223,8 +218,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -259,8 +253,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "appS19",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -295,8 +288,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "appStartAdd",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -331,8 +323,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "appLen",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -367,8 +358,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "appCRC32",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -403,8 +393,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "drvS19",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -439,8 +428,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "drvStartAdd",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -475,8 +463,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "drvLen",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -511,8 +498,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "drvCRC32",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -547,8 +533,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             }
         ],
         "start_time": null,
@@ -601,8 +586,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -637,8 +621,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -673,8 +656,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "P",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -709,8 +691,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -745,8 +726,7 @@
                 "_CheckStr1": "71 01 FF 02",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -781,8 +761,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -817,8 +796,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -853,8 +831,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -889,8 +866,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "seed",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -925,8 +901,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "key",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -961,8 +936,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             }
         ],
         "start_time": null,
@@ -1015,8 +989,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "lenOfBlock",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1051,8 +1024,7 @@
                 "_CheckStr1": "<drvCRC32>",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1087,8 +1059,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1123,8 +1094,7 @@
                 "_CheckStr1": "71 01 F0 01",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1159,8 +1129,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             }
         ],
         "start_time": null,
@@ -1213,8 +1182,7 @@
                 "_CheckStr1": "71 01 FF 00",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1249,8 +1217,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "lenOfBlock",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1285,8 +1252,7 @@
                 "_CheckStr1": "<appCRC32>",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1321,8 +1287,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1357,8 +1322,7 @@
                 "_CheckStr1": "71 01 F0 01",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             }
         ],
         "start_time": null,
@@ -1411,8 +1375,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1447,8 +1410,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1483,8 +1445,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1519,8 +1480,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "",
-                "NeverUsed": null
+                "_Json": ""
             },
             {
                 "test_result": false,
@@ -1555,8 +1515,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": "Y",
-                "NeverUsed": null
+                "_Json": "Y"
             }
         ],
         "start_time": null,

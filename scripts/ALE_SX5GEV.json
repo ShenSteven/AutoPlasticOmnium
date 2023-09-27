@@ -33,8 +33,7 @@
                 "_Retry": 0,
                 "_Timeout": 2,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             },
             {
                 "test_result": false,
@@ -59,8 +58,7 @@
                 "_Retry": 1,
                 "_Timeout": 1,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             }
         ],
         "start_time": null,
@@ -103,8 +101,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "32",
-                "_CmdOrParam": "08 80 00 00 00 00 00 C8",
-                "NeverUsed": null
+                "_CmdOrParam": "08 80 00 00 00 00 00 C8"
             },
             {
                 "test_result": false,
@@ -129,8 +126,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "33",
-                "_CmdOrParam": "00 00 02 00 00 00 00 00",
-                "NeverUsed": null
+                "_CmdOrParam": "00 00 02 00 00 00 00 00"
             },
             {
                 "test_result": false,
@@ -155,8 +151,7 @@
                 "_Retry": 0,
                 "_Timeout": 5,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             }
         ],
         "start_time": null,
@@ -199,8 +194,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "32",
-                "_CmdOrParam": "00 00 00 00 00 00 00 C8",
-                "NeverUsed": null
+                "_CmdOrParam": "00 00 00 00 00 00 00 C8"
             },
             {
                 "test_result": false,
@@ -225,8 +219,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "33",
-                "_CmdOrParam": "00 00 02 00 00 00 00 00",
-                "NeverUsed": null
+                "_CmdOrParam": "00 00 02 00 00 00 00 00"
             },
             {
                 "test_result": false,
@@ -251,8 +244,7 @@
                 "_Retry": 0,
                 "_Timeout": 1,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             }
         ],
         "start_time": null,
@@ -295,8 +287,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "32",
-                "_CmdOrParam": "00 00 00 00 00 00 00 C8",
-                "NeverUsed": null
+                "_CmdOrParam": "00 00 00 00 00 00 00 C8"
             },
             {
                 "test_result": false,
@@ -321,8 +312,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "33",
-                "_CmdOrParam": "00 08 02 00 00 00 00 00",
-                "NeverUsed": null
+                "_CmdOrParam": "00 08 02 00 00 00 00 00"
             },
             {
                 "test_result": false,
@@ -347,8 +337,7 @@
                 "_Retry": 0,
                 "_Timeout": 5,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             }
         ],
         "start_time": null,
@@ -391,8 +380,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "32",
-                "_CmdOrParam": "00 00 00 00 00 00 00 C8",
-                "NeverUsed": null
+                "_CmdOrParam": "00 00 00 00 00 00 00 C8"
             },
             {
                 "test_result": false,
@@ -417,8 +405,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "33",
-                "_CmdOrParam": "00 00 02 00 00 00 00 00",
-                "NeverUsed": null
+                "_CmdOrParam": "00 00 02 00 00 00 00 00"
             },
             {
                 "test_result": false,
@@ -443,8 +430,7 @@
                 "_Retry": 0,
                 "_Timeout": 10,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             }
         ],
         "start_time": null,
@@ -487,8 +473,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "32",
-                "_CmdOrParam": "00 80 00 00 00 00 00 C8",
-                "NeverUsed": null
+                "_CmdOrParam": "00 80 00 00 00 00 00 C8"
             },
             {
                 "test_result": false,
@@ -513,8 +498,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "33",
-                "_CmdOrParam": "00 00 02 00 00 00 00 00",
-                "NeverUsed": null
+                "_CmdOrParam": "00 00 02 00 00 00 00 00"
             },
             {
                 "test_result": false,
@@ -539,8 +523,7 @@
                 "_Retry": 0,
                 "_Timeout": 20,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             }
         ],
         "start_time": null,
@@ -583,8 +566,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "32",
-                "_CmdOrParam": "00 00 00 00 00 00 00 C8",
-                "NeverUsed": null
+                "_CmdOrParam": "00 00 00 00 00 00 00 C8"
             },
             {
                 "test_result": false,
@@ -609,8 +591,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "33",
-                "_CmdOrParam": "F4 01 02 01 00 00 00 00",
-                "NeverUsed": null
+                "_CmdOrParam": "F4 01 02 01 00 00 00 00"
             },
             {
                 "test_result": false,
@@ -635,8 +616,7 @@
                 "_Retry": 0,
                 "_Timeout": 10,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             }
         ],
         "start_time": null,
@@ -679,8 +659,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "32",
-                "_CmdOrParam": "00 80 00 00 00 00 00 C8",
-                "NeverUsed": null
+                "_CmdOrParam": "00 80 00 00 00 00 00 C8"
             },
             {
                 "test_result": false,
@@ -705,8 +684,7 @@
                 "_Retry": 0,
                 "_Timeout": 0,
                 "_ID": "33",
-                "_CmdOrParam": "F4 01 32 00 00 00 00 00",
-                "NeverUsed": null
+                "_CmdOrParam": "F4 01 32 00 00 00 00 00"
             },
             {
                 "test_result": false,
@@ -731,8 +709,7 @@
                 "_Retry": 0,
                 "_Timeout": 10,
                 "_ID": "",
-                "_CmdOrParam": "",
-                "NeverUsed": null
+                "_CmdOrParam": ""
             }
         ],
         "start_time": null,

@@ -19,7 +19,7 @@ import psutil
 import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl
+from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl, QItemSelectionModel, QModelIndex, QObject, QEvent
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices, QStandardItemModel, \
     QStandardItem, QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -205,11 +205,11 @@ class MainForm(Ui_MainWindow, TestForm):
     def init_graphicsView(self):
         self.canvas = FigureCanvas(self.sinWave())
         self.graphic_scene = QtWidgets.QGraphicsScene()
-        print(self.graphicsView.geometry())
+        # print(self.graphicsView.geometry())
         x = self.graphicsView.x()
         y = self.graphicsView.y()
         self.graphic_scene.setSceneRect(x, y, self.graphicsView.width() * 0.98, self.graphicsView.height() * 0.9)
-        print(self.graphic_scene.width(), self.graphic_scene.height(), self.graphic_scene.sceneRect())
+        # print(self.graphic_scene.width(), self.graphic_scene.height(), self.graphic_scene.sceneRect())
         self.graphic_scene.addWidget(self.canvas)
         self.graphicsView.setScene(self.graphic_scene)
 
@@ -222,16 +222,37 @@ class MainForm(Ui_MainWindow, TestForm):
         self.lb_testTime.setHidden(True)
 
     def init_tableWidget(self):
-        self.tableWidget_2.setHorizontalHeaderLabels(['property', 'value'])
-        # self.tableWidget_3.setHorizontalHeaderLabels(['variable', 'value'])
+        strHeaderQss = "QHeaderView::section { background:#CCCCCC; color:black;min-height:2em;}"
+        if not gv.IsDebug:
+            self.tableViewStepProp.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+            self.tableViewVar.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableViewStepProp.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tableViewStepProp.horizontalHeader().setStyleSheet(strHeaderQss)
+        self.tableViewStepProp.installEventFilter(self)
+        self.stepMenu = QMenu(self.tableViewStepProp)
+        self.stepMenu.addAction('Insert Row')
+        self.stepMenu.addAction('Delete Row')
+        self.stepMenu.actions()[0].triggered.connect(self.on_stepInsertRow)
+        self.stepMenu.actions()[1].triggered.connect(self.on_stepDeleteRow)
+
+        self.tableViewVar.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tableViewVar.horizontalHeader().setStyleSheet(strHeaderQss)
+
+        self.tableViewRetModel = QStandardItemModel(0, 9, self.tableViewRet)
+        self.tableViewRetModel.setHorizontalHeaderLabels(self.tableWidgetHeader)
+        self.tableViewRet.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableViewRet.setModel(self.tableViewRetModel)
+        self.tableViewRet.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tableViewRet.horizontalHeader().setStyleSheet(strHeaderQss)
+
         self.tableWidget.setHorizontalHeaderLabels(self.tableWidgetHeader)
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableWidget.resizeColumnsToContents()
         self.tableWidget.resizeRowsToContents()
-        strHeaderQss = "QHeaderView::section { background:#CCCCCC; color:black;min-height:3em;}"
+
         self.tableWidget.setStyleSheet(strHeaderQss)
-        self.tableWidget_2.setStyleSheet(strHeaderQss)
+        # self.tableWidget_2.setStyleSheet(strHeaderQss)
         # self.tableWidget_3.setStyleSheet(strHeaderQss)
 
     def init_lab_factory(self, str_):
@@ -371,7 +392,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.treeWidget.customContextMenuRequested.connect(self.on_treeWidgetMenu)
         self.treeWidget.itemChanged.connect(self.on_itemChanged)
         self.treeWidget.itemPressed.connect(self.on_itemActivated)
-        self.tableWidget_2.itemChanged.connect(self.on_stepInfoEdit)
+        # self.tableWidget_2.itemChanged.connect(self.on_stepInfoEdit2)
         self.pBt_start.clicked.connect(self.run)
         self.pBt_stop.clicked.connect(self.stop)
         self.tabWidget.tabBarClicked.connect(self.on_tabBarClicked)
@@ -407,6 +428,7 @@ class MainForm(Ui_MainWindow, TestForm):
             self.textEdit.scrollToAnchor(anchor)
             if not gv.IsHide:
                 self.on_actionShowStepInfo()
+                # self.on_actionShowStepInfo2()
 
     def on_tableWidget_clear(self):
         for i in range(0, self.tableWidget.rowCount()):
@@ -436,10 +458,20 @@ class MainForm(Ui_MainWindow, TestForm):
             elif isinstance(result_tuple, str):
                 for i in range(0, self.tableWidget.rowCount()):
                     self.tableWidget.removeRow(0)
+                # self.tableWidget.clear()
             QApplication.processEvents()
 
         thread = Thread(target=thread_update_tableWidget, daemon=True)
         thread.start()
+
+    def thread_update_tableWidget(self, result_tuple):
+        if gv.IsHide:
+            return
+        if result_tuple is None:
+            self.tableViewRet.clear()
+        else:
+            itemList = (QStandardItem(str(vale)) for vale in result_tuple)
+            self.tableViewRetModel.appendRow(itemList)
 
     def on_reloadSeqs(self):
         if self.startFlag:
@@ -745,86 +777,136 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionConfig.setEnabled(isDebug)
         self.ShowTreeView(self.testSequences)
 
+    # def on_actionShowStepInfo2(self):
+    #     self.tableWidget_2.blockSignals(True)
+    #     if self.tabWidget.currentWidget() != self.stepInfo:
+    #         self.tabWidget.setCurrentWidget(self.stepInfo)
+    #     for i in range(0, self.tableWidget_2.rowCount()):
+    #         self.tableWidget_2.removeRow(0)
+    #     step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+    #     for prop_name in gv.StepAttr:
+    #         # for prop_name in self.testcase.header:
+    #         prop_value = getattr(step_obj, prop_name)
+    #         column_cnt = self.tableWidget_2.columnCount()
+    #         row_cnt = self.tableWidget_2.rowCount()
+    #         self.tableWidget_2.insertRow(row_cnt)
+    #         key_pairs = [prop_name, prop_value]
+    #         for column in range(column_cnt):
+    #             self.tableWidget_2.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
+    #             item = QTableWidgetItem(str(key_pairs[column]))
+    #             if column == 0:
+    #                 item.setFlags(Qt.ItemIsEnabled)
+    #                 item.setBackground(Qt.lightGray)
+    #             else:
+    #                 if key_pairs[column] is None:
+    #                     item.setBackground(Qt.lightGray)
+    #                 if key_pairs[column - 1] == 'NeverUsed':
+    #                     item.setFlags(Qt.ItemIsEnabled)
+    #                 if key_pairs[column - 1] == 'SuiteName' and self.StepNo != 0:
+    #                     item.setFlags(Qt.ItemIsEnabled)
+    #                     item.setBackground(Qt.lightGray)
+    #             self.tableWidget_2.setItem(row_cnt, column, item)
+    #     # self.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
+    #     self.tableWidget_2.blockSignals(False)
+
+    # def on_stepInfoEdit2(self, item):
+    #     prop_name = self.tableWidget_2.item(item.row(), item.column() - 1).text()
+    #     prop_value = item.text()
+    #     # print(prop_value)
+    #     step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+    #     try:
+    #         T = (type(getattr(step_obj, prop_name)))
+    #         if T is int:
+    #             setattr(step_obj, prop_name, T(prop_value))
+    #         else:
+    #             if prop_value == 'None':
+    #                 prop_value = None
+    #             setattr(step_obj, prop_name, prop_value)
+    #     except ValueError:
+    #         self.tableWidget_2.blockSignals(True)
+    #         item.setBackground(Qt.red)
+    #         self.tableWidget_2.blockSignals(False)
+    #         raise
+    #     else:
+    #         self.tableWidget_2.blockSignals(True)
+    #         item.setBackground(Qt.white)
+    #         self.tableWidget_2.blockSignals(False)
+    #     self.header_new = []
+    #     for field in gv.StepAttr:
+    #         prop_value = getattr(step_obj, field)
+    #         if prop_value is not None:
+    #             self.header_new.append(field)
+    #     self.actionSaveToScript.setEnabled(True)
+
+    def eventFilter(self, obj: 'QObject', event: 'QEvent') -> bool:
+        if obj == self.tableViewStepProp and event.type() == QEvent.Type.ContextMenu:
+            self.stepMenu.exec(QCursor.pos())
+        return super().eventFilter(obj, event)
+
     def on_actionShowStepInfo(self):
-        self.tableWidget_2.blockSignals(True)
         if self.tabWidget.currentWidget() != self.stepInfo:
             self.tabWidget.setCurrentWidget(self.stepInfo)
-        for i in range(0, self.tableWidget_2.rowCount()):
-            self.tableWidget_2.removeRow(0)
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        self.model = QStandardItemModel(0, 2, self.tableViewStepProp)
+        self.model.itemChanged.connect(self.on_stepInfoEdit)
+        # self.model.dataChanged.connect()
         for prop_name in gv.StepAttr:
-            # for prop_name in self.testcase.header:
             prop_value = getattr(step_obj, prop_name)
-            column_cnt = self.tableWidget_2.columnCount()
-            row_cnt = self.tableWidget_2.rowCount()
-            self.tableWidget_2.insertRow(row_cnt)
-            key_pairs = [prop_name, prop_value]
-            for column in range(column_cnt):
-                self.tableWidget_2.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
-                item = QTableWidgetItem(str(key_pairs[column]))
-                if column == 0:
-                    item.setFlags(Qt.ItemIsEnabled)
-                    item.setBackground(Qt.lightGray)
-                else:
-                    if key_pairs[column] is None:
-                        item.setBackground(Qt.lightGray)
-                    if key_pairs[column - 1] == 'NeverUsed':
-                        item.setFlags(Qt.ItemIsEnabled)
-                    if key_pairs[column - 1] == 'SuiteName' and self.StepNo != 0:
-                        item.setFlags(Qt.ItemIsEnabled)
-                        item.setBackground(Qt.lightGray)
-                self.tableWidget_2.setItem(row_cnt, column, item)
-        # self.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
-        self.tableWidget_2.blockSignals(False)
+            self.model.setHorizontalHeaderLabels(['Property', 'Value'])
+            prop_name_item = QStandardItem(prop_name)
+            prop_name_item.setBackground(QColor('#E6E6E6'))
+            prop_name_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
+            prop_value_item = QStandardItem(str(prop_value))
+            # print(prop_name, prop_value)
+            if prop_value is None:
+                prop_value_item.setBackground(Qt.lightGray)
+            # if prop_name == 'NeverUsed':
+            #     prop_value_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
+            if prop_name == 'SuiteName' and self.StepNo != 0:
+                prop_value_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
+                prop_value_item.setBackground(Qt.lightGray)
+            self.model.appendRow([prop_name_item, prop_value_item])
+        self.tableViewStepProp.setModel(self.model)
 
-    def on_stepInfoEdit(self, item):
-        prop_name = self.tableWidget_2.item(item.row(), item.column() - 1).text()
+    def on_stepInfoEdit(self, item: QStandardItem):
+        # model = self.tableViewStepProp.model()
+        prop_name = self.model.data(self.model.index(item.row(), 0))
         prop_value = item.text()
-        # print(prop_value)
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         try:
             T = (type(getattr(step_obj, prop_name)))
-            if T is int:
-                setattr(step_obj, prop_name, T(prop_value))
-            else:
-                if prop_value == 'None':
-                    prop_value = None
+            if prop_value == 'None':
+                prop_value = None
                 setattr(step_obj, prop_name, prop_value)
+            else:
+                setattr(step_obj, prop_name, T(prop_value))
         except ValueError:
-            self.tableWidget_2.blockSignals(True)
             item.setBackground(Qt.red)
-            self.tableWidget_2.blockSignals(False)
             raise
         else:
-            self.tableWidget_2.blockSignals(True)
             item.setBackground(Qt.white)
-            self.tableWidget_2.blockSignals(False)
-        self.header_new = []
-        for field in gv.StepAttr:
-            prop_value = getattr(step_obj, field)
-            if prop_value is not None:
-                self.header_new.append(field)
+        print(gv.StepAttr)
+        self.header_new = gv.StepAttr
+        # for field in gv.StepAttr:
+        #     prop_value = getattr(step_obj, field)
+        #     if prop_value is not None:
+        #         self.header_new.append(field)
         self.actionSaveToScript.setEnabled(True)
 
     def on_tabBarClicked(self, index):
         if self.tabWidget.tabText(index) == 'Variables':
             if self.TestVariables is None:
                 return
-            if not gv.IsDebug:
-                self.tableViewVar.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-            self.tableViewVar.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-            self.tableViewVar.horizontalHeader().setStyleSheet(
-                "QHeaderView::section { background:#CCCCCC; color:black;min-height:2em;}")
-            modelVar = QStandardItemModel(0, 2, self.tableViewVar)
+            model = QStandardItemModel(0, 2, self.tableViewVar)
             for prop in self.TestVariables:
                 if prop[0] != 'Config':
-                    modelVar.setHorizontalHeaderLabels(['variable', 'value'])
+                    model.setHorizontalHeaderLabels(['Variable', 'Value'])
                     prop_name = QStandardItem(prop[0])
                     prop_name.setBackground(QColor('#E6E6E6'))
-                    prop_name.setFlags(Qt.ItemIsEnabled)
-                    prop_value = QStandardItem(prop[1])
-                    modelVar.appendRow([prop_name, prop_value])
-            self.tableViewVar.setModel(modelVar)
+                    prop_name.setFlags(Qt.ItemIsSelectable)
+                    prop_value = QStandardItem(str(prop[1]))
+                    model.appendRow([prop_name, prop_value])
+            self.tableViewVar.setModel(model)
 
     def on_actionSaveToScript(self):
         # if self.SaveScriptDisableFlag:
@@ -1316,7 +1398,7 @@ class MainForm(Ui_MainWindow, TestForm):
             self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(self.SuiteNo),
                                          hint=QAbstractItemView.EnsureVisible)
 
-            self.on_stepInfoEdit(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
+            # self.on_stepInfoEdit2(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
         except (IndexError, AttributeError):
             step_obj = self.testcase.clone_suites[0].steps[0]
             self.header_new = []
@@ -1360,7 +1442,8 @@ class MainForm(Ui_MainWindow, TestForm):
         self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(self.SuiteNo),
                                      hint=QAbstractItemView.EnsureVisible)
         try:
-            self.on_stepInfoEdit(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
+            pass
+            # self.on_stepInfoEdit2(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
         except (IndexError, AttributeError):
             step_obj = self.testcase.clone_suites[0].steps[0]
             self.header_new = []
@@ -1389,6 +1472,30 @@ class MainForm(Ui_MainWindow, TestForm):
             conf.config.save_config(gv.cfg, gv.ConfigYamlPath)
             self.ShowTreeView(self.testSequences)
             self.logger.debug(f'new {station_name} test Sequences finish!')
+
+    def on_stepDeleteRow(self):
+        prop_name = self.model.data(self.model.index(self.tableViewStepProp.currentIndex().row(), 0))
+        step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        try:
+            setattr(step_obj, prop_name, None)
+            self.model.removeRow(self.tableViewStepProp.currentIndex().row())
+            gv.StepAttr.remove(prop_name)
+            self.header_new = gv.StepAttr
+            self.actionSaveToScript.setEnabled(True)
+        except:
+            raise
+
+    def on_stepInsertRow(self):
+        pass
+        # pname = 'propName'
+        # pvalue = 'value'
+        # row = self.tableViewStepProp.currentIndex().row()
+        # self.model.insertRow(row, [QStandardItem(pname), QStandardItem(pvalue)])
+        # gv.StepAttr.insert(row, pname)
+        # step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        # setattr(step_obj, pname, pvalue)
+        # self.header_new = gv.StepAttr
+        # self.actionSaveToScript.setEnabled(True)
 
 
 if __name__ == "__main__":
