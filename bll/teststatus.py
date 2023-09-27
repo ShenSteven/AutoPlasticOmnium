@@ -60,7 +60,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                     f"Start test,SN:{myWind.SN},Station:{gv.cfg.station.station_no},DUTMode:{myWind.dut_model},"
                     f"TestMode:{gv.cfg.dut.test_mode},IsDebug:{gv.IsDebug},"
                     f"FTC:{gv.cfg.station.fail_continue},SoftVersion:{gv.VERSION}")
-                myWind.mySignals.update_tableWidget[str].emit('clear')
+                myWind.mySignals.update_tableWidget[list].emit([])
                 myWind.pause_event.set()
         elif status == TestStatus.FAIL:
             if gv.LoginWin is not None:

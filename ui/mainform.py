@@ -19,12 +19,12 @@ import psutil
 import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl, QItemSelectionModel, QModelIndex, QObject, QEvent
+from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl, QObject, QEvent, QRect
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices, QStandardItemModel, \
-    QStandardItem, QColor
+    QStandardItem, QColor, QHelpEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
-    QHeaderView, QTableWidgetItem, QLabel, QAction, QInputDialog, QLineEdit
+    QHeaderView, QLabel, QAction, QInputDialog, QLineEdit, QToolTip
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from openpyxl.utils import get_column_letter
@@ -37,12 +37,12 @@ import models.loadseq
 import models.product
 import models.testcase
 import models.variables
+from bll.testthread import TestThread, TestStatus
 from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int, ensure_path_sep
 from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from common.testform import TestForm
 from conf.logprint import QTextEditHandler, LogPrint
-from bll.testthread import TestThread, TestStatus
 from peak.plin.peaklin import PeakLin
 from ui.settings import SettingsDialog
 from ui.ui_main import Ui_MainWindow
@@ -86,6 +86,8 @@ class MainForm(Ui_MainWindow, TestForm):
     def __init__(self):
         Ui_MainWindow.__init__(self)
         TestForm.__init__(self)
+        self.tableViewRetModel = None
+        self.model = None
         self.setupUi(self)
         self.stepClipboard = None
         self.suitClipboard = None
@@ -240,20 +242,13 @@ class MainForm(Ui_MainWindow, TestForm):
 
         self.tableViewRetModel = QStandardItemModel(0, 9, self.tableViewRet)
         self.tableViewRetModel.setHorizontalHeaderLabels(self.tableWidgetHeader)
+        self.tableViewRet.installEventFilter(self)
         self.tableViewRet.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.tableViewRet.setModel(self.tableViewRetModel)
-        self.tableViewRet.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tableViewRet.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableViewRet.horizontalHeader().setStyleSheet(strHeaderQss)
-
-        self.tableWidget.setHorizontalHeaderLabels(self.tableWidgetHeader)
-        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.tableWidget.resizeColumnsToContents()
-        self.tableWidget.resizeRowsToContents()
-
-        self.tableWidget.setStyleSheet(strHeaderQss)
-        # self.tableWidget_2.setStyleSheet(strHeaderQss)
-        # self.tableWidget_3.setStyleSheet(strHeaderQss)
+        self.tableViewRet.setModel(self.tableViewRetModel)
+        self.tableViewRet.resizeColumnsToContents()
+        self.tableViewRet.resizeRowsToContents()
 
     def init_lab_factory(self, str_):
         if str_ == "lab":
@@ -335,8 +330,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.mySignals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
         self.mySignals.updateLabel[QLabel, str, int].connect(update_label)
         self.mySignals.updateLabel[QLabel, str].connect(update_label)
-        self.mySignals.update_tableWidget[list].connect(self.on_update_tableWidget)
-        self.mySignals.update_tableWidget[str].connect(self.on_update_tableWidget)
+        self.mySignals.update_tableWidget[list].connect(self.on_updateTableWidgetRet)
         self.mySignals.textEditClearSignal[str].connect(self.on_textEditClear)
         self.mySignals.lineEditEnableSignal[bool].connect(self.lineEditEnable)
         self.mySignals.setIconSignal[QAction, QIcon].connect(on_setIcon)
@@ -428,49 +422,15 @@ class MainForm(Ui_MainWindow, TestForm):
             self.textEdit.scrollToAnchor(anchor)
             if not gv.IsHide:
                 self.on_actionShowStepInfo()
-                # self.on_actionShowStepInfo2()
 
-    def on_tableWidget_clear(self):
-        for i in range(0, self.tableWidget.rowCount()):
-            self.tableWidget.removeRow(0)
-
-    def on_update_tableWidget(self, result_tuple):
-        def thread_update_tableWidget():
-            if gv.IsHide:
-                return
-            if isinstance(result_tuple, list):
-                row_cnt = self.tableWidget.rowCount()
-                self.tableWidget.insertRow(row_cnt)
-                column_cnt = self.tableWidget.columnCount()
-                for column in range(column_cnt):
-                    if IsNullOrEmpty(result_tuple[column]):
-                        result_tuple[column] = '--'
-                    item = QTableWidgetItem(str(result_tuple[column]))
-                    if 'false' in str(result_tuple[-1]).lower() or 'fail' in str(result_tuple[-1]).lower():
-                        item.setForeground(Qt.red)
-                        # item.setFont(QFont('Times', 12, QFont.Black))
-                    self.tableWidget.setItem(row_cnt, column, item)
-                    self.tableWidget.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
-                # self.tableWidget.resizeColumnsToContents()
-                self.tableWidget.scrollToItem(self.tableWidget.item(row_cnt - 1, 0),
-                                              hint=QAbstractItemView.EnsureVisible)
-                # clear all rows if var is str
-            elif isinstance(result_tuple, str):
-                for i in range(0, self.tableWidget.rowCount()):
-                    self.tableWidget.removeRow(0)
-                # self.tableWidget.clear()
-            QApplication.processEvents()
-
-        thread = Thread(target=thread_update_tableWidget, daemon=True)
-        thread.start()
-
-    def thread_update_tableWidget(self, result_tuple):
+    def on_updateTableWidgetRet(self, result_list):
         if gv.IsHide:
             return
-        if result_tuple is None:
-            self.tableViewRet.clear()
+        if len(result_list) == 0:
+            self.tableViewRetModel.clear()
+            self.tableViewRetModel.setHorizontalHeaderLabels(self.tableWidgetHeader)
         else:
-            itemList = (QStandardItem(str(vale)) for vale in result_tuple)
+            itemList = [QStandardItem(str(vale)) for vale in result_list]
             self.tableViewRetModel.appendRow(itemList)
 
     def on_reloadSeqs(self):
@@ -777,70 +737,14 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionConfig.setEnabled(isDebug)
         self.ShowTreeView(self.testSequences)
 
-    # def on_actionShowStepInfo2(self):
-    #     self.tableWidget_2.blockSignals(True)
-    #     if self.tabWidget.currentWidget() != self.stepInfo:
-    #         self.tabWidget.setCurrentWidget(self.stepInfo)
-    #     for i in range(0, self.tableWidget_2.rowCount()):
-    #         self.tableWidget_2.removeRow(0)
-    #     step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
-    #     for prop_name in gv.StepAttr:
-    #         # for prop_name in self.testcase.header:
-    #         prop_value = getattr(step_obj, prop_name)
-    #         column_cnt = self.tableWidget_2.columnCount()
-    #         row_cnt = self.tableWidget_2.rowCount()
-    #         self.tableWidget_2.insertRow(row_cnt)
-    #         key_pairs = [prop_name, prop_value]
-    #         for column in range(column_cnt):
-    #             self.tableWidget_2.horizontalHeader().setSectionResizeMode(column, QHeaderView.ResizeToContents)
-    #             item = QTableWidgetItem(str(key_pairs[column]))
-    #             if column == 0:
-    #                 item.setFlags(Qt.ItemIsEnabled)
-    #                 item.setBackground(Qt.lightGray)
-    #             else:
-    #                 if key_pairs[column] is None:
-    #                     item.setBackground(Qt.lightGray)
-    #                 if key_pairs[column - 1] == 'NeverUsed':
-    #                     item.setFlags(Qt.ItemIsEnabled)
-    #                 if key_pairs[column - 1] == 'SuiteName' and self.StepNo != 0:
-    #                     item.setFlags(Qt.ItemIsEnabled)
-    #                     item.setBackground(Qt.lightGray)
-    #             self.tableWidget_2.setItem(row_cnt, column, item)
-    #     # self.tableWidget_2.sortItems(1, order=Qt.DescendingOrder)
-    #     self.tableWidget_2.blockSignals(False)
-
-    # def on_stepInfoEdit2(self, item):
-    #     prop_name = self.tableWidget_2.item(item.row(), item.column() - 1).text()
-    #     prop_value = item.text()
-    #     # print(prop_value)
-    #     step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
-    #     try:
-    #         T = (type(getattr(step_obj, prop_name)))
-    #         if T is int:
-    #             setattr(step_obj, prop_name, T(prop_value))
-    #         else:
-    #             if prop_value == 'None':
-    #                 prop_value = None
-    #             setattr(step_obj, prop_name, prop_value)
-    #     except ValueError:
-    #         self.tableWidget_2.blockSignals(True)
-    #         item.setBackground(Qt.red)
-    #         self.tableWidget_2.blockSignals(False)
-    #         raise
-    #     else:
-    #         self.tableWidget_2.blockSignals(True)
-    #         item.setBackground(Qt.white)
-    #         self.tableWidget_2.blockSignals(False)
-    #     self.header_new = []
-    #     for field in gv.StepAttr:
-    #         prop_value = getattr(step_obj, field)
-    #         if prop_value is not None:
-    #             self.header_new.append(field)
-    #     self.actionSaveToScript.setEnabled(True)
-
     def eventFilter(self, obj: 'QObject', event: 'QEvent') -> bool:
         if obj == self.tableViewStepProp and event.type() == QEvent.Type.ContextMenu:
             self.stepMenu.exec(QCursor.pos())
+        if obj == self.tableViewRet and event.type() == QEvent.Type.ContextMenu:
+            rect = QRect(QCursor.pos().x(), QCursor.pos().y(), 50, 10)
+            QToolInfo = self.tableViewRetModel.data(self.tableViewRetModel.index(self.tableViewRet.currentIndex().row(),
+                                                                                 self.tableViewRet.currentIndex().column()))
+            QToolTip.showText(QCursor.pos(), QToolInfo, self, rect, 3000)
         return super().eventFilter(obj, event)
 
     def on_actionShowStepInfo(self):
@@ -849,7 +753,6 @@ class MainForm(Ui_MainWindow, TestForm):
         step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
         self.model = QStandardItemModel(0, 2, self.tableViewStepProp)
         self.model.itemChanged.connect(self.on_stepInfoEdit)
-        # self.model.dataChanged.connect()
         for prop_name in gv.StepAttr:
             prop_value = getattr(step_obj, prop_name)
             self.model.setHorizontalHeaderLabels(['Property', 'Value'])
@@ -885,12 +788,7 @@ class MainForm(Ui_MainWindow, TestForm):
             raise
         else:
             item.setBackground(Qt.white)
-        print(gv.StepAttr)
         self.header_new = gv.StepAttr
-        # for field in gv.StepAttr:
-        #     prop_value = getattr(step_obj, field)
-        #     if prop_value is not None:
-        #         self.header_new.append(field)
         self.actionSaveToScript.setEnabled(True)
 
     def on_tabBarClicked(self, index):
@@ -1153,14 +1051,6 @@ class MainForm(Ui_MainWindow, TestForm):
         # QApplication.processEvents()
         self.sec += 1
 
-    # def timing(self, flag):
-    #     if flag:
-    #         self.logger.debug('start timing...')
-    #         self.timerID = self.startTimer(1000, timerType=Qt.VeryCoarseTimer)
-    #     else:
-    #         self.logger.debug('stop timing...')
-    #         self.killTimer(self.timerID)
-
     def UpdateContinueFail(self, testResult: bool):
         if gv.IsDebug or gv.cfg.dut.test_mode.lower() == 'debug':
             return
@@ -1280,10 +1170,10 @@ class MainForm(Ui_MainWindow, TestForm):
             create_csv_file(self.logger, reportPath, self.tableWidgetHeader)
             if os.path.exists(reportPath):
                 all_rows = []
-                for row in range(self.tableWidget.rowCount()):
+                for row in range(self.tableViewRetModel.rowCount()):
                     row_data = []
-                    for column in range(self.tableWidget.columnCount()):
-                        item = self.tableWidget.item(row, column)
+                    for column in range(self.tableViewRetModel.columnCount()):
+                        item = self.tableViewRetModel.item(row, column)
                         if item is not None:
                             row_data.append(item.text())
                     all_rows.append(row_data)

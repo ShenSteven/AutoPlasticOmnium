@@ -63,16 +63,6 @@ class Ui_MainWindow(object):
         self.tableViewRet = QtWidgets.QTableView(self.result)
         self.tableViewRet.setObjectName("tableViewRet")
         self.horizontalLayout_5.addWidget(self.tableViewRet)
-        self.tableWidget = QtWidgets.QTableWidget(self.result)
-        self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.tableWidget.setRowCount(0)
-        self.tableWidget.setColumnCount(9)
-        self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
-        self.tableWidget.horizontalHeader().setMinimumSectionSize(5)
-        self.tableWidget.horizontalHeader().setStretchLastSection(True)
-        self.tableWidget.verticalHeader().setVisible(False)
-        self.horizontalLayout_5.addWidget(self.tableWidget)
         self.tabWidget.addTab(self.result, "")
         self.stepInfo = QtWidgets.QWidget()
         self.stepInfo.setObjectName("stepInfo")
@@ -583,4 +573,4 @@ class Ui_MainWindow(object):
         self.actionNewStep.setToolTip(_translate("MainWindow", "New step"))
         self.actionCutStep.setText(_translate("MainWindow", "Cut"))
         self.actionCutStep.setToolTip(_translate("MainWindow", "Cut step"))
-import images_rc
+import ui.images_rc

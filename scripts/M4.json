@@ -43,7 +43,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -78,7 +78,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -113,7 +113,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -148,7 +148,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -183,7 +183,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -218,7 +218,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "NAD",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -253,7 +253,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "appS19",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -288,7 +288,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "appStartAdd",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -323,7 +323,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "appLen",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -358,7 +358,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "appCRC32",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -393,7 +393,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "drvS19",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -428,7 +428,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "drvStartAdd",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -463,7 +463,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "drvLen",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -498,7 +498,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "drvCRC32",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -586,7 +586,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
@@ -621,7 +621,7 @@
                 "_CheckStr1": "",
                 "_SetGlobalVar": "",
                 "_ByPF": "",
-                "_Json": ""
+                "_Json": "Y"
             },
             {
                 "test_result": false,
