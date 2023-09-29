@@ -77,7 +77,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QTreeWidget" name="treeWidget">
+        <widget class="QTreeView" name="treeView">
          <property name="minimumSize">
           <size>
            <width>330</width>
@@ -90,11 +90,6 @@
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
-         <column>
-          <property name="text">
-           <string notr="true">1</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>
@@ -121,7 +116,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="result">
           <attribute name="title">
@@ -216,6 +211,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pBt_stop">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Stop</string>
                 </property>
@@ -461,7 +459,7 @@ font: 20pt &quot;宋体&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>1448</width>
-     <height>26</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="testcase">

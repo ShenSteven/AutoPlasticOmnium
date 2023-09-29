@@ -20,11 +20,11 @@ import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl, QObject, QEvent, QRect
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices, QStandardItemModel, \
-    QStandardItem, QColor, QHelpEvent
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices, \
+    QStandardItemModel, QStandardItem, QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtWidgets import QMessageBox, QStyleFactory, QTreeWidgetItem, QMenu, QApplication, QAbstractItemView, \
-    QHeaderView, QLabel, QAction, QInputDialog, QLineEdit, QToolTip
+from PyQt5.QtWidgets import QMessageBox, QMenu, QApplication, QAbstractItemView, QHeaderView, QLabel, QAction, \
+    QInputDialog, QLineEdit, QToolTip
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from openpyxl.utils import get_column_letter
@@ -86,6 +86,7 @@ class MainForm(Ui_MainWindow, TestForm):
     def __init__(self):
         Ui_MainWindow.__init__(self)
         TestForm.__init__(self)
+        self.treeViewModel = None
         self.tableViewRetModel = None
         self.model = None
         self.setupUi(self)
@@ -101,7 +102,7 @@ class MainForm(Ui_MainWindow, TestForm):
         gv.InitCreateDirs(self.logger)
         self.init_textEditHandler()
         self.init_lab_factory(gv.cfg.station.privileges)
-        self.init_tableWidget()
+        self.init_ViewWidget()
         self.init_childLabel()
         self.init_label_info()
         self.init_lineEdit()
@@ -223,7 +224,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.lb_testTime.setStyleSheet(f"background-color:#f0f0f0;font: 11pt '宋体';")
         self.lb_testTime.setHidden(True)
 
-    def init_tableWidget(self):
+    def init_ViewWidget(self):
         strHeaderQss = "QHeaderView::section { background:#CCCCCC; color:black;min-height:2em;}"
         if not gv.IsDebug:
             self.tableViewStepProp.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
@@ -249,6 +250,8 @@ class MainForm(Ui_MainWindow, TestForm):
         self.tableViewRet.setModel(self.tableViewRetModel)
         self.tableViewRet.resizeColumnsToContents()
         self.tableViewRet.resizeRowsToContents()
+
+        self.treeViewModel = QStandardItemModel(0, 1, self.treeView)
 
     def init_lab_factory(self, str_):
         if str_ == "lab":
@@ -383,41 +386,42 @@ class MainForm(Ui_MainWindow, TestForm):
 
         self.lineEdit.textEdited.connect(self.on_textEdited)
         self.lineEdit.returnPressed.connect(self.on_returnPressed)
-        self.treeWidget.customContextMenuRequested.connect(self.on_treeWidgetMenu)
-        self.treeWidget.itemChanged.connect(self.on_itemChanged)
-        self.treeWidget.itemPressed.connect(self.on_itemActivated)
-        # self.tableWidget_2.itemChanged.connect(self.on_stepInfoEdit2)
+        self.treeView.customContextMenuRequested.connect(self.on_treeWidgetMenu)
+
+        self.treeView.pressed.connect(self.on_itemPressed)
         self.pBt_start.clicked.connect(self.run)
         self.pBt_stop.clicked.connect(self.stop)
         self.tabWidget.tabBarClicked.connect(self.on_tabBarClicked)
 
     def init_treeWidget_color(self):
-        self.treeWidget.blockSignals(True)
-        for i, item in enumerate(self.testSequences):
-            self.treeWidget.topLevelItem(i).setBackground(0, Qt.white)
-            for j in range(len(self.testSequences[i].steps)):
-                self.treeWidget.topLevelItem(i).child(j).setBackground(0, Qt.white)
-        self.treeWidget.blockSignals(False)
+        self.treeViewModel.blockSignals(True)
+        for row in range(self.treeViewModel.rowCount()):
+            for column in range(self.treeViewModel.columnCount()):
+                item = self.treeViewModel.item(row, column)
+                item.setBackground(Qt.white)
+        self.treeViewModel.blockSignals(False)
 
-    def on_itemActivated(self, item, column=0):
+    def on_itemPressed(self, index):
+        item = self.treeViewModel.itemFromIndex(index)
         if item.parent() is None:
-            # lg.logger.critical('itemActivate')
-            self.SuiteNo = self.treeWidget.indexOfTopLevelItem(item)
+            # self.logger.critical('itemActivate')
+            self.SuiteNo = item.index().row()
             self.StepNo = -1
-            self.treeWidget.expandItem(item)
+            self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
             self.actionStepping.setEnabled(False)
             self.actionEditStep.setEnabled(False)
-            pp = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
+            pp = item.text().split(' ', 1)[1]
             anchor = f'testSuite:{pp}'
             self.textEdit.scrollToAnchor(anchor)
         else:
-            # lg.logger.critical('itemActivate')
-            self.SuiteNo = self.treeWidget.indexOfTopLevelItem(item.parent())
-            self.StepNo = item.parent().indexOfChild(item)
+            # self.logger.critical('itemActivate')
+            self.SuiteNo = item.parent().index().row()
+            self.StepNo = item.index().row()
             self.actionStepping.setEnabled(True)
             self.actionEditStep.setEnabled(True)
-            pp = item.parent().data(column, Qt.DisplayRole).split(' ', 1)[1]
-            cc = item.data(column, Qt.DisplayRole).split(' ', 1)[1]
+            # print(self.SuiteNo, self.StepNo)
+            pp = item.parent().text().split(' ', 1)[1]
+            cc = item.text().split(' ', 1)[1]
             anchor = f'testStep:{pp}-{cc}'
             self.textEdit.scrollToAnchor(anchor)
             if not gv.IsHide:
@@ -456,35 +460,115 @@ class MainForm(Ui_MainWindow, TestForm):
         self.logger.debug('reload finish!')
         self.SaveScriptDisableFlag = False
 
-    def on_itemChanged(self, item, column=0):
-        if self.startFlag:
+    def on_treeItemChanged(self, item: QStandardItem):
+        if item is None:
             return
-        if item.parent() is None:
-            pNo = self.treeWidget.indexOfTopLevelItem(item)
-            isChecked = item.checkState(column) == Qt.Checked
-            self.testcase.clone_suites[pNo].isTest = isChecked
-            self.treeWidget.blockSignals(True)
-            for i in range(0, item.childCount()):
-                item.child(i).setCheckState(column, Qt.Checked if isChecked else Qt.Unchecked)
-                self.testcase.clone_suites[pNo].steps[i].isTest = isChecked
-            self.treeWidget.blockSignals(False)
+        # print(item.text())
+        if item.isCheckable():
+            state = item.checkState()
+            if item.isTristate():
+                if state != Qt.PartiallyChecked:
+                    self.treeItem_checkAllChild(item, True if state == Qt.Checked else False)
+            else:
+                self.treeItem_CheckChildChanged(item, True if state == Qt.Checked else False)
+
+    def treeItem_checkAllChild(self, item: QStandardItem, check: bool):
+        if item is None:
+            return
+        # print('treeItem_checkAllChild')
+        pNo = item.index().row()
+        self.testcase.clone_suites[pNo].isTest = check
+        for i in range(0, item.rowCount()):
+            self.treeItem_checkAllChild_recursion(item.child(i), check)
+            self.testcase.clone_suites[pNo].steps[i].isTest = check
+        if item.isCheckable():
+            item.setCheckState(Qt.Checked if check else Qt.Unchecked)
+
+    def treeItem_checkAllChild_recursion(self, item: QStandardItem, check: bool):
+        if item is None:
+            return
+        for i in range(0, item.rowCount()):
+            self.treeItem_checkAllChild_recursion(item.child(i), check)
+        if item.isCheckable():
+            item.setCheckState(Qt.Checked if check else Qt.Unchecked)
+
+    def treeItem_CheckChildChanged(self, item: QStandardItem, check: bool):
+        if item is None:
+            return
+        siblingState = self.checkSibling(item)
+        parentItem = item.parent()
+        if parentItem is None:
+            return
+        pNo = parentItem.index().row()
+        cNO = item.index().row()
+        self.testcase.clone_suites[pNo].steps[cNO].isTest = check
+        if Qt.PartiallyChecked == siblingState:
+            if parentItem.isCheckable() and parentItem.isTristate():
+                parentItem.setCheckState(Qt.PartiallyChecked)
+                self.testcase.clone_suites[pNo].isTest = True
+        elif Qt.Checked == siblingState:
+            if parentItem.isCheckable():
+                parentItem.setCheckState(Qt.Checked)
+                self.testcase.clone_suites[pNo].isTest = True
         else:
-            ParentIsTest = []
-            pNo = self.treeWidget.indexOfTopLevelItem(item.parent())
-            cNO = item.parent().indexOfChild(item)
-            self.testcase.clone_suites[pNo].steps[cNO].isTest = item.checkState(column) == Qt.Checked
-            for i in range(item.parent().childCount()):
-                isChecked = item.parent().child(i).checkState(column) == Qt.Checked
-                ParentIsTest.append(isChecked)
-            isChecked_parent = any(ParentIsTest)
-            self.treeWidget.blockSignals(True)
-            self.testcase.clone_suites[pNo].isTest = isChecked_parent
-            item.parent().setCheckState(column, Qt.Checked if isChecked_parent else Qt.Unchecked)
-            self.treeWidget.blockSignals(False)
+            if parentItem.isCheckable():
+                parentItem.setCheckState(Qt.Unchecked)
+                self.testcase.clone_suites[pNo].isTest = False
+        self.treeItem_CheckChildChanged(parentItem, check)
+
+    def checkSibling(self, item: QStandardItem):
+        parent = item.parent()
+        if parent is None:
+            return item.checkState()
+
+        unCheckedCount = 0
+        checkedCount = 0
+        for i in range(parent.rowCount()):
+            siblingItem = parent.child(i)
+            state = siblingItem.checkState()
+            if Qt.PartiallyChecked == state:
+                return Qt.PartiallyChecked
+            elif Qt.Unchecked == state:
+                unCheckedCount += 1
+            else:
+                checkedCount += 1
+            if checkedCount > 0 and unCheckedCount > 0:
+                return Qt.PartiallyChecked
+        if unCheckedCount > 0:
+            return Qt.Unchecked
+        return Qt.Checked
+
+    # def on_itemChanged(self, item: QStandardItem):
+    #     if self.startFlag:
+    #         return
+    #     if item.parent() is None:
+    #         pNo = item.index().row()
+    #         isChecked = item.checkState() == Qt.Checked
+    #         self.testcase.clone_suites[pNo].isTest = isChecked
+    #         self.treeViewModel.blockSignals(True)
+    #         for i in range(0, item.rowCount()):
+    #             item.child(i, 0).setCheckState(Qt.Checked if isChecked else Qt.Unchecked)
+    #             # print(f'child:{i}={Qt.Checked}')
+    #             self.testcase.clone_suites[pNo].steps[i].isTest = isChecked
+    #         self.treeViewModel.blockSignals(False)
+    #     else:
+    #         ParentIsTest = []
+    #         pNo = item.parent().index().row()
+    #         cNO = item.index().row()
+    #         self.testcase.clone_suites[pNo].steps[cNO].isTest = item.checkState() == Qt.Checked
+    #         for i in range(item.parent().rowCount()):
+    #             isChecked = item.parent().child(i).checkState() == Qt.Checked
+    #             ParentIsTest.append(isChecked)
+    #         isChecked_parent = any(ParentIsTest)
+    #         self.treeViewModel.blockSignals(True)
+    #         self.testcase.clone_suites[pNo].isTest = isChecked_parent
+    #         item.parent().setCheckState(Qt.Checked if isChecked_parent else Qt.Unchecked)
+    #         # print(f'parent:={Qt.Checked}')
+    #         self.treeViewModel.blockSignals(False)
 
     def on_treeWidgetMenu(self):
         if gv.IsDebug:
-            menu = QMenu(self.treeWidget)
+            menu = QMenu(self.treeView)
             if not gv.IsHide:
                 sub_menu = QMenu(menu)
                 sub_menu.setObjectName("Edit")
@@ -529,11 +613,12 @@ class MainForm(Ui_MainWindow, TestForm):
         if not getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
             setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', True)
             self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
-            self.treeWidget.currentItem().setIcon(0, QIcon(':/images/StepBreakpoint.ico'))
+            self.treeViewModel.itemFromIndex(self.treeView.currentIndex()).setIcon(QIcon(':/images/StepBreakpoint.ico'))
         else:
             setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', False)
             self.actionBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
-            self.treeWidget.currentItem().setIcon(0, QIcon(':/images/Document-txt-icon.png'))
+            self.treeViewModel.itemFromIndex(self.treeView.currentIndex()).setIcon(
+                QIcon(':/images/Document-txt-icon.png'))
 
     def on_actionOpen_TestCase(self):
         def thread_actionOpen_TestCase():
@@ -593,7 +678,7 @@ class MainForm(Ui_MainWindow, TestForm):
         if isinstance(action, QAction):
             self.dut_model = action.text() if "(" not in action.text() else action.text()[:action.text().index('(')]
             self.actionunknow.setText(self.dut_model)
-        self.treeWidget.setHeaderLabel(f'{gv.cfg.station.station_no}_{self.dut_model}')
+        self.treeViewModel.setHorizontalHeaderLabels([f'{gv.cfg.station.station_no}_{self.dut_model}'])
         if self.lineEdit.receivers(self.lineEdit.textEdited) == 1:
             self.lineEdit.textEdited.disconnect(self.on_textEdited)
 
@@ -745,6 +830,8 @@ class MainForm(Ui_MainWindow, TestForm):
             QToolInfo = self.tableViewRetModel.data(self.tableViewRetModel.index(self.tableViewRet.currentIndex().row(),
                                                                                  self.tableViewRet.currentIndex().column()))
             QToolTip.showText(QCursor.pos(), QToolInfo, self, rect, 3000)
+        # if obj == self.treeViewModel:
+        #     print(event, event.type())
         return super().eventFilter(obj, event)
 
     def on_actionShowStepInfo(self):
@@ -760,11 +847,8 @@ class MainForm(Ui_MainWindow, TestForm):
             prop_name_item.setBackground(QColor('#E6E6E6'))
             prop_name_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
             prop_value_item = QStandardItem(str(prop_value))
-            # print(prop_name, prop_value)
             if prop_value is None:
                 prop_value_item.setBackground(Qt.lightGray)
-            # if prop_name == 'NeverUsed':
-            #     prop_value_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
             if prop_name == 'SuiteName' and self.StepNo != 0:
                 prop_value_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
                 prop_value_item.setBackground(Qt.lightGray)
@@ -880,11 +964,10 @@ class MainForm(Ui_MainWindow, TestForm):
         thread.start()
 
     def on_actionExpandAll(self):
-        self.treeWidget.expandAll()
-        self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(0), hint=QAbstractItemView.EnsureVisible)
+        self.treeView.expandAll()
 
     def on_actionCollapseAll(self):
-        self.treeWidget.collapseAll()
+        self.treeView.collapseAll()
 
     def on_connect_status(self, flag: bool, strs):
         if flag:
@@ -898,93 +981,98 @@ class MainForm(Ui_MainWindow, TestForm):
     def ShowTreeView(self, sequences=None, checkall=None):
         if sequences is None:
             return
-        self.treeWidget.blockSignals(True)
-        self.treeWidget.clear()
+        self.treeViewModel.clear()
         dut_model = '' if self.dut_model == '' else '_' + self.dut_model
-        self.treeWidget.setHeaderLabel(f'{gv.cfg.station.station_no}{dut_model}')
+        self.treeViewModel.setHorizontalHeaderLabels([f'{gv.cfg.station.station_no}{dut_model}'])
+        itemRoot = self.treeViewModel.invisibleRootItem()
+
         for suite in sequences:
-            suite_node = QTreeWidgetItem(self.treeWidget)
             if gv.IsHide:
-                suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. suite')
+                suiteItem = QStandardItem(QIcon(':/images/folder-icon.png'), f'{suite.index + 1}. suite')
             else:
-                suite_node.setData(0, Qt.DisplayRole, f'{suite.index + 1}. {suite.name}')
-            suite_node.setIcon(0, QIcon(':/images/folder-icon.png'))
+                suiteItem = QStandardItem(QIcon(':/images/folder-icon.png'), f'{suite.index + 1}. {suite.name}')
+
+            # suiteItem.setCheckable(True)
+            # suiteItem.setTristate(True)
             if checkall:
-                suite_node.setCheckState(0, Qt.Checked)
+                suiteItem.setCheckState(Qt.Checked)
                 suite.isTest = True
             else:
                 if checkall is None:
-                    suite_node.setCheckState(0, Qt.Checked if suite.isTest else Qt.Unchecked)
+                    suiteItem.setCheckState(Qt.Checked if suite.isTest else Qt.Unchecked)
                 else:
-                    suite_node.setCheckState(0, Qt.Unchecked)
+                    suiteItem.setCheckState(Qt.Unchecked)
                     suite.isTest = False
             if gv.IsDebug:
-                suite_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                suiteItem.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             else:
-                suite_node.setFlags(Qt.ItemIsSelectable)
+                suiteItem.setFlags(Qt.ItemIsSelectable)
+            suiteItem.setTristate(True)
+            itemRoot.appendRow(suiteItem)
+
             for step in suite.steps:
-                step_node = QTreeWidgetItem(suite_node)
                 if gv.IsHide:
-                    step_node.setData(0, Qt.DisplayRole, f'{step.index + 1}) step')
+                    stepItem = QStandardItem(QIcon(':/images/Document-txt-icon.png'), f'{step.index + 1}) step')
                 else:
-                    step_node.setData(0, Qt.DisplayRole, f'{step.index + 1}) {step.StepName}')
+                    stepItem = QStandardItem(QIcon(':/images/Document-txt-icon.png'),
+                                             f'{step.index + 1}) {step.StepName}')
                 if checkall:
-                    step_node.setCheckState(0, Qt.Checked)
+                    stepItem.setCheckState(Qt.Checked)
                     step.isTest = True
                 else:
                     if checkall is None:
-                        step_node.setCheckState(0, Qt.Checked if step.isTest else Qt.Unchecked)
+                        stepItem.setCheckState(Qt.Checked if step.isTest else Qt.Unchecked)
                     else:
-                        step_node.setCheckState(0, Qt.Unchecked)
+                        stepItem.setCheckState(Qt.Unchecked)
                         step.isTest = False
                 if gv.IsDebug:
-                    step_node.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    stepItem.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 else:
-                    step_node.setFlags(Qt.ItemIsSelectable)
-                self.set_step_ico(step, step_node)
-                suite_node.addChild(step_node)
-        self.treeWidget.setStyle(QStyleFactory.create('windows'))
-        self.treeWidget.resizeColumnToContents(0)
-        self.treeWidget.topLevelItem(0).setExpanded(True)
-        self.treeWidget.blockSignals(False)
+                    stepItem.setFlags(Qt.ItemIsSelectable)
+                self.setStepIcon(step, stepItem)
+                suiteItem.appendRow(stepItem)
+        self.treeView.setModel(self.treeViewModel)
+        # self.treeView.expandAll()
+        self.treeView.setExpanded(self.treeViewModel.item(0, 0).index(), True)
+        self.treeViewModel.itemChanged.connect(self.on_treeItemChanged)  # on_itemChanged
         self.tabWidget.setCurrentWidget(self.result)
 
-    def set_step_ico(self, step, step_node):
+    def setStepIcon(self, step, stepItem):
         if step.Keyword == 'MessageBoxShow' or step.Keyword == 'QInputDialog' or step.Keyword == 'DialogInput':
-            step_node.setIcon(0, QIcon(':/images/MsgBox.ico'))
+            stepItem.setIcon(QIcon(':/images/MsgBox.ico'))
         else:
             if step.IfElse == 'if' or step.IfElse == '&if' or step.IfElse == '||if':
-                step_node.setIcon(0, QIcon(':/images/NI_If.ico'))
+                stepItem.setIcon(QIcon(':/images/NI_If.ico'))
             elif step.IfElse == 'elif':
-                step_node.setIcon(0, QIcon(':/images/NI_ElseIf.ico'))
+                stepItem.setIcon(QIcon(':/images/NI_ElseIf.ico'))
             elif step.IfElse == 'else':
-                step_node.setIcon(0, QIcon(':/images/NI_Else.ico'))
+                stepItem.setIcon(QIcon(':/images/NI_Else.ico'))
             else:
                 if str_to_int(step.For)[0]:
-                    step_node.setIcon(0, QIcon(':/images/NI_For.ico'))
+                    stepItem.setIcon(QIcon(':/images/NI_For.ico'))
                 elif step.For == 'do' or step.For == 'while':
-                    step_node.setIcon(0, QIcon(':/images/NI_DoWhile.ico'))
+                    stepItem.setIcon(QIcon(':/images/NI_DoWhile.ico'))
                 elif step.For == 'whiledo':
-                    step_node.setIcon(0, QIcon(':/images/NI_While.ico'))
+                    stepItem.setIcon(QIcon(':/images/NI_While.ico'))
                 elif not IsNullOrEmpty(step.For) and step.For.startswith('end'):
-                    step_node.setIcon(0, QIcon(':/images/NI_End.ico'))
+                    stepItem.setIcon(QIcon(':/images/NI_End.ico'))
                 else:
-                    step_node.setIcon(0, QIcon(':/images/Document-txt-icon.png'))
+                    stepItem.setIcon(QIcon(':/images/Document-txt-icon.png'))
 
     # @QtCore.pyqtSlot(QBrush, int, int, bool)
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
         if stepNo_ == -1:
             if self.IsCycle or not self.startFlag:
                 return
-            self.treeWidget.topLevelItem(suiteNO_).setExpanded(True)
-            self.treeWidget.topLevelItem(suiteNO_).setBackground(0, color)
+            self.treeView.setExpanded(self.treeViewModel.item(suiteNO_, 0).index(), True)
+            self.treeViewModel.item(suiteNO_, 0).setBackground(color)
             if allChild:
-                for i in range(self.treeWidget.topLevelItem(suiteNO_).childCount()):
-                    self.treeWidget.topLevelItem(suiteNO_).child(i).setBackground(0, color)
+                for i in range(self.treeViewModel.item(suiteNO_, 0).rowCount()):
+                    self.treeViewModel.item(suiteNO_, 0).child(i).setBackground(0, color)
         else:
-            self.treeWidget.topLevelItem(suiteNO_).child(stepNo_).setBackground(0, color)
-            self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(suiteNO_).child(stepNo_),
-                                         hint=QAbstractItemView.EnsureVisible)
+            self.treeViewModel.item(suiteNO_, 0).child(stepNo_, 0).setBackground(color)
+            self.treeView.scrollTo(self.treeViewModel.item(suiteNO_, 0).child(stepNo_, 0).index(),
+                                   hint=QAbstractItemView.EnsureVisible)
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
     def showMessageBox(self, title, text, level=2):
@@ -1048,7 +1136,6 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def timerEvent(self, a):
         self.mySignals.updateLabel[QLabel, str, int].emit(self.lb_errorCode, str(self.sec), 20)
-        # QApplication.processEvents()
         self.sec += 1
 
     def UpdateContinueFail(self, testResult: bool):
@@ -1264,9 +1351,11 @@ class MainForm(Ui_MainWindow, TestForm):
         self.QtimerID = QTimer()
         self.QtimerID.timeout.connect(self.count)
         self.QtimerID.start(50)
+        self.pBt_stop.setEnabled(True)
 
     def stop(self):
         self.QtimerID.stop()
+
 
     def on_actionDelete(self):
         if self.StepNo == -1:
@@ -1283,21 +1372,23 @@ class MainForm(Ui_MainWindow, TestForm):
                     self.testcase.clone_suites[self.SuiteNo].steps[0].index = 0
         self.ShowTreeView(self.testSequences)
         self.actionSaveToScript.setEnabled(True)
-        try:
-            self.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-            self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(self.SuiteNo),
-                                         hint=QAbstractItemView.EnsureVisible)
-
-            # self.on_stepInfoEdit2(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
-        except (IndexError, AttributeError):
-            step_obj = self.testcase.clone_suites[0].steps[0]
-            self.header_new = []
-            for field in gv.StepAttr:
-                prop_value = getattr(step_obj, field)
-                if prop_value is not None:
-                    self.header_new.append(field)
-        except:
-            raise
+        self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
+        self.treeView.scrollTo(self.treeViewModel.item(self.SuiteNo, 0).index(), hint=QAbstractItemView.EnsureVisible)
+        # try:
+        #     self.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
+        #     self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(self.SuiteNo),
+        #                                  hint=QAbstractItemView.EnsureVisible)
+        #
+        #     # self.on_stepInfoEdit2(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
+        # except (IndexError, AttributeError):
+        #     step_obj = self.testcase.clone_suites[0].steps[0]
+        #     self.header_new = []
+        #     for field in gv.StepAttr:
+        #         prop_value = getattr(step_obj, field)
+        #         if prop_value is not None:
+        #             self.header_new.append(field)
+        # except:
+        #     raise
 
     def on_actionCopy(self):
         if self.StepNo == -1:
@@ -1328,21 +1419,20 @@ class MainForm(Ui_MainWindow, TestForm):
         self.ShowTreeView(self.testSequences)
         self.actionPaste.setEnabled(False)
         self.actionSaveToScript.setEnabled(True)
-        self.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-        self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(self.SuiteNo),
-                                     hint=QAbstractItemView.EnsureVisible)
-        try:
-            pass
-            # self.on_stepInfoEdit2(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
-        except (IndexError, AttributeError):
-            step_obj = self.testcase.clone_suites[0].steps[0]
-            self.header_new = []
-            for field in gv.StepAttr:
-                prop_value = getattr(step_obj, field)
-                if prop_value is not None:
-                    self.header_new.append(field)
-        except:
-            raise
+        self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
+        self.treeView.scrollTo(self.treeViewModel.item(self.SuiteNo, 0).index(), hint=QAbstractItemView.EnsureVisible)
+        # try:
+        #     pass
+        #     # self.on_stepInfoEdit2(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
+        # except (IndexError, AttributeError):
+        #     step_obj = self.testcase.clone_suites[0].steps[0]
+        #     self.header_new = []
+        #     for field in gv.StepAttr:
+        #         prop_value = getattr(step_obj, field)
+        #         if prop_value is not None:
+        #             self.header_new.append(field)
+        # except:
+        #     raise
 
     def on_actionNewSequence(self):
         station_name, ok = QInputDialog.getText(self, 'New TestSequences', 'test station name:')

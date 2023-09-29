@@ -39,7 +39,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                     f"TestMode:{gv.cfg.dut.test_mode},IsDebug:{gv.IsDebug},FTC:{gv.cfg.station.fail_continue},"
                     f"SoftVersion:{gv.VERSION},WebPS={myWind.WebPsIp}")
             else:
-                myWind.treeWidget.blockSignals(True)
+                myWind.treeView.blockSignals(True)
                 if not myWind.SingleStepTest:
                     myWind.mySignals.textEditClearSignal[str].emit('')
                 myWind.mySignals.lineEditEnableSignal[bool].emit(False)
@@ -141,7 +141,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                         myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
                                                                                     myWind.testcase.error_details_first_fail,
                                                                                     20, Qt.red)
-                    myWind.main_form.treeWidget.blockSignals(False)
+                    myWind.main_form.treeView.blockSignals(False)
         except Exception as e:
             myWind.logger.fatal(f"SetTestStatus Exception！！{e}")
             raise
