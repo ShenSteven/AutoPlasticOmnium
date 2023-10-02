@@ -389,8 +389,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.treeView.customContextMenuRequested.connect(self.on_treeWidgetMenu)
 
         self.treeView.pressed.connect(self.on_itemPressed)
-        self.pBt_start.clicked.connect(self.run)
-        self.pBt_stop.clicked.connect(self.stop)
+        self.pBt_start.toggled.connect(self.on_pBtToggled)
         self.tabWidget.tabBarClicked.connect(self.on_tabBarClicked)
 
     def init_treeWidget_color(self):
@@ -475,7 +474,6 @@ class MainForm(Ui_MainWindow, TestForm):
     def treeItem_checkAllChild(self, item: QStandardItem, check: bool):
         if item is None:
             return
-        # print('treeItem_checkAllChild')
         pNo = item.index().row()
         self.testcase.clone_suites[pNo].isTest = check
         for i in range(0, item.rowCount()):
@@ -537,34 +535,6 @@ class MainForm(Ui_MainWindow, TestForm):
         if unCheckedCount > 0:
             return Qt.Unchecked
         return Qt.Checked
-
-    # def on_itemChanged(self, item: QStandardItem):
-    #     if self.startFlag:
-    #         return
-    #     if item.parent() is None:
-    #         pNo = item.index().row()
-    #         isChecked = item.checkState() == Qt.Checked
-    #         self.testcase.clone_suites[pNo].isTest = isChecked
-    #         self.treeViewModel.blockSignals(True)
-    #         for i in range(0, item.rowCount()):
-    #             item.child(i, 0).setCheckState(Qt.Checked if isChecked else Qt.Unchecked)
-    #             # print(f'child:{i}={Qt.Checked}')
-    #             self.testcase.clone_suites[pNo].steps[i].isTest = isChecked
-    #         self.treeViewModel.blockSignals(False)
-    #     else:
-    #         ParentIsTest = []
-    #         pNo = item.parent().index().row()
-    #         cNO = item.index().row()
-    #         self.testcase.clone_suites[pNo].steps[cNO].isTest = item.checkState() == Qt.Checked
-    #         for i in range(item.parent().rowCount()):
-    #             isChecked = item.parent().child(i).checkState() == Qt.Checked
-    #             ParentIsTest.append(isChecked)
-    #         isChecked_parent = any(ParentIsTest)
-    #         self.treeViewModel.blockSignals(True)
-    #         self.testcase.clone_suites[pNo].isTest = isChecked_parent
-    #         item.parent().setCheckState(Qt.Checked if isChecked_parent else Qt.Unchecked)
-    #         # print(f'parent:={Qt.Checked}')
-    #         self.treeViewModel.blockSignals(False)
 
     def on_treeWidgetMenu(self):
         if gv.IsDebug:
@@ -992,8 +962,6 @@ class MainForm(Ui_MainWindow, TestForm):
             else:
                 suiteItem = QStandardItem(QIcon(':/images/folder-icon.png'), f'{suite.index + 1}. {suite.name}')
 
-            # suiteItem.setCheckable(True)
-            # suiteItem.setTristate(True)
             if checkall:
                 suiteItem.setCheckState(Qt.Checked)
                 suite.isTest = True
@@ -1347,15 +1315,15 @@ class MainForm(Ui_MainWindow, TestForm):
         self.graphic_scene.clear()
         self.graphic_scene.addWidget(self.canvas)
 
-    def run(self):
-        self.QtimerID = QTimer()
-        self.QtimerID.timeout.connect(self.count)
-        self.QtimerID.start(50)
-        self.pBt_stop.setEnabled(True)
-
-    def stop(self):
-        self.QtimerID.stop()
-
+    def on_pBtToggled(self, check: bool):
+        if check:
+            self.QtimerID = QTimer()
+            self.QtimerID.timeout.connect(self.count)
+            self.QtimerID.start(50)
+            self.pBt_start.setText('Stop')
+        else:
+            self.QtimerID.stop()
+            self.pBt_start.setText('Start')
 
     def on_actionDelete(self):
         if self.StepNo == -1:
@@ -1374,21 +1342,6 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionSaveToScript.setEnabled(True)
         self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
         self.treeView.scrollTo(self.treeViewModel.item(self.SuiteNo, 0).index(), hint=QAbstractItemView.EnsureVisible)
-        # try:
-        #     self.treeWidget.topLevelItem(self.SuiteNo).setExpanded(True)
-        #     self.treeWidget.scrollToItem(self.treeWidget.topLevelItem(self.SuiteNo),
-        #                                  hint=QAbstractItemView.EnsureVisible)
-        #
-        #     # self.on_stepInfoEdit2(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
-        # except (IndexError, AttributeError):
-        #     step_obj = self.testcase.clone_suites[0].steps[0]
-        #     self.header_new = []
-        #     for field in gv.StepAttr:
-        #         prop_value = getattr(step_obj, field)
-        #         if prop_value is not None:
-        #             self.header_new.append(field)
-        # except:
-        #     raise
 
     def on_actionCopy(self):
         if self.StepNo == -1:
@@ -1421,18 +1374,6 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionSaveToScript.setEnabled(True)
         self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
         self.treeView.scrollTo(self.treeViewModel.item(self.SuiteNo, 0).index(), hint=QAbstractItemView.EnsureVisible)
-        # try:
-        #     pass
-        #     # self.on_stepInfoEdit2(self.tableWidget_2.item(len(gv.StepAttr) - 1, 1))
-        # except (IndexError, AttributeError):
-        #     step_obj = self.testcase.clone_suites[0].steps[0]
-        #     self.header_new = []
-        #     for field in gv.StepAttr:
-        #         prop_value = getattr(step_obj, field)
-        #         if prop_value is not None:
-        #             self.header_new.append(field)
-        # except:
-        #     raise
 
     def on_actionNewSequence(self):
         station_name, ok = QInputDialog.getText(self, 'New TestSequences', 'test station name:')

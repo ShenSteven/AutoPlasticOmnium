@@ -204,18 +204,17 @@
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
                <widget class="QPushButton" name="pBt_start">
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(140, 205, 255);</string>
+                </property>
                 <property name="text">
                  <string>Start</string>
                 </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pBt_stop">
-                <property name="enabled">
-                 <bool>false</bool>
+                <property name="checkable">
+                 <bool>true</bool>
                 </property>
-                <property name="text">
-                 <string>Stop</string>
+                <property name="flat">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
