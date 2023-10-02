@@ -66,7 +66,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
             if gv.LoginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(255, 0, 0);")
                 myWind.mySignals.updateLabel[QLabel, str].emit(myWind.lb_testName,
-                                                               f"<A href='file:///{myWind.txtLogPath}'>{myWind.testcase.error_details_first_fail}</A>")
+                                                               f"<A href='file:///{myWind.txtLogPath}'>{myWind.testcase.errorDetailsFirstFail}</A>")
             else:
                 myWind.total_fail_count += 1
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'FAIL', 36, Qt.red)
@@ -74,12 +74,12 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testTime, str(myWind.sec), 11,
                                                                             Qt.gray)
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
-                                                                            myWind.testcase.error_details_first_fail,
+                                                                            myWind.testcase.errorDetailsFirstFail,
                                                                             20, Qt.red)
                 myWind.UpdateContinueFail(False)
                 if myWind.setIpFlag:
-                    myWind.testcase.dut_comm.send_command(f"luxsetip {gv.cfg.dut.dut_ip} 255.255.255.0",
-                                                          gv.cfg.dut.prompt, 1)
+                    myWind.testcase.dutComm.send_command(f"luxsetip {gv.cfg.dut.dut_ip} 255.255.255.0",
+                                                         gv.cfg.dut.prompt, 1)
         elif status == TestStatus.PASS:
             if gv.LoginWin is not None:
                 myWind.setStyleSheet("background-color: rgb(0, 255, 0);")
@@ -105,7 +105,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_testTime, str(myWind.sec), 11,
                                                                             Qt.gray)
                 myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
-                                                                            myWind.testcase.error_details_first_fail,
+                                                                            myWind.testcase.errorDetailsFirstFail,
                                                                             20, Qt.gray)
                 myWind.saveTestResult()
     except Exception as e:
@@ -122,7 +122,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                     myWind.mySignals.saveTextEditSignal[str].emit('rename')
                     if not myWind.finalTestResult:
                         myWind.mySignals.updateLabel[QLabel, str].emit(myWind.lb_testName,
-                                                                       rf"<A href='file:///{ensure_path_sep(myWind.txtLogPath)}'>{myWind.testcase.error_details_first_fail}</A>")
+                                                                       rf"<A href='file:///{ensure_path_sep(myWind.txtLogPath)}'>{myWind.testcase.errorDetailsFirstFail}</A>")
                     else:
                         pass
             else:
@@ -139,7 +139,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                     myWind.mySignals.saveTextEditSignal[str].emit('rename')
                     if not myWind.finalTestResult:
                         myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_errorCode,
-                                                                                    myWind.testcase.error_details_first_fail,
+                                                                                    myWind.testcase.errorDetailsFirstFail,
                                                                                     20, Qt.red)
                     myWind.main_form.treeView.blockSignals(False)
         except Exception as e:

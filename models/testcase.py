@@ -32,22 +32,22 @@ class TestCase:
     """testcase class,edit all testcase in an Excel file, categorized by test station or testing feature in sheet."""
 
     def __init__(self, testcase_path, sheet_name, logger, wind=None, cflag=True, isVerify=True):
-        self.sum_step = 0
-        self.step_finish_num = 0
-        self.step_count = 0
+        self.sumStep = 0
+        self.stepFinishNum = 0
+        self.stepCount = 0
         self.header = []
         self.myWind = wind
         self.FixSerialPort = None  # 治具串口通信
-        self.dut_comm = None  # DUT通信
+        self.dutComm = None  # DUT通信
         self.NiInstrComm = None
-        self.clone_suites = None
-        self.original_suites = None
+        self.cloneSuites = None
+        self.originalSuites = None
         self.logger = logger
-        self.testcase_path = None
+        self.testcasePath = None
         self.sheetName = None
-        self.error_details_first_fail = ''
-        self.error_code_first_fail = ''
-        self.suite_result_list = []
+        self.errorDetailsFirstFail = ''
+        self.errorCodeFirstFail = ''
+        self.suiteResultList = []
         self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.finish_time = ''
         self.tResult = True
@@ -64,10 +64,10 @@ class TestCase:
         self.jsonObj: models.product.JsonObject = None
         self.ArrayListDaq = []
         self.ArrayListDaqHeader = ['SN', 'DateTime']
-        self.daq_data_path = ''
-        self.csv_list_header = []
-        self.csv_list_data = []
-        self.csv_file_path = ''
+        self.daqDataPath = ''
+        self.csvListHeader = []
+        self.csvListData = []
+        self.csvFilePath = ''
         dal.database.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
         self.load_testcase(testcase_path, sheet_name, logger, cflag, isVerify)
 
@@ -78,20 +78,20 @@ class TestCase:
     def load_testcase(self, testcase_path, sheet_name, logger, cflag, isVerify):
         try:
             self.sheetName = sheet_name
-            self.testcase_path = testcase_path
+            self.testcasePath = testcase_path
             self.logger = logger
             if not getattr(sys, 'frozen', False) and cflag:
-                models.loadseq.excel_convert_to_json(self.testcase_path, gv.cfg.station.station_all, self.logger)
+                models.loadseq.excel_convert_to_json(self.testcasePath, gv.cfg.station.station_all, self.logger)
             if not os.path.exists(self.test_script_json):
-                models.loadseq.excel_convert_to_json(self.testcase_path, [sheet_name], self.logger)
+                models.loadseq.excel_convert_to_json(self.testcasePath, [sheet_name], self.logger)
             if gv.IsHide:
-                self.original_suites, self.header, self.step_count = models.loadseq.load_testcase_from_py(self.sheetName)
+                self.originalSuites, self.header, self.stepCount = models.loadseq.load_testcase_from_py(self.sheetName)
             else:
-                self.original_suites, self.header, self.step_count = models.loadseq.load_testcase_from_json(
+                self.originalSuites, self.header, self.stepCount = models.loadseq.load_testcase_from_json(
                     self.test_script_json, isVerify)
-            self.clone_suites = copy.deepcopy(self.original_suites)
+            self.cloneSuites = copy.deepcopy(self.originalSuites)
             gv.Keywords = get_keywords_list(rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
-            self.sum_step = self.step_count
+            self.sumStep = self.stepCount
         except Exception as e:
             QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
             # QMetaObject.invokeMethod(
@@ -106,7 +106,7 @@ class TestCase:
 
     def run(self):
         try:
-            for i, suite in enumerate(self.clone_suites, start=0):
+            for i, suite in enumerate(self.cloneSuites, start=0):
 
                 if self.loop is not None and not self.loop.IsEnd and self.loop.jump:
                     if i < self.loop.StartSuiteNo:
@@ -132,7 +132,7 @@ class TestCase:
                     stepNo = -1
 
                 suite_result = suite.run(self, stepNo)
-                self.suite_result_list.append(suite_result)
+                self.suiteResultList.append(suite_result)
                 if not suite_result:
                     break
 
@@ -145,7 +145,7 @@ class TestCase:
                 if self.WhileLoop is not None and not self.WhileLoop.IsEnd and self.WhileLoop.jump:
                     return self.run()
 
-            self.tResult = all(self.suite_result_list)
+            self.tResult = all(self.suiteResultList)
             self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return self.tResult
         except Exception as e:
@@ -163,20 +163,20 @@ class TestCase:
         obj.status = 'passed' if self.tResult else 'failed'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
-        obj.error_code = self.error_code_first_fail
-        obj.error_details = self.error_details_first_fail
+        obj.error_code = self.errorCodeFirstFail
+        obj.error_details = self.errorDetailsFirstFail
 
     def copy_to_mes(self, obj: models.product.MesInfo):
         obj.status = 'PASS' if self.tResult else 'FAIL'
         obj.start_time = self.start_time
         obj.finish_time = self.finish_time
-        obj.error_code = self.error_code_first_fail
-        obj.error_details = self.error_details_first_fail
+        obj.error_code = self.errorCodeFirstFail
+        obj.error_details = self.errorDetailsFirstFail
 
     def clear(self):
         self.tResult = True
-        self.suite_result_list = []
-        self.sum_step = self.step_count
+        self.suiteResultList = []
+        self.sumStep = self.stepCount
         self.ForLoop = None
         self.DoWhileLoop = None
         self.WhileLoop = None
@@ -184,8 +184,8 @@ class TestCase:
         self.loop = None
 
     def teardown(self):
-        if self.dut_comm is not None:
-            self.dut_comm.close()
+        if self.dutComm is not None:
+            self.dutComm.close()
         if gv.PLin is not None:
             gv.PLin.close()
         if gv.cfg.station.fix_flag and gv.cfg.station.pop_fix and self.FixSerialPort is not None:

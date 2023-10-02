@@ -142,12 +142,12 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('TelnetLogin')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    if not isinstance(test_case.dut_comm, TelnetComm):
+    if not isinstance(test_case.dutComm, TelnetComm):
         if not IsNullOrEmpty(step.CmdOrParam):
-            test_case.dut_comm = TelnetComm(step.logger, step.CmdOrParam, gv.cfg.dut.prompt)
+            test_case.dutComm = TelnetComm(step.logger, step.CmdOrParam, gv.cfg.dut.prompt)
         else:
-            test_case.dut_comm = TelnetComm(step.logger, gv.cfg.dut.dut_ip, gv.cfg.dut.prompt)
-    rReturn = test_case.dut_comm.open(gv.cfg.dut.prompt)
+            test_case.dutComm = TelnetComm(step.logger, gv.cfg.dut.dut_ip, gv.cfg.dut.prompt)
+    rReturn = test_case.dutComm.open(gv.cfg.dut.prompt)
     return rReturn, compInfo
 
 
@@ -164,10 +164,10 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('SerialPortOpen')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    if not isinstance(test_case.dut_comm, SerialPort):
+    if not isinstance(test_case.dutComm, SerialPort):
         if not IsNullOrEmpty(step.CmdOrParam):
-            test_case.dut_comm = SerialPort(step.logger, step.CmdOrParam, int(step.ExpectStr))
-    rReturn = test_case.dut_comm.open()
+            test_case.dutComm = SerialPort(step.logger, step.CmdOrParam, int(step.ExpectStr))
+    rReturn = test_case.dutComm.open()
     return rReturn, compInfo
 
 
@@ -175,8 +175,8 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('CloseDUTConnect')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    if test_case.dut_comm is not None:
-        test_case.dut_comm.close()
+    if test_case.dutComm is not None:
+        test_case.dutComm.close()
         rReturn = True
         return rReturn, compInfo
 
@@ -421,7 +421,7 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('default')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    rReturn, revStr = test_case.dut_comm.SendCommand(step.CmdOrParam, step.ExpectStr, step.Timeout)
+    rReturn, revStr = test_case.dutComm.SendCommand(step.CmdOrParam, step.ExpectStr, step.Timeout)
     if rReturn and step.CheckStr1 in revStr and step.CheckStr2 in revStr:
         if not IsNullOrEmpty(step.SubStr1) or not IsNullOrEmpty(step.SubStr2):
             step.testValue = subStr(step.SubStr1, step.SubStr2, revStr, step)

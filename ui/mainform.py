@@ -114,7 +114,7 @@ class MainForm(Ui_MainWindow, TestForm):
                                                                            self)
         self.init_status_bar()
         self.init_select_station()
-        self.testSequences = self.testcase.clone_suites
+        self.testSequences = self.testcase.cloneSuites
         self.ShowTreeView(self.testSequences)
         self.testThread = TestThread(self)
         self.testThread.start()
@@ -150,7 +150,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 station_select.setObjectName(item)
                 station_select.setText(item)
                 self.menuSelect_Station.addAction(station_select)
-                station_select.triggered.connect(self.on_select_station)
+                station_select.triggered.connect(self.on_selectStation)
             else:
                 if item == 'M4':
                     model_all = ['FL', 'FR', 'RL', 'RML', 'RMR', 'RR']
@@ -163,13 +163,13 @@ class MainForm(Ui_MainWindow, TestForm):
                 station_menu.setObjectName(item)
                 station_menu.setTitle(item)
                 self.menuSelect_Station.addMenu(station_menu)
-                station_menu.triggered.connect(self.on_select_station)
+                station_menu.triggered.connect(self.on_selectStation)
                 for item_ in model_all:
                     model_select = QAction(self)
                     model_select.setObjectName(item_)
                     model_select.setText(item_)
                     station_menu.addAction(model_select)
-                    model_select.triggered.connect(self.on_select_dut_model)
+                    model_select.triggered.connect(self.on_selectDutModel)
                     if gv.cfg.station.station_name == station_menu.title() and flag:
                         flag = False
                         model_select.triggered.emit()
@@ -322,7 +322,7 @@ class MainForm(Ui_MainWindow, TestForm):
             }
         '''
         self.progress_bar = QtWidgets.QProgressBar(self.statusbar)
-        self.progress_bar.setRange(0, self.testcase.step_count)
+        self.progress_bar.setRange(0, self.testcase.stepCount)
         self.progress_bar.setValue(0)
         self.progress_bar.setStyleSheet(style)
         self.progress_bar.setFormat('%v/%m')
@@ -387,18 +387,17 @@ class MainForm(Ui_MainWindow, TestForm):
         self.lineEdit.textEdited.connect(self.on_textEdited)
         self.lineEdit.returnPressed.connect(self.on_returnPressed)
         self.treeView.customContextMenuRequested.connect(self.on_treeWidgetMenu)
-
         self.treeView.pressed.connect(self.on_itemPressed)
         self.pBt_start.toggled.connect(self.on_pBtToggled)
         self.tabWidget.tabBarClicked.connect(self.on_tabBarClicked)
 
-    def init_treeWidget_color(self):
-        self.treeViewModel.blockSignals(True)
+    def init_treeView_color(self):
         for row in range(self.treeViewModel.rowCount()):
             for column in range(self.treeViewModel.columnCount()):
-                item = self.treeViewModel.item(row, column)
-                item.setBackground(Qt.white)
-        self.treeViewModel.blockSignals(False)
+                suiteItem = self.treeViewModel.item(row, column)
+                suiteItem.setBackground(Qt.white)
+                for i in range(suiteItem.rowCount()):
+                    self.treeViewModel.item(row, column).child(i).setBackground(Qt.white)
 
     def on_itemPressed(self, index):
         item = self.treeViewModel.itemFromIndex(index)
@@ -449,7 +448,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 os.remove(self.testcase.test_script_json)
             self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger, self,
                                                      False)
-            self.testSequences = self.testcase.clone_suites
+            self.testSequences = self.testcase.cloneSuites
 
         thread = Thread(target=thread_convert_and_load_script, daemon=True)
         thread.start()
@@ -462,7 +461,6 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_treeItemChanged(self, item: QStandardItem):
         if item is None:
             return
-        # print(item.text())
         if item.isCheckable():
             state = item.checkState()
             if item.isTristate():
@@ -475,10 +473,10 @@ class MainForm(Ui_MainWindow, TestForm):
         if item is None:
             return
         pNo = item.index().row()
-        self.testcase.clone_suites[pNo].isTest = check
+        self.testcase.cloneSuites[pNo].isTest = check
         for i in range(0, item.rowCount()):
             self.treeItem_checkAllChild_recursion(item.child(i), check)
-            self.testcase.clone_suites[pNo].steps[i].isTest = check
+            self.testcase.cloneSuites[pNo].steps[i].isTest = check
         if item.isCheckable():
             item.setCheckState(Qt.Checked if check else Qt.Unchecked)
 
@@ -499,22 +497,23 @@ class MainForm(Ui_MainWindow, TestForm):
             return
         pNo = parentItem.index().row()
         cNO = item.index().row()
-        self.testcase.clone_suites[pNo].steps[cNO].isTest = check
+        self.testcase.cloneSuites[pNo].steps[cNO].isTest = check
         if Qt.PartiallyChecked == siblingState:
             if parentItem.isCheckable() and parentItem.isTristate():
                 parentItem.setCheckState(Qt.PartiallyChecked)
-                self.testcase.clone_suites[pNo].isTest = True
+                self.testcase.cloneSuites[pNo].isTest = True
         elif Qt.Checked == siblingState:
             if parentItem.isCheckable():
                 parentItem.setCheckState(Qt.Checked)
-                self.testcase.clone_suites[pNo].isTest = True
+                self.testcase.cloneSuites[pNo].isTest = True
         else:
             if parentItem.isCheckable():
                 parentItem.setCheckState(Qt.Unchecked)
-                self.testcase.clone_suites[pNo].isTest = False
+                self.testcase.cloneSuites[pNo].isTest = False
         self.treeItem_CheckChildChanged(parentItem, check)
 
-    def checkSibling(self, item: QStandardItem):
+    @staticmethod
+    def checkSibling(item: QStandardItem):
         parent = item.parent()
         if parent is None:
             return item.checkState()
@@ -557,7 +556,7 @@ class MainForm(Ui_MainWindow, TestForm):
             menu.addAction(self.actionUncheckAll)
             menu.addAction(self.actionExpandAll)
             menu.addAction(self.actionCollapseAll)
-            if not getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
+            if not getattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
                 self.actionBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
             else:
                 self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
@@ -580,19 +579,19 @@ class MainForm(Ui_MainWindow, TestForm):
         self.on_returnPressed()
 
     def on_actionBreakpoint(self):
-        if not getattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
-            setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', True)
+        if not getattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
+            setattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint', True)
             self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
             self.treeViewModel.itemFromIndex(self.treeView.currentIndex()).setIcon(QIcon(':/images/StepBreakpoint.ico'))
         else:
-            setattr(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo], 'breakpoint', False)
+            setattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint', False)
             self.actionBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
             self.treeViewModel.itemFromIndex(self.treeView.currentIndex()).setIcon(
                 QIcon(':/images/Document-txt-icon.png'))
 
     def on_actionOpen_TestCase(self):
         def thread_actionOpen_TestCase():
-            os.startfile(self.testcase.testcase_path)
+            os.startfile(self.testcase.testcasePath)
 
         thread = Thread(target=thread_actionOpen_TestCase, daemon=True)
         thread.start()
@@ -602,7 +601,7 @@ class MainForm(Ui_MainWindow, TestForm):
             QMessageBox.information(self, 'Infor', 'Test is running, can not do it!', QMessageBox.Yes)
             return
         thread = Thread(
-            target=models.loadseq.excel_convert_to_json, args=(self.testcase.testcase_path,
+            target=models.loadseq.excel_convert_to_json, args=(self.testcase.testcasePath,
                                                                gv.cfg.station.station_all, self.logger), daemon=True)
         thread.start()
 
@@ -616,7 +615,7 @@ class MainForm(Ui_MainWindow, TestForm):
         thread = Thread(target=actionOpenScript, daemon=True)
         thread.start()
 
-    def on_select_station(self):
+    def on_selectStation(self):
         def select_station():
             action = self.sender()
             if isinstance(action, QAction):
@@ -633,8 +632,8 @@ class MainForm(Ui_MainWindow, TestForm):
             gv.cfg.station.station_no = gv.cfg.station.station_name
             self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger,
                                                      self, False)
-            self.mySignals.updateProgressBar[int, int].emit(self.testcase.step_finish_num, self.testcase.sum_step)
-            self.testSequences = self.testcase.clone_suites
+            self.mySignals.updateProgressBar[int, int].emit(self.testcase.stepFinishNum, self.testcase.sumStep)
+            self.testSequences = self.testcase.cloneSuites
             self.logger.debug(f'select {self.testcase.test_script_json} finish!')
 
         thread = Thread(target=select_station, daemon=True)
@@ -643,7 +642,7 @@ class MainForm(Ui_MainWindow, TestForm):
         if self.testSequences is not None:
             self.ShowTreeView(self.testSequences)
 
-    def on_select_dut_model(self):
+    def on_selectDutModel(self):
         action = self.sender()
         if isinstance(action, QAction):
             self.dut_model = action.text() if "(" not in action.text() else action.text()[:action.text().index('(')]
@@ -719,10 +718,10 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_actionCSVLog(self):
         def thread_update():
-            if os.path.exists(self.testcase.csv_file_path):
-                os.startfile(self.testcase.csv_file_path)
+            if os.path.exists(self.testcase.csvFilePath):
+                os.startfile(self.testcase.csvFilePath)
             else:
-                self.logger.warning(f"no find CSV log,path:{self.testcase.csv_file_path}")
+                self.logger.warning(f"no find CSV log,path:{self.testcase.csvFilePath}")
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
@@ -732,7 +731,7 @@ class MainForm(Ui_MainWindow, TestForm):
             if info == 'rename':
                 rename_log = self.txtLogPath.replace('logging',
                                                      str(self.finalTestResult).upper()).replace('details',
-                                                                                                str(self.testcase.error_details_first_fail))
+                                                                                                str(self.testcase.errorDetailsFirstFail))
                 self.logger.debug(f"rename test log to: {rename_log}")
                 self.fileHandle.close()
                 os.rename(self.txtLogPath, rename_log)
@@ -742,7 +741,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 myScreenshot.save(ScreenshotPhoto)
             else:
                 self.txtLogPath = rf'{gv.LogFolderPath}{os.sep}{str(self.finalTestResult).upper()}_{self.SN}_' \
-                                  rf'{self.testcase.error_details_first_fail}_{time.strftime("%H-%M-%S")}.txt'
+                                  rf'{self.testcase.errorDetailsFirstFail}_{time.strftime("%H-%M-%S")}.txt'
                 content = self.textEdit.toPlainText()
 
                 with open(self.txtLogPath, 'wb') as f:
@@ -807,7 +806,7 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_actionShowStepInfo(self):
         if self.tabWidget.currentWidget() != self.stepInfo:
             self.tabWidget.setCurrentWidget(self.stepInfo)
-        step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        step_obj = self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo]
         self.model = QStandardItemModel(0, 2, self.tableViewStepProp)
         self.model.itemChanged.connect(self.on_stepInfoEdit)
         for prop_name in gv.StepAttr:
@@ -826,10 +825,9 @@ class MainForm(Ui_MainWindow, TestForm):
         self.tableViewStepProp.setModel(self.model)
 
     def on_stepInfoEdit(self, item: QStandardItem):
-        # model = self.tableViewStepProp.model()
         prop_name = self.model.data(self.model.index(item.row(), 0))
         prop_value = item.text()
-        step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        step_obj = self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo]
         try:
             T = (type(getattr(step_obj, prop_name)))
             if prop_value == 'None':
@@ -885,9 +883,9 @@ class MainForm(Ui_MainWindow, TestForm):
                         del ws.tables[table[0]]
                     except KeyError:
                         pass
-                ws.delete_rows(idx=0, amount=self.testcase.step_count * 3)
+                ws.delete_rows(idx=0, amount=self.testcase.stepCount * 3)
                 ws.append(self.header_new)
-                for suit in self.testcase.clone_suites:
+                for suit in self.testcase.cloneSuites:
                     for step in suit.steps:
                         for item in self.header_new:
                             value = getattr(step, item)
@@ -1005,7 +1003,8 @@ class MainForm(Ui_MainWindow, TestForm):
         self.treeViewModel.itemChanged.connect(self.on_treeItemChanged)  # on_itemChanged
         self.tabWidget.setCurrentWidget(self.result)
 
-    def setStepIcon(self, step, stepItem):
+    @staticmethod
+    def setStepIcon(step, stepItem):
         if step.Keyword == 'MessageBoxShow' or step.Keyword == 'QInputDialog' or step.Keyword == 'DialogInput':
             stepItem.setIcon(QIcon(':/images/MsgBox.ico'))
         else:
@@ -1189,12 +1188,11 @@ class MainForm(Ui_MainWindow, TestForm):
 
         if gv.IsDebug:
             if not self.SingleStepTest:
-                self.init_treeWidget_color()
+                self.init_treeView_color()
         else:
-            self.testSequences = copy.deepcopy(self.testcase.original_suites)
-            self.testcase.clone_suites = self.testSequences
+            self.testSequences = copy.deepcopy(self.testcase.originalSuites)
+            self.testcase.cloneSuites = self.testSequences
             self.ShowTreeView(self.testSequences)
-        # self.SN = self.lineEdit.text()
         self.test_initialize(self.lineEdit.text())
 
     def test_initialize(self, SN):
@@ -1205,12 +1203,12 @@ class MainForm(Ui_MainWindow, TestForm):
         gv.InitCreateDirs(self.logger)
         self.init_textEditHandler()
         self.testcase.logger = self.logger
-        self.testcase.step_finish_num = 0
+        self.testcase.stepFinishNum = 0
         self.testcase.startTimeJson = datetime.now()
         self.testcase.jsonObj = models.product.JsonObject(SN, gv.cfg.station.station_no,
                                                           gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
         self.testcase.mesPhases = models.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
-        self.testcase.daq_data_path = rf'{gv.OutPutPath}\{gv.cfg.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
+        self.testcase.daqDataPath = rf'{gv.OutPutPath}\{gv.cfg.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         self.lb_failInfo.setHidden(True)
         self.lb_testTime.setHidden(True)
         if not self.testThread.isRunning():
@@ -1298,7 +1296,8 @@ class MainForm(Ui_MainWindow, TestForm):
         except Exception as e:
             print(e)
 
-    def sinWave(self, i=0):
+    @staticmethod
+    def sinWave(i=0):
         fig = plt.figure(figsize=(6, 4), dpi=100)
         ax = plt.axes(xlim=(0, 2), ylim=(-2, 2))
         line, = ax.plot([], [])
@@ -1327,17 +1326,17 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_actionDelete(self):
         if self.StepNo == -1:
-            del self.testcase.clone_suites[self.SuiteNo]
+            del self.testcase.cloneSuites[self.SuiteNo]
         else:
-            if len(self.testcase.clone_suites[self.SuiteNo].steps) == 1:
-                del self.testcase.clone_suites[self.SuiteNo]
+            if len(self.testcase.cloneSuites[self.SuiteNo].steps) == 1:
+                del self.testcase.cloneSuites[self.SuiteNo]
                 self.SuiteNo = 0
             else:
-                del_step = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
-                del self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+                del_step = copy.deepcopy(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo])
+                del self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo]
                 if self.StepNo == 0:
-                    self.testcase.clone_suites[self.SuiteNo].steps[0].SuiteName = del_step.SuiteName
-                    self.testcase.clone_suites[self.SuiteNo].steps[0].index = 0
+                    self.testcase.cloneSuites[self.SuiteNo].steps[0].SuiteName = del_step.SuiteName
+                    self.testcase.cloneSuites[self.SuiteNo].steps[0].index = 0
         self.ShowTreeView(self.testSequences)
         self.actionSaveToScript.setEnabled(True)
         self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
@@ -1345,9 +1344,9 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_actionCopy(self):
         if self.StepNo == -1:
-            self.suitClipboard = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo])
+            self.suitClipboard = copy.deepcopy(self.testcase.cloneSuites[self.SuiteNo])
         else:
-            self.stepClipboard = copy.deepcopy(self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo])
+            self.stepClipboard = copy.deepcopy(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo])
             if self.StepNo == 0:
                 self.stepClipboard.SuiteName = ''
         self.actionPaste.setEnabled(True)
@@ -1355,19 +1354,19 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_actionPaste(self):
         if self.StepNo == -1:
             if self.suitClipboard is not None:
-                self.testcase.clone_suites.insert(self.SuiteNo, self.suitClipboard)
+                self.testcase.cloneSuites.insert(self.SuiteNo, self.suitClipboard)
                 self.suitClipboard = None
             elif self.stepClipboard is not None:
-                self.testcase.clone_suites[self.SuiteNo].steps.insert(0, self.stepClipboard)
-                self.testcase.clone_suites[self.SuiteNo].steps[0].SuiteName = \
-                    self.testcase.clone_suites[self.SuiteNo].steps[1].SuiteName
-                self.testcase.clone_suites[self.SuiteNo].steps[0].index = 0
-                self.testcase.clone_suites[self.SuiteNo].steps[1].index = 1
-                self.testcase.clone_suites[self.SuiteNo].steps[1].SuiteName = ''
+                self.testcase.cloneSuites[self.SuiteNo].steps.insert(0, self.stepClipboard)
+                self.testcase.cloneSuites[self.SuiteNo].steps[0].SuiteName = \
+                    self.testcase.cloneSuites[self.SuiteNo].steps[1].SuiteName
+                self.testcase.cloneSuites[self.SuiteNo].steps[0].index = 0
+                self.testcase.cloneSuites[self.SuiteNo].steps[1].index = 1
+                self.testcase.cloneSuites[self.SuiteNo].steps[1].SuiteName = ''
                 self.stepClipboard = None
         else:
             if self.stepClipboard is not None:
-                self.testcase.clone_suites[self.SuiteNo].steps.insert(self.StepNo + 1, self.stepClipboard)
+                self.testcase.cloneSuites[self.SuiteNo].steps.insert(self.StepNo + 1, self.stepClipboard)
                 self.stepClipboard = None
         self.ShowTreeView(self.testSequences)
         self.actionPaste.setEnabled(False)
@@ -1388,7 +1387,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 os.system(f'copy {gv.ScriptFolder}\\sample.json {gv.ScriptFolder}\\{gv.cfg.station.station_name}.json')
             self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger, self,
                                                      False, False)
-            self.testSequences = self.testcase.clone_suites
+            self.testSequences = self.testcase.cloneSuites
             gv.cfg.station.station_all.append(station_name)
             conf.config.save_config(gv.cfg, gv.ConfigYamlPath)
             self.ShowTreeView(self.testSequences)
@@ -1396,7 +1395,7 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_stepDeleteRow(self):
         prop_name = self.model.data(self.model.index(self.tableViewStepProp.currentIndex().row(), 0))
-        step_obj = self.testcase.clone_suites[self.SuiteNo].steps[self.StepNo]
+        step_obj = self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo]
         try:
             setattr(step_obj, prop_name, None)
             self.model.removeRow(self.tableViewStepProp.currentIndex().row())

@@ -40,7 +40,7 @@ class TestSuite:
     @property
     def index(self):
         if self.myWind is not None:
-            self._index = self.myWind.testcase.clone_suites.index(self)
+            self._index = self.myWind.testcase.cloneSuites.index(self)
         return self._index
 
     @index.setter
@@ -59,8 +59,8 @@ class TestSuite:
         if self.logger is None:
             self.logger = test_case.logger
         if not self.isTest:
-            test_case.sum_step = test_case.sum_step - self.totalNumber
-            self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
+            test_case.sumStep = test_case.sumStep - self.totalNumber
+            self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.stepFinishNum, test_case.sumStep)
             self.setColor(Qt.gray)
             self.suiteResult = True
             return self.suiteResult
@@ -123,11 +123,11 @@ class TestSuite:
             self.logger.error(f"{self.name} Test Fail!,ElapsedTime:{self.elapsedTime.seconds}")
 
     def daq_collect(self, test_case):
-        self.logger.debug(f"collect DAQ data to {test_case.daq_data_path}")
-        create_csv_file(self.logger, test_case.daq_data_path, test_case.ArrayListDaqHeader)
+        self.logger.debug(f"collect DAQ data to {test_case.daqDataPath}")
+        create_csv_file(self.logger, test_case.daqDataPath, test_case.ArrayListDaqHeader)
         data_list = [str(test_case.ForLoop.LoopCounter), datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
         data_list.extend(test_case.ArrayListDaq)
-        write_csv_file(self.logger, test_case.daq_data_path, data_list)
+        write_csv_file(self.logger, test_case.daqDataPath, data_list)
         test_case.ArrayListDaq = []
 
     def copy_to_json_obj(self, obj: models.product.SuiteItem):

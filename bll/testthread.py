@@ -51,8 +51,8 @@ class TestThread(QThread):
                     elif self.myWind.SingleStepTest:
                         self.myWind.logger.debug(
                             f'Run single-step,SuiteNo:{self.myWind.SuiteNo},StepNo:{self.myWind.StepNo}')
-                        result = self.myWind.testcase.clone_suites[self.myWind.SuiteNo].steps[self.myWind.StepNo].run(
-                            self.myWind.testcase, self.myWind.testcase.clone_suites[self.myWind.SuiteNo])
+                        result = self.myWind.testcase.cloneSuites[self.myWind.SuiteNo].steps[self.myWind.StepNo].run(
+                            self.myWind.testcase, self.myWind.testcase.cloneSuites[self.myWind.SuiteNo])
                         self.myWind.finalTestResult = result
                         self.signal[QWidget, TestStatus].emit(self.myWind,
                                                               TestStatus.PASS if self.myWind.finalTestResult else TestStatus.FAIL)
@@ -64,8 +64,8 @@ class TestThread(QThread):
                         result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mes_result,
                                                        self.myWind.testcase.mesPhases)
                         self.myWind.finalTestResult = result & result1 & result2
-                        collect_data_to_csv(self.myWind.testcase.mesPhases, self.myWind.testcase.csv_list_header,
-                                            self.myWind.testcase.csv_list_data, self.myWind)
+                        collect_data_to_csv(self.myWind.testcase.mesPhases, self.myWind.testcase.csvListHeader,
+                                            self.myWind.testcase.csvListData, self.myWind)
                         if gv.MainWin is not None:
                             self.myWind.saveTestResult()
                         self.signal[QWidget, TestStatus].emit(self.myWind,

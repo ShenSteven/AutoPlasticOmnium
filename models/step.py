@@ -135,7 +135,7 @@ class Step:
     @property
     def index(self):
         if self.myWind is not None:
-            self._index = self.myWind.testcase.clone_suites[self.suiteIndex].steps.index(self)
+            self._index = self.myWind.testcase.cloneSuites[self.suiteIndex].steps.index(self)
         return self._index
 
     @index.setter
@@ -181,7 +181,7 @@ class Step:
         if not hasattr(self, '_SuiteName'):
             return None
         if self.myWind is not None:
-            self._SuiteName = self.myWind.testcase.clone_suites[self.suiteIndex].name
+            self._SuiteName = self.myWind.testcase.cloneSuites[self.suiteIndex].name
         return self._SuiteName
 
     @SuiteName.setter
@@ -625,9 +625,9 @@ class Step:
                     self.setColor(Qt.gray)
                 self.test_result = True
                 self.status = str(self.test_result)
-                test_case.step_finish_num = test_case.step_finish_num - 1
-                test_case.sum_step = test_case.sum_step - 1
-                self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
+                test_case.stepFinishNum = test_case.stepFinishNum - 1
+                test_case.sumStep = test_case.sumStep - 1
+                self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.stepFinishNum, test_case.sumStep)
                 return True
         except Exception as e:
             self.logger.fatal(f"TestStep precondition Exception!{e},{traceback.format_exc()}")
@@ -673,13 +673,13 @@ class Step:
                 else:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_case, self.test_result)
-            test_case.step_finish_num = test_case.step_finish_num + 1
+            test_case.stepFinishNum = test_case.stepFinishNum + 1
             if (test_case.ForLoop is not None and not test_case.ForLoop.IsEnd) or \
                     (test_case.DoWhileLoop is not None and not test_case.DoWhileLoop.IsEnd) or \
                     (test_case.WhileLoop is not None and not test_case.WhileLoop.IsEnd):
                 # if test_case.loop is not None and not test_case.loop.IsEnd:
-                test_case.sum_step = test_case.sum_step + 1
-            self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.step_finish_num, test_case.sum_step)
+                test_case.sumStep = test_case.sumStep + 1
+            self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.stepFinishNum, test_case.sumStep)
             self.clear()
             test_case.IfElseFlow.clear(self.IfElse)
 
@@ -765,9 +765,9 @@ class Step:
             test_case.failCount += 1
         else:
             return
-        if test_case.failCount == 1 and IsNullOrEmpty(test_case.error_code_first_fail):
-            test_case.error_code_first_fail = self.error_code if self.error_code is not None else '0.0.0'
-            test_case.error_details_first_fail = self.error_details if self.error_details is not None else 'NoErrorCode'
+        if test_case.failCount == 1 and IsNullOrEmpty(test_case.errorCodeFirstFail):
+            test_case.errorCodeFirstFail = self.error_code if self.error_code is not None else '0.0.0'
+            test_case.errorDetailsFirstFail = self.error_details if self.error_details is not None else 'NoErrorCode'
             test_case.mesPhases.first_fail = self.SuiteName
 
     def _process_bypass_byfail(self, step_result: bool):
@@ -820,17 +820,17 @@ class Step:
 
     def record_to_csv(self, test_case, name):
         """collect test result and data into csv file"""
-        if name in test_case.csv_list_header:
+        if name in test_case.csvListHeader:
             return
         if not IsNullOrEmpty(self.USL) or not IsNullOrEmpty(self.LSL):
-            test_case.csv_list_header.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
-            test_case.csv_list_data.extend([self.testValue, self.LSL, self.USL])
+            test_case.csvListHeader.extend([name, f"{name}_LIMIT_MIN", f"{name}_LIMIT_MAX"])
+            test_case.csvListData.extend([self.testValue, self.LSL, self.USL])
         elif not IsNullOrEmpty(self.SPEC):
-            test_case.csv_list_header.extend([name, f"{name}_SPEC"])
-            test_case.csv_list_data.extend([self.testValue, self.SPEC])
+            test_case.csvListHeader.extend([name, f"{name}_SPEC"])
+            test_case.csvListData.extend([self.testValue, self.SPEC])
         else:
-            test_case.csv_list_header.append(name)
-            test_case.csv_list_data.append(self.testValue)
+            test_case.csvListHeader.append(name)
+            test_case.csvListData.append(self.testValue)
 
     def record_to_json(self, test_case, testResult, suiteItem: models.product.SuiteItem = None):
         """copy test data to json object"""

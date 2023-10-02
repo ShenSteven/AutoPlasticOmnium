@@ -100,7 +100,7 @@ class Cell(QFrame, Ui_cell, TestForm):
             if info == 'rename':
                 rename_log = self.txtLogPath.replace('logging',
                                                      str(self.finalTestResult).upper()).replace('details',
-                                                                                                self.testcase.error_details_first_fail)
+                                                                                                self.testcase.errorDetailsFirstFail)
                 self.logger.debug(f"rename test log to: {rename_log}")
                 self.fileHandle.close()
                 os.rename(self.txtLogPath, rename_log)
@@ -130,7 +130,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.init_variable(SN)
         self.testcase.jsonObj = models.product.JsonObject(SN, gv.cfg.station.station_no,
                                                           gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
-        self.testcase.daq_data_path = rf'{gv.OutPutPath}{os.sep}{gv.cfg.station.station_no}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
+        self.testcase.daqDataPath = rf'{gv.OutPutPath}{os.sep}{gv.cfg.station.station_no}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         self.testcase.mesPhases = models.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
         self.testcase.startTimeJson = datetime.now()
         self.TestVariables = models.variables.Variables(SN, str(self.LocalNo), str(gv.cfg.LTT.row))

@@ -72,14 +72,14 @@ def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
 
 def collect_data_to_csv(mesPhases, csv_list_header, csv_list_data, myWind):
     def thread_update():
-        myWind.testcase.csv_file_path = fr'{gv.cfg.station.log_folder}{os.sep}CsvData{os.sep}{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cfg.station.station_no}.csv'
+        myWind.testcase.csvFilePath = fr'{gv.cfg.station.log_folder}{os.sep}CsvData{os.sep}{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cfg.station.station_no}.csv'
         csvColumnPath = fr'{gv.ScriptFolder}{os.sep}csv_column.txt'
         fix_header = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
                       "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
                       "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
         fix_header.extend(csv_list_header)
         updateColumn = myWind.finalTestResult and not gv.IsDebug
-        create_csv_file(myWind.logger, myWind.testcase.csv_file_path, fix_header, updateColumn)
+        create_csv_file(myWind.logger, myWind.testcase.csvFilePath, fix_header, updateColumn)
         if os.path.exists(csvColumnPath):
             os.remove(csvColumnPath)
         with open(csvColumnPath, 'w') as f:
@@ -90,12 +90,12 @@ def collect_data_to_csv(mesPhases, csv_list_header, csv_list_data, myWind):
                             "1", myWind.SN, gv.cfg.dut.qsdk_ver, mesPhases.HW_REVISION, gv.VERSION,
                             time.strftime("%Y/%m/%d %H:%M:%S"), str(myWind.sec),
                             myWind.finalTestResult,
-                            mesPhases.first_fail, myWind.testcase.error_details_first_fail, "UTC",
+                            mesPhases.first_fail, myWind.testcase.errorDetailsFirstFail, "UTC",
                             gv.cfg.dut.test_mode,
                             mesPhases.JSON_UPLOAD, mesPhases.MES_UPLOAD]
         fix_header_value.extend(csv_list_data)
-        myWind.logger.debug(f'CollectResultToCsv {myWind.testcase.csv_file_path}')
-        write_csv_file(myWind.logger, myWind.testcase.csv_file_path, fix_header_value)
+        myWind.logger.debug(f'CollectResultToCsv {myWind.testcase.csvFilePath}')
+        write_csv_file(myWind.logger, myWind.testcase.csvFilePath, fix_header_value)
 
     thread = Thread(target=thread_update, daemon=True)
     thread.start()
