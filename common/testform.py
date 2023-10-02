@@ -72,7 +72,7 @@ class TestForm(QMainWindow):
         self.DUTMesMac = ''
         self.setIpFlag = False
         self.finalTestResult = False
-        if self.SingleStepTest and self.testcase.Finished:
+        if self.SingleStepTest and self.TestVariables is not None:
             pass
         else:
             self.TestVariables = models.variables.Variables(self.SN, gv.cfg.LTT.channel)
