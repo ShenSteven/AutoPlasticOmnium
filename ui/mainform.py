@@ -256,10 +256,10 @@ class MainForm(Ui_MainWindow, TestForm):
     def init_lab_factory(self, str_):
         if str_ == "lab":
             gv.IsDebug = True
-            self.actionPrivileges.setIcon(QIcon(':/images/lab-icon.png'))
+            self.actionPrivileges.setIcon(QIcon(':/images/UnlockedObject.ico'))
         else:
             gv.IsDebug = False
-            self.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
+            self.actionPrivileges.setIcon(QIcon(':/images/LockedObject.ico'))
             self.actionConvertExcelToJson.setEnabled(False)
             self.actionReloadScript.setEnabled(False)
             self.actionStart.setEnabled(False)
@@ -432,7 +432,12 @@ class MainForm(Ui_MainWindow, TestForm):
             self.tableViewRetModel.clear()
             self.tableViewRetModel.setHorizontalHeaderLabels(self.tableWidgetHeader)
         else:
-            itemList = [QStandardItem(str(vale)) for vale in result_list]
+            itemList = []
+            for i, result in enumerate(result_list):
+                item = QStandardItem(str(result))
+                if result_list[len(result_list) - 1].lower() == 'fail':
+                    item.setForeground(Qt.red)
+                itemList.append(item)
             self.tableViewRetModel.appendRow(itemList)
 
     def on_reloadSeqs(self):
@@ -754,12 +759,12 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_actionEnable_lab(self):
         gv.IsDebug = True
-        self.actionPrivileges.setIcon(QIcon(':/images/lab-icon.png'))
+        self.actionPrivileges.setIcon(QIcon(':/images/UnlockedObject.ico'))
         self.debug_switch(gv.IsDebug)
 
     def on_actionDisable_factory(self):
         gv.IsDebug = False
-        self.actionPrivileges.setIcon(QIcon(':/images/factory.png'))
+        self.actionPrivileges.setIcon(QIcon(':/images/LockedObject.ico'))
         self.debug_switch(gv.IsDebug)
 
     def on_actionAbout(self):
@@ -1419,7 +1424,8 @@ class MainForm(Ui_MainWindow, TestForm):
 
 
 if __name__ == "__main__":
-    app = QApplication([])
-    mainWin = MainForm()
-    mainWin.show()
-    app.exec_()
+    pass
+    # app = QApplication([])
+    # mainWin = MainForm()
+    # mainWin.show()
+    # app.exec_()

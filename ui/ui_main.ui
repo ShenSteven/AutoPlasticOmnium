@@ -458,7 +458,7 @@ font: 20pt &quot;宋体&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>1448</width>
-     <height>31</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="testcase">
@@ -708,7 +708,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionPrivileges">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/images/lab-icon.png</normaloff>:/images/lab-icon.png</iconset>
+     <normaloff>:/images/UnlockedObject.ico</normaloff>:/images/UnlockedObject.ico</iconset>
    </property>
    <property name="text">
     <string>Lab</string>
@@ -901,7 +901,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionEnable_lab">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/images/lab-icon.png</normaloff>:/images/lab-icon.png</iconset>
+     <normaloff>:/images/UnlockedObject.ico</normaloff>:/images/UnlockedObject.ico</iconset>
    </property>
    <property name="text">
     <string>Enable(lab)</string>
@@ -910,7 +910,7 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionDisable_factory">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/images/factory.png</normaloff>:/images/factory.png</iconset>
+     <normaloff>:/images/LockedObject.ico</normaloff>:/images/LockedObject.ico</iconset>
    </property>
    <property name="text">
     <string>Disable(factory)</string>

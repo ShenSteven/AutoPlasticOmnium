@@ -40,20 +40,22 @@ def excepthook(cls, exception, traceback):
 def main():
     sys.excepthook = excepthook
     app = QApplication([])
-    # print("applicationDirPath:", app.applicationDirPath())
+    # try:
+    #     import qdarkgraystyle
+    #     app.setStyleSheet(qdarkgraystyle.load_stylesheet_pyqt5())
+    #     print(qdarkgraystyle.load_stylesheet_pyqt5())
+    # except:
+    #     pass
     try:
-        # if gv.About['__station__'] == 'RUNIN' or gv.About['__station__'] == 'ORT':
         if gv.cfg.RUNIN.IsRUNIN:
             gv.LoginWin = rmf.LoginWind()
             gv.LoginWin.show()
         else:
             gv.MainWin = mf.MainForm()
             gv.MainWin.show()
-
         sys.exit(app.exec_())
     except KeyboardInterrupt:
         gv.lg.logger.fatal('KeyboardInterrupt')
-        pass
 
 
 if __name__ == "__main__":
