@@ -563,18 +563,11 @@ class MainForm(Ui_MainWindow, TestForm):
             else:
                 self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
                 self.actionBreakpoint.setText('Breakpoint Clear')
-            if self.startFlag:
-                self.actionStepping.setEnabled(False)
-                self.actionLooping.setEnabled(False)
-                self.actionCheckAll.setEnabled(False)
-                self.actionUncheckAll.setEnabled(False)
-                sub_menu.setEnabled(False)
-            else:
-                self.actionStepping.setEnabled(True)
-                self.actionLooping.setEnabled(True)
-                self.actionCheckAll.setEnabled(True)
-                self.actionUncheckAll.setEnabled(True)
-                sub_menu.setEnabled(True)
+            self.actionStepping.setEnabled(not self.startFlag)
+            self.actionLooping.setEnabled(not self.startFlag)
+            self.actionCheckAll.setEnabled(not self.startFlag)
+            self.actionUncheckAll.setEnabled(not self.startFlag)
+            sub_menu.setEnabled(not self.startFlag)
             menu.exec_(QCursor.pos())
 
     def on_actionCheckAll(self):
