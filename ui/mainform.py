@@ -243,7 +243,6 @@ class MainForm(Ui_MainWindow, TestForm):
 
         self.tableViewRetModel = QStandardItemModel(0, 9, self.tableViewRet)
         self.tableViewRetModel.setHorizontalHeaderLabels(self.tableWidgetHeader)
-        self.tableViewRet.installEventFilter(self)
         self.tableViewRet.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableViewRet.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableViewRet.horizontalHeader().setStyleSheet(strHeaderQss)
@@ -435,6 +434,7 @@ class MainForm(Ui_MainWindow, TestForm):
             itemList = []
             for i, result in enumerate(result_list):
                 item = QStandardItem(str(result))
+                item.setData(str(result), Qt.ToolTipRole)
                 if result_list[len(result_list) - 1].lower() == 'fail':
                     item.setForeground(Qt.red)
                 itemList.append(item)
@@ -810,13 +810,11 @@ class MainForm(Ui_MainWindow, TestForm):
     def eventFilter(self, obj: 'QObject', event: 'QEvent') -> bool:
         if obj == self.tableViewStepProp and event.type() == QEvent.Type.ContextMenu:
             self.stepMenu.exec(QCursor.pos())
-        if obj == self.tableViewRet and event.type() == QEvent.Type.ContextMenu:
-            rect = QRect(QCursor.pos().x(), QCursor.pos().y(), 50, 10)
-            QToolInfo = self.tableViewRetModel.data(self.tableViewRetModel.index(self.tableViewRet.currentIndex().row(),
-                                                                                 self.tableViewRet.currentIndex().column()))
-            QToolTip.showText(QCursor.pos(), QToolInfo, self, rect, 3000)
-        # if obj == self.treeViewModel:
-        #     print(event, event.type())
+        # if obj == self.tableViewRet and event.type() == QEvent.Type.ContextMenu:
+        #     rect = QRect(QCursor.pos().x(), QCursor.pos().y(), 50, 10)
+        #     QToolInfo = self.tableViewRetModel.data(self.tableViewRetModel.index(self.tableViewRet.currentIndex().row(),
+        #                                                                          self.tableViewRet.currentIndex().column()))
+        #     QToolTip.showText(QCursor.pos(), QToolInfo, self, rect, 3000)
         return super().eventFilter(obj, event)
 
     def on_actionShowStepInfo(self):
