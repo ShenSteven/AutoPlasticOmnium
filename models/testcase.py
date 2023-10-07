@@ -177,6 +177,7 @@ class TestCase:
         self.tResult = True
         self.suiteResultList = []
         self.sumStep = self.stepCount
+        self.stepFinishNum = 0
         self.ForLoop = None
         self.DoWhileLoop = None
         self.WhileLoop = None

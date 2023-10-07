@@ -7,7 +7,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 10,
+        "totalNum": 10,
         "suiteVar": "",
         "steps": [
             {
@@ -365,7 +365,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 2,
+        "totalNum": 2,
         "suiteVar": "",
         "steps": [
             {
@@ -451,7 +451,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 2,
+        "totalNum": 2,
         "suiteVar": "",
         "steps": [
             {
@@ -537,7 +537,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 1,
+        "totalNum": 1,
         "suiteVar": "",
         "steps": [
             {
@@ -589,7 +589,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 2,
+        "totalNum": 2,
         "suiteVar": "",
         "steps": [
             {
@@ -675,7 +675,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 2,
+        "totalNum": 2,
         "suiteVar": "",
         "steps": [
             {
@@ -761,7 +761,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 1,
+        "totalNum": 1,
         "suiteVar": "",
         "steps": [
             {
@@ -813,7 +813,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 1,
+        "totalNum": 1,
         "suiteVar": "",
         "steps": [
             {
@@ -865,7 +865,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 1,
+        "totalNum": 1,
         "suiteVar": "",
         "steps": [
             {

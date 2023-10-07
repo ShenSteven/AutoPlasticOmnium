@@ -7,7 +7,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 7,
+        "totalNum": 7,
         "suiteVar": "",
         "steps": [
             {
@@ -270,7 +270,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 8,
+        "totalNum": 8,
         "suiteVar": "",
         "steps": [
             {

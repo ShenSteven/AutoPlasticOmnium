@@ -82,17 +82,17 @@ def load_testcase_from_excel(testcase_path, sheet_name, json_path, logger):
             test_step = models.step.Step()
             step_count += 1
             for header, cell in dict(zip(headers, line)).items():
-                test_step.index = temp_suite.totalNumber
+                test_step.index = temp_suite.totalNum
                 # test_step.suiteIndex = temp_suite.index
                 if not hasattr(test_step, header):
                     setattr(test_step, header, '')
                 setattr(test_step, header, '' if type(cell.value) is NoneType else str(cell.value).strip())
-                if temp_suite.totalNumber == 0:
+                if temp_suite.totalNum == 0:
                     test_step.SuiteName = temp_suite_name
             # else:
             #     setattr(test_step, 'NeverUsed', None)
 
-            temp_suite.totalNumber += 1
+            temp_suite.totalNum += 1
             temp_suite.steps.append(test_step)
     except Exception as e:
         QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)

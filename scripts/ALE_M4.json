@@ -7,7 +7,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 5,
+        "totalNum": 5,
         "suiteVar": "",
         "steps": [
             {
@@ -150,7 +150,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {
@@ -243,7 +243,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {
@@ -336,7 +336,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {
@@ -429,7 +429,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {
@@ -522,7 +522,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {
@@ -615,7 +615,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {
@@ -708,7 +708,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {
@@ -801,7 +801,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {
@@ -894,7 +894,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 3,
+        "totalNum": 3,
         "suiteVar": "",
         "steps": [
             {

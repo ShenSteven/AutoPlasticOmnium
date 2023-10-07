@@ -543,14 +543,11 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_treeWidgetMenu(self):
         if gv.IsDebug:
             menu = QMenu(self.treeView)
+            sub_menu = QMenu("Edit", menu)
+            sub_menu.setObjectName("Edit")
+            sub_menu.setIcon(QIcon(':/images/edit.png'))
             if not gv.IsHide:
-                sub_menu = QMenu(menu)
-                sub_menu.setObjectName("Edit")
-                sub_menu.setTitle("Edit")
                 menu.addMenu(sub_menu)
-                icon7 = QIcon()
-                icon7.addPixmap(QPixmap(":/images/edit.png"), QIcon.Normal, QIcon.Off)
-                sub_menu.setIcon(icon7)
                 sub_menu.addAction(self.actionCopy)
                 sub_menu.addAction(self.actionPaste)
                 sub_menu.addAction(self.actionDelete)
@@ -566,6 +563,18 @@ class MainForm(Ui_MainWindow, TestForm):
             else:
                 self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
                 self.actionBreakpoint.setText('Breakpoint Clear')
+            if self.startFlag:
+                self.actionStepping.setEnabled(False)
+                self.actionLooping.setEnabled(False)
+                self.actionCheckAll.setEnabled(False)
+                self.actionUncheckAll.setEnabled(False)
+                sub_menu.setEnabled(False)
+            else:
+                self.actionStepping.setEnabled(True)
+                self.actionLooping.setEnabled(True)
+                self.actionCheckAll.setEnabled(True)
+                self.actionUncheckAll.setEnabled(True)
+                sub_menu.setEnabled(True)
             menu.exec_(QCursor.pos())
 
     def on_actionCheckAll(self):
@@ -686,10 +695,12 @@ class MainForm(Ui_MainWindow, TestForm):
                 self.pauseFlag = True
                 self.actionStart.setIcon(QIcon(':/images/Start-icon.png'))
                 self.pause_event.clear()
+                self.treeView.blockSignals(False)
             else:
                 self.pauseFlag = False
                 self.actionStart.setIcon(QIcon(':/images/Pause-icon.png'))
                 self.pause_event.set()
+                self.treeView.blockSignals(True)
         else:
             self.on_returnPressed()
 

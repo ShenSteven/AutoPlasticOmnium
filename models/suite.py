@@ -26,7 +26,7 @@ class TestSuite:
         self.isTest = True
         self.suiteResult = True
         self.isTestFinished = False
-        self.totalNumber = 0
+        self.totalNum = 0
         self.suiteVar = ''
         self.steps = []
         self.start_time = ""
@@ -59,7 +59,7 @@ class TestSuite:
         if self.logger is None:
             self.logger = test_case.logger
         if not self.isTest:
-            test_case.sumStep = test_case.sumStep - self.totalNumber
+            test_case.sumStep = test_case.sumStep - self.totalNum
             self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.stepFinishNum, test_case.sumStep)
             self.setColor(Qt.gray)
             self.suiteResult = True

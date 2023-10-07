@@ -7,7 +7,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 13,
+        "totalNum": 13,
         "suiteVar": "",
         "steps": [
             {
@@ -467,7 +467,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 11,
+        "totalNum": 11,
         "suiteVar": "",
         "steps": [
             {
@@ -859,7 +859,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 5,
+        "totalNum": 5,
         "suiteVar": "",
         "steps": [
             {
@@ -1047,7 +1047,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 5,
+        "totalNum": 5,
         "suiteVar": "",
         "steps": [
             {
@@ -1235,7 +1235,7 @@
         "isTest": true,
         "suiteResult": true,
         "isTestFinished": false,
-        "totalNumber": 5,
+        "totalNum": 5,
         "suiteVar": "",
         "steps": [
             {

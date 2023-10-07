@@ -612,7 +612,7 @@ class Step:
                         return True
                 if not isinstance(self.myWind, ui.mainform.MainForm):
                     self.myWind.mySignals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
-                                                                         f"<A href='file:///{self.myWind.txtLogPath}'>{self.StepName}</A>")
+                                                                        f"<A href='file:///{self.myWind.txtLogPath}'>{self.StepName}</A>")
                 self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
                                   f"Keyword:{self.Keyword},Retry:{self.Retry},Timeout:{self.Timeout}s,"
                                   f"SubStr:{self.SubStr1} - {self.SubStr2},"
@@ -625,8 +625,8 @@ class Step:
                     self.setColor(Qt.gray)
                 self.test_result = True
                 self.status = str(self.test_result)
-                test_case.stepFinishNum = test_case.stepFinishNum - 1
-                test_case.sumStep = test_case.sumStep - 1
+                test_case.stepFinishNum += 1
+                # test_case.sumStep -= 1
                 self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.stepFinishNum, test_case.sumStep)
                 return True
         except Exception as e:
@@ -673,12 +673,12 @@ class Step:
                 else:
                     self.logger.debug(f"Step test fail, don't setGlobalVar:{self.SetGlobalVar}")
             self.record_date_to_db(test_case, self.test_result)
-            test_case.stepFinishNum = test_case.stepFinishNum + 1
+            test_case.stepFinishNum += 1
             if (test_case.ForLoop is not None and not test_case.ForLoop.IsEnd) or \
                     (test_case.DoWhileLoop is not None and not test_case.DoWhileLoop.IsEnd) or \
                     (test_case.WhileLoop is not None and not test_case.WhileLoop.IsEnd):
                 # if test_case.loop is not None and not test_case.loop.IsEnd:
-                test_case.sumStep = test_case.sumStep + 1
+                test_case.sumStep += 1
             self.myWind.mySignals.updateProgressBar[int, int].emit(test_case.stepFinishNum, test_case.sumStep)
             self.clear()
             test_case.IfElseFlow.clear(self.IfElse)
@@ -690,6 +690,7 @@ class Step:
                 self.myWind.mySignals.setIconSignal[QAction, QIcon].emit(
                     self.myWind.actionStart, QIcon(':/images/Start-icon.png'))
             self.myWind.pause_event.clear()
+            self.myWind.treeView.blockSignals(False)
         else:
             self.myWind.pause_event.set()
 
