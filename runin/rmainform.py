@@ -84,9 +84,9 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.lb_info.setText('Please scan sn.')
         self.setWindowTitle('RUNIN/ORT ' + gv.VERSION)
         self.initCellUi()
-        self.lineEdit.returnPressed.connect(self.locationInput)
-        self.lineEdit_2.textEdited.connect(self.on_textEdited)
-        self.lineEdit_2.returnPressed.connect(self.start_cell)
+        self.lineEdit_1.returnPressed.connect(self.locationInput)
+        self.lineEdit.textEdited.connect(self.on_textEdited)
+        self.lineEdit.returnPressed.connect(self.start_cell)
         self.bt_openLog.clicked.connect(on_actionLogFolder)
 
     def initCellUi(self):
@@ -100,12 +100,13 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
                 widget_cell.setObjectName(f"widget_{row + 1}{col + 1}")
                 self.gridLayout.addWidget(widget_cell, row, col, 1, 1)
                 self.CellList.append(widget_cell)
-        self.lineEdit.setFocus()
+        self.lineEdit_1.setFocus()
+        self.lineEdit.setMaxLength(gv.cfg.dut.snLen)
 
     def locationInput(self):
         try:
-            if len(self.lineEdit.text().strip()) == 3:
-                self.lineEdit_2.setFocus()
+            if len(self.lineEdit_1.text().strip()) == 3:
+                self.lineEdit.setFocus()
             else:
                 QMessageBox.critical(None, "Exception", "Location length error")
                 self.clear_input()
@@ -116,11 +117,11 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
 
     def start_cell(self):
         try:
-            scanSN = self.lineEdit_2.text().strip()
-            localNo = int(self.lineEdit.text().strip()[1:])
+            scanSN = self.lineEdit.text().strip()
+            localNo = int(self.lineEdit_1.text().strip()[1:])
             if getattr(sys, 'frozen', True):
                 if scanSN in gv.CheckSnList:
-                    self.lineEdit_2.setStyleSheet("background-color: rgb(255, 85, 255);")
+                    self.lineEdit.setStyleSheet("background-color: rgb(255, 85, 255);")
                     self.lb_info.setText('SN is repetitive!')
                     self.clear_input()
                     return
@@ -128,17 +129,17 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
                 if not self.CellList[localNo - 1].startFlag:
                     self.clear_input()
                     self.init_cell_param(localNo, scanSN)
+                    self.lineEdit_1.setStyleSheet("background-color: rgb(255, 255, 255);")
                     self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 255);")
-                    self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 255);")
                     self.lb_info.setText('')
                 else:
+                    self.lineEdit_1.setStyleSheet("background-color: rgb(255, 255, 0);")
                     self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 0);")
-                    self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 0);")
                     self.lb_info.setText('Location is testing!')
                     self.clear_input()
             else:
                 if len(scanSN) != gv.cfg.dut.snLen:
-                    self.lineEdit_2.setStyleSheet("background-color: rgb(255, 0, 0);")
+                    self.lineEdit.setStyleSheet("background-color: rgb(255, 0, 0);")
                     self.lb_info.setText('SN length error!')
                     self.clear_input()
         except Exception as e:
@@ -148,7 +149,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
     def on_textEdited(self):
         def JudgeProdMode():
             """通过SN判断机种"""
-            sn = self.lineEdit_2.text()
+            sn = self.lineEdit.text()
             if sn[0] == 'J' or sn[0] == '6':
                 self.dutModel = gv.cfg.dut.dutModels[0]
             elif sn[0] == 'N' or sn[0] == '7':
@@ -164,7 +165,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         if JudgeProdMode() != 'unknown' and not gv.IsDebug:
             reg = QRegExp(gv.cfg.dut.dutSNRegex[self.dutModel])
             pValidator = QRegExpValidator(reg, self)
-            self.lineEdit_2.setValidator(pValidator)
+            self.lineEdit.setValidator(pValidator)
 
     def init_cell_param(self, localNo, sn):
         self.CellList[localNo - 1].lb_sn.setText(sn)
@@ -175,9 +176,9 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
             gv.CheckSnList.append(sn)
 
     def clear_input(self):
+        self.lineEdit_1.setText('')
         self.lineEdit.setText('')
-        self.lineEdit_2.setText('')
-        self.lineEdit.setFocus()
+        self.lineEdit_1.setFocus()
 
 
 if __name__ == "__main__":

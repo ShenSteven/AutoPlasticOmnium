@@ -39,7 +39,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.row_index = row
         self.col_index = col
         self.testcase: models.testcase.TestCase = models.testcase.TestCase(rf'{gv.ExcelFilePath}',
-                                                                         f'{gv.cfg.station.stationName}', self.logger,
+                                                                           f'{gv.cfg.station.stationName}', self.logger,
                                                                            self, False)
         self.setupUi(self)
         self.init_cell_ui()
@@ -161,14 +161,6 @@ class Cell(QFrame, Ui_cell, TestForm):
             self.continue_fail_count = 0
         else:
             self.continue_fail_count += 1
-
-    # def timing(self, flag):
-    #     if flag:
-    #         self.logger.debug('start timing...')
-    #         self.timer = self.startTimer(1000)
-    #     else:
-    #         self.logger.debug('stop timing...')
-    #         self.killTimer(self.timer)
 
     def timerEvent(self, a):
         self.mySignals.updateLabel[QLabel, str].emit(self.lb_testTime, strftime("%H:%M:%S", gmtime(self.sec)))

@@ -199,11 +199,11 @@ class MainForm(Ui_MainWindow, TestForm):
         self.lineEdit.setFocus()
         self.lineEdit.setMaxLength(gv.cfg.dut.snLen)
         # 自定义文本验证器
-        reg = QRegExp('^[A-Z0-9]{' + f'{gv.cfg.dut.snLen},' + f'{gv.cfg.dut.snLen}' + '}')
-        pValidator = QRegExpValidator(self.lineEdit)
-        pValidator.setRegExp(reg)
-        # if not gv.IsDebug:
-        #     self.lineEdit.setValidator(pValidator)
+        # reg = QRegExp('^[A-Z0-9]{' + f'{gv.cfg.dut.snLen},' + f'{gv.cfg.dut.snLen}' + '}')
+        # pValidator = QRegExpValidator(self.lineEdit)
+        # pValidator.setRegExp(reg)
+        # # if not gv.IsDebug:
+        # #     self.lineEdit.setValidator(pValidator)
 
     def init_graphicsView(self):
         self.canvas = FigureCanvas(self.sinWave())
