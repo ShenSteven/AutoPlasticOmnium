@@ -81,7 +81,7 @@ class TestCase:
             self.testcasePath = testcase_path
             self.logger = logger
             if not getattr(sys, 'frozen', False) and cflag:
-                models.loadseq.excel_convert_to_json(self.testcasePath, gv.cfg.station.station_all, self.logger)
+                models.loadseq.excel_convert_to_json(self.testcasePath, gv.cfg.station.stationAll, self.logger)
             if not os.path.exists(self.test_script_json):
                 models.loadseq.excel_convert_to_json(self.testcasePath, [sheet_name], self.logger)
             if gv.IsHide:
@@ -189,22 +189,22 @@ class TestCase:
             self.dutComm.close()
         if gv.PLin is not None:
             gv.PLin.close()
-        if gv.cfg.station.fix_flag and gv.cfg.station.pop_fix and self.FixSerialPort is not None:
+        if gv.cfg.station.fixFlag and gv.cfg.station.pop_fix and self.FixSerialPort is not None:
             self.FixSerialPort.open()
             self.FixSerialPort.sendCommand('AT+TESTEND%', )
 
     def get_stationNo(self):
         """通过串口读取治具中设置的测试工站名字"""
-        if not gv.cfg.station.fix_flag:
+        if not gv.cfg.station.fixFlag:
             return
-        self.FixSerialPort = dal.serialport.SerialPort(gv.cfg.station.fix_com_port,
-                                                       gv.cfg.station.fix_com_baudRate)
+        self.FixSerialPort = dal.serialport.SerialPort(gv.cfg.station.fixComPort,
+                                                       gv.cfg.station.fixComBaudRate)
         for i in range(0, 3):
             rReturn, revStr = self.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
             if rReturn:
-                gv.cfg.station.station_no = revStr.replace('\r\n', '').strip()
-                gv.cfg.station.station_name = gv.cfg.station.station_no[0, gv.cfg.station.station_no.index('-')]
-                self.logger.debug(f"Read fix number success,stationName:{gv.cfg.station.station_name}")
+                gv.cfg.station.stationNo = revStr.replace('\r\n', '').strip()
+                gv.cfg.station.stationName = gv.cfg.station.stationNo[0, gv.cfg.station.stationNo.index('-')]
+                self.logger.debug(f"Read fix number success,stationName:{gv.cfg.station.stationName}")
                 break
         else:
             QMessageBox.Critical(self, 'Read StationNO', "Read FixNum error,Please check it!")

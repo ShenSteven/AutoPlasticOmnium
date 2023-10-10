@@ -39,7 +39,7 @@ class Cell(QFrame, Ui_cell, TestForm):
         self.row_index = row
         self.col_index = col
         self.testcase: models.testcase.TestCase = models.testcase.TestCase(rf'{gv.ExcelFilePath}',
-                                                                         f'{gv.cfg.station.station_name}', self.logger,
+                                                                         f'{gv.cfg.station.stationName}', self.logger,
                                                                            self, False)
         self.setupUi(self)
         self.init_cell_ui()
@@ -128,10 +128,10 @@ class Cell(QFrame, Ui_cell, TestForm):
         """测试变量初始化"""
         gv.InitCreateDirs(self.logger)
         self.init_variable(SN)
-        self.testcase.jsonObj = models.product.JsonObject(SN, gv.cfg.station.station_no,
-                                                          gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
-        self.testcase.daqDataPath = rf'{gv.OutPutPath}{os.sep}{gv.cfg.station.station_no}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
-        self.testcase.mesPhases = models.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
+        self.testcase.jsonObj = models.product.JsonObject(SN, gv.cfg.station.stationNo,
+                                                          gv.cfg.dut.testMode, gv.cfg.dut.sdkVer, gv.VERSION)
+        self.testcase.daqDataPath = rf'{gv.OutPutPath}{os.sep}{gv.cfg.station.stationNo}_{self.LocalNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
+        self.testcase.mesPhases = models.product.MesInfo(SN, gv.cfg.station.stationNo, gv.VERSION)
         self.testcase.startTimeJson = datetime.now()
         self.TestVariables = models.variables.Variables(SN, str(self.LocalNo), str(gv.cfg.LTT.row))
         self.txtLogPath = rf'{gv.LogFolderPath}{os.sep}logging_{self.LocalNo}_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
@@ -155,7 +155,7 @@ class Cell(QFrame, Ui_cell, TestForm):
             self.fileHandle = gv.lg.logger.handlers[1]
 
     def UpdateContinueFail(self, testResult: bool):
-        if gv.IsDebug or gv.cfg.dut.test_mode.lower() == 'debug':
+        if gv.IsDebug or gv.cfg.dut.testMode.lower() == 'debug':
             return
         if testResult:
             self.continue_fail_count = 0

@@ -101,7 +101,7 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('AppS19Info')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    file_path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.station_name}{os.sep}{step.myWind.dut_model}{os.sep}{step.CmdOrParam}"
+    file_path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
     step.testValue = time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(file_path)))
     rReturn = True
     return rReturn, compInfo
@@ -146,7 +146,7 @@ def _testKeyword_what(kw, step, test_case):
         if not IsNullOrEmpty(step.CmdOrParam):
             test_case.dutComm = TelnetComm(step.logger, step.CmdOrParam, gv.cfg.dut.prompt)
         else:
-            test_case.dutComm = TelnetComm(step.logger, gv.cfg.dut.dut_ip, gv.cfg.dut.prompt)
+            test_case.dutComm = TelnetComm(step.logger, gv.cfg.dut.dutIP, gv.cfg.dut.prompt)
     rReturn = test_case.dutComm.open(gv.cfg.dut.prompt)
     return rReturn, compInfo
 
@@ -303,7 +303,7 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('UDSTransferData')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.station_name}{os.sep}{step.myWind.dut_model}{os.sep}{step.CmdOrParam}"
+    path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
     s19datas = gv.PLin.get_datas(path)
     step.logger.debug(path)
     rReturn = gv.PLin.TransferData(step.ID, step.NAD, s19datas, step.PCI_LEN, step.Timeout)
@@ -330,7 +330,7 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('GetCRC')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.station_name}{os.sep}{step.myWind.dut_model}{os.sep}{step.CmdOrParam}"
+    path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
     step.testValue = peak.plin.peaklin.PeakLin.get_crc_apps19(step.logger, path)
     rReturn = not IsNullOrEmpty(step.testValue)
     return rReturn, compInfo
@@ -339,7 +339,7 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('SrecGetStartAdd')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    cmd = rf"{gv.CurrentDir}{os.sep}tool{os.sep}srec_info.exe {gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.station_name}{os.sep}{step.myWind.dut_model}\{step.CmdOrParam}"
+    cmd = rf"{gv.CurrentDir}{os.sep}tool{os.sep}srec_info.exe {gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}\{step.CmdOrParam}"
     rReturn, revStr = run_cmd(step.logger, cmd)
 
     if rReturn:
@@ -352,7 +352,7 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('SrecGetLen')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    cmd = rf"{gv.CurrentDir}\tool\srec_info.exe {gv.CurrentDir}\flash\{gv.cfg.station.station_name}\{step.myWind.dut_model}\{step.CmdOrParam}"
+    cmd = rf"{gv.CurrentDir}\tool\srec_info.exe {gv.CurrentDir}\flash\{gv.cfg.station.stationName}\{step.myWind.dutModel}\{step.CmdOrParam}"
     rReturn, revStr = run_cmd(step.logger, cmd)
     if rReturn:
         data_len = int(revStr.split()[-1], 16) - int(revStr.split()[-3], 16) + 1

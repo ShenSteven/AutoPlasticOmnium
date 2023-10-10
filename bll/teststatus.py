@@ -35,15 +35,15 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.startFlag = True
                 myWind.mySignals.timingSignal[bool].emit(True)
                 print(
-                    f"Start test,SN:{myWind.SN},CellNO={myWind.LocalNo},Station:{gv.cfg.station.station_no},DUTMode:{myWind.dut_model},"
-                    f"TestMode:{gv.cfg.dut.test_mode},IsDebug:{gv.IsDebug},FTC:{gv.cfg.station.fail_continue},"
+                    f"Start test,SN:{myWind.SN},CellNO={myWind.LocalNo},Station:{gv.cfg.station.stationNo},DUTMode:{myWind.dutModel},"
+                    f"TestMode:{gv.cfg.dut.testMode},IsDebug:{gv.IsDebug},FTC:{gv.cfg.station.failContinue},"
                     f"SoftVersion:{gv.VERSION},WebPS={myWind.WebPsIp}")
             else:
                 myWind.treeView.blockSignals(True)
                 if not myWind.SingleStepTest:
                     myWind.mySignals.textEditClearSignal[str].emit('')
                 myWind.mySignals.lineEditEnableSignal[bool].emit(False)
-                if gv.cfg.station.station_name in ['M4', 'M6', 'SX5GEV']:
+                if gv.cfg.station.stationName in ['M4', 'M6', 'SX5GEV']:
                     myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'Flashing', 36,
                                                                                 Qt.yellow)
                 else:
@@ -57,9 +57,9 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                 myWind.mySignals.controlEnableSignal[QAction, bool].emit(myWind.actionStop, True)
                 myWind.startFlag = True
                 myWind.logger.debug(
-                    f"Start test,SN:{myWind.SN},Station:{gv.cfg.station.station_no},DUTMode:{myWind.dut_model},"
-                    f"TestMode:{gv.cfg.dut.test_mode},IsDebug:{gv.IsDebug},"
-                    f"FTC:{gv.cfg.station.fail_continue},SoftVersion:{gv.VERSION}")
+                    f"Start test,SN:{myWind.SN},Station:{gv.cfg.station.stationNo},DUTMode:{myWind.dutModel},"
+                    f"TestMode:{gv.cfg.dut.testMode},IsDebug:{gv.IsDebug},"
+                    f"FTC:{gv.cfg.station.failContinue},SoftVersion:{gv.VERSION}")
                 myWind.mySignals.update_tableWidget[list].emit([])
                 myWind.pause_event.set()
         elif status == TestStatus.FAIL:
@@ -78,7 +78,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
                                                                             20, Qt.red)
                 myWind.UpdateContinueFail(False)
                 if myWind.setIpFlag:
-                    myWind.testcase.dutComm.send_command(f"luxsetip {gv.cfg.dut.dut_ip} 255.255.255.0",
+                    myWind.testcase.dutComm.send_command(f"luxsetip {gv.cfg.dut.dutIP} 255.255.255.0",
                                                          gv.cfg.dut.prompt, 1)
         elif status == TestStatus.PASS:
             if gv.LoginWin is not None:

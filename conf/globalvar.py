@@ -70,17 +70,17 @@ pMsg33 = None
 
 def CreateSubLogFolder():
     global LogFolderPath, CriticalLog, ErrorsLog
-    LogFolderPath = ensure_path_sep(join(cfg.station.log_folder, datetime.now().strftime('%Y%m%d')))
+    LogFolderPath = ensure_path_sep(join(cfg.station.logFolder, datetime.now().strftime('%Y%m%d')))
     try:
         if not exists(LogFolderPath):
             os.makedirs(LogFolderPath)
     except FileNotFoundError:
-        cfg.station.log_folder = ensure_path_sep(join(CurrentDir, 'TestLog'))
-        LogFolderPath = ensure_path_sep(join(cfg.station.log_folder, datetime.now().strftime('%Y%m%d')))
+        cfg.station.logFolder = ensure_path_sep(join(CurrentDir, 'TestLog'))
+        LogFolderPath = ensure_path_sep(join(cfg.station.logFolder, datetime.now().strftime('%Y%m%d')))
         if not exists(LogFolderPath):
             os.makedirs(LogFolderPath)
-    CriticalLog = (join(cfg.station.log_folder, 'critical.log').replace('\\', '/'))
-    ErrorsLog = (join(cfg.station.log_folder, 'errors.log').replace('\\', '/'))
+    CriticalLog = (join(cfg.station.logFolder, 'critical.log').replace('\\', '/'))
+    ErrorsLog = (join(cfg.station.logFolder, 'errors.log').replace('\\', '/'))
 
 
 CreateSubLogFolder()
@@ -99,7 +99,7 @@ def InitCreateDirs(logger=None):
         os.makedirs(LogFolderPath + rf"{os.sep}Json", exist_ok=True)
         os.makedirs(OutPutPath, exist_ok=True)
         os.makedirs(DataPath, exist_ok=True)
-        os.makedirs(cfg.station.log_folder + rf"{os.sep}CsvData{os.sep}Upload", exist_ok=True)
+        os.makedirs(cfg.station.logFolder + rf"{os.sep}CsvData{os.sep}Upload", exist_ok=True)
     except Exception as e:
         raise Exception(f'{currentframe().f_code.co_name}:{e}')
 

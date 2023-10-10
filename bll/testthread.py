@@ -61,7 +61,7 @@ class TestThread(QThread):
                         result = self.myWind.testcase.run()
                         result1 = upload_Json_to_client(self.myWind.logger, self.myWind.rs_url, self.myWind.txtLogPath,
                                                         self.myWind.SN, self.myWind.testcase.jsonObj)
-                        result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mes_result,
+                        result2 = upload_result_to_mes(self.myWind.logger, self.myWind.mesUrl,
                                                        self.myWind.testcase.mesPhases)
                         self.myWind.finalTestResult = result & result1 & result2
                         collect_data_to_csv(self.myWind.testcase.mesPhases, self.myWind.testcase.csvListHeader,

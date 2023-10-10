@@ -5,24 +5,24 @@
 # sudo apt-get install qttools5-dev-tools   #linux
 # sudo apt-get install qttools5-dev         #linux
 # /usr/bin/designer                         #linux
-#=====PyUIC=====
+# todo =====PyUIC=====
 #$PyInterpreterDirectory$\pyuic5.exe
 #$PyInterpreterDirectory$/pyuic5    #linux
 #$FileName$ -o $FileNameWithoutExtension$.py
 #$FileDir$
-#=====PyRcc=====
+# todo =====PyRcc=====
 #$PyInterpreterDirectory$\pyrcc5.exe
 #$PyInterpreterDirectory$pyrcc5                 #linux
 #$FileName$ -o $FileNameWithoutExtension$_rc.py
 #$FileDir$
-#=====.spec=====
+# todo =====.spec=====
 # $PyInterpreterDirectory$\pyinstaller.exe
 # $PyInterpreterDirectory$/pyinstaller          #linux
 # sudo apt-get install python3.11-dev           #linux
 # -y $FileName$
 #--clean -y  $FileName$
 # $FileDir$
-#======D:\PythonDev\pyside2\venv\Lib\site-packages\PyInstaller\building\utils.py  line:435========
+# todo ======D:\PythonDev\pyside2\venv\Lib\site-packages\PyInstaller\building\utils.py  line:435========
 #             except PermissionError:
 #                 os.system(f'rmdir /S /Q {path}')
 
@@ -50,4 +50,4 @@ pyodbc~=4.0.39
 PyMySQL==1.1.0
 python-can==4.2.2
 PyAutoGUI~=0.9.54
-tk ~=0.1.0 # only Liunx
+tk~=0.1.0 # only Liunx

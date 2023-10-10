@@ -35,14 +35,12 @@ def check_connection(logger, url):
 
 def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
     """上传json内容和测试log到客户服务器"""
-    return True
     json_upload_path = os.path.join(gv.LogFolderPath, 'Json', f'{SN}_{time.strftime("%H%M%S")}.json')
-    # gv.jsonOfResult = json_upload_path
     jsonStr = json.dumps(jsonObj, default=lambda o: o.__dict__, sort_keys=True, indent=4)
     with open(json_upload_path, 'w') as fw:
         fw.write(jsonStr)
     logger.debug(jsonStr)
-
+    return True
     if not check_connection(logger, url):
         return False
     # read_json = open(json_upload_path, "r").read()
@@ -72,26 +70,26 @@ def upload_Json_to_client(logger, url, log_path, SN, jsonObj):
 
 def collect_data_to_csv(mesPhases, csv_list_header, csv_list_data, myWind):
     def thread_update():
-        myWind.testcase.csvFilePath = fr'{gv.cfg.station.log_folder}{os.sep}CsvData{os.sep}{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cfg.station.station_no}.csv'
+        myWind.testcase.csvFilePath = fr'{gv.cfg.station.logFolder}{os.sep}CsvData{os.sep}{time.strftime("%Y-%m-%d--%H")}-00-00_{gv.cfg.station.stationNo}.csv'
         csvColumnPath = fr'{gv.ScriptFolder}{os.sep}csv_column.txt'
-        fix_header = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
+        csv_header_fix = ["DEVICE_TYPE", "STATION_TYPE", "FACILITY_ID", "LINE_ID", "FIXTURE_ID", "DUT_POSITION", "SN",
                       "FW_VERSION", "HW_REVISION", "SW_VERSION", "START_TIME", "TEST_DURATION", "DUT_TEST_RESULT",
                       "FIRST_FAIL", "ERROR_CODE", "TIME_ZONE", "TEST_DEBUG", "JSON_UPLOAD", "MES_UPLOAD"]
-        fix_header.extend(csv_list_header)
+        csv_header_fix.extend(csv_list_header)
         updateColumn = myWind.finalTestResult and not gv.IsDebug
-        create_csv_file(myWind.logger, myWind.testcase.csvFilePath, fix_header, updateColumn)
+        create_csv_file(myWind.logger, myWind.testcase.csvFilePath, csv_header_fix, updateColumn)
         if os.path.exists(csvColumnPath):
             os.remove(csvColumnPath)
         with open(csvColumnPath, 'w') as f:
-            header = '\t'.join(fix_header)
+            header = '\t'.join(csv_header_fix)
             f.write(header)
-        fix_header_value = [myWind.dut_model, gv.cfg.station.station_name, "Luxxxxx", myWind.WorkOrder,
-                            gv.cfg.station.station_no,
-                            "1", myWind.SN, gv.cfg.dut.qsdk_ver, mesPhases.HW_REVISION, gv.VERSION,
+        fix_header_value = [myWind.dutModel, gv.cfg.station.stationName, "Luxxxxx", myWind.WorkOrder,
+                            gv.cfg.station.stationNo,
+                            "1", myWind.SN, gv.cfg.dut.sdkVer, mesPhases.HW_REVISION, gv.VERSION,
                             time.strftime("%Y/%m/%d %H:%M:%S"), str(myWind.sec),
                             myWind.finalTestResult,
                             mesPhases.first_fail, myWind.testcase.errorDetailsFirstFail, "UTC",
-                            gv.cfg.dut.test_mode,
+                            gv.cfg.dut.testMode,
                             mesPhases.JSON_UPLOAD, mesPhases.MES_UPLOAD]
         fix_header_value.extend(csv_list_data)
         myWind.logger.debug(f'CollectResultToCsv {myWind.testcase.csvFilePath}')

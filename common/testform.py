@@ -48,9 +48,9 @@ class TestForm(QMainWindow):
         self.testcase = None
         self.SN = ''
         self.txtLogPath = ''
-        self.dut_model = ''
-        self.shop_floor_url = ''
-        self.mes_result = ''
+        self.dutModel = ''
+        self.shopFloorUrl = ''
+        self.mesUrl = ''
         self.rs_url = ''
         self.WorkOrder = '1'
         self.DUTMesIP = ''
@@ -64,8 +64,8 @@ class TestForm(QMainWindow):
         self.sec = 1
         self.SN = sn
         self.txtLogPath = rf'{gv.LogFolderPath}{os.sep}logging_{self.SN}_details_{time.strftime("%H-%M-%S")}.txt'
-        self.shop_floor_url = f'http://{gv.cfg.station.mes_shop_floor}/api/CHKRoute/serial/{self.SN}/station/{gv.cfg.station.station_name}'
-        self.mes_result = f'http://{gv.cfg.station.mes_result}/api/2/serial/{self.SN}/station/{gv.cfg.station.station_no}/info'
+        self.shopFloorUrl = f'http://{gv.cfg.station.mesShopFloor}/api/CHKRoute/serial/{self.SN}/station/{gv.cfg.station.stationName}'
+        self.mesUrl = f'http://{gv.cfg.station.mesServer}/api/2/serial/{self.SN}/station/{gv.cfg.station.stationNo}/info'
         self.rs_url = gv.cfg.station.rs_url
         self.WorkOrder = '1'
         self.DUTMesIP = ''

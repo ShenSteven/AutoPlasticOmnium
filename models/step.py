@@ -150,7 +150,7 @@ class Step:
             self._isTest = not self.myWind.testcase.IfElseFlow.ifCond_all
         if not IsNullOrEmpty(self.IfElse) and str(self.IfElse).lower() == 'elif':
             self._isTest = not self.myWind.testcase.IfElseFlow.ifCond_all
-        if not IsNullOrEmpty(self.Model) and self.myWind.dut_model.lower() not in self.Model.lower().split():
+        if not IsNullOrEmpty(self.Model) and self.myWind.dutModel.lower() not in self.Model.lower().split():
             self._isTest = False
         if self.myWind.SingleStepTest:
             self._isTest = True
@@ -333,11 +333,11 @@ class Step:
     @property
     def FTC(self):
         if not hasattr(self, '_FTC'):
-            return 'Y' if gv.cfg.station.fail_continue else 'N'
+            return 'Y' if gv.cfg.station.failContinue else 'N'
         elif self._FTC.lower() == 'n' or self._FTC.lower() == 'y':
             return self._FTC.upper()
         else:
-            return 'Y' if gv.cfg.station.fail_continue else 'N'
+            return 'Y' if gv.cfg.station.failContinue else 'N'
 
     @FTC.setter
     def FTC(self, value):
@@ -640,7 +640,7 @@ class Step:
             self.set_breakpoint()
             for retry in range(self.Retry, -1, -1):
                 if self.myWind.pause_event.wait():
-                    if gv.cfg.dut.test_mode == 'debug' or gv.IsDebug and self.Keyword in gv.cfg.dut.debug_skip:
+                    if gv.cfg.dut.testMode == 'debug' or gv.IsDebug and self.Keyword in gv.cfg.dut.debugSkip:
                         self.logger.debug('This is debug mode.Skip this step.')
                         self.test_result, info = True, ''
                     else:
@@ -706,8 +706,8 @@ class Step:
         SQL_statements = f'''INSERT INTO RESULT 
                       (ID,SN,STATION_NAME,STATION_NO,MODEL,SUITE_NAME,ITEM_NAME,SPEC,LSL,VALUE,USL,
                       ELAPSED_TIME,ERROR_CODE,ERROR_DETAILS,START_TIME,TEST_RESULT,STATUS) 
-                      VALUES (NULL,'{test_case.myWind.SN}','{gv.cfg.station.station_name}','{gv.cfg.station.station_no}',
-                      '{test_case.myWind.dut_model}','{self.SuiteName}','{self.StepName}','{self.SPEC}','{self.LSL}',
+                      VALUES (NULL,'{test_case.myWind.SN}','{gv.cfg.station.stationName}','{gv.cfg.station.stationNo}',
+                      '{test_case.myWind.dutModel}','{self.SuiteName}','{self.StepName}','{self.SPEC}','{self.LSL}',
                       '{self.testValue}','{self.USL}',{self.elapsedTime},'{self.error_code}','{self.error_details}',
                       '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
                       '''

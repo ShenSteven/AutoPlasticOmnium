@@ -11,40 +11,38 @@ import yaml
 
 class Conf:
     privileges: str
-    station_all: list
-    station_name: str
-    station_no: str
-    log_folder: str
-    log_server: str
-    log_server_username: str
-    log_server_password: str
-    fix_flag: bool
-    fix_com_port: str
-    fix_com_baudRate: int
-    GPIB_address: int
+    stationAll: list
+    stationName: str
+    stationNo: str
+    logFolder: str
+    logServer: str
+    logServerUser: str
+    logServerPwd: str
+    fixFlag: bool
+    fixComPort: str
+    fixComBaudRate: int
+    GPIBPort: int
     testcase: str
-    fail_continue: bool
-    mes_shop_floor: str
-    mes_result: str
+    failContinue: bool
+    mesShopFloor: str
+    mesServer: str
     rs_url: str
-    csv_column: str
-    continue_fail_limit: int
+    continueFailLimit: int
     setTimeZone: str
 
     prompt: str
-    dut_ip: str
-    dut_com_port: str
-    dut_com_baudRate: int
-    ssh_port: int
-    ssh_username: str
-    ssh_password: str
-    dut_models: list
-    dut_regex: dict
-    data_api: dict
-    sn_len: int
-    qsdk_ver: str
-    test_mode: str
-    debug_skip: list
+    dutIP: str
+    dutComPort: str
+    dutComBaudRate: int
+    sshUser: str
+    sshPwd: str
+    dutModels: list
+    dutSNRegex: dict
+    dataAPI: dict
+    snLen: int
+    sdkVer: str
+    testMode: str
+    debugSkip: list
 
     def __init__(self, dict_=None):
         if dict_ is not None:
@@ -105,5 +103,5 @@ def read_yaml(yaml_file):
 if __name__ == '__main__':
     pass
     cf = read_config('config.yaml', Configs)
-    cf.station.station_all.append('LTT9')
+    cf.station.stationAll.append('LTT9')
     save_config(cf, 'config.yaml')

@@ -109,7 +109,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.init_graphicsView()
         self.init_signals_connect()
         self.testcase: models.testcase.TestCase = models.testcase.TestCase(rf'{gv.ExcelFilePath}',
-                                                                           f'{gv.cfg.station.station_name}',
+                                                                           f'{gv.cfg.station.stationName}',
                                                                            self.logger,
                                                                            self)
         self.init_status_bar()
@@ -143,7 +143,7 @@ class MainForm(Ui_MainWindow, TestForm):
         """
         station_model = ['M4', 'M6', 'SX5GEV', 'SX5GEV_EOL']
         flag = True
-        for item in gv.cfg.station.station_all:
+        for item in gv.cfg.station.stationAll:
             model_all = []
             if item not in station_model:
                 station_select = QAction(self)
@@ -170,7 +170,7 @@ class MainForm(Ui_MainWindow, TestForm):
                     model_select.setText(item_)
                     station_menu.addAction(model_select)
                     model_select.triggered.connect(self.on_selectDutModel)
-                    if gv.cfg.station.station_name == station_menu.title() and flag:
+                    if gv.cfg.station.stationName == station_menu.title() and flag:
                         flag = False
                         model_select.triggered.emit()
 
@@ -197,9 +197,9 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def init_lineEdit(self):
         self.lineEdit.setFocus()
-        self.lineEdit.setMaxLength(gv.cfg.dut.sn_len)
+        self.lineEdit.setMaxLength(gv.cfg.dut.snLen)
         # 自定义文本验证器
-        reg = QRegExp('^[A-Z0-9]{' + f'{gv.cfg.dut.sn_len},' + f'{gv.cfg.dut.sn_len}' + '}')
+        reg = QRegExp('^[A-Z0-9]{' + f'{gv.cfg.dut.snLen},' + f'{gv.cfg.dut.snLen}' + '}')
         pValidator = QRegExpValidator(self.lineEdit)
         pValidator.setRegExp(reg)
         # if not gv.IsDebug:
@@ -274,7 +274,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 self.actionDisable_factory.setEnabled(False)
 
     def init_label_info(self):
-        self.actionproduction.setText(gv.cfg.dut.test_mode)
+        self.actionproduction.setText(gv.cfg.dut.testMode)
         self.action192_168_1_101.setText(GetAllIpv4Address('10.90.'))
 
     def init_status_bar(self):
@@ -451,7 +451,7 @@ class MainForm(Ui_MainWindow, TestForm):
             if os.path.exists(self.testcase.test_script_json):
                 os.chmod(self.testcase.test_script_json, stat.S_IWRITE)
                 os.remove(self.testcase.test_script_json)
-            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger, self,
+            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.stationName, self.logger, self,
                                                      False)
             self.testSequences = self.testcase.cloneSuites
 
@@ -609,7 +609,7 @@ class MainForm(Ui_MainWindow, TestForm):
             return
         thread = Thread(
             target=models.loadseq.excel_convert_to_json, args=(self.testcase.testcasePath,
-                                                               gv.cfg.station.station_all, self.logger), daemon=True)
+                                                               gv.cfg.station.stationAll, self.logger), daemon=True)
         thread.start()
 
     def on_actionOpenScript(self):
@@ -626,18 +626,18 @@ class MainForm(Ui_MainWindow, TestForm):
         def select_station():
             action = self.sender()
             if isinstance(action, QAction):
-                gv.cfg.station.station_name = action.text() if "(" not in action.text() else action.text()[
+                gv.cfg.station.stationName = action.text() if "(" not in action.text() else action.text()[
                                                                                              :action.text().index('(')]
-                self.dut_model = ''
+                self.dutModel = ''
                 self.actionunknow.setText('')
             if isinstance(action, QMenu):
-                gv.cfg.station.station_name = action.title() if "(" not in action.title() else action.title()[
+                gv.cfg.station.stationName = action.title() if "(" not in action.title() else action.title()[
                                                                                                :action.title().index(
                                                                                                    '(')]
-            if gv.cfg.station.station_name.startswith('ReadVer'):
+            if gv.cfg.station.stationName.startswith('ReadVer'):
                 gv.IsDebug = True
-            gv.cfg.station.station_no = gv.cfg.station.station_name
-            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger,
+            gv.cfg.station.stationNo = gv.cfg.station.stationName
+            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.stationName, self.logger,
                                                      self, False)
             self.mySignals.updateProgressBar[int, int].emit(self.testcase.stepFinishNum, self.testcase.sumStep)
             self.testSequences = self.testcase.cloneSuites
@@ -652,9 +652,9 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_selectDutModel(self):
         action = self.sender()
         if isinstance(action, QAction):
-            self.dut_model = action.text() if "(" not in action.text() else action.text()[:action.text().index('(')]
-            self.actionunknow.setText(self.dut_model)
-        self.treeViewModel.setHorizontalHeaderLabels([f'{gv.cfg.station.station_no}_{self.dut_model}'])
+            self.dutModel = action.text() if "(" not in action.text() else action.text()[:action.text().index('(')]
+            self.actionunknow.setText(self.dutModel)
+        self.treeViewModel.setHorizontalHeaderLabels([f'{gv.cfg.station.stationNo}_{self.dutModel}'])
         if self.lineEdit.receivers(self.lineEdit.textEdited) == 1:
             self.lineEdit.textEdited.disconnect(self.on_textEdited)
 
@@ -875,7 +875,7 @@ class MainForm(Ui_MainWindow, TestForm):
 
         def SaveToScript():
             step_value = []
-            sheet_name = gv.cfg.station.station_name
+            sheet_name = gv.cfg.station.stationName
             workbook = openpyxl.load_workbook(gv.ExcelFilePath)
             try:
                 ws = workbook[sheet_name]
@@ -957,8 +957,8 @@ class MainForm(Ui_MainWindow, TestForm):
         if sequences is None:
             return
         self.treeViewModel.clear()
-        dut_model = '' if self.dut_model == '' else '_' + self.dut_model
-        self.treeViewModel.setHorizontalHeaderLabels([f'{gv.cfg.station.station_no}{dut_model}'])
+        dut_model = '' if self.dutModel == '' else '_' + self.dutModel
+        self.treeViewModel.setHorizontalHeaderLabels([f'{gv.cfg.station.stationNo}{dut_model}'])
         itemRoot = self.treeViewModel.invisibleRootItem()
 
         for suite in sequences:
@@ -1113,7 +1113,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.sec += 1
 
     def UpdateContinueFail(self, testResult: bool):
-        if gv.IsDebug or gv.cfg.dut.test_mode.lower() == 'debug':
+        if gv.IsDebug or gv.cfg.dut.testMode.lower() == 'debug':
             return
         if testResult:
             self.continue_fail_count = 0
@@ -1141,7 +1141,7 @@ class MainForm(Ui_MainWindow, TestForm):
             db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
             self.logger.debug(str(self.continue_fail_count))
-        if self.continue_fail_count >= gv.cfg.station.continue_fail_limit:
+        if self.continue_fail_count >= gv.cfg.station.continueFailLimit:
             self.lb_continuous_fail.setStyleSheet(f"background-color:red;")
             if gv.IsDebug:
                 return True
@@ -1158,22 +1158,22 @@ class MainForm(Ui_MainWindow, TestForm):
             """通过SN判断机种"""
             sn = self.lineEdit.text()
             if sn[0] == 'J' or sn[0] == '6':
-                self.dut_model = gv.cfg.dut.dut_models[0]
+                self.dutModel = gv.cfg.dut.dutModels[0]
             elif sn[0] == 'N' or sn[0] == '7':
-                self.dut_model = gv.cfg.dut.dut_models[1]
+                self.dutModel = gv.cfg.dut.dutModels[1]
             elif sn[0] == 'Q' or sn[0] == '8':
-                self.dut_model = gv.cfg.dut.dut_models[2]
+                self.dutModel = gv.cfg.dut.dutModels[2]
             elif sn[0] == 'S' or sn[0] == 'G':
-                self.dut_model = gv.cfg.dut.dut_models[3]
+                self.dutModel = gv.cfg.dut.dutModels[3]
             else:
-                self.dut_model = 'unknown'
+                self.dutModel = 'unknown'
                 # if not gv.IsDebug:
                 #     raise Exception('dut_model is unknown!!')
-            self.actionunknow.setText(self.dut_model)
+            self.actionunknow.setText(self.dutModel)
 
         """验证dut sn的正则规则"""
         if JudgeProdMode() != 'unknown' and not gv.IsDebug:
-            reg = QRegExp(gv.cfg.dut.dut_regex[self.dut_model])
+            reg = QRegExp(gv.cfg.dut.dutSNRegex[self.dutModel])
             pValidator = QRegExpValidator(reg, self)
             self.lineEdit.setValidator(pValidator)
 
@@ -1182,8 +1182,8 @@ class MainForm(Ui_MainWindow, TestForm):
             self.SingleStepTest = True
         else:
             self.SingleStepTest = False
-        if not gv.IsDebug and (self.dut_model == 'unknown' or len(self.lineEdit.text()) != gv.cfg.dut.sn_len):
-            str_info = f'无法根据SN判断机种或者SN长度不对! 扫描:{len(self.lineEdit.text())},规定:{gv.cfg.dut.sn_len}.'
+        if not gv.IsDebug and (self.dutModel == 'unknown' or len(self.lineEdit.text()) != gv.cfg.dut.snLen):
+            str_info = f'无法根据SN判断机种或者SN长度不对! 扫描:{len(self.lineEdit.text())},规定:{gv.cfg.dut.snLen}.'
             QMetaObject.invokeMethod(self, 'showMessageBox', Qt.AutoConnection,
                                      QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
                                      QtCore.Q_ARG(str, 'JudgeMode!'),
@@ -1212,10 +1212,10 @@ class MainForm(Ui_MainWindow, TestForm):
         self.testcase.logger = self.logger
         self.testcase.stepFinishNum = 0
         self.testcase.startTimeJson = datetime.now()
-        self.testcase.jsonObj = models.product.JsonObject(SN, gv.cfg.station.station_no,
-                                                          gv.cfg.dut.test_mode, gv.cfg.dut.qsdk_ver, gv.VERSION)
-        self.testcase.mesPhases = models.product.MesInfo(SN, gv.cfg.station.station_no, gv.VERSION)
-        self.testcase.daqDataPath = rf'{gv.OutPutPath}\{gv.cfg.station.station_no}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
+        self.testcase.jsonObj = models.product.JsonObject(SN, gv.cfg.station.stationNo,
+                                                          gv.cfg.dut.testMode, gv.cfg.dut.sdkVer, gv.VERSION)
+        self.testcase.mesPhases = models.product.MesInfo(SN, gv.cfg.station.stationNo, gv.VERSION)
+        self.testcase.daqDataPath = rf'{gv.OutPutPath}\{gv.cfg.station.stationNo}_DAQ_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}.csv'
         self.lb_failInfo.setHidden(True)
         self.lb_testTime.setHidden(True)
         if not self.testThread.isRunning():
@@ -1249,9 +1249,9 @@ class MainForm(Ui_MainWindow, TestForm):
         thread.join()
 
     def open_camera(self):
-        if not gv.cfg.station.auto_scan:
+        if not gv.cfg.station.autoScan:
             return
-        if gv.cfg.station.station_name == "CCT":
+        if gv.cfg.station.stationName == "CCT":
             return
         self.cap = cv2.VideoCapture(0)
         if not self.cap.isOpened():
@@ -1389,13 +1389,13 @@ class MainForm(Ui_MainWindow, TestForm):
                 QMessageBox.critical(None, 'ERROR!', '{station_name} have existed!!', QMessageBox.Yes)
                 return
             else:
-                gv.cfg.station.station_name = station_name
-                gv.cfg.station.station_no = gv.cfg.station.station_name
-                os.system(f'copy {gv.ScriptFolder}\\sample.json {gv.ScriptFolder}\\{gv.cfg.station.station_name}.json')
-            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.station_name, self.logger, self,
+                gv.cfg.station.stationName = station_name
+                gv.cfg.station.stationNo = gv.cfg.station.stationName
+                os.system(f'copy {gv.ScriptFolder}\\sample.json {gv.ScriptFolder}\\{gv.cfg.station.stationName}.json')
+            self.testcase = models.testcase.TestCase(gv.ExcelFilePath, gv.cfg.station.stationName, self.logger, self,
                                                      False, False)
             self.testSequences = self.testcase.cloneSuites
-            gv.cfg.station.station_all.append(station_name)
+            gv.cfg.station.stationAll.append(station_name)
             conf.config.save_config(gv.cfg, gv.ConfigYamlPath)
             self.ShowTreeView(self.testSequences)
             self.logger.debug(f'new {station_name} test Sequences finish!')
