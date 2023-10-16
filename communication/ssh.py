@@ -11,7 +11,7 @@ import traceback
 import time
 import paramiko
 from common.basicfunc import IsNullOrEmpty
-from communication.communication import CommAbstract
+from communication.commbasic import CommAbstract
 
 
 class SSH(CommAbstract):
@@ -33,7 +33,7 @@ class SSH(CommAbstract):
     def close(self):
         self.sftp.close()
         self.ssh.close()
-        self.logger.debug(f"ssh close success!")
+        self.logger.debug(f"ssh disconnect success!")
 
     def read(self):
         pass
@@ -68,10 +68,10 @@ class SSH(CommAbstract):
             self.logger.fatal(f'{e}, {traceback.format_exc()}')
             return False, strRecAll
 
-        # 用一行命令 进入目录 testdir 并且 查看当前路径
-        # stdin, stdout, stderr = ssh.exec_command("cd testdir;pwd")
-        # print(stdout.read())
-        # put方法上传文件，第1个参数是本地路径，第2个参数是远程路径
-        # sftp.put('install.zip', '/home/byhy/install.zip')
-        # get方法下载文件，第1个参数是远程路径，第2个参数是本地路径
-        # sftp.get('/home/byhy/log.zip', 'd:/log.zip')
+    # 用一行命令 进入目录 testdir 并且 查看当前路径
+    # stdin, stdout, stderr = ssh.exec_command("cd testdir;pwd")
+    # print(stdout.read())
+    # put方法上传文件，第1个参数是本地路径，第2个参数是远程路径
+    # sftp.put('install.zip', '/home/byhy/install.zip')
+    # get方法下载文件，第1个参数是远程路径，第2个参数是本地路径
+    # sftp.get('/home/byhy/log.zip', 'd:/log.zip')

@@ -187,7 +187,12 @@ def _testKeyword_what(kw, step, test_case):
     rReturn = False
     compInfo = ''
     if gv.PLin is None:
-        gv.PLin = peaklin.PeakLin(step.logger)
+        gv.PLin = peaklin.PeakLin(step.logger,
+                                  gv.cfg.BLF.ReqDelay,
+                                  gv.cfg.BLF.RespDelay,
+                                  gv.cfg.BLF.ReadTxCount,
+                                  gv.cfg.BLF.MRtoMRDelay,
+                                  gv.cfg.BLF.SchedulePeriod)
         bll.mainform.MainForm.main_form.mySignals.controlEnableSignal[QAction, bool].emit(
             bll.mainform.MainForm.main_form.actionPeakLin, False)
         gv.PLin.refreshHardware()
@@ -214,7 +219,12 @@ def _testKeyword_what(kw, step, test_case):
     rReturn = False
     compInfo = ''
     if gv.PLin is None:
-        gv.PLin = peaklin.PeakLin(step.logger)
+        gv.PLin = peaklin.PeakLin(step.logger,
+                                  gv.cfg.BLF.ReqDelay,
+                                  gv.cfg.BLF.RespDelay,
+                                  gv.cfg.BLF.ReadTxCount,
+                                  gv.cfg.BLF.MRtoMRDelay,
+                                  gv.cfg.BLF.SchedulePeriod)
         bll.mainform.MainForm.main_form.mySignals.controlEnableSignal[QAction, bool].emit(
             bll.mainform.MainForm.main_form.actionPeakLin, False)
         gv.PLin.refreshHardware()

@@ -627,13 +627,13 @@ class MainForm(Ui_MainWindow, TestForm):
             action = self.sender()
             if isinstance(action, QAction):
                 gv.cfg.station.stationName = action.text() if "(" not in action.text() else action.text()[
-                                                                                             :action.text().index('(')]
+                                                                                            :action.text().index('(')]
                 self.dutModel = ''
                 self.actionunknow.setText('')
             if isinstance(action, QMenu):
                 gv.cfg.station.stationName = action.title() if "(" not in action.title() else action.title()[
-                                                                                               :action.title().index(
-                                                                                                   '(')]
+                                                                                              :action.title().index(
+                                                                                                  '(')]
             if gv.cfg.station.stationName.startswith('ReadVer'):
                 gv.IsDebug = True
             gv.cfg.station.stationNo = gv.cfg.station.stationName
@@ -671,7 +671,12 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def on_peak_lin(self):
         if gv.PLin is None:
-            gv.PLin = PeakLin(self.logger, self)
+            gv.PLin = PeakLin(self.logger,
+                              gv.cfg.BLF.ReqDelay,
+                              gv.cfg.BLF.RespDelay,
+                              gv.cfg.BLF.ReadTxCount,
+                              gv.cfg.BLF.MRtoMRDelay,
+                              gv.cfg.BLF.SchedulePeriod, self)
             gv.PLin.exec_()
         else:
             gv.PLin.show()

@@ -10,17 +10,9 @@ import re
 import time
 import traceback
 import pyvisa
-from common.basicfunc import IsNullOrEmpty
-from communication.communication import CommAbstract
+from common.basicfunc import IsNullOrEmpty, ReplaceCommonEscapeSequences, InsertCommonEscapeSequences
+from communication.commbasic import CommAbstract
 from inspect import currentframe
-
-
-def ReplaceCommonEscapeSequences(date):
-    return date.replace('\\n', '\n').replace('\\r', '\r')
-
-
-def InsertCommonEscapeSequences(date):
-    return date.replace('\n', '\\n').replace('\r', '\\r')
 
 
 class VisaComm(CommAbstract):

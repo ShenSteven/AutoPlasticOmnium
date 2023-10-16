@@ -11,7 +11,7 @@ import time
 import traceback
 from telnetlib import Telnet
 from common.basicfunc import IsNullOrEmpty
-from communication.communication import CommAbstract
+from communication.commbasic import CommAbstract
 
 
 class TelnetComm(CommAbstract):
@@ -24,11 +24,11 @@ class TelnetComm(CommAbstract):
         self.logger.debug(login_prompt)
 
     def open(self, *args):
-        self.tel.open(self.tel.host, self.tel.port)
+        self.tel.open(self.tel.host)
 
     def close(self):
         self.tel.close()
-        self.logger.debug(f"{self.tel.port} serialPort close success!!")
+        self.logger.debug(f"{self.tel.host} telnet disconnect success!!")
 
     def read(self):
         self.tel.read_all()

@@ -9,10 +9,9 @@
 import re
 import time
 import traceback
-
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 from common.basicfunc import IsNullOrEmpty
-from communication.communication import CommAbstract
+from communication.commbasic import CommAbstract
 
 
 class SerialPort(CommAbstract):

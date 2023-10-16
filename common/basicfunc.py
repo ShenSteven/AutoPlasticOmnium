@@ -24,6 +24,15 @@ from decimal import Decimal, ROUND_UP, ROUND_HALF_UP
 
 
 # from pydub import AudioSegment
+
+def ReplaceCommonEscapeSequences(date):
+    return date.replace('\\n', '\n').replace('\\r', '\r')
+
+
+def InsertCommonEscapeSequences(date):
+    return date.replace('\n', '\\n').replace('\r', '\\r')
+
+
 def bytes_to_string(byte_strs):
     str_list = []
     for i in range(len(byte_strs)):
