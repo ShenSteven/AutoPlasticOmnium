@@ -9,31 +9,17 @@
 import traceback
 from PyQt5.QtWidgets import QDialog  # QMessageBox
 from future.moves import collections
-import ui.mainform
-from peak.ui_peak import Ui_PeakGui
+import bll.mainform
+from common.basicfunc import bytes_to_string, right_round
+from communication.peak.ui_peak import Ui_PeakGui
 import conf.globalvar as gv
 import binascii
-import os
 import re
 import sys
 import time
 from ctypes import *
-from peak.plin import PLinApi
+from communication.peak.plin import PLinApi
 from inspect import currentframe
-from decimal import Decimal, ROUND_UP
-
-
-def bytes_to_string(byte_strs):
-    str_list = []
-    for i in range(len(byte_strs)):
-        str_list.append('{:02X}'.format(byte_strs[i]))
-    return str.join(' ', str_list)
-
-
-def right_round(num, keep_n):
-    if isinstance(num, float):
-        num = str(num)
-    return Decimal(num).quantize((Decimal('0.' + '0' * keep_n)), rounding=ROUND_UP)
 
 
 class PeakLin(QDialog, Ui_PeakGui):
@@ -46,7 +32,7 @@ class PeakLin(QDialog, Ui_PeakGui):
         Ui_PeakGui.__init__(self)
         self.logger = logger
         self.setupUi(self)
-        self.init_signals_connect()
+        self.set_signals_connect()
         self.initialize()
         self.ReqDelay = c_ushort(gv.cfg.BLF.ReqDelay)
         self.RespDelay = c_ushort(gv.cfg.BLF.RespDelay)
@@ -54,7 +40,7 @@ class PeakLin(QDialog, Ui_PeakGui):
         self.Master3C = PLinApi.TLINScheduleSlot()
         self.Slave3D = PLinApi.TLINScheduleSlot()
 
-    def init_signals_connect(self):
+    def set_signals_connect(self):
         """connect signals to slots"""
         self.refreshBt.clicked.connect(self.refreshHardware)
         self.identifyBt.clicked.connect(self.on_IdentifyHardware)
@@ -163,9 +149,9 @@ class PeakLin(QDialog, Ui_PeakGui):
             self.hardwareCbx.setCurrentIndex(0)
             # self.hardwareCbx.blockSignals(False)
         else:
-            ui.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
+            bll.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
                                                                                          f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
-                                                                                        5)
+                                                                                         5)
 
     def getFormattedError(self, linError):
         # get error string from code
@@ -240,9 +226,9 @@ class PeakLin(QDialog, Ui_PeakGui):
             result = False
         if linResult != PLinApi.TLIN_ERROR_OK:
             self.logger.fatal(f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)}')
-            ui.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
+            bll.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
                                                                                          f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
-                                                                                        5)
+                                                                                         5)
         return result
 
     def doLinDisconnect(self):
@@ -298,9 +284,9 @@ class PeakLin(QDialog, Ui_PeakGui):
                     return True
                 else:
                     # Error while disconnecting from hardware.
-                    ui.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
+                    bll.mainform.MainForm.main_form.mySignals.showMessageBox[str, str, int].emit('Exception!',
                                                                                                  f'{currentframe().f_code.co_name}:{self.getFormattedError(linResult)} ',
-                                                                                                5)
+                                                                                                 5)
                     return False
             else:
                 return True
@@ -559,9 +545,8 @@ class PeakLin(QDialog, Ui_PeakGui):
 
         return True, bytes_to_string(datas)
 
-    def CalKey(self, seed):
+    def CalKey(self, seed, xorMask=0xC0A59221):
         try:
-            xorMask = 0xC0A59221
             seeds = seed.split()
             cal = [(int(seeds[0], 16) ^ ((xorMask >> 24) & 0xFF)), (int(seeds[1], 16) ^ ((xorMask >> 16) & 0xFF)),
                    (int(seeds[2], 16) ^ ((xorMask >> 8) & 0xFF)), (int(seeds[3], 16) ^ (xorMask & 0xFF))]

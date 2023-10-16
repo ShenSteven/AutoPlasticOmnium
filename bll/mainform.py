@@ -19,12 +19,12 @@ import psutil
 import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl, QObject, QEvent, QRect
+from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl, QObject, QEvent
 from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices, \
     QStandardItemModel, QStandardItem, QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QMessageBox, QMenu, QApplication, QAbstractItemView, QHeaderView, QLabel, QAction, \
-    QInputDialog, QLineEdit, QToolTip
+    QInputDialog, QLineEdit
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from openpyxl.utils import get_column_letter
@@ -32,7 +32,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 
 import conf.config
 import conf.globalvar as gv
-import dal.database.sqlite
+import dataaccess.sqlite
 import models.loadseq
 import models.product
 import models.testcase
@@ -43,8 +43,8 @@ from common.mysignals import update_label, on_setIcon, updateAction, controlEnab
     on_actionException
 from common.testform import TestForm
 from conf.logprint import QTextEditHandler, LogPrint
-from peak.plin.peaklin import PeakLin
-from ui.settings import SettingsDialog
+from communication.peak.plin.peaklin import PeakLin
+from bll.settings import SettingsDialog
 from ui.ui_main import Ui_MainWindow
 
 matplotlib.use("Qt5Agg")
@@ -278,7 +278,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.action192_168_1_101.setText(GetAllIpv4Address('10.90.'))
 
     def init_status_bar(self):
-        with dal.database.sqlite.Sqlite(gv.DatabaseSetting) as db:
+        with dataaccess.sqlite.Sqlite(gv.DatabaseSetting) as db:
             db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
             db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='total_pass_count'")
@@ -755,7 +755,7 @@ class MainForm(Ui_MainWindow, TestForm):
 
                 with open(self.txtLogPath, 'wb') as f:
                     f.write(content.encode('utf8'))
-                self.logger = LogPrint('debug', gv.CriticalLog, gv.ErrorsLog).logger
+                self.logger = LogPrint('../ui/debug', gv.CriticalLog, gv.ErrorsLog).logger
                 self.logger.debug(f"Save test log path.{self.txtLogPath}")
 
         thread = Thread(target=thread_update, daemon=True)
@@ -1079,7 +1079,7 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def updateStatusBar(self, info):
         self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
-        with dal.database.sqlite.Sqlite(gv.DatabaseSetting) as db:
+        with dataaccess.sqlite.Sqlite(gv.DatabaseSetting) as db:
             db.execute_commit(f"UPDATE COUNT SET VALUE='{self.continue_fail_count}' where NAME ='continue_fail_count'")
             db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_pass_count}' where NAME ='total_pass_count'")
             db.execute_commit(f"UPDATE COUNT SET VALUE='{self.total_fail_count}' where NAME ='total_fail_count'")
@@ -1137,7 +1137,7 @@ class MainForm(Ui_MainWindow, TestForm):
             return False
 
     def CheckContinueFailNum(self):
-        with dal.database.sqlite.Sqlite(gv.DatabaseSetting) as db:
+        with dataaccess.sqlite.Sqlite(gv.DatabaseSetting) as db:
             db.execute_commit(f"SELECT VALUE  from COUNT WHERE NAME='continue_fail_count'")
             self.continue_fail_count = db.cur.fetchone()[0]
             self.logger.debug(str(self.continue_fail_count))

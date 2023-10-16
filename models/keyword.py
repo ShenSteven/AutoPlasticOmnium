@@ -12,14 +12,15 @@ import nidaqmx
 from PyQt5 import QtCore
 from PyQt5.QtCore import QMetaObject, Qt
 from PyQt5.QtWidgets import QAction, QMessageBox
-import ui.mainform
-import peak.plin.peaklin
+
+import bll.mainform
 from common import value_dispatch
-from dal.serialport import SerialPort
-from dal.telnet import TelnetComm
+from communication.peak.plin import peaklin
+from communication.serialport import SerialPort
+from communication.telnet import TelnetComm
 import conf.globalvar as gv
 import time
-from dal.visa import VisaComm
+from communication.visa import VisaComm
 from common.basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping, str_to_int, \
     subStr, assert_value
 
@@ -65,7 +66,7 @@ def _testKeyword_what(kw, step, test_case):
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     invoke_return = QMetaObject.invokeMethod(
-        ui.mainform.MainForm.main_form,
+        bll.mainform.MainForm.main_form,
         'showMessageBox',
         Qt.BlockingQueuedConnection,
         QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
@@ -84,7 +85,7 @@ def _testKeyword_what(kw, step, test_case):
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     invoke_return = QMetaObject.invokeMethod(
-        ui.mainform.MainForm.main_form,
+        bll.mainform.MainForm.main_form,
         'showQInputDialog',
         Qt.BlockingQueuedConnection,
         QtCore.Q_RETURN_ARG(list),
@@ -186,9 +187,9 @@ def _testKeyword_what(kw, step, test_case):
     rReturn = False
     compInfo = ''
     if gv.PLin is None:
-        gv.PLin = peak.plin.peaklin.PeakLin(step.logger)
-        ui.mainform.MainForm.main_form.mySignals.controlEnableSignal[QAction, bool].emit(
-            ui.mainform.MainForm.main_form.actionPeakLin, False)
+        gv.PLin = peaklin.PeakLin(step.logger)
+        bll.mainform.MainForm.main_form.mySignals.controlEnableSignal[QAction, bool].emit(
+            bll.mainform.MainForm.main_form.actionPeakLin, False)
         gv.PLin.refreshHardware()
         gv.PLin.hardwareCbx_IndexChanged()
         if gv.PLin.doLinConnect():
@@ -202,7 +203,7 @@ def _testKeyword_what(kw, step, test_case):
         time.sleep(0.1)
         rReturn = gv.PLin.runScheduleDiag()
         time.sleep(0.1)
-    ui.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(
+    bll.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(
         rReturn,
         f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
     return rReturn, compInfo
@@ -213,9 +214,9 @@ def _testKeyword_what(kw, step, test_case):
     rReturn = False
     compInfo = ''
     if gv.PLin is None:
-        gv.PLin = peak.plin.peaklin.PeakLin(step.logger)
-        ui.mainform.MainForm.main_form.mySignals.controlEnableSignal[QAction, bool].emit(
-            ui.mainform.MainForm.main_form.actionPeakLin, False)
+        gv.PLin = peaklin.PeakLin(step.logger)
+        bll.mainform.MainForm.main_form.mySignals.controlEnableSignal[QAction, bool].emit(
+            bll.mainform.MainForm.main_form.actionPeakLin, False)
         gv.PLin.refreshHardware()
         gv.PLin.hardwareCbx_IndexChanged()
         if gv.PLin.doLinConnect():
@@ -231,7 +232,7 @@ def _testKeyword_what(kw, step, test_case):
         gv.PLin.runSchedule()
         time.sleep(0.1)
         rReturn = True
-    ui.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(
+    bll.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(
         rReturn,
         f"Connected to PLIN-USB(19200) | HW ID:{gv.PLin.m_hHw.value} | Client:{gv.PLin.m_hClient.value} | ")
     return rReturn, compInfo
@@ -241,7 +242,7 @@ def _testKeyword_what(kw, step, test_case):
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     rReturn = gv.PLin.DoLinDisconnect()
-    ui.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(True, "Not connected | ")
+    bll.mainform.MainForm.main_form.mySignals.updateConnectStatusSignal[bool, str].emit(True, "Not connected | ")
     return rReturn, compInfo
 
 
@@ -331,7 +332,7 @@ def _testKeyword_what(kw, step, test_case):
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
-    step.testValue = peak.plin.peaklin.PeakLin.get_crc_apps19(step.logger, path)
+    step.testValue = peaklin.PeakLin.get_crc_apps19(step.logger, path)
     rReturn = not IsNullOrEmpty(step.testValue)
     return rReturn, compInfo
 

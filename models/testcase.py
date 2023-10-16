@@ -12,10 +12,10 @@ import sys
 import traceback
 import models.loadseq
 import models.product
-import dal.database.sqlite
+import dataaccess.sqlite
 import models.variables
 import conf.globalvar as gv
-import dal.serialport
+import communication.serialport
 import bll.flowcontrol.ifelse
 from inspect import currentframe
 from datetime import datetime
@@ -68,7 +68,7 @@ class TestCase:
         self.csvListHeader = []
         self.csvListData = []
         self.csvFilePath = ''
-        dal.database.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
+        dataaccess.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
         self.load_testcase(testcase_path, sheet_name, logger, cflag, isVerify)
 
     @property
@@ -197,8 +197,8 @@ class TestCase:
         """通过串口读取治具中设置的测试工站名字"""
         if not gv.cfg.station.fixFlag:
             return
-        self.FixSerialPort = dal.serialport.SerialPort(gv.cfg.station.fixComPort,
-                                                       gv.cfg.station.fixComBaudRate)
+        self.FixSerialPort = communication.serialport.SerialPort(gv.cfg.station.fixComPort,
+                                                                 gv.cfg.station.fixComBaudRate)
         for i in range(0, 3):
             rReturn, revStr = self.FixSerialPort.SendCommand('AT+READ_FIXNUM%', '\r\n', 1, False)
             if rReturn:

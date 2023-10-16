@@ -16,7 +16,7 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 import conf.globalvar as gv
-import dal.database.sqlite
+import dataaccess.sqlite
 import models.loadseq
 import models.testcase
 from common.mysignals import on_actionLogFolder
@@ -91,7 +91,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
 
     def initCellUi(self):
         gv.InitCreateDirs(self.logger)
-        dal.database.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
+        dataaccess.sqlite.init_sqlite_database(self.logger, gv.DatabaseSetting)
         if not getattr(sys, 'frozen', False):
             models.loadseq.excel_convert_to_json(f'{gv.ExcelFilePath}', gv.cfg.station.stationAll, self.logger)
         for row in range(self.RowCount):

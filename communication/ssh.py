@@ -11,7 +11,7 @@ import traceback
 import time
 import paramiko
 from common.basicfunc import IsNullOrEmpty
-from dal.communication import CommAbstract
+from communication.communication import CommAbstract
 
 
 class SSH(CommAbstract):

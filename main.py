@@ -10,7 +10,7 @@ import sys
 from os.path import dirname, abspath
 from traceback import format_exception
 from PyQt5.QtWidgets import QApplication, QMessageBox
-import ui.mainform as mf
+import bll.mainform as mf
 import runin.rmainform as rmf
 import conf.globalvar as gv
 

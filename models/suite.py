@@ -13,7 +13,7 @@ from PyQt5.QtGui import QBrush
 import models.product
 import models.step
 from common.basicfunc import create_csv_file, write_csv_file
-import ui.mainform
+import bll.mainform
 
 
 class TestSuite:
@@ -84,10 +84,10 @@ class TestSuite:
                     break
 
             self.suiteResult = all(step_result_list)
-            self.print_result_info()
+            self.print_test_info()
             self.process_mesVer(test_case)
             if test_case.jsonObj.test_phases is not None:
-                self.copy_to_json_obj(suiteItem)
+                self.copy_to_json(suiteItem)
                 test_case.jsonObj.test_phases.append(suiteItem)
             self.setColor(Qt.green if self.suiteResult else Qt.red)
             return self.suiteResult
@@ -108,12 +108,12 @@ class TestSuite:
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
         try:
-            if isinstance(self.myWind, ui.mainform.MainForm):
+            if isinstance(self.myWind, bll.mainform.MainForm):
                 self.myWind.mySignals.treeWidgetColor.emit(color, self.index, -1, False)
         except RuntimeError:
             pass
 
-    def print_result_info(self):
+    def print_test_info(self):
         self.finish_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         self.elapsedTime = datetime.strptime(self.finish_time, '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(
             self.start_time, '%Y-%m-%d %H:%M:%S.%f')
@@ -130,7 +130,7 @@ class TestSuite:
         write_csv_file(self.logger, test_case.daqDataPath, data_list)
         test_case.ArrayListDaq = []
 
-    def copy_to_json_obj(self, obj: models.product.SuiteItem):
+    def copy_to_json(self, obj: models.product.SuiteItem):
         obj.phase_name = self.name
         obj.status = "passed" if self.suiteResult else "failed"
         obj.start_time = self.start_time

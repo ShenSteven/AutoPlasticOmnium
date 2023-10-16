@@ -20,9 +20,27 @@ import openpyxl
 import psutil
 import hashlib
 from socket import AddressFamily
+from decimal import Decimal, ROUND_UP, ROUND_HALF_UP
 
 
 # from pydub import AudioSegment
+def bytes_to_string(byte_strs):
+    str_list = []
+    for i in range(len(byte_strs)):
+        str_list.append('{:02X}'.format(byte_strs[i]))
+    return str.join(' ', str_list)
+
+
+def right_round(num, keep_n):
+    """
+    保留小数位，或者实现四舍五入
+    :param num:
+    :param keep_n:
+    :return:
+    """
+    if isinstance(num, float):
+        num = str(num)
+    return Decimal(num).quantize((Decimal('0.' + '0' * keep_n)), rounding=ROUND_UP)
 
 
 def CompareLimit(limitMin, limitMax, value, item, is_round=False):
@@ -422,11 +440,12 @@ def merge_list_to_dict(list_one: list or tuple, list_two: list or tuple) -> dict
 
 if __name__ == '__main__':
     pass
-    li = [('a', 'a'), ('a', 'a'), ('a', 'a'), ('bb', 'bb'), ('a', 'a'), ('c', 'c'), ('c', 'c')]
-    print(li)
+    print(right_round(4.94524324, 2))
+    # li = [('a', 'a'), ('a', 'a'), ('a', 'a'), ('bb', 'bb'), ('a', 'a'), ('c', 'c'), ('c', 'c')]
+    # print(li)
     # get_nodup_list(li)
-    r1, r2 = de_adjacent_repeat(li)
-    dd = merge_list_to_dict(r1, r2)
+    # r1, r2 = de_adjacent_repeat(li)
+    # dd = merge_list_to_dict(r1, r2)
     # print(dd.keys())
     # print(dd.values())
     # create_csv_file('test.csv', ['No', 'Phase test_name', 'Test test_name', 'Error Code'])

@@ -12,12 +12,13 @@ from datetime import datetime
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QIcon
 from PyQt5.QtWidgets import QAction, QLabel
+
+import dataaccess
 import models.product
-import dal.database.sqlite
 import models.keyword
 from common.basicfunc import IsNullOrEmpty, str_to_int
 import conf.globalvar as gv
-import ui.mainform
+import bll.mainform
 
 
 def parse_expr(value):
@@ -584,7 +585,7 @@ class Step:
     def setColor(self, color: QBrush):
         """set treeWidget item color"""
         try:
-            if isinstance(self.myWind, ui.mainform.MainForm):
+            if isinstance(self.myWind, bll.mainform.MainForm):
                 self.myWind.mySignals.treeWidgetColor.emit(color, self.suiteIndex, self.index, False)
         except RuntimeError:
             pass
@@ -610,7 +611,7 @@ class Step:
                         self.status = str(self.test_result)
                         self.setColor(Qt.lightGray)
                         return True
-                if not isinstance(self.myWind, ui.mainform.MainForm):
+                if not isinstance(self.myWind, bll.mainform.MainForm):
                     self.myWind.mySignals.updateLabel[QLabel, str].emit(self.myWind.lb_testName,
                                                                         f"<A href='file:///{self.myWind.txtLogPath}'>{self.StepName}</A>")
                 self.logger.debug(f"<a name='testStep:{self.SuiteName}-{self.StepName}'>Start:{self.StepName},"
@@ -686,7 +687,7 @@ class Step:
     def set_breakpoint(self):
         if self.breakpoint or self.myWind.pauseFlag:
             self.myWind.pauseFlag = True
-            if isinstance(self.myWind, ui.mainform.MainForm):
+            if isinstance(self.myWind, bll.mainform.MainForm):
                 self.myWind.mySignals.setIconSignal[QAction, QIcon].emit(
                     self.myWind.actionStart, QIcon(':/images/Start-icon.png'))
             self.myWind.pause_event.clear()
@@ -712,7 +713,7 @@ class Step:
                       '{self.start_time.strftime('%Y-%m-%d %H:%M:%S')}','{test_result}','{self.status}')
                       '''
         if self.isTest and self.Json == 'Y':
-            with dal.database.sqlite.Sqlite(gv.DatabaseResult) as db:
+            with dataaccess.sqlite.Sqlite(gv.DatabaseResult) as db:
                 self.logger.debug('INSERT test result to result.db table RESULT.')
                 db.execute_commit(SQL_statements)
             # with database.mysql.MySQL(host='127.0.0.1', port=3306, user='root', passwd='123456') as db:
@@ -813,7 +814,7 @@ class Step:
         if self.Json == 'Y':
             ts = datetime.now() - self.start_time
             self.elapsedTime = "%.3f" % (ts.seconds + ts.microseconds / 1000000)
-            if isinstance(self.myWind, ui.mainform.MainForm):
+            if isinstance(self.myWind, bll.mainform.MainForm):
                 self.myWind.mySignals.update_tableWidget[list].emit(
                     [test_case.myWind.SN, self.StepName, self.SPEC, self.LSL, self.testValue, self.USL,
                      self.elapsedTime, self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -833,7 +834,7 @@ class Step:
             test_case.csvListHeader.append(name)
             test_case.csvListData.append(self.testValue)
 
-    def record_to_json(self, test_case, testResult, suiteItem: models.product.SuiteItem = None):
+    def copy_to_json(self, test_case, testResult, suiteItem: models.product.SuiteItem = None):
         """copy test data to json object"""
         if self.status != str(True):
             self.start_time_json = test_case.startTimeJson
@@ -877,12 +878,12 @@ class Step:
 
     def record_test_data(self, test_case, test_result, suiteItem: models.product.SuiteItem):
         """ according to self.Json record test result and data into json file"""
-        if self.Json == 'Y':
-            obj = self.record_to_json(test_case, test_result, suiteItem)
+        if self.Json == 'Y' or not test_result or self.ByPF == 'F':
+            obj = self.copy_to_json(test_case, test_result, suiteItem)
             self.record_to_csv(test_case, obj.test_name)
-        elif not test_result or self.ByPF == 'F':
-            obj = self.record_to_json(test_case, test_result, suiteItem)
-            self.record_to_csv(test_case, obj.test_name)
+        # elif not test_result or self.ByPF == 'F':
+        #     obj = self.copy_to_json(test_case, test_result, suiteItem)
+        #     self.record_to_csv(test_case, obj.test_name)
 
     def process_teardown(self):
         if IsNullOrEmpty(self.TearDown) or self.test_result:

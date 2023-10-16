@@ -12,7 +12,7 @@ import traceback
 
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 from common.basicfunc import IsNullOrEmpty
-from dal.communication import CommAbstract
+from communication.communication import CommAbstract
 
 
 class SerialPort(CommAbstract):

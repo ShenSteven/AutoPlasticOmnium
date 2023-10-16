@@ -58,7 +58,6 @@ class TestForm(QMainWindow):
         self.setIpFlag = False  # 是否设置dut IP为默认ip
         self.mySignals = MySignals()
         QApplication.setStyle(QStyleFactory.create("fusion"))
-        # QApplication.setStyle(QStyleFactory.create("macintosh"))
 
     def init_variable(self, sn):
         self.sec = 1

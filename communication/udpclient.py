@@ -12,7 +12,7 @@ import socket
 import time
 import traceback
 from common.basicfunc import IsNullOrEmpty
-from dal.communication import CommAbstract
+from communication.communication import CommAbstract
 
 
 class UDPClient(CommAbstract):
