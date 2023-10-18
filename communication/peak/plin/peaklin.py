@@ -26,7 +26,7 @@ class PeakLin(QDialog, Ui_PeakGui):
     bootloader download, uds.
     """
 
-    def __init__(self, logger, ReqDelay=0, RespDelay=0, ReadTxCount=0, MRtoMRDelay=0, SchedulePeriod=0, parent=None):
+    def __init__(self, logger, ReqDelay, RespDelay, ReadTxCount, MRtoMRDelay, SchedulePeriod, parent=None):
         QDialog.__init__(self, parent)
         Ui_PeakGui.__init__(self)
         self.logger = logger
@@ -41,6 +41,7 @@ class PeakLin(QDialog, Ui_PeakGui):
         self._interval = ReqDelay + RespDelay
         self.Master3C = PLinApi.TLINScheduleSlot()
         self.Slave3D = PLinApi.TLINScheduleSlot()
+        self.tabWidget.setCurrentWidget(self.tabLin)
 
     def set_signals_connect(self):
         """connect signals to slots"""

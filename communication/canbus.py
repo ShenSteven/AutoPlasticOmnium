@@ -14,13 +14,14 @@ from can.message import Message
 
 
 class CanBus:
+    is_extended_id: bool = False
+    is_remote_frame: bool = False
+    is_error_frame: bool = False
+    is_fd: bool = False
+    is_rx: bool = False
+
     def __init__(self, logger=None, interface=None, channel=None, context=None, **kwargs):
         self.logger = logger
-        self.is_extended_id: bool = False
-        self.is_remote_frame: bool = False
-        self.is_error_frame: bool = False
-        self.is_fd: bool = False
-        self.is_rx: bool = False
         self.bus = can.Bus(interface=interface, channel=channel, config_context=context, ignore_config=False,
                            **kwargs)
 
@@ -71,7 +72,8 @@ class CanBus:
         :param timeout: Unit: second
         :return:
         """
-        self.logger.debug(f"Starting to send a message every {period * 1000}ms for {timeout}s")
+        # self.logger.debug(f"Starting to send a message every {period * 1000}ms for {timeout}s")
+        print(f"Starting to send a message every {period * 1000}ms for {timeout}s")
         msg = can.Message(arbitration_id=fid, data=data)
         msg.is_extended_id = self.is_extended_id
         msg.is_remote_frame = self.is_remote_frame
@@ -82,7 +84,8 @@ class CanBus:
         assert isinstance(task, can.CyclicSendTaskABC)
         time.sleep(timeout)
         task.stop()
-        self.logger.debug("stopped periodic cyclic send")
+        # self.logger.debug("stopped periodic cyclic send")
+        print("stopped periodic cyclic send")
 
     def limited_periodic_send(self, fid, data, period, duration):
         """
@@ -163,9 +166,16 @@ def print_msg(msg):
 if __name__ == "__main__":
     pass
     # import conf.globalvar as gv
-
-    bus_test = CanBus(None, interface='vector', channel=2)
-    bus_test.send_one(0x451, [0x0, 0x25, 0x0, 0x1, 0x3, 0x1, 0x4, 0x1], 1)
+    # bus = can.Bus(interface='vector', channel=1, bitrate=500000, app_name='python-can')
+    # msg = can.Message(arbitration_id=0x341, data=[0x83, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
+    # bus.send(msg)
+    bus_test = CanBus(None, interface='vector', channel=1, bitrate=500000, app_name='python-can')
+    while True:
+        bus_test.simple_periodic_send(0x341, [0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], 0.01)
+        bus_test.simple_periodic_send(0x341, [0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], 0.01)
+        bus_test.simple_periodic_send(0x341, [0x83, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], 0.01)
+        bus_test.simple_periodic_send(0x341, [0x84, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], 0.01)
+        bus_test.simple_periodic_send(0x341, [0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], 0.01)
     # bus = can.interface.Bus('virtual_ch', bustype='virtual')
     # logger = can.Logger("logfile.asc")  # save log to asc file
     # listeners = [

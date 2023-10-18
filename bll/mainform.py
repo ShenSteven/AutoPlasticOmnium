@@ -42,6 +42,7 @@ from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4
 from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
     on_actionException
 from common.testform import TestForm
+from communication.peak.pcan.peakcan import PeakCan
 from conf.logprint import QTextEditHandler, LogPrint
 from communication.peak.plin.peaklin import PeakLin
 from bll.settings import SettingsDialog
@@ -678,6 +679,9 @@ class MainForm(Ui_MainWindow, TestForm):
                               gv.cfg.BLF.MRtoMRDelay,
                               gv.cfg.BLF.SchedulePeriod, self)
             gv.PLin.exec_()
+            if gv.PCan is None:
+                gv.PCan = PeakCan(self.logger, self)
+                gv.PCan.exec_()
         else:
             gv.PLin.show()
 

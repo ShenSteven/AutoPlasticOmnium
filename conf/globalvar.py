@@ -52,6 +52,7 @@ IsDebug = False
 MainWin = None
 LoginWin = None
 
+PCan = None
 PLin = None
 pMsg32 = None
 pMsg33 = None
