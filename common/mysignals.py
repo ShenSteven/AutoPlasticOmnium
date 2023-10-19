@@ -11,7 +11,7 @@ import conf.globalvar as gv
 from threading import Thread
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QIcon
-from PyQt5.QtWidgets import QLabel, QAction, QApplication
+from PyQt5.QtWidgets import QLabel, QAction, QApplication, QMessageBox
 
 
 class MySignals(QObject):
@@ -53,23 +53,18 @@ def on_setIcon(action_, icon: QIcon):
     action_.setIcon(icon)
 
 
-def on_actionLogFolder():
-    def thread_update():
-        if os.path.exists(gv.LogFolderPath):
-            os.startfile(gv.LogFolderPath)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
-def on_actionException():
-    def thread_update():
-        if os.path.exists(gv.CriticalLog):
-            os.startfile(gv.CriticalLog)
-
-    thread = Thread(target=thread_update, daemon=True)
-    thread.start()
-
-
 def controlEnable(control, isEnable):
     control.setEnabled(isEnable)
+
+
+def on_actOpenFile(filePath: str):
+    def thread_update():
+        if os.path.exists(filePath):
+            os.startfile(filePath)
+            # QDesktopServices.openUrl(QUrl(f'file:///{ensure_path_sep(self.txtLogPath)}'))
+        else:
+            # self.logger.warning(f"File not found! path:{filePath}")
+            QMessageBox.information(None, 'Information', f"File not found! path:{filePath}", QMessageBox.Yes)
+
+    thread = Thread(target=thread_update, daemon=True)
+    thread.start()

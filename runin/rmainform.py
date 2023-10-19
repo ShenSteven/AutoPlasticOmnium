@@ -19,7 +19,7 @@ import conf.globalvar as gv
 import dataaccess.sqlite
 import models.loadseq
 import models.testcase
-from common.mysignals import on_actionLogFolder
+from common.mysignals import on_actOpenFile
 from runin.cell import Cell
 from runin.ui_login import Ui_Login
 from runin.ui_runin import Ui_RuninMain
@@ -87,7 +87,7 @@ class RuninMainForm(QMainWindow, Ui_RuninMain):
         self.lineEdit_1.returnPressed.connect(self.locationInput)
         self.lineEdit.textEdited.connect(self.on_textEdited)
         self.lineEdit.returnPressed.connect(self.start_cell)
-        self.bt_openLog.clicked.connect(on_actionLogFolder)
+        self.bt_openLog.clicked.connect(lambda: on_actOpenFile(gv.LogFolderPath))
 
     def initCellUi(self):
         gv.InitCreateDirs(self.logger)

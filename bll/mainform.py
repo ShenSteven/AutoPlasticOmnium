@@ -39,8 +39,7 @@ import models.testcase
 import models.variables
 from bll.testthread import TestThread, TestStatus
 from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int, ensure_path_sep
-from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actionLogFolder, \
-    on_actionException
+from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actOpenFile
 from common.testform import TestForm
 from communication.peak.pcan.peakcan import PeakCan
 from conf.logprint import QTextEditHandler, LogPrint
@@ -338,21 +337,22 @@ class MainForm(Ui_MainWindow, TestForm):
         self.mySignals.play_audio[str].connect(self.on_play_audio)
 
         self.actionNewSeq.triggered.connect(self.on_actionNewSequence)
-        self.actionOpen_TestCase.triggered.connect(self.on_actionOpen_TestCase)
+        self.actionOpen_TestCase.triggered.connect(lambda: on_actOpenFile(self.testcase.testcasePath))
         self.actionConvertExcelToJson.triggered.connect(self.on_actionConvertExcelToJson)
-        self.actionOpenScript.triggered.connect(self.on_actionOpenScript)
+        self.actionOpenScript.triggered.connect(lambda: on_actOpenFile(self.testcase.test_script_json))
         self.actionSaveToScript.triggered.connect(self.on_actionSaveToScript)
         self.actionReloadScript.triggered.connect(self.on_reloadSeqs)
         self.actionConfig.triggered.connect(self.on_actionConfig)
         self.actionPrivileges.triggered.connect(self.on_actionPrivileges)
         self.actionStart.triggered.connect(self.on_actionStart)
         self.actionStop.triggered.connect(self.on_actionStop)
-        self.actionOpenLog.triggered.connect(self.on_actionOpenLog)
+        self.actionOpenLog.triggered.connect(lambda: on_actOpenFile(self.txtLogPath))
         self.actionClearLog.triggered.connect(self.on_actionClearLog)
-        self.actionLogFolder.triggered.connect(on_actionLogFolder)
+        self.actionLogFolder.triggered.connect(lambda: on_actOpenFile(gv.LogFolderPath))
         self.actionSaveLog.triggered.connect(self.on_actionSaveLog)
-        self.actionCSVLog.triggered.connect(self.on_actionCSVLog)
-        self.actionException.triggered.connect(on_actionException)
+        self.actionCSVLog.triggered.connect(lambda: on_actOpenFile(self.testcase.csvFilePath))
+        self.actionException.triggered.connect(lambda: on_actOpenFile(gv.CriticalLog))
+        self.actResultLog.triggered.connect(lambda: on_actOpenFile(gv.retPath))
         self.actionEnable_lab.triggered.connect(self.on_actionEnable_lab)
         self.actionDisable_factory.triggered.connect(self.on_actionDisable_factory)
         self.actionAbout.triggered.connect(self.on_actionAbout)
@@ -577,13 +577,6 @@ class MainForm(Ui_MainWindow, TestForm):
             self.treeViewModel.itemFromIndex(self.treeView.currentIndex()).setIcon(
                 QIcon(':/images/Document-txt-icon.png'))
 
-    def on_actionOpen_TestCase(self):
-        def thread_actionOpen_TestCase():
-            os.startfile(self.testcase.testcasePath)
-
-        thread = Thread(target=thread_actionOpen_TestCase, daemon=True)
-        thread.start()
-
     def on_actionConvertExcelToJson(self):
         if self.startFlag:
             QMessageBox.information(self, 'Infor', 'Test is running, can not do it!', QMessageBox.Yes)
@@ -591,16 +584,6 @@ class MainForm(Ui_MainWindow, TestForm):
         thread = Thread(
             target=models.loadseq.excel_convert_to_json, args=(self.testcase.testcasePath,
                                                                gv.cfg.station.stationAll, self.logger), daemon=True)
-        thread.start()
-
-    def on_actionOpenScript(self):
-
-        def actionOpenScript():
-            os.startfile(self.testcase.test_script_json)
-
-        if getattr(sys, 'frozen', False):
-            return
-        thread = Thread(target=actionOpenScript, daemon=True)
         thread.start()
 
     def on_selectStation(self):
@@ -702,27 +685,6 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_actionClearLog(self):
         if not self.startFlag:
             self.textEdit.clear()
-
-    def on_actionOpenLog(self):
-        def thread_update():
-            if os.path.exists(self.txtLogPath):
-                # os.startfile(self.txtLogPath)
-                QDesktopServices.openUrl(QUrl(f'file:///{ensure_path_sep(self.txtLogPath)}'))
-            else:
-                self.logger.warning(f"no find txt log,path:{self.txtLogPath}")
-
-        thread = Thread(target=thread_update, daemon=True)
-        thread.start()
-
-    def on_actionCSVLog(self):
-        def thread_update():
-            if os.path.exists(self.testcase.csvFilePath):
-                os.startfile(self.testcase.csvFilePath)
-            else:
-                self.logger.warning(f"no find CSV log,path:{self.testcase.csvFilePath}")
-
-        thread = Thread(target=thread_update, daemon=True)
-        thread.start()
 
     def on_actionSaveLog(self, info):
         def thread_update():
@@ -1215,9 +1177,9 @@ class MainForm(Ui_MainWindow, TestForm):
 
     def saveTestResult(self):
         def thread_update():
-            reportPath = fr'{gv.OutPutPath}\result.csv'
-            create_csv_file(self.logger, reportPath, self.tableWidgetHeader)
-            if os.path.exists(reportPath):
+            retPath = gv.retPath
+            create_csv_file(self.logger, retPath, self.tableWidgetHeader)
+            if os.path.exists(retPath):
                 all_rows = []
                 for row in range(self.tableViewRetModel.rowCount()):
                     row_data = []
@@ -1227,11 +1189,11 @@ class MainForm(Ui_MainWindow, TestForm):
                             row_data.append(item.text())
                     all_rows.append(row_data)
 
-                with open(reportPath, 'a', newline='') as stream:
+                with open(retPath, 'a', newline='') as stream:
                     writer = csv.writer(stream)
                     writer.writerows(all_rows)
             if self.logger is not None:
-                self.logger.debug(f'saveTestResult to:{reportPath}')
+                self.logger.debug(f'saveTestResult to:{retPath}')
 
         thread = Thread(target=thread_update, daemon=True)
         thread.start()
