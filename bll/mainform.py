@@ -20,8 +20,8 @@ import pyautogui
 import zxing
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QRegExp, QMetaObject, QTimer, QUrl, QObject, QEvent
-from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QDesktopServices, \
-    QStandardItemModel, QStandardItem, QColor
+from PyQt5.QtGui import QIcon, QCursor, QBrush, QRegExpValidator, QPixmap, QImage, QStandardItemModel, QStandardItem, \
+    QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QMessageBox, QMenu, QApplication, QAbstractItemView, QHeaderView, QLabel, QAction, \
     QInputDialog, QLineEdit
@@ -37,14 +37,14 @@ import models.loadseq
 import models.product
 import models.testcase
 import models.variables
+from bll.settings import SettingsDialog
 from bll.testthread import TestThread, TestStatus
-from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int, ensure_path_sep
-from common.mysignals import update_label, on_setIcon, updateAction, controlEnable, on_actOpenFile
+from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int
+from common.mysignals import update_label, on_actOpenFile
 from common.testform import TestForm
 from communication.peak.pcan.peakcan import PeakCan
-from conf.logprint import QTextEditHandler, LogPrint
 from communication.peak.plin.peaklin import PeakLin
-from bll.settings import SettingsDialog
+from conf.logprint import QTextEditHandler, LogPrint
 from ui.ui_main import Ui_MainWindow
 
 matplotlib.use("Qt5Agg")
@@ -317,25 +317,22 @@ class MainForm(Ui_MainWindow, TestForm):
         """connect signals to slots"""
         self.mySignals.timingSignal[bool].connect(self.timing)
         self.mySignals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
-        self.mySignals.updateLabel[QLabel, str, int].connect(update_label)
-        self.mySignals.updateLabel[QLabel, str].connect(update_label)
+        self.mySignals.updateLabel[QLabel, str].connect(lambda label, str_: label.setText(str_))
         self.mySignals.update_tableWidget[list].connect(self.on_updateTableWidgetRet)
-        self.mySignals.textEditClearSignal[str].connect(self.on_textEditClear)
+        self.mySignals.textEditClearSignal.connect(lambda: self.textEdit.clear())
         self.mySignals.lineEditEnableSignal[bool].connect(self.lineEditEnable)
-        self.mySignals.setIconSignal[QAction, QIcon].connect(on_setIcon)
-        self.mySignals.updateActionSignal[QAction, QIcon].connect(updateAction)
-        self.mySignals.updateActionSignal[QAction, QIcon, str].connect(updateAction)
+        self.mySignals.setIconSignal[QAction, QIcon].connect(lambda action_, icon: action_.setIcon(icon))
         self.mySignals.updateStatusBarSignal[str].connect(self.updateStatusBar)
         self.mySignals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
-        self.mySignals.controlEnableSignal[QAction, bool].connect(controlEnable)
+        self.mySignals.controlEnableSignal[QAction, bool].connect(lambda action, isEnable: action.setEnabled(isEnable))
         self.mySignals.treeWidgetColor[QBrush, int, int, bool].connect(self.update_treeWidget_color)
         self.mySignals.threadStopSignal[str].connect(self.on_actionStop)
         self.mySignals.updateConnectStatusSignal[bool, str].connect(self.on_connect_status)
-        self.mySignals.showMessageBox[str, str, int].connect(self.showMessageBox)
-        self.mySignals.updateProgressBar[int].connect(self.update_progress_bar)
-        self.mySignals.updateProgressBar[int, int].connect(self.update_progress_bar)
+        self.mySignals.showMessageBox[str, str, int].connect(self.myShowMessageBox)
+        self.mySignals.updateProgressBar[int].connect(lambda value: self.progress_bar.setValue(value))
+        self.mySignals.updateProgressBar[int, int].connect(lambda value, _range: (self.progress_bar.setRange(0, _range),
+                                                                                  self.progress_bar.setValue(value)))
         self.mySignals.play_audio[str].connect(self.on_play_audio)
-
         self.actionNewSeq.triggered.connect(self.on_actionNewSequence)
         self.actionOpen_TestCase.triggered.connect(lambda: on_actOpenFile(self.testcase.testcasePath))
         self.actionConvertExcelToJson.triggered.connect(self.on_actionConvertExcelToJson)
@@ -347,7 +344,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionStart.triggered.connect(self.on_actionStart)
         self.actionStop.triggered.connect(self.on_actionStop)
         self.actionOpenLog.triggered.connect(lambda: on_actOpenFile(self.txtLogPath))
-        self.actionClearLog.triggered.connect(self.on_actionClearLog)
+        self.actionClearLog.triggered.connect(lambda: self.textEdit.clear() if not self.startFlag else None)
         self.actionLogFolder.triggered.connect(lambda: on_actOpenFile(gv.LogFolderPath))
         self.actionSaveLog.triggered.connect(self.on_actionSaveLog)
         self.actionCSVLog.triggered.connect(lambda: on_actOpenFile(self.testcase.csvFilePath))
@@ -355,7 +352,10 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actResultLog.triggered.connect(lambda: on_actOpenFile(gv.retPath))
         self.actionEnable_lab.triggered.connect(self.on_actionEnable_lab)
         self.actionDisable_factory.triggered.connect(self.on_actionDisable_factory)
-        self.actionAbout.triggered.connect(self.on_actionAbout)
+        self.actionAbout.triggered.connect(lambda: QMessageBox.about(self, 'About',
+                                                                     'Python3.11+PyQt5\n'
+                                                                     'Technical support: StevenShen\n'
+                                                                     'WeChat:chenhlzqbx'))
         self.actionRestart.triggered.connect(self.on_actionRestart)
         self.actionPeakLin.triggered.connect(self.on_peak_lin)
         self.actionUpdates.triggered.connect(self.on_actionUpdates)
@@ -523,19 +523,20 @@ class MainForm(Ui_MainWindow, TestForm):
                                                    'Paste', self.on_actPaste)
                 self.actDelete = sub_menu.addAction(QIcon(':/images/edit_cut.ico'),
                                                     'Delete', self.on_actDelete)
-            self.actStepping = menu.addAction(QIcon(':/images/RunSingle.ico'),
-                                              'Run Single-Step', self.on_actStepping)
+            self.actStepping = menu.addAction(QIcon(':/images/RunSingle.ico'), 'Run Single-Step',
+                                              lambda: self.on_returnPressed('stepping'))
             self.actLooping = menu.addAction(QIcon(':/images/loop.png'),
                                              'Loop All Selected', self.on_actLooping)
             self.actBreakpoint = menu.addAction(QIcon(':/images/StepBreakpoint.ico'),
                                                 'Breakpoint', self.on_actBreakpoint)
-            self.actCheckAll = menu.addAction(QIcon(':/images/check-all.png'),
-                                              'CheckAll', self.on_actCheckAll)
-            self.actUncheckAll = menu.addAction(QIcon(':/images/uncheck-all.png'),
-                                                'UncheckAll', self.on_actUncheckAll)
-            self.actExpandAll = menu.addAction(QIcon(':/images/ExpandAll.ico'), 'ExpandAll', self.on_actExpandAll)
-            self.actCollapseAll = menu.addAction(QIcon(':/images/CollapseAll.ico'),
-                                                 'CollapseAll', self.on_actCollapseAll)
+            self.actCheckAll = menu.addAction(QIcon(':/images/check-all.png'), 'CheckAll',
+                                              lambda: self.ShowTreeView(self.testSequences, True))
+            self.actUncheckAll = menu.addAction(QIcon(':/images/uncheck-all.png'), 'UncheckAll',
+                                                lambda: self.ShowTreeView(self.testSequences, False))
+            self.actExpandAll = menu.addAction(QIcon(':/images/ExpandAll.ico'), 'ExpandAll',
+                                               lambda: self.treeView.expandAll())
+            self.actCollapseAll = menu.addAction(QIcon(':/images/CollapseAll.ico'), 'CollapseAll',
+                                                 lambda: self.treeView.collapseAll())
             if not getattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
                 self.actBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
             else:
@@ -550,15 +551,6 @@ class MainForm(Ui_MainWindow, TestForm):
                 self.actStepping.setEnabled(not self.startFlag)
             sub_menu.setEnabled(not self.startFlag)
             menu.exec_(QCursor.pos())
-
-    def on_actCheckAll(self):
-        self.ShowTreeView(self.testSequences, True)
-
-    def on_actUncheckAll(self):
-        self.ShowTreeView(self.testSequences, False)
-
-    def on_actStepping(self):
-        self.on_returnPressed('stepping')
 
     def on_actLooping(self):
         self.FailNumOfCycleTest = 0
@@ -682,10 +674,6 @@ class MainForm(Ui_MainWindow, TestForm):
         else:
             self.testThread.signal[MainForm, TestStatus].emit(self, TestStatus.ABORT)
 
-    def on_actionClearLog(self):
-        if not self.startFlag:
-            self.textEdit.clear()
-
     def on_actionSaveLog(self, info):
         def thread_update():
             if info == 'rename':
@@ -722,9 +710,6 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionPrivileges.setIcon(QIcon(':/images/LockedObject.ico'))
         self.debug_switch(gv.IsDebug)
 
-    def on_actionAbout(self):
-        QMessageBox.about(self, 'About', 'Python3.11+PyQt5\nTechnical support: StevenShen\nWeChat:chenhlzqbx')
-
     def on_actionUpdates(self):
         pass
 
@@ -754,11 +739,6 @@ class MainForm(Ui_MainWindow, TestForm):
     def eventFilter(self, obj: 'QObject', event: 'QEvent') -> bool:
         if obj == self.tableViewStepProp and event.type() == QEvent.Type.ContextMenu:
             self.stepMenu.exec(QCursor.pos())
-        # if obj == self.tableViewRet and event.type() == QEvent.Type.ContextMenu:
-        #     rect = QRect(QCursor.pos().x(), QCursor.pos().y(), 50, 10)
-        #     QToolInfo = self.tableViewRetModel.data(self.tableViewRetModel.index(self.tableViewRet.currentIndex().row(),
-        #                                                                          self.tableViewRet.currentIndex().column()))
-        #     QToolTip.showText(QCursor.pos(), QToolInfo, self, rect, 3000)
         return super().eventFilter(obj, event)
 
     def on_actionShowStepInfo(self):
@@ -889,12 +869,6 @@ class MainForm(Ui_MainWindow, TestForm):
         thread = Thread(target=SaveToScript, daemon=True)
         thread.start()
 
-    def on_actExpandAll(self):
-        self.treeView.expandAll()
-
-    def on_actCollapseAll(self):
-        self.treeView.collapseAll()
-
     def on_connect_status(self, flag: bool, strs):
         if flag:
             self.connect_status_image.setPixmap(QPixmap(":/images/connect_ok.png"))
@@ -984,7 +958,6 @@ class MainForm(Ui_MainWindow, TestForm):
                 else:
                     stepItem.setIcon(QIcon(':/images/Document-txt-icon.png'))
 
-    # @QtCore.pyqtSlot(QBrush, int, int, bool)
     def update_treeWidget_color(self, color: QBrush, suiteNO_: int, stepNo_: int = -1, allChild=False):
         if stepNo_ == -1:
             if self.IsCycle or not self.startFlag:
@@ -999,20 +972,6 @@ class MainForm(Ui_MainWindow, TestForm):
             self.treeView.scrollTo(self.treeViewModel.item(suiteNO_, 0).child(stepNo_, 0).index(),
                                    hint=QAbstractItemView.EnsureVisible)
 
-    @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
-    def showMessageBox(self, title, text, level=2):
-        if level == 0:
-            return QMessageBox.information(self, title, text, QMessageBox.Yes)
-        elif level == 1:
-            return QMessageBox.warning(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        elif level == 2:
-            aa = QMessageBox.question(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            return aa
-        elif level == 3:
-            return QMessageBox.about(self, title, text)
-        else:
-            return QMessageBox.critical(self, title, text, QMessageBox.Yes)
-
     @QtCore.pyqtSlot(str, str, result=list)
     def showQInputDialog(self, title, label):
         results = QInputDialog.getText(self, title, label)
@@ -1023,10 +982,6 @@ class MainForm(Ui_MainWindow, TestForm):
         if isEnable:
             self.lineEdit.setText('')
             self.lineEdit.setFocus()
-
-    def on_textEditClear(self, info):
-        self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
-        self.textEdit.clear()
 
     def updateStatusBar(self, info):
         self.logger.debug(f'{currentframe().f_code.co_name}:{info}')
@@ -1046,11 +1001,6 @@ class MainForm(Ui_MainWindow, TestForm):
             self.lb_count_yield.setText('Yield: 0.00%')
         # QApplication.processEvents()
 
-    def update_progress_bar(self, value: int, _range: int = None):
-        if _range is not None:
-            self.progress_bar.setRange(0, _range)
-        self.progress_bar.setValue(value)
-
     def on_play_audio(self, path):
         player = QMediaPlayer(self)
         qurl = QUrl.fromLocalFile(path)
@@ -1060,7 +1010,7 @@ class MainForm(Ui_MainWindow, TestForm):
         player.play()
 
     def timerEvent(self, a):
-        self.mySignals.updateLabel[QLabel, str, int].emit(self.lb_errorCode, str(self.sec), 20)
+        self.mySignals.updateLabel[QLabel, str].emit(self.lb_errorCode, str(self.sec))
         self.sec += 1
 
     def UpdateContinueFail(self, testResult: bool):

@@ -10,6 +10,7 @@ import os
 import sys
 import threading
 import time
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QStyleFactory
 import models.variables
@@ -86,6 +87,20 @@ class TestForm(QMainWindow):
         else:
             self.logger.debug('stop timing...')
             self.killTimer(self.timerID)
+
+    @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
+    def myShowMessageBox(self, title, text, level=2):
+        if level == 0:
+            return QMessageBox.information(self, title, text, QMessageBox.Yes)
+        elif level == 1:
+            return QMessageBox.warning(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        elif level == 2:
+            aa = QMessageBox.question(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            return aa
+        elif level == 3:
+            return QMessageBox.about(self, title, text)
+        else:
+            return QMessageBox.critical(self, title, text, QMessageBox.Yes)
 
     def closeEvent(self, event):
         """

@@ -41,7 +41,7 @@ def SetTestStatus(myWind: QWidget, status: TestStatus):
             else:
                 myWind.treeView.blockSignals(True)
                 if not myWind.SingleStepTest:
-                    myWind.mySignals.textEditClearSignal[str].emit('')
+                    myWind.mySignals.textEditClearSignal.emit()
                 myWind.mySignals.lineEditEnableSignal[bool].emit(False)
                 if gv.cfg.station.stationName in ['M4', 'M6', 'SX5GEV']:
                     myWind.mySignals.updateLabel[QLabel, str, int, QBrush].emit(myWind.lb_status, 'Flashing', 36,

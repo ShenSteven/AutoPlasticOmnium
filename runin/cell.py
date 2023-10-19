@@ -13,20 +13,22 @@ import time
 import traceback
 from datetime import datetime
 from threading import Thread
-import conf.globalvar as gv
+from time import gmtime
+from time import strftime
+
 from PyQt5 import QtCore
-from PyQt5.QtGui import QBrush, QCursor
+from PyQt5.QtGui import QBrush, QCursor, QIcon
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QMessageBox, QMenu
+
+import conf.globalvar as gv
 import models.variables
-from conf.logprint import LogPrint
+from bll.teststatus import TestStatus
+from bll.testthread import TestThread
 from common.basicfunc import IsNullOrEmpty
 from common.mysignals import update_label
 from common.testform import TestForm
-from bll.teststatus import TestStatus
-from bll.testthread import TestThread
+from conf.logprint import LogPrint
 from runin.ui_cell import Ui_cell
-from time import strftime
-from time import gmtime
 
 
 class Cell(QFrame, Ui_cell, TestForm):
@@ -69,20 +71,14 @@ class Cell(QFrame, Ui_cell, TestForm):
         """connect signals to slots"""
         self.mySignals.timingSignal[bool].connect(self.timing)
         self.mySignals.updateLabel[QLabel, str, int, QBrush].connect(update_label)
-        self.mySignals.updateLabel[QLabel, str, int].connect(update_label)
-        self.mySignals.updateLabel[QLabel, str].connect(update_label)
-        self.mySignals.showMessageBox[str, str, int].connect(self.showMessageBox)
+        self.mySignals.updateLabel[QLabel, str].connect(lambda label, str_: label.setText(str_))
+        self.mySignals.showMessageBox[str, str, int].connect(self.myShowMessageBox)
         self.mySignals.saveTextEditSignal[str].connect(self.on_actionSaveLog)
         # self.lb_testName.linkActivated.connect(self.link_clicked)
         self.customContextMenuRequested.connect(self.on_menu)
-        self.actionClearCell.triggered.connect(self.On_actionClearCell)
-        self.actionRetest.triggered.connect(self.On_actionRetest)
-        self.actionResetFailCount.triggered.connect(self.On_actionResetFailCount)
-        self.actionSetDefaultIP.triggered.connect(self.On_actionSetDefaultIP)
-        self.actionTelnetLogin.triggered.connect(self.On_actionTelnetLogin)
 
     @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
-    def showMessageBox(self, title, text, level=2):
+    def myShowMessageBox(self, title, text, level=2):
         if level == 0:
             return QMessageBox.information(self, title, text, QMessageBox.Yes)
         elif level == 1:
@@ -164,29 +160,18 @@ class Cell(QFrame, Ui_cell, TestForm):
 
     def timerEvent(self, a):
         self.mySignals.updateLabel[QLabel, str].emit(self.lb_testTime, strftime("%H:%M:%S", gmtime(self.sec)))
-        # QApplication.processEvents()
         self.sec += 1
-
-    # def link_clicked(self):
-    #     def open_testlog():
-    #         if os.path.exists(self.txtLogPath):
-    #             os.startfile(self.txtLogPath)
-    #         else:
-    #             self.logger.warning(f"no find txt log,path:{self.txtLogPath}")
-    #
-    #     thread = Thread(target=open_testlog, daemon=True)
-    #     thread.start()
 
     def on_menu(self):
         menu = QMenu(self)
-        menu.addAction(self.actionClearCell)
-        menu.addAction(self.actionRetest)
-        menu.addAction(self.actionResetFailCount)
-        menu.addAction(self.actionSetDefaultIP)
-        menu.addAction(self.actionTelnetLogin)
+        menu.addAction(QIcon(), 'ClearCell', self.On_actClearCell)
+        menu.addAction(QIcon(), 'Retest', self.On_actRetest)
+        menu.addAction(QIcon(), 'ResetFailCount', lambda: self.UpdateContinueFail(True))
+        menu.addAction(QIcon(), 'SetDefaultIP', self.On_actSetDefaultIP)
+        menu.addAction(QIcon(), 'TelnetDUT', self.On_actTelnetDUT)
         menu.exec_(QCursor.pos())
 
-    def On_actionClearCell(self):
+    def On_actClearCell(self):
         if not self.startFlag:
             self.lb_cellNum.setText('')
             self.lb_sn.setText('')
@@ -196,7 +181,7 @@ class Cell(QFrame, Ui_cell, TestForm):
             self.lb_testName.setText(f'{self.row_index}-{self.col_index}')
             self.setStyleSheet("background-color: rgb(154, 142, 139);")
 
-    def On_actionRetest(self):
+    def On_actRetest(self):
         if IsNullOrEmpty(self.lb_sn.text()):
             return
         if self.startFlag:
@@ -210,13 +195,10 @@ class Cell(QFrame, Ui_cell, TestForm):
             return
         gv.CheckSnList.append(self.SN)
 
-    def On_actionResetFailCount(self):
-        self.UpdateContinueFail(True)
-
-    def On_actionSetDefaultIP(self):
+    def On_actSetDefaultIP(self):
         pass
 
-    def On_actionTelnetLogin(self):
+    def On_actTelnetDUT(self):
         pass
 
 

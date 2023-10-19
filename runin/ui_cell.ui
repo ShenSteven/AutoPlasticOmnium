@@ -204,31 +204,6 @@
     </widget>
    </item>
   </layout>
-  <action name="actionClearCell">
-   <property name="text">
-    <string>ClearCell</string>
-   </property>
-  </action>
-  <action name="actionRetest">
-   <property name="text">
-    <string>Retest</string>
-   </property>
-  </action>
-  <action name="actionResetFailCount">
-   <property name="text">
-    <string>ResetFailCount</string>
-   </property>
-  </action>
-  <action name="actionSetDefaultIP">
-   <property name="text">
-    <string>SetDefaultIP</string>
-   </property>
-  </action>
-  <action name="actionTelnetLogin">
-   <property name="text">
-    <string>TelnetLogin</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections/>

@@ -67,7 +67,7 @@ def _testKeyword_what(kw, step, test_case):
     compInfo = ''
     invoke_return = QMetaObject.invokeMethod(
         bll.mainform.MainForm.main_form,
-        'showMessageBox',
+        'myShowMessageBox',
         Qt.BlockingQueuedConnection,
         QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
         QtCore.Q_ARG(str, step.ExpectStr),
