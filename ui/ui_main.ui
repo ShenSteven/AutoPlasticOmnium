@@ -525,12 +525,14 @@ font: 20pt &quot;宋体&quot;;</string>
      <string>Log</string>
     </property>
     <addaction name="actionSaveLog"/>
-    <addaction name="actionOpenLog"/>
     <addaction name="actionClearLog"/>
-    <addaction name="separator"/>
+    <addaction name="actionOpenLog"/>
     <addaction name="actionException"/>
-    <addaction name="actionLogFolder"/>
+    <addaction name="separator"/>
     <addaction name="actionCSVLog"/>
+    <addaction name="actResultLog"/>
+    <addaction name="separator"/>
+    <addaction name="actionLogFolder"/>
    </widget>
    <widget class="QMenu" name="menuTestCase">
     <property name="title">
@@ -715,7 +717,11 @@ font: 20pt &quot;宋体&quot;;</string>
     <string>CSVLog</string>
    </property>
   </action>
-  <action name="actionResultLog">
+  <action name="actResultLog">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/microsoft-excel.png</normaloff>:/images/microsoft-excel.png</iconset>
+   </property>
    <property name="text">
     <string>ResultLog</string>
    </property>
@@ -739,51 +745,6 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
    <property name="text">
     <string>Helper</string>
-   </property>
-  </action>
-  <action name="actionCheckAll">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/check-all.png</normaloff>:/images/check-all.png</iconset>
-   </property>
-   <property name="text">
-    <string>CheckAll</string>
-   </property>
-  </action>
-  <action name="actionUncheckAll">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/uncheck-all.png</normaloff>:/images/uncheck-all.png</iconset>
-   </property>
-   <property name="text">
-    <string>UncheckAll</string>
-   </property>
-  </action>
-  <action name="actionStepping">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/RunSingle.ico</normaloff>:/images/RunSingle.ico</iconset>
-   </property>
-   <property name="text">
-    <string>Run Single-Step</string>
-   </property>
-  </action>
-  <action name="actionLooping">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/loop.png</normaloff>:/images/loop.png</iconset>
-   </property>
-   <property name="text">
-    <string>Loop All Selected</string>
-   </property>
-  </action>
-  <action name="actionEditStep">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/edit.png</normaloff>:/images/edit.png</iconset>
-   </property>
-   <property name="text">
-    <string>EditStep</string>
    </property>
   </action>
   <action name="actionClearLog">
@@ -824,15 +785,6 @@ font: 20pt &quot;宋体&quot;;</string>
   <action name="actionFeedback">
    <property name="text">
     <string>Feedback</string>
-   </property>
-  </action>
-  <action name="actionPause">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/Pause-icon.png</normaloff>:/images/Pause-icon.png</iconset>
-   </property>
-   <property name="text">
-    <string>Pause</string>
    </property>
   </action>
   <action name="actionunknow">
@@ -889,30 +841,6 @@ font: 20pt &quot;宋体&quot;;</string>
     <string>Restart</string>
    </property>
   </action>
-  <action name="actionExpandAll">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/ExpandAll.ico</normaloff>:/images/ExpandAll.ico</iconset>
-   </property>
-   <property name="text">
-    <string>ExpandAll</string>
-   </property>
-   <property name="toolTip">
-    <string>ExpandAll</string>
-   </property>
-  </action>
-  <action name="actionCollapseAll">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/CollapseAll.ico</normaloff>:/images/CollapseAll.ico</iconset>
-   </property>
-   <property name="text">
-    <string>CollapseAll</string>
-   </property>
-   <property name="toolTip">
-    <string>CollapseAll</string>
-   </property>
-  </action>
   <action name="actionEnable_lab">
    <property name="icon">
     <iconset resource="images.qrc">
@@ -936,58 +864,9 @@ font: 20pt &quot;宋体&quot;;</string>
     <string>About</string>
    </property>
   </action>
-  <action name="actionBreakpoint">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/StepBreakpoint.ico</normaloff>:/images/StepBreakpoint.ico</iconset>
-   </property>
-   <property name="text">
-    <string>Breakpoint Set</string>
-   </property>
-   <property name="toolTip">
-    <string>Breakpoint</string>
-   </property>
-  </action>
-  <action name="actionMBLT">
-   <property name="text">
-    <string>MBLT</string>
-   </property>
-  </action>
   <action name="actionPeakLin">
    <property name="text">
     <string>PEAK</string>
-   </property>
-  </action>
-  <action name="actionDelete">
-   <property name="text">
-    <string>Delete</string>
-   </property>
-  </action>
-  <action name="actionCopy">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/edit_copy.ico</normaloff>:/images/edit_copy.ico</iconset>
-   </property>
-   <property name="text">
-    <string>Copy</string>
-   </property>
-   <property name="toolTip">
-    <string>Copy</string>
-   </property>
-  </action>
-  <action name="actionPaste">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/edit_paste.ico</normaloff>:/images/edit_paste.ico</iconset>
-   </property>
-   <property name="text">
-    <string>Paste</string>
-   </property>
-   <property name="toolTip">
-    <string>Paste</string>
    </property>
   </action>
   <action name="actionNewSeq">
@@ -1001,18 +880,6 @@ font: 20pt &quot;宋体&quot;;</string>
    </property>
    <property name="toolTip">
     <string>New step</string>
-   </property>
-  </action>
-  <action name="actionCutStep">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/images/edit_cut.ico</normaloff>:/images/edit_cut.ico</iconset>
-   </property>
-   <property name="text">
-    <string>Cut</string>
-   </property>
-   <property name="toolTip">
-    <string>Cut step</string>
    </property>
   </action>
  </widget>

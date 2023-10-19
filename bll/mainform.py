@@ -147,11 +147,7 @@ class MainForm(Ui_MainWindow, TestForm):
         for item in gv.cfg.station.stationAll:
             model_all = []
             if item not in station_model:
-                station_select = QAction(self)
-                station_select.setObjectName(item)
-                station_select.setText(item)
-                self.menuSelect_Station.addAction(station_select)
-                station_select.triggered.connect(self.on_selectStation)
+                self.menuSelect_Station.addAction(QAction(item, self, triggered=self.on_selectStation))
             else:
                 if item == 'M4':
                     model_all = ['FL', 'FR', 'RL', 'RML', 'RMR', 'RR']
@@ -159,18 +155,11 @@ class MainForm(Ui_MainWindow, TestForm):
                     model_all = ['FL', 'FR', 'FLG', 'FRG']
                 elif item == 'SX5GEV' or item == 'SX5GEV_EOL':
                     model_all = ['FL', 'FR', 'RL', 'RM', 'RR', 'FLB', 'FRB']
-
-                station_menu = QMenu(self.menuSelect_Station)
-                station_menu.setObjectName(item)
-                station_menu.setTitle(item)
+                station_menu = QMenu(item, self.menuSelect_Station, triggered=self.on_selectStation)
                 self.menuSelect_Station.addMenu(station_menu)
-                station_menu.triggered.connect(self.on_selectStation)
                 for item_ in model_all:
-                    model_select = QAction(self)
-                    model_select.setObjectName(item_)
-                    model_select.setText(item_)
+                    model_select = QAction(item_, self, triggered=self.on_selectDutModel)
                     station_menu.addAction(model_select)
-                    model_select.triggered.connect(self.on_selectDutModel)
                     if gv.cfg.station.stationName == station_menu.title() and flag:
                         flag = False
                         model_select.triggered.emit()
@@ -234,10 +223,8 @@ class MainForm(Ui_MainWindow, TestForm):
         self.tableViewStepProp.horizontalHeader().setStyleSheet(strHeaderQss)
         self.tableViewStepProp.installEventFilter(self)
         self.stepMenu = QMenu(self.tableViewStepProp)
-        self.stepMenu.addAction('Insert Row')
-        self.stepMenu.addAction('Delete Row')
-        self.stepMenu.actions()[0].triggered.connect(self.on_stepInsertRow)
-        self.stepMenu.actions()[1].triggered.connect(self.on_stepDeleteRow)
+        self.stepMenu.addAction(QIcon(), 'Insert Row', self.on_stepInsertRow)
+        self.stepMenu.addAction(QIcon(), 'Delete Row', self.on_stepDeleteRow)
 
         self.tableViewVar.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tableViewVar.horizontalHeader().setStyleSheet(strHeaderQss)
@@ -350,17 +337,6 @@ class MainForm(Ui_MainWindow, TestForm):
         self.mySignals.updateProgressBar[int, int].connect(self.update_progress_bar)
         self.mySignals.play_audio[str].connect(self.on_play_audio)
 
-        self.actionCheckAll.triggered.connect(self.on_actionCheckAll)
-        self.actionUncheckAll.triggered.connect(self.on_actionUncheckAll)
-        self.actionStepping.triggered.connect(self.on_actionStepping)
-        self.actionLooping.triggered.connect(self.on_actionLooping)
-        self.actionExpandAll.triggered.connect(self.on_actionExpandAll)
-        self.actionCollapseAll.triggered.connect(self.on_actionCollapseAll)
-        self.actionBreakpoint.triggered.connect(self.on_actionBreakpoint)
-        self.actionCopy.triggered.connect(self.on_actionCopy)
-        self.actionPaste.triggered.connect(self.on_actionPaste)
-        self.actionDelete.triggered.connect(self.on_actionDelete)
-
         self.actionNewSeq.triggered.connect(self.on_actionNewSequence)
         self.actionOpen_TestCase.triggered.connect(self.on_actionOpen_TestCase)
         self.actionConvertExcelToJson.triggered.connect(self.on_actionConvertExcelToJson)
@@ -402,22 +378,15 @@ class MainForm(Ui_MainWindow, TestForm):
     def on_itemPressed(self, index):
         item = self.treeViewModel.itemFromIndex(index)
         if item.parent() is None:
-            # self.logger.critical('itemActivate')
             self.SuiteNo = item.index().row()
             self.StepNo = -1
             self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
-            self.actionStepping.setEnabled(False)
-            self.actionEditStep.setEnabled(False)
             pp = item.text().split(' ', 1)[1]
             anchor = f'testSuite:{pp}'
             self.textEdit.scrollToAnchor(anchor)
         else:
-            # self.logger.critical('itemActivate')
             self.SuiteNo = item.parent().index().row()
             self.StepNo = item.index().row()
-            self.actionStepping.setEnabled(True)
-            self.actionEditStep.setEnabled(True)
-            # print(self.SuiteNo, self.StepNo)
             pp = item.parent().text().split(' ', 1)[1]
             cc = item.text().split(' ', 1)[1]
             anchor = f'testStep:{pp}-{cc}'
@@ -545,55 +514,66 @@ class MainForm(Ui_MainWindow, TestForm):
         if gv.IsDebug:
             menu = QMenu(self.treeView)
             sub_menu = QMenu("Edit", menu)
-            sub_menu.setObjectName("Edit")
             sub_menu.setIcon(QIcon(':/images/edit.png'))
             if not gv.IsHide:
                 menu.addMenu(sub_menu)
-                sub_menu.addAction(self.actionCopy)
-                sub_menu.addAction(self.actionPaste)
-                sub_menu.addAction(self.actionDelete)
-            menu.addAction(self.actionStepping)
-            menu.addAction(self.actionLooping)
-            menu.addAction(self.actionBreakpoint)
-            menu.addAction(self.actionCheckAll)
-            menu.addAction(self.actionUncheckAll)
-            menu.addAction(self.actionExpandAll)
-            menu.addAction(self.actionCollapseAll)
+                self.actCopy = sub_menu.addAction(QIcon(':/images/edit_copy.ico'),
+                                                  'Copy', self.on_actCopy)
+                self.actPaste = sub_menu.addAction(QIcon(':/images/edit_paste.ico'),
+                                                   'Paste', self.on_actPaste)
+                self.actDelete = sub_menu.addAction(QIcon(':/images/edit_cut.ico'),
+                                                    'Delete', self.on_actDelete)
+            self.actStepping = menu.addAction(QIcon(':/images/RunSingle.ico'),
+                                              'Run Single-Step', self.on_actStepping)
+            self.actLooping = menu.addAction(QIcon(':/images/loop.png'),
+                                             'Loop All Selected', self.on_actLooping)
+            self.actBreakpoint = menu.addAction(QIcon(':/images/StepBreakpoint.ico'),
+                                                'Breakpoint', self.on_actBreakpoint)
+            self.actCheckAll = menu.addAction(QIcon(':/images/check-all.png'),
+                                              'CheckAll', self.on_actCheckAll)
+            self.actUncheckAll = menu.addAction(QIcon(':/images/uncheck-all.png'),
+                                                'UncheckAll', self.on_actUncheckAll)
+            self.actExpandAll = menu.addAction(QIcon(':/images/ExpandAll.ico'), 'ExpandAll', self.on_actExpandAll)
+            self.actCollapseAll = menu.addAction(QIcon(':/images/CollapseAll.ico'),
+                                                 'CollapseAll', self.on_actCollapseAll)
             if not getattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
-                self.actionBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
+                self.actBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
             else:
-                self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
-                self.actionBreakpoint.setText('Breakpoint Clear')
-            self.actionStepping.setEnabled(not self.startFlag)
-            self.actionLooping.setEnabled(not self.startFlag)
-            self.actionCheckAll.setEnabled(not self.startFlag)
-            self.actionUncheckAll.setEnabled(not self.startFlag)
+                self.actBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
+                self.actBreakpoint.setText('Breakpoint Clear')
+            self.actLooping.setEnabled(not self.startFlag)
+            self.actCheckAll.setEnabled(not self.startFlag)
+            self.actUncheckAll.setEnabled(not self.startFlag)
+            if self.StepNo == -1:
+                self.actStepping.setEnabled(False)
+            else:
+                self.actStepping.setEnabled(not self.startFlag)
             sub_menu.setEnabled(not self.startFlag)
             menu.exec_(QCursor.pos())
 
-    def on_actionCheckAll(self):
+    def on_actCheckAll(self):
         self.ShowTreeView(self.testSequences, True)
 
-    def on_actionUncheckAll(self):
+    def on_actUncheckAll(self):
         self.ShowTreeView(self.testSequences, False)
 
-    def on_actionStepping(self):
+    def on_actStepping(self):
         self.on_returnPressed('stepping')
 
-    def on_actionLooping(self):
+    def on_actLooping(self):
         self.FailNumOfCycleTest = 0
         self.PassNumOfCycleTest = 0
         self.IsCycle = True
         self.on_returnPressed()
 
-    def on_actionBreakpoint(self):
+    def on_actBreakpoint(self):
         if not getattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint'):
             setattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint', True)
-            self.actionBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
+            self.actBreakpoint.setIcon(QIcon(':/images/BreakpointDisabled.ico'))
             self.treeViewModel.itemFromIndex(self.treeView.currentIndex()).setIcon(QIcon(':/images/StepBreakpoint.ico'))
         else:
             setattr(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo], 'breakpoint', False)
-            self.actionBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
+            self.actBreakpoint.setIcon(QIcon(':/images/StepBreakpoint.ico'))
             self.treeViewModel.itemFromIndex(self.treeView.currentIndex()).setIcon(
                 QIcon(':/images/Document-txt-icon.png'))
 
@@ -947,10 +927,10 @@ class MainForm(Ui_MainWindow, TestForm):
         thread = Thread(target=SaveToScript, daemon=True)
         thread.start()
 
-    def on_actionExpandAll(self):
+    def on_actExpandAll(self):
         self.treeView.expandAll()
 
-    def on_actionCollapseAll(self):
+    def on_actCollapseAll(self):
         self.treeView.collapseAll()
 
     def on_connect_status(self, flag: bool, strs):
@@ -1340,7 +1320,7 @@ class MainForm(Ui_MainWindow, TestForm):
             self.QtimerID.stop()
             self.pBt_start.setText('Start')
 
-    def on_actionDelete(self):
+    def on_actDelete(self):
         if self.StepNo == -1:
             del self.testcase.cloneSuites[self.SuiteNo]
         else:
@@ -1358,16 +1338,16 @@ class MainForm(Ui_MainWindow, TestForm):
         self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
         self.treeView.scrollTo(self.treeViewModel.item(self.SuiteNo, 0).index(), hint=QAbstractItemView.EnsureVisible)
 
-    def on_actionCopy(self):
+    def on_actCopy(self):
         if self.StepNo == -1:
             self.suitClipboard = copy.deepcopy(self.testcase.cloneSuites[self.SuiteNo])
         else:
             self.stepClipboard = copy.deepcopy(self.testcase.cloneSuites[self.SuiteNo].steps[self.StepNo])
             if self.StepNo == 0:
                 self.stepClipboard.SuiteName = ''
-        self.actionPaste.setEnabled(True)
+        self.actPaste.setEnabled(True)
 
-    def on_actionPaste(self):
+    def on_actPaste(self):
         if self.StepNo == -1:
             if self.suitClipboard is not None:
                 self.testcase.cloneSuites.insert(self.SuiteNo, self.suitClipboard)
@@ -1385,7 +1365,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 self.testcase.cloneSuites[self.SuiteNo].steps.insert(self.StepNo + 1, self.stepClipboard)
                 self.stepClipboard = None
         self.ShowTreeView(self.testSequences)
-        self.actionPaste.setEnabled(False)
+        self.actPaste.setEnabled(False)
         self.actionSaveToScript.setEnabled(True)
         self.treeView.setExpanded(self.treeViewModel.item(self.SuiteNo, 0).index(), True)
         self.treeView.scrollTo(self.treeViewModel.item(self.SuiteNo, 0).index(), hint=QAbstractItemView.EnsureVisible)
