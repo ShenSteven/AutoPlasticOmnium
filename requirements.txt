@@ -26,27 +26,27 @@
 #             except PermissionError:
 #                 os.system(f'rmdir /S /Q {path}')
 
-PyQt5~=5.15.9
+PyQt5==5.15.10
 PyQt5-stubs~=5.15
 PyQt5Designer~=5.14.1 # only windows
-pyinstaller==5.13.0
+pyinstaller==6.1.0
 tinyaes~=1.0.3
 PyYAML~=6.0.1
 requests==2.31.0
 openpyxl==3.1.2
-psutil~=5.9.5
+psutil==5.9.6
 pyserial~=3.5
-setuptools==67.8.0
+setuptools==68.2.2
 PyVISA~=1.13.0
 nidaqmx~=0.8.0
 future==0.18.3
-opencv-python~=4.8.0.74
-opencv-python-headless~=4.8.0.74
+opencv-python==4.8.1.78
+opencv-python-headless==4.8.1.78
 zxing~=1.0
-numpy~=1.25.2
-matplotlib==3.7.2
+numpy==1.26.1
+matplotlib==3.8.0
 paramiko~=3.3.1
-pyodbc~=4.0.39
+pyodbc==5.0.1
 PyMySQL==1.1.0
 python-can==4.2.2
 PyAutoGUI~=0.9.54

@@ -230,10 +230,11 @@ class MainForm(Ui_MainWindow, TestForm):
 
         self.tableViewRetModel = QStandardItemModel(0, 9, self.tableViewRet)
         self.tableViewRetModel.setHorizontalHeaderLabels(self.tableWidgetHeader)
+        self.tableViewRet.setModel(self.tableViewRetModel)
+
         self.tableViewRet.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableViewRet.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableViewRet.horizontalHeader().setStyleSheet(strHeaderQss)
-        self.tableViewRet.setModel(self.tableViewRetModel)
         self.tableViewRet.resizeColumnsToContents()
         self.tableViewRet.resizeRowsToContents()
 
@@ -398,8 +399,8 @@ class MainForm(Ui_MainWindow, TestForm):
         if gv.IsHide:
             return
         if len(result_list) == 0:
-            self.tableViewRetModel.clear()
-            self.tableViewRetModel.setHorizontalHeaderLabels(self.tableWidgetHeader)
+            self.tableViewRet.model().clear()
+            self.tableViewRet.model().setHorizontalHeaderLabels(self.tableWidgetHeader)
         else:
             itemList = []
             for i, result in enumerate(result_list):
@@ -408,7 +409,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 if result_list[len(result_list) - 1].lower() == 'fail':
                     item.setForeground(Qt.red)
                 itemList.append(item)
-            self.tableViewRetModel.appendRow(itemList)
+            self.tableViewRet.model().appendRow(itemList)
 
     def on_reloadSeqs(self):
         if self.startFlag:
@@ -1131,10 +1132,10 @@ class MainForm(Ui_MainWindow, TestForm):
             create_csv_file(self.logger, retPath, self.tableWidgetHeader)
             if os.path.exists(retPath):
                 all_rows = []
-                for row in range(self.tableViewRetModel.rowCount()):
+                for row in range(self.tableViewRet.model().rowCount()):
                     row_data = []
-                    for column in range(self.tableViewRetModel.columnCount()):
-                        item = self.tableViewRetModel.item(row, column)
+                    for column in range(self.tableViewRet.model().columnCount()):
+                        item = self.tableViewRet.model().item(row, column)
                         if item is not None:
                             row_data.append(item.text())
                     all_rows.append(row_data)
