@@ -75,3 +75,8 @@ LTT:
     channel: 1
     Volt: 13.5
     Curr: 12
+Updates:
+    FTPServer: 10.177.4.201
+    FTPUser: user
+    FTPPwd: pwd
+

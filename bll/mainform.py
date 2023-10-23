@@ -712,7 +712,21 @@ class MainForm(Ui_MainWindow, TestForm):
         self.debug_switch(gv.IsDebug)
 
     def on_actionUpdates(self):
-        pass
+        process_name = psutil.Process(os.getpid()).name().removesuffix('.exe')
+        ftpUpdateBat = rf"""C:
+        cd C:\Windows\System32
+        taskkill /f /t /im {process_name}.exe
+        net use S: /del /y&net use S: \\{gv.cfg.Updates.FTPServer}\{process_name} /USER:{gv.cfg.Updates.FTPUser}\{gv.cfg.Updates.FTPPwd}
+        echo D|xcopy S:\{process_name} D:\{process_name} /Y /s /e
+        net use S: /del /y
+        cd /D D:\{process_name}
+        start {process_name}.exe
+        exit
+        """
+        with open(f'{gv.CurrentDir}/tool/updates.bat', 'w') as f:
+            f.write(ftpUpdateBat)
+        time.sleep(0.1)
+        run_cmd(self.logger, rf'{gv.CurrentDir}{os.sep}tool{os.sep}updates.bat')
 
     def on_actionRestart(self):
         def thread_update():
