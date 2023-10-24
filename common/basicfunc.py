@@ -24,6 +24,11 @@ from decimal import Decimal, ROUND_UP, ROUND_HALF_UP
 
 
 # from pydub import AudioSegment
+def get_line_list(path):
+    with open(path, 'r', encoding='utf-8') as rf:
+        lines = [item.strip() for item in rf.readlines()]
+        return lines
+
 
 def ReplaceCommonEscapeSequences(date):
     return date.replace('\\n', '\n').replace('\\r', '\r')

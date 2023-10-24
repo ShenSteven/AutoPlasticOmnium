@@ -20,7 +20,7 @@ from openpyxl import load_workbook
 import models.suite
 import models.step
 import dataaccess.sqlite
-from common.basicfunc import IsNullOrEmpty, get_sha256
+from common.basicfunc import IsNullOrEmpty, get_sha256, get_line_list
 import conf.globalvar as gv
 
 
@@ -41,8 +41,11 @@ def save_keywords_to_txt(path, wpath):
 
 def excel_convert_to_json(testcase_path_excel, all_stations, logger):
     logger.debug("Start convert excel testcase to json script,please wait a moment...")
-    gv.Keywords = save_keywords_to_txt(rf'{gv.CurrentDir}{os.sep}models{os.sep}keyword.py',
-                                       rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
+    if not getattr(sys, 'frozen', False):
+        gv.Keywords = save_keywords_to_txt(rf'{gv.CurrentDir}{os.sep}models{os.sep}keyword.py',
+                                           rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
+    else:
+        gv.Keywords = get_line_list(rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
     for station in all_stations:
         load_testcase_from_excel(testcase_path_excel, station, rf"{gv.ScriptFolder}{os.sep}{station}.json", logger)
     logger.debug("convert finish!")

@@ -20,12 +20,7 @@ import bll.flowcontrol.ifelse
 from inspect import currentframe
 from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
-
-
-def get_keywords_list(path):
-    with open(path, 'r', encoding='utf-8') as rf:
-        keywords = [item.strip() for item in rf.readlines()]
-        return keywords
+from common.basicfunc import get_line_list
 
 
 class TestCase:
@@ -90,18 +85,10 @@ class TestCase:
                 self.originalSuites, self.header, self.stepCount = models.loadseq.load_testcase_from_json(
                     self.test_script_json, isVerify)
             self.cloneSuites = copy.deepcopy(self.originalSuites)
-            gv.Keywords = get_keywords_list(rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
+            gv.Keywords = get_line_list(rf'{gv.CurrentDir}{os.sep}conf{os.sep}keywords.txt')
             self.sumStep = self.stepCount
         except Exception as e:
-            QMessageBox.critical(None, 'ERROR!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
-            # QMetaObject.invokeMethod(
-            #     self.myWind,
-            #     'showMessageBox',
-            #     Qt.BlockingQueuedConnection,
-            #     QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
-            #     QtCore.Q_ARG(str, 'ERROR!'),
-            #     QtCore.Q_ARG(str, f'{currentframe().f_code.co_name}:{e}'),
-            #     QtCore.Q_ARG(int, 4))
+            QMessageBox.critical(None, 'load_testcase error!', f'{currentframe().f_code.co_name}:{e} ', QMessageBox.Yes)
             raise
 
     def run(self):

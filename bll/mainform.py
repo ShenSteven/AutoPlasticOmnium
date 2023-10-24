@@ -860,14 +860,7 @@ class MainForm(Ui_MainWindow, TestForm):
                 # ws.protection.password = '....'
             except Exception as e:
                 self.logger.error(f'{currentframe().f_code.co_name}:{e}')
-                QMetaObject.invokeMethod(
-                    self,
-                    'showMessageBox',
-                    Qt.BlockingQueuedConnection,
-                    QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
-                    QtCore.Q_ARG(str, 'ERROR!'),
-                    QtCore.Q_ARG(str, f'{currentframe().f_code.co_name}:{e}'),
-                    QtCore.Q_ARG(int, 4))
+                self.myShowMessageBox('ERROR!', f'{currentframe().f_code.co_name}:{e}', level=4)
             else:
                 try:
                     workbook.save(gv.ExcelFilePath)
@@ -875,6 +868,7 @@ class MainForm(Ui_MainWindow, TestForm):
                     self.on_reloadSeqs()
                 except PermissionError as e:
                     self.logger.error(f'{e},Please close the excel file first.')
+                    self.myShowMessageBox('PermissionError!', f'{e},Please close the excel file first.', level=4)
                 except Exception as e:
                     self.logger.error(f'{e}')
                     raise
@@ -883,6 +877,20 @@ class MainForm(Ui_MainWindow, TestForm):
 
         thread = Thread(target=SaveToScript, daemon=True)
         thread.start()
+
+    @QtCore.pyqtSlot(str, str, int, result=QMessageBox.StandardButton)
+    def myShowMessageBox(self, title, text, level=2):
+        if level == 0:
+            return QMessageBox.information(self, title, text, QMessageBox.Yes)
+        elif level == 1:
+            return QMessageBox.warning(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        elif level == 2:
+            aa = QMessageBox.question(self, title, text, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            return aa
+        elif level == 3:
+            return QMessageBox.about(self, title, text)
+        else:
+            return QMessageBox.critical(self, title, text, QMessageBox.Yes)
 
     def on_connect_status(self, flag: bool, strs):
         if flag:
@@ -1100,11 +1108,7 @@ class MainForm(Ui_MainWindow, TestForm):
             self.SingleStepTest = False
         if not gv.IsDebug and (self.dutModel == 'unknown' or len(self.lineEdit.text()) != gv.cfg.dut.snLen):
             str_info = f'无法根据SN判断机种或者SN长度不对! 扫描:{len(self.lineEdit.text())},规定:{gv.cfg.dut.snLen}.'
-            QMetaObject.invokeMethod(self, 'showMessageBox', Qt.AutoConnection,
-                                     QtCore.Q_RETURN_ARG(QMessageBox.StandardButton),
-                                     QtCore.Q_ARG(str, 'JudgeMode!'),
-                                     QtCore.Q_ARG(str, str_info),
-                                     QtCore.Q_ARG(int, 5))
+            self.myShowMessageBox('JudgeMode!', str_info, level=5)
             return
         # if not self.CheckContinueFailNum() and not gv.IsDebug:
         # return
