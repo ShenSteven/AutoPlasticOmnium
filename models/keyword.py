@@ -61,6 +61,22 @@ def _testKeyword_what(kw, step, test_case):
     return rReturn, compInfo
 
 
+@testKeyword.register('SetVars')
+def _testKeyword_what(kw, step, test_case):
+    compInfo = ''
+    step.testValue = step.CmdOrParam
+    varList = step.SetGlobalVar.split(',')
+    setattr(test_case.myWind.TestVariables, varList[0], step.RxID)
+    step.logger.debug(f"setGlobalVar:{varList[0]} = {step.RxID}")
+    setattr(test_case.myWind.TestVariables, varList[1], step.GRxID)
+    step.logger.debug(f"setGlobalVar:{varList[1]} = {step.GRxID}")
+    setattr(test_case.myWind.TestVariables, varList[2], step.TxID)
+    step.logger.debug(f"setGlobalVar:{varList[2]} = {step.TxID}")
+    rReturn = True
+    time.sleep(0.1)
+    return rReturn, compInfo
+
+
 @testKeyword.register('MessageBoxShow')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
