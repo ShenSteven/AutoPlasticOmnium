@@ -67,8 +67,8 @@ BLF:
     SchedulePeriod: 20
 RUNIN:
     IsRUNIN: false
-    row: 5 # group No,<=10
-    col: 4 # <=8
+    row: 10 # group No,<=10
+    col: 8 # <=8
 LTT:
     row: 5 # group No,<=10
     col: 4 # <=8

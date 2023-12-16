@@ -42,8 +42,6 @@ from bll.testthread import TestThread, TestStatus
 from common.basicfunc import IsNullOrEmpty, run_cmd, create_csv_file, GetAllIpv4Address, str_to_int
 from common.mysignals import update_label, on_actOpenFile
 from common.testform import TestForm
-from communication.peak.pcan.peakcan import PeakCan
-from communication.peak.plin.peaklin import PeakLin
 from conf.logprint import QTextEditHandler, LogPrint
 from ui.ui_main import Ui_MainWindow
 
@@ -354,7 +352,7 @@ class MainForm(Ui_MainWindow, TestForm):
         self.actionEnable_lab.triggered.connect(self.on_actionEnable_lab)
         self.actionDisable_factory.triggered.connect(self.on_actionDisable_factory)
         self.actionAbout.triggered.connect(lambda: QMessageBox.about(self, 'About',
-                                                                     'Python3.11+PyQt5\n'
+                                                                     'Python3+PyQt\n'
                                                                      'Technical support: StevenShen\n'
                                                                      'WeChat:chenhlzqbx'))
         self.actionRestart.triggered.connect(self.on_actionRestart)
@@ -627,6 +625,8 @@ class MainForm(Ui_MainWindow, TestForm):
         settings_wind.destroy()
 
     def on_peak_lin(self):
+        from communication.peak.plin.peaklin import PeakLin
+        from communication.peak.pcan.peakcan import PeakCan
         if gv.PLin is None:
             gv.PLin = PeakLin(self.logger,
                               gv.cfg.BLF.ReqDelay,

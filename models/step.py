@@ -805,8 +805,8 @@ class Step:
         if self.Keyword == 'Waiting':
             return
         result_info = f"{self.StepName} {'pass' if self.test_result else 'fail'}!! ElapsedTime:{self.elapsedTime}s," \
-                      f"Symptom:{self.error_code}:{self.error_details}," \
-                      f"spec:{self.SPEC},Min:{self.LSL},Value:{self.testValue}, Max: {self.USL}"
+                      f"Symptom:{self.error_code}::{self.error_details}," \
+                      f"SPEC:{self.SPEC},LSL:{self.LSL},Value:{self.testValue}, USL:{self.USL}"
         if self.test_result:
             self.logger.info(result_info)
         else:

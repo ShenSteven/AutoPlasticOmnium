@@ -15,7 +15,6 @@ from PyQt5.QtWidgets import QAction, QMessageBox
 
 import bll.mainform
 from common import value_dispatch
-from communication.peak.plin import peaklin
 from communication.serialport import SerialPort
 from communication.telnet import TelnetComm
 import conf.globalvar as gv
@@ -184,6 +183,7 @@ def _testKeyword_what(kw, step, test_case):
 
 @testKeyword.register('PLINInitConnect')
 def _testKeyword_what(kw, step, test_case):
+    from communication.peak.plin import peaklin
     rReturn = False
     compInfo = ''
     if gv.PLin is None:
@@ -216,6 +216,7 @@ def _testKeyword_what(kw, step, test_case):
 
 @testKeyword.register('PLINInitConnectELV')
 def _testKeyword_what(kw, step, test_case):
+    from communication.peak.plin import peaklin
     rReturn = False
     compInfo = ''
     if gv.PLin is None:
@@ -340,6 +341,7 @@ def _testKeyword_what(kw, step, test_case):
 
 @testKeyword.register('GetCRC')
 def _testKeyword_what(kw, step, test_case):
+    from communication.peak.plin import peaklin
     compInfo = ''
     path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
     step.testValue = peaklin.PeakLin.get_crc_apps19(step.logger, path)
