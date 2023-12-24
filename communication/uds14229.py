@@ -353,7 +353,7 @@ class UDSonCAN:
             msg.is_fd = self.is_fd
             try:
                 bus.send(msg, timeout=timeout)
-                self.logger.debug(f"Tx  :{msg.arbitration_id:X}, {msg.data}.")
+                self.logger.debug(f"Tx  {msg.arbitration_id:X}, {msg.data}.")
                 return True
             except can.CanError:
                 self.logger.fatal("Message NOT sent")
