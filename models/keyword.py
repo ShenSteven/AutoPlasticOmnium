@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QAction, QMessageBox
 
 import bll.mainform
 from common import value_dispatch
+from communication.canbus import CanBus
 from communication.serialport import SerialPort
 from communication.telnet import TelnetComm
 import conf.globalvar as gv
@@ -470,9 +471,8 @@ def _testKeyword_what(kw, step, test_case):
     rReturn = False
     compInfo = ''
 
-    """ test action
-     ......
-    """
+    if gv.CANBus is None:
+        gv.CANBus = CanBus(step.logger, interface=None, channel=None, bitrate=None, appname=None)
 
     return rReturn, compInfo
 
@@ -480,39 +480,35 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('UDSonCANSingleFrame')
 @testKeyword.register('CANSingleFrame')
 def _testKeyword_what(kw, step, test_case):
-    rReturn = False
     compInfo = ''
-
-    """ test action
-     ......
-    """
-
+    rReturn, revStr = gv.CANBus.uds.SingleFrame(step.RxID, step.GRxID, step.TxID, step.PCI_LEN, step.CmdOrParam,
+                                                step.Timeout)
+    if rReturn and step.CheckStr1 in revStr:
+        step.testValue = subStr(step.SubStr1, step.SubStr2, revStr, step)
+    compInfo, rReturn = assert_value(compInfo, step, rReturn)
     return rReturn, compInfo
 
 
 @testKeyword.register('UDSonCANMultiFrame')
 @testKeyword.register('CANMultiFrame')
 def _testKeyword_what(kw, step, test_case):
-    rReturn = False
     compInfo = ''
-
-    """ test action
-     ......
-    """
-
+    rReturn, revStr = gv.CANBus.uds.MultiFrame(step.RxID, step.GRxID, step.TxID, step.PCI_LEN, step.CmdOrParam,
+                                               step.Timeout)
+    if rReturn and step.CheckStr1 in revStr:
+        step.testValue = subStr(step.SubStr1, step.SubStr2, revStr, step)
     return rReturn, compInfo
 
 
 @testKeyword.register('CANTransferData')
 @testKeyword.register('UDSonCANTransferData')
 def _testKeyword_what(kw, step, test_case):
-    rReturn = False
+    from communication.uds14229 import get_datas
     compInfo = ''
-
-    """ test action
-     ......
-    """
-
+    path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
+    s19datas = get_datas(step.logger, path)
+    step.logger.debug(path)
+    rReturn = gv.CANBus.uds.TransferData(step.RxID, step.GRxID, step.TxID, s19datas, step.PCI_LEN, step.Timeout)
     return rReturn, compInfo
 
 

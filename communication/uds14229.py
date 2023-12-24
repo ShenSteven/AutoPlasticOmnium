@@ -14,7 +14,7 @@ import traceback
 from ctypes import *
 from enum import Enum
 from inspect import currentframe
-from common.basicfunc import bytes_to_string
+from common.basicfunc import bytes_to_string, right_round
 from communication.peak.plin import PLinApi
 
 
@@ -330,10 +330,11 @@ class UDSonLIN:
 
 
 class UDSonCAN:
-    def __init__(self, logger, can_bus, is_extended_id=False):
+    def __init__(self, logger, can_bus, is_extended_id=False, is_fd=False):
         self.logger = logger
         self.bus = can_bus
         self.is_extended_id = is_extended_id
+        self.is_fd = is_fd
         self.RxID = None
         self.TxID = None
         self.SID = None
@@ -349,6 +350,7 @@ class UDSonCAN:
         with self.bus as bus:
             msg = can.Message(arbitration_id=fid, data=fdata)
             msg.is_extended_id = self.is_extended_id
+            msg.is_fd = self.is_fd
             try:
                 bus.send(msg, timeout=timeout)
                 self.logger.debug(f"Tx  :{msg.arbitration_id:X}, {msg.data}.")
@@ -358,23 +360,46 @@ class UDSonCAN:
                 return False
 
     def read(self, respSID, timeout):
+        multiFrameDatas = []
+        CFSum = 0
+        CFCounter = 0
         while True:
             pRcvMsg = self.bus.recv(timeout)
             if pRcvMsg is not None:
                 respData = bytes_to_string(pRcvMsg.Data)
+                self.logger.debug(f"Rx  {pRcvMsg.arbitration_id:X}, {respData}.")
                 if pRcvMsg.arbitration_id == self.TxID:
-                    if pRcvMsg.Data[1] == (int(respSID, 16)):
-                        self.logger.debug(f"Rx  {pRcvMsg.arbitration_id:X}, {pRcvMsg.data}.")
-                        return True, bytes_to_string(pRcvMsg.Data)
-                    elif pRcvMsg.Data[1] == (int('7F', 16)) and pRcvMsg.Data[2] == self.SID:
-                        self.logger.debug(f"RX  {pRcvMsg.arbitration_id:X}, {bytes_to_string(pRcvMsg.Data)}")
-                        if pRcvMsg.Data[3] == (int("78", 16)):
-                            continue
-                        self.logger.error(f"Negative response!NRC={hex(pRcvMsg.Data[3])}")
-                        return False, respData
+                    if pRcvMsg.Data[0] <= 15:  # respond is singleFrame
+                        if pRcvMsg.Data[1] == (int(respSID, 16)):  # Positive response
+                            return True, respData
+                        elif pRcvMsg.Data[1] == (int('7F', 16)) and pRcvMsg.Data[2] == self.SID:  # Negative response
+                            if pRcvMsg.Data[3] == (int("78", 16)):  # pending
+                                continue
+                            self.logger.error(f"Negative response!NRC={hex(pRcvMsg.Data[3])}")
+                            return False, respData
+                        else:
+                            return False, ''
+                    elif 15 < pRcvMsg.Data[0] < 32:  # respond is FirstFrame of MultiFrame
+                        if pRcvMsg.Data[2] == (int(respSID, 16)):  # Positive response
+                            multiFrameDatasLen = pRcvMsg.Data[0] + pRcvMsg.Data[1] - 0X1000
+                            CFSum = right_round((multiFrameDatasLen - 6) / 7, 0)
+                            for j in range(2, 8):
+                                multiFrameDatas.append(pRcvMsg.Data[j])
+                        elif pRcvMsg.Data[2] == (int('7F', 16)) and pRcvMsg.Data[3] == self.SID:  # Negative response
+                            if pRcvMsg.Data[4] == (int("78", 16)):  # pending
+                                continue
+                            self.logger.error(f"Negative response!NRC={hex(pRcvMsg.Data[3])}")
+                        else:
+                            return False, ''
+                    elif 31 < pRcvMsg.Data[0] < 48:  # respond is Consecutive frames of MultiFrame
+                        CFCounter += 1
+                        for j in range(1, 8):
+                            multiFrameDatas.append(pRcvMsg.Data[j])
+                        if CFCounter == CFSum:
+                            return True, bytes_to_string(multiFrameDatas)
                     else:
-                        self.logger.debug(f"Rx3  {pRcvMsg.arbitration_id:X}, {pRcvMsg.data}.")
-                        continue
+                        self.logger.error(f"unknown frame type!!!")
+                        return False, ''
             else:
                 return False, ''
 
@@ -441,7 +466,7 @@ class UDSonCAN:
             self.logger.fatal(f'{currentframe().f_code.co_name}:{ex},{traceback.format_exc()}')
             return False, ""
 
-    def MultiFrame(self, rx_id, grx_id, tx_id, pci, data, maxPayload=6, timeout=2):
+    def MultiFrame(self, rx_id, grx_id, tx_id, pci, data, timeout=2, maxPayload=6):
         self.SetRxTxID(rx_id, grx_id, tx_id)
         self.SID = '{:02X}'.format((int(data.split()[0], 16)))
         tempData = data.split()
