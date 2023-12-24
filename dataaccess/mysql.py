@@ -85,8 +85,8 @@ class MySQL(object):
 
 if __name__ == '__main__':
     with MySQL(host='127.0.0.1', port=3306, user='root', passwd='123456') as mydb:
-        mydb.execute_commit('''CREATE DATABASE AutoPlasticOmnium;''')
-        mydb.execute_commit('''USE AutoPlasticOmnium;''')
+        mydb.execute_commit('''CREATE DATABASE AutoBRUSA;''')
+        mydb.execute_commit('''USE AutoBRUSA;''')
         mydb.execute_commit('''CREATE TABLE RESULT
                                      (ID            INTEGER PRIMARY KEY AUTO_INCREMENT,
                                       SN            TEXT,

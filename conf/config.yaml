@@ -1,19 +1,9 @@
 station:
     privileges: lab
     stationAll:
-    - Sample
-    - LTT1
-    - M4
-    - M6
-    - SX5GEV
-    - SX5GEV_EOL
-    - ReadVer_M4
-    - ReadVer_SX5GEV
-    - ALE_M4
-    - ALE_M6
-    - ALE_SX5GEV
-    stationName: SX5GEV
-    stationNo: SX5GEV
+    - CalOBC7CANID
+    stationName: CalOBC7CANID
+    stationNo: CalOBC7CANID
     logFolder: D:\TestLog
     logServer: 10.90.104.85
     logServerUser: eero
@@ -79,4 +69,17 @@ Updates:
     FTPServer: 10.177.4.201
     FTPUser: user
     FTPPwd: pwd
+Vector:
+    interface: vector
+    channel: 1
+    bitrate: 500
+    app_name: python-can
+PCAN:
+    interface: pcan
+    channel: PCAN_USBBUS1
+    bitrate: 500
+CANalystII:
+    interface: canalystii
+    channel: 1
+    bitrate: 500
 

@@ -65,6 +65,9 @@ class Configs:
         self.RUNIN = Conf(dict_['RUNIN'])
         self.LTT = Conf(dict_['LTT'])
         self.Updates = Conf(dict_['Updates'])
+        self.Vector = Conf(dict_['Vector'])
+        self.PCAN = Conf(dict_['PCAN'])
+        self.CANalystII = Conf(dict_['CANalystII'])
 
     def __getitem__(self, i):
         if i >= len(self.__dict__.items()):

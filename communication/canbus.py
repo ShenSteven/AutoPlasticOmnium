@@ -12,6 +12,8 @@ from abc import ABC
 from can import Listener
 from can.message import Message
 
+from communication.uds14229 import UDSonCAN
+
 
 class CanBus:
     is_extended_id: bool = False
@@ -20,13 +22,23 @@ class CanBus:
     is_fd: bool = False
     is_rx: bool = False
 
-    def __init__(self, logger=None, interface=None, channel=None, context=None, **kwargs):
+    def __init__(self, logger=None, interface=None, channel=None, bitrate=None, appname=None):
         self.logger = logger
-        self.bus = can.Bus(interface=interface, channel=channel, config_context=context, ignore_config=False,
-                           **kwargs)
+        self.bus = can.Bus(interface=interface, channel=channel, bitrate=bitrate, app_name=appname)
 
-    def open(self, *args):
-        pass
+    # def open(self, *args):
+    def open(self, interface=None, channel=None, bitrate=None, appname=None):
+        try:
+            self.bus = can.Bus(interface=interface, channel=channel, bitrate=bitrate)
+        except ValueError:
+            pass
+        except Exception as e:
+            self.logger.debug('e')
+            self.bus = can.Bus(interface=interface, channel=channel, bitrate=bitrate, app_name=appname)
+        else:
+            return True
+        finally:
+            pass
 
     def close(self):
         self.bus.shutdown()
@@ -58,7 +70,7 @@ class CanBus:
             msg.is_rx = self.is_rx
             try:
                 bus.send(msg, timeout=timeout)
-                # self.logger.debug(f"Message sent on {bus.channel_info}:id:{msg.arbitration_id:X}, {msg.data}")
+                # self.logger.debug(f"Message sent on {bus.channel_info}:id:{msg.arbitration_id:X}, {msg.fdata}")
                 print(f"Message sent on {bus.channel_info}, id:{msg.arbitration_id:X}, {msg.data}")
             except can.CanError:
                 self.logger.fatal("Message NOT sent")
@@ -67,7 +79,7 @@ class CanBus:
         """
         Sends a message every period with no explicit timeout Sleeps for 2 seconds then stops the task.
         :param fid: frame ID
-        :param data: frame data field
+        :param data: frame fdata field
         :param period: Unit: second
         :param timeout: Unit: second
         :return:
@@ -91,7 +103,7 @@ class CanBus:
         """
         Send using LimitedDurationCyclicSendTaskABC.
         :param fid: frame ID
-        :param data: frame data field
+        :param data: frame fdata field
         :param period: Unit: second
         :param duration: Unit: second
         :return:
@@ -141,6 +153,135 @@ class CanBus:
                 self.logger.fatal("Message NOT sent")
 
 
+class CanBus2:
+    is_extended_id: bool = False
+    is_fd: bool = False
+
+    def __init__(self, logger, interface, channel, bitrate=500000, appname='python-can'):
+        self.logger = logger
+        self.interface = interface
+        self.channel = channel
+        self.bitrate = bitrate
+        self.appname = appname
+        self.bus = None
+        self.udsoncan = None
+
+    def open(self):
+        try:
+            self.bus = can.Bus(interface=self.interface, channel=self.channel, bitrate=self.bitrate)
+        except ValueError:
+            pass
+        except Exception as e:
+            self.logger.debug('e')
+            self.bus = can.Bus(interface=self.interface, channel=self.channel, bitrate=self.bitrate,
+                               app_name=self.appname)
+        else:
+            return True
+        finally:
+            self.udsoncan = UDSonCAN(self.logger, self.bus, self.is_extended_id)
+
+    def close(self):
+        self.bus.shutdown()
+
+    def read(self, timeout):
+        print('Waiting for RX CAN messages ...')
+        try:
+            while True:
+                msg = self.bus.recv(timeout)
+                if msg is not None:
+                    self.logger.debug(f"Rx<-- id:{msg.arbitration_id:X}, {msg.data}")
+        except KeyboardInterrupt:
+            pass
+
+    def write(self, fid: int, fdata, timeout):
+        """
+        send one can standard frame
+        :param fid:
+        :param fdata: (bytes | bytearray | int | Iterable[int] | None)
+        :param timeout:
+        :return:
+        """
+        with self.bus as bus:
+            msg = can.Message(arbitration_id=fid, data=fdata)
+            msg.is_extended_id = self.is_extended_id
+            msg.is_fd = self.is_fd
+            try:
+                bus.send(msg, timeout=timeout)
+                self.logger.debug(f"Tx--> id:{msg.arbitration_id:X}, {msg.data}")
+                return True
+            except can.CanError:
+                self.logger.fatal("Message NOT sent")
+                return False
+
+    def simple_periodic_send(self, fid, data, period, timeout=2):
+        """
+        Sends a message every period with no explicit timeout Sleeps for 2 seconds then stops the task.
+        :param fid: frame ID
+        :param data: frame fdata field
+        :param period: Unit: second
+        :param timeout: Unit: second
+        :return:
+        """
+        # self.logger.debug(f"Starting to send a message every {period * 1000}ms for {timeout}s")
+        print(f"Starting to send a message every {period * 1000}ms for {timeout}s")
+        msg = can.Message(arbitration_id=fid, data=data)
+        msg.is_extended_id = self.is_extended_id
+        msg.is_fd = self.is_fd
+        task = self.bus.send_periodic(msg, period)
+        assert isinstance(task, can.CyclicSendTaskABC)
+        time.sleep(timeout)
+        task.stop()
+        # self.logger.debug("stopped periodic cyclic send")
+        print("stopped periodic cyclic send")
+
+    def limited_periodic_send(self, fid, data, period, duration):
+        """
+        Send using LimitedDurationCyclicSendTaskABC.
+        :param fid: frame ID
+        :param data: frame fdata field
+        :param period: Unit: second
+        :param duration: Unit: second
+        :return:
+        """
+        self.logger.debug("Starting to send a message every 200ms for 1s")
+        msg = can.Message(arbitration_id=fid, data=data)
+        msg.is_extended_id = self.is_extended_id
+        msg.is_fd = self.is_fd
+        task = self.bus.send_periodic(msg, period, duration, store_task=False)
+        if not isinstance(task, can.LimitedDurationCyclicSendTaskABC):
+            self.logger.debug("This interface doesn't seem to support LimitedDurationCyclicSendTaskABC")
+            task.stop()
+            return
+        time.sleep(2)
+        self.logger.debug("Cyclic send should have stopped as duration expired")
+
+    def SendCommand(self, fid, data, timeout=10, exceptStr=None):
+        """
+
+        :param fid:
+        :param data:
+        :param timeout:
+        :param exceptStr:
+        :return:
+        """
+        with self.bus as bus:
+            msg = can.Message(arbitration_id=fid, data=data)
+            msg.is_extended_id = self.is_extended_id
+            msg.is_fd = self.is_fd
+            try:
+                bus.send(msg, timeout=timeout)
+                self.logger.debug(f"Message sent on {bus.channel_info}, id:{msg.arbitration_id:X}, {msg.data}")
+                # iterate over received messages
+                for msg in bus:
+                    self.logger.debug(f"Message received: {msg.arbitration_id:X}: {msg.data}")
+                # or use an asynchronous notifier
+                notifier = can.Notifier(bus, [print_msg, can.Logger("logfile.asc"), MyListener(bus)])
+                time.sleep(1)
+                notifier.stop()
+            except can.CanError:
+                self.logger.fatal("Message NOT sent")
+
+
 class MyListener(Listener, ABC):
     def __init__(self, bus):
         super(MyListener, self).__init__()
@@ -167,7 +308,7 @@ if __name__ == "__main__":
     pass
     # import conf.globalvar as gv
     # bus = can.Bus(interface='vector', channel=1, bitrate=500000, app_name='python-can')
-    # msg = can.Message(arbitration_id=0x341, data=[0x83, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
+    # msg = can.Message(arbitration_id=0x341, fdata=[0x83, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
     # bus.send(msg)
     bus_test = CanBus(None, interface='vector', channel=1, bitrate=500000, app_name='python-can')
     while True:
