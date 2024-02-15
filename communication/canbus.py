@@ -170,13 +170,17 @@ class CanBus:
 
     def open(self):
         try:
-            self.bus = can.Bus(interface=self.interface, channel=self.channel, bitrate=self.bitrate)
-        except ValueError:
-            pass
+            if self.interface == 'vector':
+                self.bus = can.Bus(interface=self.interface, channel=self.channel, bitrate=self.bitrate,
+                                   app_name=self.appname)
+            elif self.interface == 'pcan':
+                self.bus = can.Bus(interface=self.interface, channel=self.channel, bitrate=self.bitrate)
+            elif self.interface == 'zlg':
+                self.bus = can.Bus(interface=self.interface, channel=self.channel, bitrate=self.bitrate)
+            else:
+                pass
         except Exception as e:
             self.logger.debug('e')
-            self.bus = can.Bus(interface=self.interface, channel=self.channel, bitrate=self.bitrate,
-                               app_name=self.appname)
         else:  # no Exception
             self.uds = UDSonCAN(self.logger, self.bus, self.is_extended_id, self.is_fd)
             return False if self.bus is None else True
