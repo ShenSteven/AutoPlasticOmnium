@@ -49,7 +49,7 @@ def right_round(num, keep_n):
     """
     保留小数位，或者实现四舍五入
     :param num:
-    :param keep_n:
+    :param keep_n: 保留小数位数
     :return:
     """
     if isinstance(num, float):

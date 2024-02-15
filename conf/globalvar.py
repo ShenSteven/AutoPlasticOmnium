@@ -55,6 +55,7 @@ LoginWin = None
 
 PCan = None
 PLin = None
+CANBus = None
 pMsg32 = None
 pMsg33 = None
 

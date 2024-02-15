@@ -250,7 +250,10 @@ class Step:
     @Retry.setter
     def Retry(self, value):
         try:
-            self._Retry = int(value)
+            if value == '':
+                self._Retry = 0
+            else:
+                self._Retry = int(value)
         except ValueError:
             raise
 
@@ -264,7 +267,10 @@ class Step:
     @Timeout.setter
     def Timeout(self, value):
         try:
-            self._Timeout = int(value)
+            if value == '':
+                self._Timeout = 1
+            else:
+                self._Timeout = int(value)
         except ValueError:
             raise
 
@@ -526,6 +532,36 @@ class Step:
     @ID.setter
     def ID(self, value):
         self._ID = value
+
+    @property
+    def RxID(self):
+        if not hasattr(self, '_RxID'):
+            return None
+        return self.parse_var(self._RxID)
+
+    @RxID.setter
+    def RxID(self, value):
+        self._RxID = value
+
+    @property
+    def GRxID(self):
+        if not hasattr(self, '_GRxID'):
+            return None
+        return self.parse_var(self._GRxID)
+
+    @GRxID.setter
+    def GRxID(self, value):
+        self._GRxID = value
+
+    @property
+    def TxID(self):
+        if not hasattr(self, '_TxID'):
+            return None
+        return self.parse_var(self._TxID)
+
+    @TxID.setter
+    def TxID(self, value):
+        self._TxID = value
 
     @property
     def NAD(self):

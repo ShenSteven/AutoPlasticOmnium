@@ -15,10 +15,12 @@ from PyQt5.QtWidgets import QAction, QMessageBox
 
 import bll.mainform
 from common import value_dispatch
+from communication.canbus import CanBus
 from communication.serialport import SerialPort
 from communication.telnet import TelnetComm
 import conf.globalvar as gv
 import time
+
 from communication.visa import VisaComm
 from common.basicfunc import IsNullOrEmpty, kill_process, start_process, restart_process, run_cmd, ping, str_to_int, \
     subStr, assert_value
@@ -328,11 +330,12 @@ def _testKeyword_what(kw, step, test_case):
 
 
 @testKeyword.register('TransferData')
-@testKeyword.register('UDSTransferData')
+@testKeyword.register('UDSonLINTransferData')
 def _testKeyword_what(kw, step, test_case):
+    from communication.uds14229 import get_datas
     compInfo = ''
     path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
-    s19datas = gv.PLin.get_datas(path)
+    s19datas = get_datas(step.logger, path)
     step.logger.debug(path)
     rReturn = gv.PLin.TransferData(step.ID, step.NAD, s19datas, step.PCI_LEN, step.Timeout)
     return rReturn, compInfo
@@ -357,10 +360,11 @@ def _testKeyword_what(kw, step, test_case):
 
 @testKeyword.register('GetCRC')
 def _testKeyword_what(kw, step, test_case):
-    from communication.peak.plin import peaklin
+    # from communication.peak.plin import peaklin
+    from communication.uds14229 import get_crc_apps19
     compInfo = ''
     path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
-    step.testValue = peaklin.PeakLin.get_crc_apps19(step.logger, path)
+    step.testValue = get_crc_apps19(step.logger, path)
     rReturn = not IsNullOrEmpty(step.testValue)
     return rReturn, compInfo
 
@@ -368,7 +372,7 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('SrecGetStartAdd')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    cmd = rf"{gv.CurrentDir}{os.sep}tool{os.sep}srec_info.exe {gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}\{step.CmdOrParam}"
+    cmd = rf"{gv.CurrentDir}{os.sep}tool{os.sep}srec_info.exe {gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
     rReturn, revStr = run_cmd(step.logger, cmd)
 
     if rReturn:
@@ -381,7 +385,7 @@ def _testKeyword_what(kw, step, test_case):
 @testKeyword.register('SrecGetLen')
 def _testKeyword_what(kw, step, test_case):
     compInfo = ''
-    cmd = rf"{gv.CurrentDir}\tool\srec_info.exe {gv.CurrentDir}\flash\{gv.cfg.station.stationName}\{step.myWind.dutModel}\{step.CmdOrParam}"
+    cmd = rf"{gv.CurrentDir}{os.sep}tool{os.sep}srec_info.exe {gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
     rReturn, revStr = run_cmd(step.logger, cmd)
     if rReturn:
         data_len = int(revStr.split()[-1], 16) - int(revStr.split()[-3], 16) + 1
@@ -459,6 +463,52 @@ def _testKeyword_what(kw, step, test_case):
             rReturn = True
     else:
         rReturn = False
+    return rReturn, compInfo
+
+
+@testKeyword.register('CANConnect')
+def _testKeyword_what(kw, step, test_case):
+    rReturn = False
+    compInfo = ''
+
+    if gv.CANBus is None:
+        gv.CANBus = CanBus(step.logger, interface=None, channel=None, bitrate=None, appname=None)
+
+    return rReturn, compInfo
+
+
+@testKeyword.register('UDSonCANSingleFrame')
+@testKeyword.register('CANSingleFrame')
+def _testKeyword_what(kw, step, test_case):
+    compInfo = ''
+    rReturn, revStr = gv.CANBus.uds.SingleFrame(step.RxID, step.GRxID, step.TxID, step.PCI_LEN, step.CmdOrParam,
+                                                step.Timeout)
+    if rReturn and step.CheckStr1 in revStr:
+        step.testValue = subStr(step.SubStr1, step.SubStr2, revStr, step)
+    compInfo, rReturn = assert_value(compInfo, step, rReturn)
+    return rReturn, compInfo
+
+
+@testKeyword.register('UDSonCANMultiFrame')
+@testKeyword.register('CANMultiFrame')
+def _testKeyword_what(kw, step, test_case):
+    compInfo = ''
+    rReturn, revStr = gv.CANBus.uds.MultiFrame(step.RxID, step.GRxID, step.TxID, step.PCI_LEN, step.CmdOrParam,
+                                               step.Timeout)
+    if rReturn and step.CheckStr1 in revStr:
+        step.testValue = subStr(step.SubStr1, step.SubStr2, revStr, step)
+    return rReturn, compInfo
+
+
+@testKeyword.register('CANTransferData')
+@testKeyword.register('UDSonCANTransferData')
+def _testKeyword_what(kw, step, test_case):
+    from communication.uds14229 import get_datas
+    compInfo = ''
+    path = rf"{gv.CurrentDir}{os.sep}flash{os.sep}{gv.cfg.station.stationName}{os.sep}{step.myWind.dutModel}{os.sep}{step.CmdOrParam}"
+    s19datas = get_datas(step.logger, path)
+    step.logger.debug(path)
+    rReturn = gv.CANBus.uds.TransferData(step.RxID, step.GRxID, step.TxID, s19datas, step.PCI_LEN, step.Timeout)
     return rReturn, compInfo
 
 

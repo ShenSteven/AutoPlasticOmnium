@@ -55,7 +55,7 @@ exe = EXE(
     a.scripts,
     [('v', None, 'OPTION')],
     exclude_binaries=True,
-    name='AutoPlasticOmnium',
+    name='AutoBRUSA',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -76,5 +76,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='AutoPlasticOmnium',
+    name='AutoBRUSA',
 )
